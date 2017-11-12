@@ -53,29 +53,29 @@
 
 	Instead of having inline key tests and waiting for the key to release, we can do something better.
 	
-	This key system defines three unsgined, and some bitmasks. On every frame we will check all keys and update
-	our ints appropriately.
+	This key system defines three longs, and some bitmasks. On every frame we will check all keys and update
+	our longs appropriately.
 	
-	In the game logic, we can test these shorts with their bitmasks.
+	In the game logic, we can test these longs with their bitmasks.
 	
-	One int bit will only be 1 when keys are first down, one int bit will always reflect the state of the key
-	and one int bit will only be true on the frame the key is released.
+	One long bit will only be 1 when keys are first down, one long bit will always reflect the state of the key
+	and one long bit will only be true on the frame the key is released.
 	
-	This way, the key can test the keyDown int for the desired key, and it will only be true
-	on the frame that the key was down.
+	This way, the key can test the keysDown long for the desired key, and it will only be true
+	on the frame that the key was first pressed down.
 	
 	Other things, like waking or moving the cursor only care if the key is currently down,
-	and instead can test the keyState int.
+	and instead can test the keysState long.
 	
 	This header will define the public keytest functions as well as the bitmasks for the keys we care about,
 	and a key-update method that we will call at the beginning of every frame.
 	
-	This way, by the time the gamelogic is ready to check keys, the latest-states will be available.
+	This way, by the time the game logic is ready to check keys, the latest-states will be available.
 	
-	We will define three unsigned ints, but they only need to be in the Keys.c file:
-	keyDown
-	keyState
-	keyUp
+	We will define three longs, but they only need to be in the Keys.c file:
+	keysDown
+	keysState
+	keysUp
 	
 	and provide public methods for testing keys with our custom defines, instead of the TI-89 keycodes
 */

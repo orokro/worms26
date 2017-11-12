@@ -37,7 +37,7 @@ long keysDown, keysState, keysUp;
 void Keys_update()
 {
 	// we can use a temporary integer to save the new state of the keys
-	// then we can use that temporary integer to handle the keysDown and keysUp state integers
+	// then we can use that temporary integer to compare for the keysDown and keysUp state integers
 	long tempKeysState = 0;
 	
 	// use ternary operators to apply our bit masks to the keyState integer.
@@ -62,6 +62,7 @@ void Keys_update()
 	(_keytest(RR_4)) ? (tempKeysState |= key4) : (tempKeysState &= ~key4);
 	(_keytest(RR_5)) ? (tempKeysState |= key5) : (tempKeysState &= ~key5);
 	
+	// reset our buffers, since we will write all the bits in the upcomming loop anyway
 	keysDown = 0;
 	keysUp = 0;
 	
