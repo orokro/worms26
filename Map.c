@@ -13,3 +13,12 @@ char Map_testPoint(short x, short y)
 	// TO-DO: implement
 	return FALSE;
 }
+
+// find a free point to spawn something, that doesn't overlap with something else existing
+void Map_getSpawnPoint()
+{
+	// TO-DO: implement
+	Map_lastRequestedSpawnX=0;
+	Map_lastRequestedSpawnY=0;
+	
+}

@@ -132,6 +132,9 @@ short Game_retreatTimer=0;
 // the grace-timer for WormSelect mode
 short Game_graceTimer=0;
 
+// sudden death timer - 10 minutes before sudden death begins
+short Game_suddenDeathTimer=((60*100) * 10);
+
 // the current team, and the current selected worm on each team:
 char Game_currentTeam=1;
 char Game_currentWormUp[2] = {0, 0};

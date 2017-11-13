@@ -35,7 +35,7 @@ char Match_mineFuseLength = 3;
 char Match_dudMines = TRUE;
 
 // playing with oil barrols?
-char Match_oilBarrels = TRUE;
+char Match_oilDrumsEnabled = TRUE;
 
 // allow each type of crate?
 char Match_toolCratesEnabled = TRUE;

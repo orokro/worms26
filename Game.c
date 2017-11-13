@@ -13,7 +13,7 @@
 	gameMode_Cursor
 	gameMode_TurnEnd
 	gameMode_Death
-	gameMode_CrateSpawn
+	gameMode_AfterTurn
 */
 
 // function prototypes for our local game-mode logic methods!
@@ -171,10 +171,22 @@ void Game_changeMode(char newMode)
 /* ----------------------------------------------------------------------------------------
 	 GLOBAL GAME METHODS +++ GLOBAL GAME METHODS +++ GLOBAL GAME METHODS +++ GLOBAL GAME METH
    ---------------------------------------------------------------------------------------- */
-void GameTimers();
+void gameTimers();
+void gameUpdates();
+void startSuddenDeath();
 
-void GameTimers()
+// decrement's all Game Timers
+void gameTimers()
 {
+	// always decreates the sudden death timer
+	Game_suddenDeathTimer--;
+	
+	// note: technically suddenDeathTimer will go negative, but I doubt anyone will play
+	// long enough to get a negative overflow without drowning, so no need to check for negatives
+	// the benefit of this, is that when it's 0 for just one frame, we can init sudden death
+	if(Game_suddenDeathTimer==0)
+		startSuddenDeath();
+		
 	// decrease whichever timer is active
 	if(Game_graceTimer>0)
 		Game_graceTimer--;
@@ -187,6 +199,34 @@ void GameTimers()
 }
 
 
+// sets all the worm's health to 1
+// we don't need a separate variable to know that Sudden Death is on, we can always test against
+// the timer variable being less than 0
+void startSuddenDeath()
+{
+	// we don't even need to test for active worms, just make 'em all 0
+	short i=0;
+	for(i=0; i<16; i++)
+		Worm_health[i]=1;
+}
+
+
+// this handles all the updates for the Game mode.
+// this is not called during the pause menu, but everywhere else, mostly yes
+void gameUpdates()
+{
+	// decrease game timers
+	gameTimers();
+	
+	// update OilDrums
+	OilDrum_update();
+	
+	// update explosions
+	// NOTE: this comes last because after an explosion has had its first frame
+	// it disables that bit... gotta make sure everyone else on this frame has a
+	// chance to see it
+	Explosion_update();
+}
 
 
 
@@ -227,7 +267,7 @@ void WormSelect_update()
 		Game_changeMode(gameMode_Turn);
 		
 	// Game timers are counting during WormSelect
-	GameTimers();
+	gameTimers();
 }
 
 void WormSelect_exit()
@@ -392,7 +432,7 @@ void WeaponSelect_update()
 	}
 	
 	// timer still runs in this mode
-	GameTimers();
+	gameTimers();
 	
 	// draw the weapons menu!
 	Draw_renderWeaponsMenu(weaponSelectX, weaponSelectY);	
@@ -570,7 +610,7 @@ void Cursor_update()
 	}
 	
 	// timer still runs in this mode
-	GameTimers();
+	gameTimers();
 	
 	// draw the weapons menu!
 	Draw_renderWeaponsMenu(weaponSelectX, weaponSelectY);	
