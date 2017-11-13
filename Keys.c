@@ -16,7 +16,7 @@
 	keyBackflip
 	keyCameraControl
 	keyEscape
-	keyWeaponsMenu
+	keyWeaponsSelect
 	keyWormSelect
 	keyLeft
 	keyRight
