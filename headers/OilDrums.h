@@ -21,12 +21,12 @@ short OilDrum_x[8];
 short OilDrum_y[8];
 
 // health of our oil drums
-short OilDrum_health[8] = {100, 100, 100, 100, 100, 100, 100, 100};
+char OilDrum_health[8] = {30, 30, 30, 30, 30, 30, 30, 30};
 
 // this int will be a bit-wise mask for the drums
 // the first 8 bits will represent if the drums are active or not
 int OilDrum_active = 0;
 
 // function prototypes
-void OilDrum_spawnDrums();
-void OilDrum_update();
+void OilDrums_spawnDrums();
+void OilDrums_update();

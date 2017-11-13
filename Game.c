@@ -218,8 +218,9 @@ void gameUpdates()
 	// decrease game timers
 	gameTimers();
 	
-	// update OilDrums
-	OilDrum_update();
+	// update OilDrums, Crates, Mines
+	OilDrums_update();
+	Crates_update();
 	
 	// update explosions
 	// NOTE: this comes last because after an explosion has had its first frame
@@ -266,8 +267,8 @@ void WormSelect_update()
 	if(Keys_keyDown(keyAny)==TRUE && Keys_keyDown(keyWormSelect)==FALSE)
 		Game_changeMode(gameMode_Turn);
 		
-	// Game timers are counting during WormSelect
-	gameTimers();
+	// All regular game-updates during this mode
+	gameUpdates();
 }
 
 void WormSelect_exit()
@@ -321,12 +322,10 @@ void Turn_enter()
 
 void Turn_update()
 {
-	
-		
 	// all key-logic and movement logic for the worm will happen in WormsUpdate
 	
-	// Game timers are counting the Turn mode...
-	gameTimers();
+	// All regular game-updates during this mode
+	gameUpdates();
 	
 	// if the user pressed escape, we should goto the pause menu
 	if(Keys_keyDown(keyEscape)==TRUE)
@@ -431,8 +430,8 @@ void WeaponSelect_update()
 		// TO-DO: implement
 	}
 	
-	// timer still runs in this mode
-	gameTimers();
+	// All regular game-updates during this mode
+	gameUpdates();
 	
 	// draw the weapons menu!
 	Draw_renderWeaponsMenu(weaponSelectX, weaponSelectY);	
@@ -540,6 +539,10 @@ void Cursor_enter()
 
 void Cursor_update()
 {
+	
+	// All regular game-updates during this mode
+	gameUpdates();
+	
 	// for each cursor key, move the cursor position, when its pressed
 	if(Keys_keyDown(keyLeft)==TRUE)
 		Game_cursorX--;
@@ -609,9 +612,6 @@ void Cursor_update()
 		}
 	}
 	
-	// timer still runs in this mode
-	gameTimers();
-	
 	// draw the weapons menu!
 	Draw_renderWeaponsMenu(weaponSelectX, weaponSelectY);	
 }
@@ -638,7 +638,8 @@ void TurnEnd_enter()
 
 void TurnEnd_update()
 {
-	
+	// All regular game-updates during this mode
+	gameUpdates();
 }
 
 void TurnEnd_exit()
@@ -657,7 +658,8 @@ void Death_enter()
 
 void Death_update()
 {
-	
+	// All regular game-updates during this mode
+	gameUpdates();
 }
 
 void Death_exit()
@@ -676,7 +678,7 @@ void AfterTurn_enter()
 
 void AfterTurn_update()
 {
-	
+
 }
 
 void AfterTurn_exit()

@@ -8,7 +8,7 @@ void spawnDrum(short);
 void checkExplosions(short);
 
 // spawns OilDrums on the map, if they're enabled
-void OilDrum_spawnDrums()
+void OilDrums_spawnDrums()
 {
 	if(Match_oilDrumsEnabled==TRUE)
 	{
@@ -34,7 +34,7 @@ void spawnDrum(short index)
 }
 
 // main update for oil drums
-void OilDrum_update()
+void OilDrums_update()
 {
 	// if any of the active OilDrums have less than 0 health, create an explosion
 	// and set it inactive for the rest of the game
