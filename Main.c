@@ -3,6 +3,18 @@
 
 void *doubleBuffer;
 
+short dist(short x1, short y1, short x2, short y2)
+{
+	short a = abs(x2-x1);
+	short b = abs(y2-y1);
+	short aSquared = a*a;
+	short bSquared = b*b;
+	short cSquared = aSquared+bSquared;
+	short c = (short)sqrt((float)cSquared);
+	return c;
+}
+
+
 // Main Function
 void _main(void)
 {

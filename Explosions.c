@@ -97,5 +97,8 @@ void updateExplosion(short index)
 	
 	// draw the explosion on our MapBuffers to erase map
 	// TO-DO: implement explosion drawing
+	
+	// prevent warnings for now
+	radius = radius;
 
 }

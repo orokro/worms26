@@ -326,7 +326,7 @@ void Turn_update()
 	// all key-logic and movement logic for the worm will happen in WormsUpdate
 	
 	// Game timers are counting the Turn mode...
-	GameTimers();
+	gameTimers();
 	
 	// if the user pressed escape, we should goto the pause menu
 	if(Keys_keyDown(keyEscape)==TRUE)

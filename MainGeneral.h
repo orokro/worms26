@@ -60,3 +60,6 @@
 
 // super-global variables
 short GameRunning=TRUE;
+
+// super-glogal prototypes
+short dist(short, short, short, short);

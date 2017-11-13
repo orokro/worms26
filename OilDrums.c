@@ -5,9 +5,10 @@
 
 // function prototypes
 void spawnDrum(short);
+void checkExplosions(short);
 
 // spawns OilDrums on the map, if they're enabled
-OilDrum_spawnDrums()
+void OilDrum_spawnDrums()
 {
 	if(Match_oilDrumsEnabled==TRUE)
 	{
@@ -42,13 +43,71 @@ void OilDrum_update()
 	{
 		// check if enabled and health is <= 0... then boom
 		char enabled = (char)((OilDrum_active & (int)1<<(i)) > 0);
-		if(enabled==TRUE && OilDrum_health[i]<=0)
+		if(enabled==TRUE)
 		{
-			// boom
-			Explosion_spawn(OilDrum_x[i], OilDrum_y[i], 10, 10, TRUE);
 			
-			// no longer active
-			OilDrum_active &= ~((int)1<<(i));
-		}
+			// check all explosions if they are near-by and damaging this oildrum
+			checkExplosions(i);
+			
+			// if ded
+			if(OilDrum_health[i]<=0)
+			{
+				// boom
+				Explosion_spawn(OilDrum_x[i], OilDrum_y[i], 10, 10, TRUE);
+				
+				// no longer active
+				OilDrum_active &= ~((int)1<<(i));
+				
+				// nothing left to check on this drum
+				continue;
+			}// end if health<=0
+
+		}// end if active
+		
+	}// next i
+}
+
+// loop over explosions, and if there are any first-frame explosions, see if they hit us
+void checkExplosions(short index)
+{
+	short i=0; 
+	for(i=0; i<8; i++)
+	{
+		// check if the explosion is in it's first-frame
+		char firstFrame = (char)((Explosion_firstFrame & (int)1<<(i))>0);
+		
+		// only do shit if first frame, yo
+		if(firstFrame==TRUE)
+		{
+				
+			// if it's in it's first frame, calculate the distance from us to it:
+			short d = dist(OilDrum_x[index], OilDrum_y[index], Explosion_x[i], Explosion_y[i]);
+			
+			// if we're withing the blast radius, take full damage:
+			if(d<Explosion_size[i])
+			{
+				OilDrum_health[index] -= Explosion_power[i];
+				continue;
+			}// end if within exp radius
+			
+			// calculate the extranius radius, with a power-fall off
+			short largerRadius = (short)(1.5f * Explosion_size[i]);
+			if(d<largerRadius)
+			{
+				// subract the minimum radius from both:
+				short minD = d - Explosion_size[i];
+				short minL = largerRadius - Explosion_size[i];
+				
+				// calculate how far away we are:
+				float distFallOffRatio = (1.0f - ((float)minD/(float)minL));
+				
+				// apply only this much damage:
+				OilDrum_health[index] -= (Explosion_power[i] * distFallOffRatio);
+				
+				continue;
+			}// end if within larger radius
+			
+		}// end if first frame
+		
 	}// next i
 }
