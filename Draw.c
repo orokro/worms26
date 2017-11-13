@@ -1,7 +1,7 @@
 // C Source File
 // Created 11/11/2017; 11:34:12 PM
 
-#include "../MainSubFolder.h"
+#include "../Main.h"
 
 
 // main drawing routine for the game, e.g. map, worms, weapons, etc

@@ -1,7 +1,7 @@
 // C Source File
 // Created 11/11/2017; 11:34:14 PM
 
-#include "../MainSubFolder.h"
+#include "../Main.h"
 
 // boolean if Camera is focused on something
 char cameraIsFocused = FALSE;

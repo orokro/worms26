@@ -1,5 +1,5 @@
 
-#include "Main.h"
+#include "../Main.h"
 
 void *doubleBuffer;
 

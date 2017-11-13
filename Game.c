@@ -1,7 +1,7 @@
 // C Source File
 // Created 11/12/2017; 4:26:32 PM
 
-#include "../MainSubFolder.h"
+#include "../Main.h"
 
 /* 
 	For reference, Game modes:
