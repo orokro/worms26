@@ -38,9 +38,9 @@ void TurnEnd_exit();
 void Death_enter();
 void Death_update();
 void Death_exit();
-void CrateSpawn_enter();
-void CrateSpawn_update();
-void CrateSpawn_exit();
+void AfterTurn_enter();
+void AfterTurn_update();
+void AfterTurn_exit();
 void GameOver_enter();
 void GameOver_update();
 void GameOver_exit();
@@ -83,8 +83,8 @@ void Game_update()
 		case gameMode_Death:
 			Death_update();
 			break;
-		case gameMode_CrateSpawn:
-			CrateSpawn_update();
+		case gameMode_AfterTurn:
+			AfterTurn_update();
 			break;
 		case gameMode_GameOver:
 			GameOver_update();
@@ -119,8 +119,8 @@ void Game_changeMode(char newMode)
 		case gameMode_Death:
 			Death_exit();
 			break;
-		case gameMode_CrateSpawn:
-			CrateSpawn_exit();
+		case gameMode_AfterTurn:
+			AfterTurn_exit();
 			break;
 		case gameMode_GameOver:
 			GameOver_exit();
@@ -157,8 +157,8 @@ void Game_changeMode(char newMode)
 		case gameMode_Death:
 			Death_enter();
 			break;
-		case gameMode_CrateSpawn:
-			CrateSpawn_enter();
+		case gameMode_AfterTurn:
+			AfterTurn_enter();
 			break;
 		case gameMode_GameOver:
 			GameOver_enter();
@@ -627,19 +627,19 @@ void Death_exit()
 
 
 /* ----------------------------------------------------------------------------------------
-	 CRATE SPAWN +++ CRATE SPAWN +++ CRATE SPAWN +++ CRATE SPAWN +++ CRATE SPAWN +++ CRATE SP
+	 AFTER TURN +++ AFTER TURN +++ AFTER TURN +++ AFTER TURN +++ AFTER TURN +++ AFTER TURN ++
    ---------------------------------------------------------------------------------------- */
-void CrateSpawn_enter()
+void AfterTurn_enter()
 {
 	
 }
 
-void CrateSpawn_update()
+void AfterTurn_update()
 {
 	
 }
 
-void CrateSpawn_exit()
+void AfterTurn_exit()
 {
 	
 }

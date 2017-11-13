@@ -92,7 +92,7 @@
 				
 				After all the worms have exploded and things have "settled" we can continue to Crate Spawn mode
 			
-		7 - Crate Spawn Mode
+		7 - After Turn Mode
 				After a turn is comlpete, but before the next turn, occasionally crates can spawn.
 				
 				A random number will be picked, and if within threshold, a random crate will spawn somewhere on the
@@ -101,8 +101,7 @@
 				Before this mode can exit, the crate must land on the ground, and "settle". If the user presses
 				the keyAction, the parachut will cancel and regular gravity will apply.
 				
-				Even if a crate was NOT spawned, at the end of this mode the game will toggle teams, and set the mode
-				back to Worm Select Mode
+				This mode is also where the water will rise if sudden death is enabled
 				
 		8 - Game Over
 				When one team is completely elimated, or the game ends in a draw, it automatically goes to Game Over mode.
@@ -113,7 +112,7 @@
 				
 				After the user confirms the annoucement with any key, the game will exit.
 */
-enum GameModes {gameMode_WormSelect, gameMode_Turn, gameMode_WeaponSelect, gameMode_Pause, gameMode_Cursor, gameMode_TurnEnd, gameMode_Death, gameMode_CrateSpawn, gameMode_GameOver};
+enum GameModes {gameMode_WormSelect, gameMode_Turn, gameMode_WeaponSelect, gameMode_Pause, gameMode_Cursor, gameMode_TurnEnd, gameMode_Death, gameMode_AfterTurn, gameMode_GameOver};
 
 
 // global game properties
