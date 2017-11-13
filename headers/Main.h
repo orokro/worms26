@@ -62,8 +62,13 @@
 
 // include all our headers in dependency order
 #include "extgraph.h"
+#include "match.h"
 #include "Keys.h"
 #include "Camera.h"
 #include "Draw.h"
 #include "Map.h"
-#include "Worm.h"
+#include "Worms.h"
+#include "Game.h"
+
+// super-global variables
+short GameRunning=TRUE;

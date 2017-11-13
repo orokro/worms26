@@ -48,7 +48,7 @@ void Keys_update()
 	(_keytest(RR_ALPHA)) ? (tempKeysState |= keyBackflip) : (tempKeysState &= ~keyBackflip);
 	(_keytest(RR_SHIFT)) ? (tempKeysState |= keyCameraControl) : (tempKeysState &= ~keyCameraControl);
 	(_keytest(RR_ESC)) ? (tempKeysState |= keyEscape) : (tempKeysState &= ~keyEscape);
-	(_keytest(RR_F1) || _keytest(RR_CATALOG)) ? (tempKeysState |= keyWeaponsMenu) : (tempKeysState &= ~keyWeaponsMenu);
+	(_keytest(RR_F1) || _keytest(RR_CATALOG)) ? (tempKeysState |= keyWeaponsSelect) : (tempKeysState &= ~keyWeaponsSelect);
 	(_keytest(RR_APPS)) ? (tempKeysState |= keyWormSelect) : (tempKeysState &= ~keyWormSelect);
 	(_keytest(RR_LEFT)) ? (tempKeysState |= keyLeft) : (tempKeysState &= ~keyLeft);
 	(_keytest(RR_RIGHT)) ? (tempKeysState |= keyRight) : (tempKeysState &= ~keyRight);

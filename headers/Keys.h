@@ -88,7 +88,7 @@
 #define keyBackflip (long)4				//00000000000000000000000000000100
 #define keyCameraControl (long)8	//00000000000000000000000000001000
 #define keyEscape (long)16				//00000000000000000000000000010000
-#define keyWeaponsMenu (long)32		//00000000000000000000000000100000
+#define keyWeaponsSelect (long)32	//00000000000000000000000000100000
 #define keyWormSelect (long)64		//00000000000000000000000001000000
 #define keyLeft (long)128					//00000000000000000000000010000000
 #define keyRight (long)256				//00000000000000000000000100000000
@@ -101,6 +101,13 @@
 #define key3 (long)32768					//00000000000000001000000000000000
 #define key4 (long)65536					//00000000000000010000000000000000
 #define key5 (long)131072					//00000000000000100000000000000000
+
+// note this key: because it's all 1's, it will always return true when & on any other int,
+// so long as at least ONE bit is set. This way, we can test for any-key
+#define keyAny (long)262143				//00000000000000111111111111111111
+
+// this works similar to keyAny, except just for the direction keys
+#define keyCursors (long)1920			//00000000000000000000011110000000
 
 // useful macro to check a single bit
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos)))

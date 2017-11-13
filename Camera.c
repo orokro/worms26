@@ -4,7 +4,7 @@
 #include "Main.h"
 
 // boolean if Camera is focused on something
-char isFocused = 0;
+char cameraIsFocused = FALSE;
 
 /* 
 	Pointers to shorts that the Camera should focus on.
@@ -19,20 +19,71 @@ char isFocused = 0;
 short *cameraTargetX;
 short *cameraTargetY;
 
+// if the user is controlling the camera, keep track of the users
+// camera offset
+short userX=0;
+short userY=0;
 
 // this is the main update function for the logic of the Camera.
-Camera_update()
+void Camera_update()
 {
+	// if this is the first frame that shift was pressed,
+	// we should reset the user offsets to whatever the camera's current
+	// position is..
+	if(Keys_keyDown(keyCameraControl)==TRUE)
+	{
+		userX = camX;
+		userY = camY;
+	}
 	
+	// if shift is down, we should test for the arrow keys for camera control:
+	if(Keys_keyState(keyCameraControl)==TRUE)
+	{
+		if(Keys_keyState(keyLeft)==TRUE) userX--;
+		if(Keys_keyState(keyRight)==TRUE) userX++;
+		if(Keys_keyState(keyUp)==TRUE) userY--;
+		if(Keys_keyState(keyDown)==TRUE) userY++;
+		
+		// at this point, the camera should just be the user-set value:
+		camX = userX;
+		camY = userY;
+		
+		// and we out
+		return;
+	}
+	
+	// if we are focusing on a target, we should move towards it...
+	if(cameraIsFocused==TRUE)
+	{
+		// calc deltas:
+		short deltaX = (*cameraTargetX - camX);
+		short deltaY = (*cameraTargetY - camY);
+		
+		// move just some small percent
+		short moveX = (short)(deltaX * 0.2f);
+		short moveY = (short)(deltaY * 0.2f);
+		
+		// move the camera pos:
+		camX += moveX;
+		camY += moveY;
+	}
 }
 
 // tell the Camera to focus on a pair of X/Y coordinates
-Camera_focusOn(short *targetX, short *target Y)
+void Camera_focusOn(short *targetX, short *targetY)
 {
+	// save our target pointers
+	cameraTargetX = targetX;
+	cameraTargetY = targetY;
 	
+	// we are now in camera follow mode:
+	cameraIsFocused=TRUE;
 }
 
-Camera_clearFocus()
+// stop the camera from focusing on anything in particular
+void Camera_clearFocus()
 {
-	
+	// just disable the focus mode, no need to clear pointers
+	// since they won't be used until set again
+	cameraIsFocused=FALSE;
 }

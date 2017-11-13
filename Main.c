@@ -29,9 +29,11 @@ void _main(void)
 		DrawStr(0, 30, "Keys State:", A_NORMAL);
 		DrawStr(0, 60, "Keys Up:", A_NORMAL);
 		
-		
 		// update keystates
 		Keys_update();
+		
+		// update camera position
+		Camera_update();
 		
 		// loop from 1 to 20 and show the states of our keys on the screen
 		for(i=0; i<19; i++)
