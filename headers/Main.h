@@ -14,5 +14,6 @@
 #include "../OilDrums.h"
 #include "../Mines.h"
 #include "../Crates.h"
+#include "../Weapons.h"
 #include "../Game.h"
 

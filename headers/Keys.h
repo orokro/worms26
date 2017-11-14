@@ -35,7 +35,7 @@
 	The game only cares about the following keys:
 	
 	2nd - fire, place target, select weapon from weapons menu
-	Enter - same as 2nd
+	Enter - same as 2nd, but also acts as secondary fire for for weapons or droping from ropes, etc
 	diamond - jump
 	alpha - backflip
 	shift - enable manual camera scrolling
@@ -101,10 +101,11 @@
 #define key3 (long)32768					//00000000000000001000000000000000
 #define key4 (long)65536					//00000000000000010000000000000000
 #define key5 (long)131072					//00000000000000100000000000000000
+#define keyAction2 (long)262144		//00000000000001000000000000000000
 
 // note this key: because it's all 1's, it will always return true when & on any other int,
 // so long as at least ONE bit is set. This way, we can test for any-key
-#define keyAny (long)262143				//00000000000000111111111111111111
+#define keyAny (long)262143				//00000000000001111111111111111111
 
 // this works similar to keyAny, except just for the direction keys
 #define keyCursors (long)1920			//00000000000000000000011110000000

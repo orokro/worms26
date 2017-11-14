@@ -206,10 +206,18 @@ void gameUpdates()
 	// decrease game timers
 	gameTimers();
 	
-	// update OilDrums, Crates, Mines
-	OilDrums_update();
-	Crates_update();
-	Mines_update();
+	// update OilDrums, Crates, Mines, Weapons
+	if(OilDrum_active)
+		OilDrums_update();
+	
+	if(Crate_active>0)
+		Crates_update();
+	
+	if(Mine_active>0)
+		Mines_update();
+		
+	if(Weapon_active>0)
+		Weapons_update();
 	
 	// update explosions
 	// NOTE: this comes last because after an explosion has had its first frame
@@ -602,6 +610,7 @@ void Cursor_update()
 			
 			// at this point we should do whatever weaponspawning junk we need to do..
 			// TO-DO: implement
+			Weapons_setTarget(Game_xMarkSpotX, Game_xMarkSpotY);
 			
 			// depending on the type of weaponing being used
 			// this should either return to TURN mode, or goto TurnEND
@@ -676,16 +685,16 @@ char waterLevelTimer=0;
 void AfterTurn_enter()
 {
 	// incase of sudden death
-	waterlevelTime=10;
+	waterLevelTimer=10;
 }
 
 void AfterTurn_update()
 {
 	// if sudden death is active, we should increase the water level
-	if((Game_suddenDeathTimer<=0) && waterLevelTime>0)
+	if((Game_suddenDeathTimer<=0) && waterLevelTimer>0)
 	{
 		Game_waterLevel++;
-		waterlevelTime--;
+		waterLevelTimer--;
 		return;
 	}
 	
