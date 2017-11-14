@@ -199,18 +199,6 @@ void gameTimers()
 }
 
 
-// sets all the worm's health to 1
-// we don't need a separate variable to know that Sudden Death is on, we can always test against
-// the timer variable being less than 0
-void startSuddenDeath()
-{
-	// we don't even need to test for active worms, just make 'em all 0
-	short i=0;
-	for(i=0; i<16; i++)
-		Worm_health[i]=1;
-}
-
-
 // this handles all the updates for the Game mode.
 // this is not called during the pause menu, but everywhere else, mostly yes
 void gameUpdates()
@@ -221,6 +209,7 @@ void gameUpdates()
 	// update OilDrums, Crates, Mines
 	OilDrums_update();
 	Crates_update();
+	Mines_update();
 	
 	// update explosions
 	// NOTE: this comes last because after an explosion has had its first frame
@@ -230,7 +219,16 @@ void gameUpdates()
 }
 
 
-
+// sets all the worm's health to 1
+// we don't need a separate variable to know that Sudden Death is on, we can always test against
+// the timer variable being less than 0
+void startSuddenDeath()
+{
+	// we don't even need to test for active worms, just make 'em all 0
+	short i=0;
+	for(i=0; i<16; i++)
+		Worm_health[i]=1;
+}
 
 
 /* ----------------------------------------------------------------------------------------
@@ -671,14 +669,26 @@ void Death_exit()
 /* ----------------------------------------------------------------------------------------
 	 AFTER TURN +++ AFTER TURN +++ AFTER TURN +++ AFTER TURN +++ AFTER TURN +++ AFTER TURN ++
    ---------------------------------------------------------------------------------------- */
+// during the after turn, the water will take 10 frames to advance 10 pixels...
+// this is that timer
+char waterLevelTimer=0;
+
 void AfterTurn_enter()
 {
-	
+	// incase of sudden death
+	waterlevelTime=10;
 }
 
 void AfterTurn_update()
 {
-
+	// if sudden death is active, we should increase the water level
+	if((Game_suddenDeathTimer<=0) && waterLevelTime>0)
+	{
+		Game_waterLevel++;
+		waterlevelTime--;
+		return;
+	}
+	
 }
 
 void AfterTurn_exit()

@@ -135,6 +135,9 @@ short Game_graceTimer=0;
 // sudden death timer - 10 minutes before sudden death begins
 long Game_suddenDeathTimer=(long)((long)((long)60*(long)100) * (long)10);
 
+// water level for sudden death:
+long Game_waterLevel = 0;
+
 // the current team, and the current selected worm on each team:
 char Game_currentTeam=1;
 char Game_currentWormUp[2] = {0, 0};
