@@ -42,10 +42,13 @@ short Worm_yVelo[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 char Worm_dir[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // the current HEALTH of the worm
-char Worm_health[16] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100 };
+char Worm_health[16] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
-// if the worm is DEAD 0 = ALIVE, 1 = DEAD
-char Worm_isDead[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+// bit mask if the worm is dead. bit 1 = dead, bit = 0 or live
+int Worm_isDead = 0;
+
+// bit mask if the worm is ACTIVE... different that dead.
+long Worm_active = 0;
 
 // worms can be in various states, depending on the game mode or their physical situation
 // this ENUM defines the possible states of a Worm

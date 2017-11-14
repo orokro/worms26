@@ -24,7 +24,6 @@ void Explosion_spawn(short x, short y, char size, char power, char hasFire)
 			break;
 		}else
 		{
-		
 			// if its not yet set, or its a new lowest time, save this index
 			if(lowestTimeIndex==-1)
 				lowestTimeIndex=i;
