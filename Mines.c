@@ -30,7 +30,7 @@ void spawnMine(char index)
 	Mine_x[(short)index] = Map_lastRequestedSpawnX;
 	Mine_y[(short)index] = Map_lastRequestedSpawnY;
 	
-	// set timeer for the mine
+	// set timer for the mine
 	Mine_fuse[(short)index] = Match_mineFuseLength;
 }
 

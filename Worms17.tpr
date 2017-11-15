@@ -50,7 +50,7 @@ Use Return Value=0
 Enable Error Return=0
 Save Screen=1
 [File Editing]
-Open File=C:\Users\Dude\Desktop\worms89-master\WormsNew\Game.c
+Open File=C:\Users\Weakling\Downloads\WormsNew2\WormsNew\headers\Worms.h
 [Included Files]
 C File 1=Mines.c
 C File 1 Folder=GameObjects

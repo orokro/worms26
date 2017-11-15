@@ -59,7 +59,7 @@
 	 0b0000000000000000}
 
 // super-global variables
-short GameRunning=TRUE;
+char GameRunning=TRUE;
 
 // super-glogal prototypes
 short dist(short, short, short, short);

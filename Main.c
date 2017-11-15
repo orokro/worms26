@@ -20,7 +20,7 @@ short dist(short x1, short y1, short x2, short y2)
 void _main(void)
 {
 	// enable double-buffering
-  GrayDBufInit(doubleBuffer);
+  // GrayDBufInit(doubleBuffer);
   
   // Sets It Up For _keytest usage..
 	INT_HANDLER save_1 = GetIntVec(AUTO_INT_1); 
@@ -28,15 +28,38 @@ void _main(void)
 	SetIntVec(AUTO_INT_1, DUMMY_HANDLER); 
 	SetIntVec(AUTO_INT_5, DUMMY_HANDLER); 
 	
+	void *virtual=malloc (LCD_SIZE);
+	
+	//char virtual[LCD_SIZE];
+	PortSet (virtual, 239, 127);
+	
 	// main loop!
 	while(GameRunning==TRUE)
 	{		
 		// it all happens here
-		Game_update();
+		//Game_update();
+		clrscr();
+		Keys_update();
+		short i=0;
+		for(i=0; i<18; i++)
+		{
+			long mask = (long)((long)1<<(i));
+			DrawChar(0+i*6, 0, (Keys_keyDown(mask)==TRUE ? '1' : '0'), A_NORMAL);
+			DrawChar(0+i*6, 10, (Keys_keyState(mask)==TRUE ? '1' : '0'), A_NORMAL);
+			DrawChar(0+i*6, 20, (Keys_keyUp(mask)==TRUE ? '1' : '0'), A_NORMAL);
+			
+		}
+		
+		if(Keys_keyState(keyAction) && Keys_keyDown(keyEscape))
+			GameRunning=FALSE;
+			
+		memcpy (LCD_MEM, virtual, LCD_SIZE);
 	}
 	
+	LCD_restore (virtual);
+	
 	// free our double buffering buffer
-	free(doubleBuffer);
+	// free(doubleBuffer);
 	
 	//resets key stuff
 	SetIntVec(AUTO_INT_1, save_1); 

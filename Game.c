@@ -206,10 +206,12 @@ void gameUpdates()
 	// decrease game timers
 	gameTimers();
 	
+	return;
+	
 	// update OilDrums, Crates, Mines, Weapons
 	if(OilDrum_active)
 		OilDrums_update();
-	
+
 	if(Crate_active>0)
 		Crates_update();
 	
@@ -232,7 +234,7 @@ void gameUpdates()
 // the timer variable being less than 0
 void startSuddenDeath()
 {
-	// we don't even need to test for active worms, just make 'em all 0
+	// we don't even need to test for active worms, just make 'em all 1hp
 	short i=0;
 	for(i=0; i<16; i++)
 		Worm_health[i]=1;
@@ -299,7 +301,7 @@ void nextWorm()
 			Game_currentWormUp[(short)Game_currentTeam] = 0;
 			
 		// worms 0-7 are team 0 and 8-15 are team 1, math helps us:
-		char teamWorm = (Game_currentTeam * 8) * Game_currentWormUp[(short)Game_currentTeam];
+		char teamWorm = (Game_currentTeam * 8) + Game_currentWormUp[(short)Game_currentTeam];
 		
 		// make sure he is not dead:
 		if(Worm_health[(short)teamWorm]>0)
@@ -529,7 +531,7 @@ char cursorFastMove=0;
 
 void Cursor_enter()
 {
-	// when we enter this mode, allways put the cursor over the current worm:
+	// when we enter this mode, always put the cursor over the current worm:
 	Game_cursorX = Worm_x[(short)Worm_currentWorm];
 	Game_cursorY = Worm_y[(short)Worm_currentWorm];
 	
@@ -678,7 +680,7 @@ void Death_exit()
 /* ----------------------------------------------------------------------------------------
 	 AFTER TURN +++ AFTER TURN +++ AFTER TURN +++ AFTER TURN +++ AFTER TURN +++ AFTER TURN ++
    ---------------------------------------------------------------------------------------- */
-// during the after turn, the water will take 10 frames to advance 10 pixels...
+// during the after turn in sudden death, the water will take 10 frames to advance 10 pixels...
 // this is that timer
 char waterLevelTimer=0;
 

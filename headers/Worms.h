@@ -16,7 +16,7 @@
 /*
 	Worm Arrays...
 	
-	Since C doesn't have Ojects (and even if it did they'd be too expensive on TI-89...
+	Since C doesn't have Ojects (and even if it did they'd be too expensive on TI-89...)
 	
 	We will store all the worms properties in a set of arrays.
 	
@@ -35,8 +35,8 @@ short Worm_x[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 short Worm_y[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // the current X/Y velocity of the worm, if it was knocked back by an explosion, etc
-short Worm_xVelo[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-short Worm_yVelo[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Worm_xVelo[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Worm_yVelo[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // the direction the worm is currently FACING.. 0 = LEFT 1 = RIGHT
 char Worm_dir[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -44,8 +44,8 @@ char Worm_dir[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 // the current HEALTH of the worm
 char Worm_health[16] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
-// bit mask if the worm is dead. bit 1 = dead, bit = 0 or live
-int Worm_isDead = 0;
+// bit mask if the worm is dead. bit 1 = dead, bit = 0 alive
+long Worm_isDead = 0;
 
 // bit mask if the worm is ACTIVE... different that dead.
 long Worm_active = 0;

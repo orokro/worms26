@@ -11,9 +11,9 @@
 	They can either be enabled, or disabled for a match.
 	If disabled, they will not spawn.
 	
-	Crates have no velocity - they can fall down, but not moved otherwise.
+	OilDrums have no velocity - they can fall down, but not moved otherwise.
 	
-	Crates have health, and will explode if drained of health.
+	OilDrums have health, and will explode if drained of health.
 */
 
 // x/y positions of our oil drums

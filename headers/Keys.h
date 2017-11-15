@@ -41,8 +41,8 @@
 	shift - enable manual camera scrolling
 	escape - pause game, or exit weapons menu
 	catalog - open weapon menu
-	apps - select worm in worm-select mode	
 	F1 - open weapon menu
+	apps - select worm in worm-select mode	
 	up/down/left/right - move worm, aim, pan camera, move arrow, select weapon
 	plus - rotate girder clockwise
 	minus - rotate girder counter-clockwise
@@ -64,7 +64,7 @@
 	This way, the key can test the keysDown long for the desired key, and it will only be true
 	on the frame that the key was first pressed down.
 	
-	Other things, like waking or moving the cursor only care if the key is currently down,
+	Some things, like walking or moving the cursor only care if the key is currently down,
 	and instead can test the keysState long.
 	
 	This header will define the public keytest functions as well as the bitmasks for the keys we care about,
@@ -109,9 +109,6 @@
 
 // this works similar to keyAny, except just for the direction keys
 #define keyCursors (long)1920			//00000000000000000000011110000000
-
-// useful macro to check a single bit
-#define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
 
 // function declarations
 void Keys_update();

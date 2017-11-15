@@ -31,11 +31,11 @@ short Mine_x[10];
 short Mine_y[10];
 
 // velocity of mines
-short Mine_xVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-short Mine_yVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Mine_xVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Mine_yVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // fuse of mines
-short Mine_fuse[10] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+char Mine_fuse[10] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
 // is the mine active?
 int Mine_active=0;

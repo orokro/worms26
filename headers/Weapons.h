@@ -19,7 +19,7 @@
 	- .. and more
 	
 	Each weapon has it's on unique behavoir, however, some behavoirs can be
-	shared between many weapons. For example, hande greands and cluster bombs
+	shared between many weapons. For example, hand grenands and cluster bombs
 	both are fired and have physics. When the cluser explodes it will create
 	more bomb particles, where as the grenade just explodes.
 	

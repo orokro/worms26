@@ -7,8 +7,8 @@
 // main drawing routine for the game, e.g. map, worms, weapons, etc
 void Draw_renderGame()
 {
-	
-	
+	ClrScr();
+	DrawStr(0,0,"mode", A_NORMAL);	
 }
 
 
@@ -17,7 +17,8 @@ void Draw_renderPauseMenu(char menuItem)
 {
 	// prevent warnings for now
 	menuItem=menuItem;
-	
+	ClrScr();
+	DrawStr(0,0,"mode", A_NORMAL);	
 }
 
 
@@ -27,5 +28,7 @@ void Draw_renderWeaponsMenu(char wx, char wy)
 	// prevent warnings for now
 	wx=wx;
 	wy=wy;
+	ClrScr();
+	DrawStr(0,0,"mode", A_NORMAL);	
 	
 }

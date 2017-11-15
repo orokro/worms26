@@ -36,58 +36,42 @@ long keysDown, keysState, keysUp;
 // can have access to the current state of the logical keys
 void Keys_update()
 {
-	// we can use a temporary integer to save the new state of the keys
-	// then we can use that temporary integer to compare for the keysDown and keysUp state integers
-	long tempKeysState = 0;
+	// save the current keystate before we update it below, so we can compare agsint it
+	// to see what changed
+	long lastKeysState = keysState;
 	
-	// use ternary operators to apply our bit masks to the keyState integer.
-	// with the OR operation, we can turn the proper bits to 1
-	// and with AND ~ we can turn off bits
-	(_keytest(RR_2ND) || _keytest(RR_ENTER)) ? (tempKeysState |= keyAction) : (tempKeysState &= ~keyAction);
-	(_keytest(RR_DIAMOND)) ? (tempKeysState |= keyJump) : (tempKeysState &= ~keyJump);
-	(_keytest(RR_ALPHA)) ? (tempKeysState |= keyBackflip) : (tempKeysState &= ~keyBackflip);
-	(_keytest(RR_SHIFT)) ? (tempKeysState |= keyCameraControl) : (tempKeysState &= ~keyCameraControl);
-	(_keytest(RR_ESC)) ? (tempKeysState |= keyEscape) : (tempKeysState &= ~keyEscape);
-	(_keytest(RR_F1) || _keytest(RR_CATALOG)) ? (tempKeysState |= keyWeaponsSelect) : (tempKeysState &= ~keyWeaponsSelect);
-	(_keytest(RR_APPS)) ? (tempKeysState |= keyWormSelect) : (tempKeysState &= ~keyWormSelect);
-	(_keytest(RR_LEFT)) ? (tempKeysState |= keyLeft) : (tempKeysState &= ~keyLeft);
-	(_keytest(RR_RIGHT)) ? (tempKeysState |= keyRight) : (tempKeysState &= ~keyRight);
-	(_keytest(RR_UP)) ? (tempKeysState |= keyUp) : (tempKeysState &= ~keyUp);
-	(_keytest(RR_DOWN)) ? (tempKeysState |= keyDown) : (tempKeysState &= ~keyDown);
-	(_keytest(RR_PLUS)) ? (tempKeysState |= keyGirderRight) : (tempKeysState &= ~keyGirderRight);
-	(_keytest(RR_MINUS)) ? (tempKeysState |= keyGirderLeft) : (tempKeysState &= ~keyGirderLeft);
-	(_keytest(RR_1)) ? (tempKeysState |= key1) : (tempKeysState &= ~key1);
-	(_keytest(RR_2)) ? (tempKeysState |= key2) : (tempKeysState &= ~key2);
-	(_keytest(RR_3)) ? (tempKeysState |= key3) : (tempKeysState &= ~key3);
-	(_keytest(RR_4)) ? (tempKeysState |= key4) : (tempKeysState &= ~key4);
-	(_keytest(RR_5)) ? (tempKeysState |= key5) : (tempKeysState &= ~key5);
+	// each bit-mask is a binary place, so we can just multiply its values and sum them
+	// by the trutiness of those keys
+	keysState = 0;
+	keysState += (_keytest(RR_2ND) || _keytest(RR_ENTER)) * keyAction;
+	keysState += _keytest(RR_DIAMOND) * keyJump;
+	keysState += _keytest(RR_ALPHA) * keyBackflip;
+	keysState += _keytest(RR_SHIFT) * keyCameraControl;
+	keysState += _keytest(RR_ESC) * keyEscape;
+	keysState += (_keytest(RR_F1) || _keytest(RR_CATALOG)) * keyWeaponsSelect;
+	keysState += _keytest(RR_APPS) * keyWormSelect;
+	keysState += _keytest(RR_LEFT) * keyLeft;
+	keysState += _keytest(RR_RIGHT) * keyRight;
+	keysState += _keytest(RR_UP) * keyUp;
+	keysState += _keytest(RR_DOWN) * keyDown;
+	keysState += _keytest(RR_PLUS) * keyGirderRight;
+	keysState += _keytest(RR_MINUS) * keyGirderLeft;
+	keysState += _keytest(RR_1) * key1;
+	keysState += _keytest(RR_2) * key2;
+	keysState += _keytest(RR_3) * key3;
+	keysState += _keytest(RR_4) * key4;
+	keysState += _keytest(RR_5) * key5;
 	
-	// reset our buffers, since we will write all the bits in the upcomming loop anyway
-	keysDown = 0;
-	keysUp = 0;
 	
-	// loop to update our our keysDown and keysUp variables
-	long i=0;
-	for(i=0; i<32; i++)
-	{
-		
-		// get the previus value of the key
-		char previousState = (char)(((keysState) & ((long)1<<(i))) > 0);
-		
-		// current state
-		char currentState = (char)(((tempKeysState) & ((long)1<<(i))) > 0);
-		
-		// set keydown state:
-		// if it was down on the last frame, then this should just be 0
-		(!previousState && currentState) ? (keysDown |= (long)((long)1<<(i))) : (keysDown &= ~(long)((long)1<<(i)));
-		
-		// if it was down on the last frame, and is no longer down,
-		// then it should set keyUp to true:
-		(previousState && !currentState) ? (keysUp |= (long)((long)1<<(i))) : (keysUp &= ~(long)((long)1<<(i)));
-	}
+	// if we XOR our current state (keysState) and our previous state (lastKeysState)
+	// we will get just the keys that changed ON or OFF from the last frame
+	long changedKeys = (lastKeysState ^ keysState);
 	
-	// now that we've updated the keysDown and keysUp int buffers, we can just copy over the current state
-	keysState = tempKeysState;
+	// if we AND the changed keys to our current keys, we can determine which keys were down this frame:
+	keysDown = (long)(keysState & changedKeys);
+	
+	// if we AND it to our last state, we can detmine which keys were let go
+	keysUp = (long)(lastKeysState & changedKeys);
 }
 
 // test if a key is down for the first time this frame
