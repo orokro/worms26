@@ -3,6 +3,35 @@
 
 extern char GameRunning;
 
+extern char Game_mode;
+extern char Game_previousMode;
+extern short Game_timer;
+extern short Game_retreatTimer;
+extern short Game_graceTimer;
+extern long Game_suddenDeathTimer;
+extern long Game_waterLevel;
+extern char Game_currentTeam;
+extern char *Game_currentWormUp;
+extern short Game_cursorX;
+extern short Game_cursorY;
+extern char Game_cursirDir;
+extern short Game_xMarkSpotX;
+extern short Game_xMarkSpotY;
+extern char Game_xMarkPlaced;
+extern char Game_xMarkAllowedOverLand;
+extern char Game_cursorEndTurn;
+
+extern short *Worm_x;
+extern short *Worm_y;
+extern char *Worm_xVelo;
+extern char *Worm_yVelo;
+extern char *Worm_dir;
+extern char *Worm_health;
+extern long Worm_isDead;
+extern long Worm_active;
+extern char *Worm_mode;
+extern char Worm_currentWorm;
+
 void keyTestRoutine();
 
 void *doubleBuffer;
@@ -51,7 +80,7 @@ void _main(void)
 {
 	// enable double-buffering
   // GrayDBufInit(doubleBuffer);
-  
+ 
   // Sets It Up For _keytest usage..
 	INT_HANDLER save_1 = GetIntVec(AUTO_INT_1); 
 	INT_HANDLER save_5 = GetIntVec(AUTO_INT_5); 
@@ -60,9 +89,12 @@ void _main(void)
 	
 	// allocat and set a virtual screen to render to
 	// (this will be black and white until I implement graphics and double buffering)
-	virtual=malloc (LCD_SIZE);
+	virtual = malloc(LCD_SIZE);
 	PortSet (virtual, 239, 127);
 	
+	// init our game variables that are global
+  init();
+  
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	Game_changeMode(gameMode_WormSelect);
 

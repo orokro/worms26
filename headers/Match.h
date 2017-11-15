@@ -27,7 +27,7 @@ char Match_allowWormSelection = TRUE;
 char Match_artilleryMode = FALSE;
 
 // how long are turns, in seconds?
-char Match_turnTime = 45;
+char Match_turnTime = 10; //45;
 
 // mine settings: enabled? fuse length? duds enabled?
 char Match_minesEnabled = TRUE;

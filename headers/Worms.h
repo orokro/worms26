@@ -29,36 +29,36 @@
 */
 
 // the X position of all the worms
-short Worm_x[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+short *Worm_x;
 
 // the Y position of all the worms
-short Worm_y[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+short *Worm_y;
 
 // the current X/Y velocity of the worm, if it was knocked back by an explosion, etc
-char Worm_xVelo[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-char Worm_yVelo[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char *Worm_xVelo;
+char *Worm_yVelo;
 
 // the direction the worm is currently FACING.. 0 = LEFT 1 = RIGHT
-char Worm_dir[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char *Worm_dir;
 
 // the current HEALTH of the worm
-char Worm_health[16] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+char *Worm_health;
 
 // bit mask if the worm is dead. bit 1 = dead, bit = 0 alive
-long Worm_isDead = 0;
+long Worm_isDead;
 
 // bit mask if the worm is ACTIVE... different that dead.
-long Worm_active = 1;
+long Worm_active;
 
 // worms can be in various states, depending on the game mode or their physical situation
 // this ENUM defines the possible states of a Worm
 enum WormModes {wormMode_idle, wormMode_walking, wormMode_jumping, wormMode_backFliping, wormMode_falling, wormMode_knockBack, wormMode_parachute, wormMode_rope, wormMode_bungie};
 
 // store the current mode for every worm:
-char Worm_mode[16] = {wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle };
+char *Worm_mode;
 
 // every time the team / turn switches a new worm is the "active" worm.
 // if worm-select is enabled, during this period the play can change the active worm.
 // the game-logic will update this variable, such that worms that are alive, and on the current team, will cycle
-char Worm_currentWorm = 0;
+char Worm_currentWorm;
 

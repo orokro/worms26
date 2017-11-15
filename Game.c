@@ -5,6 +5,17 @@
 
 extern char GameRunning;
 
+extern short *Worm_x;
+extern short *Worm_y;
+extern char *Worm_xVelo;
+extern char *Worm_yVelo;
+extern char *Worm_dir;
+extern char *Worm_health;
+extern long Worm_isDead;
+extern long Worm_active;
+extern char *Worm_mode;
+extern char Worm_currentWorm;
+
 /* 
 	For reference, Game modes:
 	
@@ -196,7 +207,9 @@ void gameTimers()
 		Game_timer--;
 		
 	// if we hit zero, end the turn!
-	if(Game_timer<=0)
+	// note the states after turn will keep decremending the timers, so this will go negative
+	// we only want to end the turn on the frame that it hit 0
+	if(Game_timer==0)
 		Game_changeMode(gameMode_TurnEnd);
 }
 
@@ -259,8 +272,8 @@ void WormSelect_enter()
 	// NOTE: for now we're not using real seconds, and instead frames,
 	// where ever 100 is an ingame-clock unit. This will be tweaked after
 	// the game is done, to get frames-to-seconds more accurate
-	Game_graceTimer = 5 * 100;
-	Game_timer = Match_turnTime * 100;
+	Game_graceTimer = 5 * TIME_MULTIPLIER;
+	Game_timer = Match_turnTime * TIME_MULTIPLIER;
 }
 
 void WormSelect_update()
@@ -649,7 +662,7 @@ void Cursor_exit()
    ---------------------------------------------------------------------------------------- */
 void TurnEnd_enter()
 {
-	
+	Game_timer=-1;
 }
 
 void TurnEnd_update()
@@ -659,6 +672,9 @@ void TurnEnd_update()
 	
 	// the game
 	Draw_renderGame();
+	
+	if(Game_timer<-2*TIME_MULTIPLIER)
+		Game_changeMode(gameMode_Death);
 }
 
 void TurnEnd_exit()
@@ -672,7 +688,7 @@ void TurnEnd_exit()
    ---------------------------------------------------------------------------------------- */
 void Death_enter()
 {
-	
+	Game_timer=-1;
 }
 
 void Death_update()
@@ -682,6 +698,9 @@ void Death_update()
 	
 	// the game
 	Draw_renderGame();
+	
+	if(Game_timer<-2*TIME_MULTIPLIER)
+		Game_changeMode(gameMode_AfterTurn);
 }
 
 void Death_exit()
@@ -701,6 +720,7 @@ void AfterTurn_enter()
 {
 	// incase of sudden death
 	waterLevelTimer=10;
+	Game_timer=-1;
 }
 
 void AfterTurn_update()
@@ -714,6 +734,12 @@ void AfterTurn_update()
 	
 	// the game
 	Draw_renderGame();
+	
+	// All regular game-updates during this mode
+	gameUpdates();
+	
+	if(Game_timer<-2*TIME_MULTIPLIER)
+		Game_changeMode(gameMode_WormSelect);
 }
 
 void AfterTurn_exit()

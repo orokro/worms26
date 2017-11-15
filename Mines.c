@@ -108,7 +108,7 @@ void checkProximity(short index)
 			{
 				// based on mine timer settings pick set a time for this mine
 				// 6 will be random length, anything less will be the associated time
-				Mine_fuse[index] = ((Match_mineFuseLength<6) ? (Match_mineFuseLength*100) : (random(5)*100));
+				Mine_fuse[index] = ((Match_mineFuseLength<6) ? (Match_mineFuseLength*TIME_MULTIPLIER) : (random(5)*TIME_MULTIPLIER));
 			}
 			
 		}// end if first frame

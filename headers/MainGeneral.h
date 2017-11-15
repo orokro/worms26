@@ -58,8 +58,15 @@
 	 0b0000000000000000, \
 	 0b0000000000000000}
 
+
+#define TIME_MULTIPLIER 40
+
 // super-global variables
 char GameRunning;
 
 // super-glogal prototypes
 short dist(short, short, short, short);
+
+
+// main init function
+void init();

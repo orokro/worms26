@@ -4,6 +4,22 @@
 #include "../Main.h"
 
 extern char Game_mode;
+extern char Game_previousMode;
+extern short Game_timer;
+extern short Game_retreatTimer;
+extern short Game_graceTimer;
+extern long Game_suddenDeathTimer;
+extern long Game_waterLevel;
+extern char Game_currentTeam;
+extern char *Game_currentWormUp;
+extern short Game_cursorX;
+extern short Game_cursorY;
+extern char Game_cursirDir;
+extern short Game_xMarkSpotX;
+extern short Game_xMarkSpotY;
+extern char Game_xMarkPlaced;
+extern char Game_xMarkAllowedOverLand;
+extern char Game_cursorEndTurn;
 
 // main drawing routine for the game, e.g. map, worms, weapons, etc
 void Draw_renderGame()
@@ -13,13 +29,19 @@ void Draw_renderGame()
 	
 	ClrScr();
 	DrawStr(0,0,modes[(short)Game_mode], A_NORMAL);
+	DrawStr(0,10,modes[(short)Game_previousMode], A_NORMAL);
 	
-	char timeStr[32];
+	char timeStr[40];
 	//short time = Game_timer/100;  
-	sprintf(timeStr, "time: %d", Game_timer);
-	DrawStr(0,10,timeStr, A_NORMAL);	
+	sprintf(timeStr, "time: %d, %d, %d", (short)(Game_graceTimer/TIME_MULTIPLIER), (short)(Game_timer/TIME_MULTIPLIER), (short)(Game_retreatTimer));
+	DrawStr(0,30,timeStr, A_NORMAL);	
 	
-	DrawStr(0,20,(Keys_keyDown(keyAny)?"any key!":""), A_NORMAL);		
+	DrawStr(0,40, (Game_currentTeam ? "Team: Black" : "Team: White") , A_NORMAL);	
+	
+	char wormStr[20];
+	sprintf(wormStr, "Worm Up: %d", (short)Game_currentWormUp[(short)Game_currentTeam]);
+	
+	DrawStr(0,50, wormStr , A_NORMAL);	
 }
 
 
