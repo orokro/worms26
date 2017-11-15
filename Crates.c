@@ -5,7 +5,7 @@ void spawnCrate(char);
 void checkExplosions(short);
 
 // spawns a Crate on the map, if they're enabled
-void Crate_spawnCrate(char type)
+void Crates_spawnCrate(char type)
 {
 	if(	
 			(type==crateHealth && Match_healthCratesEnabled==TRUE)

@@ -48,7 +48,7 @@ char Worm_health[16] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 1
 long Worm_isDead = 0;
 
 // bit mask if the worm is ACTIVE... different that dead.
-long Worm_active = 0;
+long Worm_active = 1;
 
 // worms can be in various states, depending on the game mode or their physical situation
 // this ENUM defines the possible states of a Worm

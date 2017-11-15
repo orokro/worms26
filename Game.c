@@ -3,6 +3,8 @@
 
 #include "../Main.h"
 
+extern char GameRunning;
+
 /* 
 	For reference, Game modes:
 	
@@ -206,8 +208,6 @@ void gameUpdates()
 	// decrease game timers
 	gameTimers();
 	
-	return;
-	
 	// update OilDrums, Crates, Mines, Weapons
 	if(OilDrum_active)
 		OilDrums_update();
@@ -277,6 +277,9 @@ void WormSelect_update()
 		
 	// All regular game-updates during this mode
 	gameUpdates();
+	
+	// the game
+	Draw_renderGame();
 }
 
 void WormSelect_exit()
@@ -334,6 +337,9 @@ void Turn_update()
 	
 	// All regular game-updates during this mode
 	gameUpdates();
+	
+	// the game
+	Draw_renderGame();
 	
 	// if the user pressed escape, we should goto the pause menu
 	if(Keys_keyDown(keyEscape)==TRUE)
@@ -489,6 +495,7 @@ void Pause_update()
 			return;
 		}else
 		{
+			extern char GameRunning;
 			// setting this will exit the next tick of our main loop
 			GameRunning=FALSE;
 			return;
@@ -621,8 +628,8 @@ void Cursor_update()
 		}
 	}
 	
-	// draw the weapons menu!
-	Draw_renderWeaponsMenu(weaponSelectX, weaponSelectY);	
+	// the game
+	Draw_renderGame();
 }
 
 void Cursor_exit()
@@ -649,6 +656,9 @@ void TurnEnd_update()
 {
 	// All regular game-updates during this mode
 	gameUpdates();
+	
+	// the game
+	Draw_renderGame();
 }
 
 void TurnEnd_exit()
@@ -669,6 +679,9 @@ void Death_update()
 {
 	// All regular game-updates during this mode
 	gameUpdates();
+	
+	// the game
+	Draw_renderGame();
 }
 
 void Death_exit()
@@ -697,9 +710,10 @@ void AfterTurn_update()
 	{
 		Game_waterLevel++;
 		waterLevelTimer--;
-		return;
 	}
 	
+	// the game
+	Draw_renderGame();
 }
 
 void AfterTurn_exit()
@@ -718,7 +732,8 @@ void GameOver_enter()
 
 void GameOver_update()
 {
-	
+	// the game
+	Draw_renderGame();
 }
 
 void GameOver_exit()

@@ -118,7 +118,7 @@ enum GameModes {gameMode_WormSelect, gameMode_Turn, gameMode_WeaponSelect, gameM
 // global game properties
 
 // current game mode!
-char Game_mode = gameMode_WormSelect;
+char Game_mode;
 
 // used when certain game modes require the ability to "go back" to the previous mode
 char Game_previousMode = gameMode_WormSelect;
