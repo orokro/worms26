@@ -1,0 +1,26 @@
+// C Source File
+// Created 11/15/2017; 11:46:48 AM
+
+#include "../Main.h"
+
+// define extern/global variables
+char Match_wormCount[2] = {6, 6};
+char Match_gravestones[2] = {0, 1};
+char Match_wormStartHealth = 100;
+char Match_allowWormSelection = TRUE;
+char Match_artilleryMode = FALSE;
+char Match_turnTime = 10; //45;
+char Match_minesEnabled = TRUE;
+char Match_mineFuseLength = 3;
+char Match_dudMines = TRUE;
+char Match_oilDrumsEnabled = TRUE;
+char Match_toolCratesEnabled = TRUE;
+char Match_healthCratesEnabled = TRUE;
+char Match_weaponCratesEnabled = TRUE;
+short Match_defaultWeapons[5][14] = { 
+																			{0,9,9,9,9,1,1,3,5,0,2,0,9,1},
+																			{0,1,3,9,9,2,1,3,2,0,1,0,9,1},
+																			{0,5,0,9,1,1,0,3,2,0,0,0,3,1},
+																			{0,0,2,0,0,0,0,1,2,0,0,0,0,1},
+																			{0,0,0,2,9,0,0,0,0,0,0,0,0,1}
+																		};
