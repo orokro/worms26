@@ -1,25 +1,6 @@
 // C Source File
 // Created 11/11/2017; 11:34:12 PM
-
 #include "../Main.h"
-
-extern char Game_mode;
-extern char Game_previousMode;
-extern short Game_timer;
-extern short Game_retreatTimer;
-extern short Game_graceTimer;
-extern long Game_suddenDeathTimer;
-extern long Game_waterLevel;
-extern char Game_currentTeam;
-extern char *Game_currentWormUp;
-extern short Game_cursorX;
-extern short Game_cursorY;
-extern char Game_cursirDir;
-extern short Game_xMarkSpotX;
-extern short Game_xMarkSpotY;
-extern char Game_xMarkPlaced;
-extern char Game_xMarkAllowedOverLand;
-extern char Game_cursorEndTurn;
 
 // main drawing routine for the game, e.g. map, worms, weapons, etc
 void Draw_renderGame()

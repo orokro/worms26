@@ -3,19 +3,6 @@
 
 #include "../Main.h"
 
-extern char GameRunning;
-
-extern short *Worm_x;
-extern short *Worm_y;
-extern char *Worm_xVelo;
-extern char *Worm_yVelo;
-extern char *Worm_dir;
-extern char *Worm_health;
-extern long Worm_isDead;
-extern long Worm_active;
-extern char *Worm_mode;
-extern char Worm_currentWorm;
-
 /* 
 	For reference, Game modes:
 	
