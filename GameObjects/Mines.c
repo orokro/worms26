@@ -1,4 +1,4 @@
-#include "../Main.h"
+#include "../Headers/System/Main.h"
 
 // define our exter/global variables
 short Mine_x[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};

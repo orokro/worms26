@@ -1,7 +1,7 @@
 // C Source File
 // Created 11/11/2017; 11:34:05 PM
 
-#include "../Main.h"
+#include "../Headers/System/Main.h"
 
 // worm variable defaults
 short Worm_x[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};

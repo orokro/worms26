@@ -1,7 +1,7 @@
 // C Source File
 // Created 11/12/2017; 4:26:32 PM
 
-#include "../Main.h"
+#include "../Headers/System/Main.h"
 
 // declare our external/global variables
 char Game_mode = gameMode_WormSelect;
