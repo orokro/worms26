@@ -3,6 +3,25 @@
 
 #include "../Main.h"
 
+// declare our external/global variables
+char Game_mode = gameMode_WormSelect;
+char Game_previousMode = gameMode_WormSelect;
+short Game_timer = 0;
+short Game_retreatTimer = 5;
+short Game_graceTimer = 5;
+long Game_suddenDeathTimer = (long)((long)((long)60*(long)TIME_MULTIPLIER) * (long)10);
+char Game_waterLevel = 0;
+char Game_currentTeam = 1;
+char Game_currentWormUp[2] = {0, 0};
+short Game_cursorX = 0;
+short Game_cursorY = 0;
+char Game_cursirDir = 0;
+short Game_xMarkSpotX = 0;
+short Game_xMarkSpotY = 0;
+char Game_xMarkPlaced = FALSE;
+char Game_xMarkAllowedOverLand = TRUE;
+char Game_cursorEndTurn = FALSE;
+	
 /* 
 	For reference, Game modes:
 	

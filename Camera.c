@@ -3,6 +3,10 @@
 
 #include "../Main.h"
 
+// declare our external/global variables
+int camX = 0;
+int camY = 0;
+
 // boolean if Camera is focused on something
 char cameraIsFocused = FALSE;
 

@@ -17,15 +17,15 @@
 */
 
 // x/y positions of our oil drums
-short OilDrum_x[8];
-short OilDrum_y[8];
+extern short OilDrum_x[8];
+extern short OilDrum_y[8];
 
 // health of our oil drums
-char OilDrum_health[8] = {30, 30, 30, 30, 30, 30, 30, 30};
+extern char OilDrum_health[8];
 
 // this int will be a bit-wise mask for the drums
 // the first 8 bits will represent if the drums are active or not
-int OilDrum_active = 0;
+extern int OilDrum_active;
 
 // function prototypes
 void OilDrums_spawnDrums();

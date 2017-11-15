@@ -3,6 +3,14 @@
 
 #include "../Main.h"
 
+// define our extern/global variables
+short Explosion_x[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+short Explosion_y[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+char Explosion_time[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+char Explosion_size[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+char Explosion_power[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+int Explosion_firstFrame = 0;
+
 // function prototypes
 void updateExplosion(short);
 void spawnFire();

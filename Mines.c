@@ -1,5 +1,13 @@
 #include "../Main.h"
 
+// define our exter/global variables
+short Mine_x[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+short Mine_y[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Mine_xVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Mine_yVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Mine_fuse[10] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+int Mine_active=0;
+
 // function prototypes
 void spawnMine(char);
 void checkExplosions(short);

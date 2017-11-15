@@ -23,17 +23,17 @@
 #define crateTool 2
 
 // x/y positions of our Crates
-short Crate_x[8];
-short Crate_y[8];
+extern short Crate_x[8];
+extern short Crate_y[8];
 
 // health of our crates
-char Crate_health[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
+extern char Crate_health[8];
 
 // type of each Crate
-char Crate_type[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+extern char Crate_type[8];
 
 // is the crate active?
-int Crate_active=0;
+extern int Crate_active;
 
 // function prototypes
 void Crates_spawnCrate(char);

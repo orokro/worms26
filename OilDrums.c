@@ -3,6 +3,12 @@
 
 #include "../Main.h"
 
+// define our extern/global variables
+short OilDrum_x[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+short OilDrum_y[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+char OilDrum_health[8] = {30, 30, 30, 30, 30, 30, 30, 30};
+int OilDrum_active = 0;
+
 // function prototypes
 void spawnDrum(short);
 void checkExplosions(short);

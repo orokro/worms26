@@ -28,8 +28,8 @@
 */
 
 // the current position of the camera in game-world units
-int camX = 0;
-int camY = 0;
+extern int camX;
+extern int camY;
 
 // function prototypes
 void Camera_update();

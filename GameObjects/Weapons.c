@@ -30,6 +30,18 @@
 
 */
 
+// define our extern/global variables
+char Weapon_type[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Weapon_x[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Weapon_y[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Weapon_xVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Weapon_yVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Weapon_time[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Weapon_uses[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+short Weapon_active = 0;
+short Weapon_targetX = 0;
+short Weapon_targetY = 0;
+
 // local function prototypes
 short findFreeWeaponSlot();
 void updateVelocity(short);

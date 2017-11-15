@@ -27,18 +27,18 @@
 #define mineTriggerDistance 10
 
 // x/y positions of our Mines
-short Mine_x[10];
-short Mine_y[10];
+extern short Mine_x[10];
+extern short Mine_y[10];
 
 // velocity of mines
-char Mine_xVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-char Mine_yVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+extern char Mine_xVelo[10];
+extern char Mine_yVelo[10];
 
 // fuse of mines
-char Mine_fuse[10] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+extern char Mine_fuse[10];
 
 // is the mine active?
-int Mine_active=0;
+int Mine_active;
 
 // function prototypes
 void Mines_spawnMines();

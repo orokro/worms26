@@ -14,18 +14,18 @@
 */
 
 // x/y positions of our Explosions
-short Explosion_x[8];
-short Explosion_y[8];
+extern short Explosion_x[8];
+extern short Explosion_y[8];
 
 // current time of our explosion
 // note that we will consider <=0 time an inactive explosion
-char Explosion_time[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+extern char Explosion_time[8];
 
 // the size of the explosion
-char Explosion_size[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+extern char Explosion_size[8];
 
 // the damage power of the explosion
-char Explosion_power[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+extern char Explosion_power[8];
 
 /*
 	this int will store a bitmask for the first-frame of an explosion
@@ -37,7 +37,7 @@ char Explosion_power[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	
 	explosions will only cause damage on the first frame
 */
-int Explosion_firstFrame = 0;
+extern int Explosion_firstFrame;
 
 // function prototypes
 void Explosion_spawn(short, short, char, char, char);

@@ -60,10 +60,7 @@ void _main(void)
 	// (this will be black and white until I implement graphics and double buffering)
 	virtual = malloc(LCD_SIZE);
 	PortSet (virtual, 239, 127);
-	
-	// init our game variables that are global
-  init();
-  
+
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	Game_changeMode(gameMode_WormSelect);
 

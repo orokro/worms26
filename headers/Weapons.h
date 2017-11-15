@@ -97,30 +97,30 @@ enum Weapons {
 	WClusterFrag, WBananaFrag, 	WComet,				WSuperSheep };
 
 // the type of the weapon!
-char Weapon_type[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+extern char Weapon_type[10];
 
 // x/y positions of our weapons
-char Weapon_x[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-char Weapon_y[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+extern char Weapon_x[10];
+extern char Weapon_y[10];
 
 // velocities of weapons
-char Weapon_xVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-char Weapon_yVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+extern char Weapon_xVelo[10];
+extern char Weapon_yVelo[10];
 
 // timer: various weapons can make use of a fuse timer, or timers for other reasons
-char Weapon_time[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+extern char Weapon_time[10];
 
 // each weapon has varius properties it can have: uses velocity, uses gravity, etc.
 // this is an array of bit masks for the current weapons, and what features they have
-char Weapon_uses[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+extern char Weapon_uses[10];
 
 // bit mask if the weapon is active in this slot
-short Weapon_active = 0;
+extern short Weapon_active;
 
 // because Weapons are defined BEFORE the Game header file, we cant access the cursor target
 // thus, whever a target is set, it will have to update our weapon target
-short Weapon_targetX;
-short Weapon_targetY;
+extern short Weapon_targetX;
+extern short Weapon_targetY;
 
 // function prototypes
 void Weapons_spawn(char, char, char, char, char, char, char);

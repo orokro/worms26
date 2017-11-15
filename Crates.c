@@ -1,5 +1,12 @@
 #include "../Main.h"
 
+// define our extern/global variables
+short Crate_x[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+short Crate_y[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+char Crate_health[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
+char Crate_type[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+int Crate_active=0;
+
 // function prototypes
 void spawnCrate(char);
 void checkExplosions(short);

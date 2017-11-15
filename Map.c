@@ -3,6 +3,10 @@
 
 #include "../Main.h"
 
+// declare our external/global variables
+short Map_lastRequestedSpawnX=0;
+short Map_lastRequestedSpawnY=0;
+
 // tests a point on the map
 char Map_testPoint(short x, short y)
 {

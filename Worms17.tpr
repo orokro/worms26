@@ -50,7 +50,7 @@ Use Return Value=0
 Enable Error Return=0
 Save Screen=1
 [File Editing]
-Open File=C:\Users\YouVisit\Documents\Worms17\headers\Main.h
+Open File=C:\Users\YouVisit\Documents\Worms17\headers\Match.h
 [Included Files]
 C File 1=Mines.c
 C File 1 Folder=GameObjects
@@ -92,5 +92,3 @@ Header File 12=headers\Explosions.h
 Header File 13=headers\Crates.h
 Header File 14=headers\MainGeneral.h
 Header File 15=headers\Weapons.h
-C File 13=System\Init.c
-C File 13 Folder=System

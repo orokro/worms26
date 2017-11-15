@@ -29,36 +29,36 @@
 */
 
 // the X position of all the worms
-short *Worm_x;
+extern short Worm_x[16];
 
 // the Y position of all the worms
-short *Worm_y;
+extern short Worm_y[16];
 
 // the current X/Y velocity of the worm, if it was knocked back by an explosion, etc
-char *Worm_xVelo;
-char *Worm_yVelo;
+extern char Worm_xVelo[16];
+extern char Worm_yVelo[16];
 
 // the direction the worm is currently FACING.. 0 = LEFT 1 = RIGHT
-char *Worm_dir;
+extern long Worm_dir;
 
 // the current HEALTH of the worm
-char *Worm_health;
+extern char Worm_health[16];
 
 // bit mask if the worm is dead. bit 1 = dead, bit = 0 alive
-long Worm_isDead;
+extern long Worm_isDead;
 
 // bit mask if the worm is ACTIVE... different that dead.
-long Worm_active;
+extern long Worm_active;
 
 // worms can be in various states, depending on the game mode or their physical situation
 // this ENUM defines the possible states of a Worm
 enum WormModes {wormMode_idle, wormMode_walking, wormMode_jumping, wormMode_backFliping, wormMode_falling, wormMode_knockBack, wormMode_parachute, wormMode_rope, wormMode_bungie};
 
 // store the current mode for every worm:
-char *Worm_mode;
+extern char Worm_mode[16];
 
 // every time the team / turn switches a new worm is the "active" worm.
 // if worm-select is enabled, during this period the play can change the active worm.
 // the game-logic will update this variable, such that worms that are alive, and on the current team, will cycle
-char Worm_currentWorm;
+extern char Worm_currentWorm;
 

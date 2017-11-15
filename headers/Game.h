@@ -118,39 +118,39 @@ enum GameModes {gameMode_WormSelect, gameMode_Turn, gameMode_WeaponSelect, gameM
 // global game properties
 
 // current game mode!
-char Game_mode;
+extern char Game_mode;
 
 // used when certain game modes require the ability to "go back" to the previous mode
-char Game_previousMode;
+extern char Game_previousMode;
 
 // the main timer for a turn
-short Game_timer;
+extern short Game_timer;
 
 // the retreat timer, if any
-short Game_retreatTimer;
+extern short Game_retreatTimer;
 
 // the grace-timer for WormSelect mode
-short Game_graceTimer;
+extern short Game_graceTimer;
 
 // sudden death timer - 10 minutes before sudden death begins
-long Game_suddenDeathTimer;
+extern long Game_suddenDeathTimer;
 
 // water level for sudden death:
-long Game_waterLevel;
+extern char Game_waterLevel;
 
 // the current team, and the current selected worm on each team:
-char Game_currentTeam;
-char *Game_currentWormUp;
+extern char Game_currentTeam;
+extern char Game_currentWormUp[2];
 
 // the current cursor position, facing direction, xMark spot position
-short Game_cursorX;
-short Game_cursorY;
-char Game_cursirDir;
-short Game_xMarkSpotX;
-short Game_xMarkSpotY;
-char Game_xMarkPlaced;
-char Game_xMarkAllowedOverLand;
-char Game_cursorEndTurn;
+extern short Game_cursorX;
+extern short Game_cursorY;
+extern char Game_cursirDir;
+extern short Game_xMarkSpotX;
+extern short Game_xMarkSpotY;
+extern char Game_xMarkPlaced;
+extern char Game_xMarkAllowedOverLand;
+extern char Game_cursorEndTurn;
 
 // function prototypes
 void Game_changeMode(char);
