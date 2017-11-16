@@ -13,3 +13,4 @@
 void Draw_renderGame();
 void Draw_renderPauseMenu(char);
 void Draw_renderWeaponsMenu(char, char);
+void setMapPtr(void *ptr);

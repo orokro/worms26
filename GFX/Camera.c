@@ -28,6 +28,8 @@ short *cameraTargetY;
 short userX=0;
 short userY=0;
 
+#define camSpeed 3
+
 // this is the main update function for the logic of the Camera.
 void Camera_update()
 {
@@ -43,10 +45,10 @@ void Camera_update()
 	// if shift is down, we should test for the arrow keys for camera control:
 	if(Keys_keyState(keyCameraControl)==TRUE)
 	{
-		if(Keys_keyState(keyLeft)==TRUE) userX--;
-		if(Keys_keyState(keyRight)==TRUE) userX++;
-		if(Keys_keyState(keyUp)==TRUE) userY--;
-		if(Keys_keyState(keyDown)==TRUE) userY++;
+		if(Keys_keyState(keyLeft)==TRUE) userX-=camSpeed;
+		if(Keys_keyState(keyRight)==TRUE) userX+=camSpeed;
+		if(Keys_keyState(keyUp)==TRUE) userY-=camSpeed;
+		if(Keys_keyState(keyDown)==TRUE) userY+=camSpeed;
 		
 		// at this point, the camera should just be the user-set value:
 		camX = userX;

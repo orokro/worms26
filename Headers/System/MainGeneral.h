@@ -61,8 +61,11 @@
 // how many frames consist of one second?
 #define TIME_MULTIPLIER 40
 
+extern void *virtual;
+
 // super-global variables
 char GameRunning;
 
 // super-glogal prototypes
 short dist(short, short, short, short);
+//void drawMap();

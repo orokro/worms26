@@ -5,6 +5,7 @@ void keyTestRoutine();
 
 void *doubleBuffer;
 void *virtual;
+void *mapBuffer;
 
 // global method to calculate distance between two points
 // maybe I'll move this into a math file one day
@@ -44,6 +45,7 @@ void keyTestRoutine()
 }
 
 
+
 // Main Function
 void _main(void)
 {
@@ -60,7 +62,14 @@ void _main(void)
 	// (this will be black and white until I implement graphics and double buffering)
 	virtual = malloc(LCD_SIZE);
 	PortSet (virtual, 239, 127);
-
+	
+	
+	mapBuffer = malloc(LCD_SIZE*4);
+	Map_makeMap(mapBuffer);
+	//setMapPtr(mapBuffer);
+	
+	PortSet (virtual, 239, 127);
+	
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	Game_changeMode(gameMode_WormSelect);
 
