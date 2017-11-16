@@ -23,6 +23,11 @@ void Draw_renderGame()
 	sprintf(wormStr, "Worm Up: %d", (short)Game_currentWormUp[(short)Game_currentTeam]);
 	
 	DrawStr(0,50, wormStr , A_NORMAL);	
+	
+	
+	char camStr[40];
+	sprintf(camStr, "Cam: %d, %d", (short)camX, (short)camY);
+	DrawStr(0,60, camStr , A_NORMAL);
 }
 
 

@@ -67,6 +67,14 @@ void Camera_update()
 		short moveX = (short)(deltaX * 0.2f);
 		short moveY = (short)(deltaY * 0.2f);
 		
+		// if the deltas aren't zero (camera perfectly focused) but our moves
+		// are 0, then just set the camera to the target
+		// since move will never be 
+		if(deltaX!=0 && moveX==0)
+			moveX = deltaX / abs(deltaX);
+		if(deltaY!=0 && moveY==0)
+			moveY = deltaY / abs(deltaY);
+		
 		// move the camera pos:
 		camX += moveX;
 		camY += moveY;

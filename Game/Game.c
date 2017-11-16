@@ -78,6 +78,9 @@ void Game_update()
 	// before we do anything else, we should update the states of the keys
 	Keys_update();
 	
+	// always update the camera, even when we arent rendering the game (easier this way)
+	Camera_update();
+	
 	// depending on the current game mode, different logic will be present for each mode
 	switch(Game_mode)
 	{

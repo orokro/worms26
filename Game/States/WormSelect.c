@@ -70,6 +70,9 @@ void nextWorm()
 			// set as current worm
 			Worm_currentWorm = teamWorm;
 			
+			// focus the camera on the selected worm
+			Camera_focusOn(&Worm_x[(short)Worm_currentWorm], &Worm_y[(short)Worm_currentWorm]);
+			
 			// and we out!
 			return;
 		}
