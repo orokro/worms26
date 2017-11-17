@@ -100,8 +100,8 @@ enum Weapons {
 extern char Weapon_type[10];
 
 // x/y positions of our weapons
-extern char Weapon_x[10];
-extern char Weapon_y[10];
+extern short Weapon_x[10];
+extern short Weapon_y[10];
 
 // velocities of weapons
 extern char Weapon_xVelo[10];
