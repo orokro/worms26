@@ -5,11 +5,13 @@
 
 static void *mapPtr;
 
+// crashes if I try this...
 void setMapPtr(void *ptr)
 {
 	mapPtr=ptr;
 }
 
+// draw the map.. but I can't call this, crashes
 void drawMap()
 {
 	// camera top position, in world-space
@@ -91,8 +93,6 @@ void Draw_renderGame()
 	
 	// clear screen
 	ClrScr();
-	
-	
 	
 	/* ======================================================================================================================
 		 DRAWING THE MAP +++ DRAWING THE MAP +++ DRAWING THE MAP +++ DRAWING THE MAP +++ DRAWING THE MAP +++ DRAWING THE MAP ++
@@ -202,8 +202,6 @@ void Draw_renderGame()
 // main drawing routine for the pause menu
 void Draw_renderPauseMenu(char menuItem)
 {
-	// prevent warnings for now
-	menuItem=menuItem;
 	ClrScr();
 	DrawStr(0,0,"pause menu", A_XOR);
 	
@@ -214,9 +212,6 @@ void Draw_renderPauseMenu(char menuItem)
 // main drawing routine for the weapons menu
 void Draw_renderWeaponsMenu(char wx, char wy)
 {
-	// prevent warnings for now
-	wx=wx;
-	wy=wy;
 	ClrScr();
 	DrawStr(0,0,"Weapons Menu", A_NORMAL);
 	
