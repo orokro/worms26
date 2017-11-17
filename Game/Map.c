@@ -9,6 +9,9 @@ short Map_lastRequestedSpawnY=0;
 
 //void *mapBuffer;
 
+#define screenWidth 159
+#define screenHeight 99
+
 void Map_makeMap(void *mapBuffer)
 {
 	short x, y;
@@ -16,22 +19,30 @@ void Map_makeMap(void *mapBuffer)
 	void *segment = malloc(LCD_SIZE);
 	PortSet(segment, 239, 127);
 	//DrawClipEllipse((short)20, (short)20, (short)15, (short)15, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
-	for(x=10; x<229; x+=30)
+	for(x=10; x<screenWidth; x+=30)
 	{
-		for(y=10; y<117; y+=30)
+		for(y=10; y<90; y+=30)
 		{
-			DrawClipEllipse((short)x, (short)y, (short)5, (short)5, &(SCR_RECT){{(unsigned short)0, (unsigned short)0, (unsigned short)239, (unsigned short)127}}, A_NORMAL);
+			DrawClipEllipse((short)x, (short)y, (short)5, (short)5, &(SCR_RECT){{(unsigned short)0, (unsigned short)0, (unsigned short)screenWidth, (unsigned short)screenHeight}}, A_NORMAL);
 		}
 	}
 	
-	char *seg = segment;
-	char *map = mapBuffer;
-	for(x=0; x<60; x++)
+	// draw borders on the map
+	DrawLine(0, 0, screenWidth, 0, A_NORMAL);
+	DrawLine(0, screenHeight, screenWidth, screenHeight, A_NORMAL);
+	DrawLine(0, 0, 0, screenHeight, A_NORMAL);
+	DrawLine(screenWidth, 0, screenWidth, screenHeight, A_NORMAL);
+	
+	short *seg = segment;
+	short *map = mapBuffer;
+	for(x=0; x<30; x++)
 	{
-		for(y=0; y<254; y++)
-			map[y*60+x] = seg[((y%127)*30)+(x%30)];
+		for(y=0; y<200; y++)
+			map[y*30+x] = seg[((y%100)*15)+(x%15)];
 	}
 	
+	free(segment);
+	/*
 	return;
 	
 	PortSet(mapBuffer, 477, 254);
@@ -49,7 +60,7 @@ void Map_makeMap(void *mapBuffer)
 			DrawClipEllipse((short)x, (short)y, (short)15, (short)15, &(SCR_RECT){{(unsigned short)0, (unsigned short)0, (unsigned short)477, (unsigned short)261}}, A_NORMAL);
 		}
 	}
-	
+	*/
 }
 
 // tests a point on the map

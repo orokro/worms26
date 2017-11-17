@@ -33,24 +33,18 @@ void Draw_renderGame()
 	
 	ClrScr();
 	
-	//PortSet(mapBuffer, 477, 254);
-	int camStartY=0;
-	int camEndY=0;
-	int screenStartOffset=0;
-	int screenEndOffset=0;
-	
 	// which rows should we copy from the map buffer?
-	short mapOriginX=239;
-	short mapOriginY=127;
+	// short mapOriginX=160;
+	// short mapOriginY=100;
 	
 	// camera top position, in world-space
-	short camTop = camY-64;
+	short camTop = camY-50;
 	
 	// camera bottom position, in wrold-space
-	short camBottom = camY+64;
+	short camBottom = camY+50;
 	
 	// we shouldn't continue if either is out of bounds
-	if(!(camBottom<0) && !(camTop>254) && !(camTop<0))
+	if(!(camBottom<0) && !(camTop>199))
 	{
 		
 		// the of the screen we should start copying the buffer to
@@ -60,7 +54,7 @@ void Draw_renderGame()
 		short bufferTop=camTop;
 		
 		// the bottom of the screen we should stop copying the buffer to
-		short screenBottom=127;
+		short screenBottom=99;
 		
 		// the bottom of the buffer should stop copying from
 		short bufferBottom=camBottom;
@@ -77,16 +71,16 @@ void Draw_renderGame()
 			bufferTop = 0;
 			
 			// we want to draw lower on the screen... by how far the camera is beyond
-			screenTop = -(camTop);
+			screenTop = (camTop*-1);
 			
 			// we want to only copy pixels for the rest of the screen
-			screenBottom = (127-screenTop);
+			screenBottom = 99;
 			
 			// we dont need to copy any more pixels from the buffer:
-			bufferBottom = bufferTop+(127-screenTop);
+			bufferBottom = bufferTop+(200-screenTop);
 		
 		// also check if the bottom of the camera is beyond the map buffer
-		}else if(camBottom>254)
+		}else if(camBottom>199)
 		{
 			// always draw on the top of the screen:
 			screenTop = 0;
@@ -95,26 +89,18 @@ void Draw_renderGame()
 			bufferTop = camTop;
 			
 			// always draw the remaining rows in the buffer:
-			bufferBottom = 254;
+			bufferBottom = 200;
 			
 			// only draw that many rows:
-			screenBottom = (254-bufferTop);
+			screenBottom = (200-bufferTop);
 		}
 		
 		short *lcd = virtual;
 		short *map = mapBuffer;
 		short x,y;
-		short lcdY=0;
-		for(x=0; x<15; x++)
-		{
-			lcdY=0;
-			for(y=screenTop; y<screenBottom; y++)
-			{
-				lcd[lcdY*15+x+screenStartOffset] = map[(bufferTop+y)*30+x];
-				lcdY++;
-			}
-				
-		}
+		for(y=0; y<=(screenBottom-screenTop); y++)
+			for(x=0; x<15; x++)
+				lcd[(screenTop+y)*15+x] = map[(bufferTop+y)*30+x];
 		
 		//	memcpy (virtual, mapBuffer, LCD_SIZE);
 		

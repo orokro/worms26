@@ -61,18 +61,15 @@ void _main(void)
 	// allocat and set a virtual screen to render to
 	// (this will be black and white until I implement graphics and double buffering)
 	virtual = malloc(LCD_SIZE);
-	PortSet (virtual, 239, 127);
-	
-	
 	mapBuffer = malloc(LCD_SIZE*4);
 	Map_makeMap(mapBuffer);
 	//setMapPtr(mapBuffer);
 	
-	PortSet (virtual, 239, 127);
-	
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	Game_changeMode(gameMode_WormSelect);
-
+	
+	PortSet (virtual, 239, 127);
+	
 	// main loop!
 	GameRunning=TRUE;
 	while(GameRunning==TRUE)
