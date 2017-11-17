@@ -77,7 +77,7 @@ void Crates_update()
 		if(enabled==TRUE)
 		{
 			
-			// check all explosions if they are near-by and damaging this oildrum
+			// check all explosions if they are near-by and damaging this crate
 			checkExplosions(i);
 			
 			// if ded
@@ -92,9 +92,7 @@ void Crates_update()
 				// nothing left to check on this drum
 				continue;
 			}// end if health<=0
-
 		}// end if active
-		
 	}// next i
 }
 
@@ -137,8 +135,6 @@ void checkExplosions(short index)
 				
 				continue;
 			}// end if within larger radius
-			
-		}// end if first frame
-		
+		}// end if first frame		
 	}// next i
 }

@@ -67,9 +67,7 @@ void OilDrums_update()
 				// nothing left to check on this drum
 				continue;
 			}// end if health<=0
-
-		}// end if active
-		
+		}// end if active		
 	}// next i
 }
 
@@ -111,9 +109,7 @@ void checkExplosions(short index)
 				OilDrum_health[index] -= (Explosion_power[i] * distFallOffRatio);
 				
 				continue;
-			}// end if within larger radius
-			
-		}// end if first frame
-		
+			}// end if within larger radius			
+		}// end if first frame		
 	}// next i
 }

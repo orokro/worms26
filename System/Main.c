@@ -90,6 +90,10 @@ void _main(void)
 	LCD_restore (virtual);
 	PortRestore();
 	
+	// free our buffers:
+	free(virtual);
+	free(mapBuffer);
+	
 	// free our double buffering buffer
 	// free(doubleBuffer);
 	

@@ -61,6 +61,7 @@
 // how many frames consist of one second?
 #define TIME_MULTIPLIER 40
 
+// has to be extern so our draw routines can see it
 extern void *virtual;
 
 // super-global variables
@@ -68,4 +69,6 @@ char GameRunning;
 
 // super-glogal prototypes
 short dist(short, short, short, short);
+
+// commented out, because making this global crashes the game for some reason
 //void drawMap();

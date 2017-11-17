@@ -95,7 +95,7 @@ void Cursor_update()
 			Game_xMarkSpotY = Game_cursorY;
 			Game_xMarkPlaced = TRUE;
 			
-			// at this point we should do whatever weaponspawning junk we need to do..
+			// at this point we should do whatever weapon spawning junk we need to do..
 			// TO-DO: implement
 			Weapons_setTarget(Game_xMarkSpotX, Game_xMarkSpotY);
 			

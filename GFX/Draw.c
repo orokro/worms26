@@ -32,10 +32,7 @@ void drawMap()
 		
 		// the bottom of the screen we should stop copying the buffer to
 		short screenBottom=99;
-		
-		// the bottom of the buffer should stop copying from
-		short bufferBottom=camBottom;
-		
+
 		// if both the top and the bottom of the buffer points are inbounds
 		// we can simplly draw the whole screen worth!
 		// we don't need to change any variables
@@ -52,10 +49,7 @@ void drawMap()
 			
 			// we want to only copy pixels for the rest of the screen
 			screenBottom = 99;
-			
-			// we dont need to copy any more pixels from the buffer:
-			bufferBottom = bufferTop+(200-screenTop);
-		
+
 		// also check if the bottom of the camera is beyond the map buffer
 		}else if(camBottom>199)
 		{
@@ -64,10 +58,7 @@ void drawMap()
 			
 			// always draw from the camera-top in the buffer:
 			bufferTop = camTop;
-			
-			// always draw the remaining rows in the buffer:
-			bufferBottom = 200;
-			
+
 			// only draw that many rows:
 			screenBottom = (200-bufferTop);
 		}
@@ -88,16 +79,48 @@ void drawMap()
 // main drawing routine for the game, e.g. map, worms, weapons, etc
 void Draw_renderGame()
 {
-	// game modes by name	
-	char modes[9][16] = {"Select", "Turn", "WeaponSel", "Pause", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
-	
 	// clear screen
 	ClrScr();
 	
 	/* ======================================================================================================================
 		 DRAWING THE MAP +++ DRAWING THE MAP +++ DRAWING THE MAP +++ DRAWING THE MAP +++ DRAWING THE MAP +++ DRAWING THE MAP ++
 	 	 ====================================================================================================================== */
-	 	 
+	
+	/*
+			How this works:
+			
+			Our mapBuffer pointer points a buffer that's four times the normal LCD_SIZE.
+			
+			We only want to draw a sub-section of that buffer on the screen.
+			
+			For vertical:
+			
+			The calculators screen height is 100 pixels, so we should draw 50 pixels above and below
+			the camera's "center"
+			
+			So: CameraTop = CameraY-50, and CameraBottom = CameraY+50
+			
+			The rows we draw on the screen will always be between 0 and 99 inclusive.
+			
+			So we need to determine the following:
+				- The top most row on the screen to draw
+				- The bottom most row on the screen to draw
+				- The top row from the buffer we should start copying.
+				
+			If the camera goes out of bounds of the map buffer, we can still draw part of the map
+			In this case, there are a few conditions:
+				- If the Camera goes above the map (CameraTop is less than 0 in the map-buffer)
+					then we can still draw the map, but ScreenTop will be lower on the screen
+				- If the Camera goes below the map (CameraBottom is more than 200 in the map-buffer)
+					then we can still draw the map. ScreenTop will be 0, but we'll only draw till the end of the buffer
+				- If either the CameraBottom is less than 0 or CameraTop is greater than 200 then the map is compeltey
+					off screen, and we don't need to draw it at all.
+					
+			This way, the camera can still pan outside the map, into nothingness.
+			This is useful for following weapons or worms that fly far off the map, or projectiles that fly high
+			into the sky.
+	*/
+	
 	// for some reason I can't put this in a method... the identical code copied from the method below
 	//drawMap();	
 	// camera top position, in world-space
@@ -113,15 +136,14 @@ void Draw_renderGame()
 		// the of the screen we should start copying the buffer to
 		short screenTop=0;
 		
-		// the top row from the buffer we should start copying from
-		short bufferTop=camTop;
-		
 		// the bottom of the screen we should stop copying the buffer to
 		short screenBottom=99;
 		
-		// the bottom of the buffer should stop copying from
-		short bufferBottom=camBottom;
-		
+		// the top row from the buffer we should start copying from
+		// note: we don't need a buffer bottom, since the loop is controlled from screenTop to screenBottom
+		// so we only really need bufferTop in the loop
+		short bufferTop=camTop;
+
 		// if both the top and the bottom of the buffer points are inbounds
 		// we can simplly draw the whole screen worth!
 		// we don't need to change any variables
@@ -138,10 +160,7 @@ void Draw_renderGame()
 			
 			// we want to only copy pixels for the rest of the screen
 			screenBottom = 99;
-			
-			// we dont need to copy any more pixels from the buffer:
-			bufferBottom = bufferTop+(200-screenTop);
-		
+
 		// also check if the bottom of the camera is beyond the map buffer
 		}else if(camBottom>199)
 		{
@@ -150,10 +169,7 @@ void Draw_renderGame()
 			
 			// always draw from the camera-top in the buffer:
 			bufferTop = camTop;
-			
-			// always draw the remaining rows in the buffer:
-			bufferBottom = 200;
-			
+
 			// only draw that many rows:
 			screenBottom = (200-bufferTop);
 		}
@@ -172,27 +188,36 @@ void Draw_renderGame()
 	/* ======================================================================================================================
 		 END MAP +++ END MAP +++ END MAP +++ END MAP +++ END MAP +++ END MAP +++ END MAP +++ END MAP +++ END MAP +++ END MAP ++
 	 	 ====================================================================================================================== */
-	 	 
+	 	
+	// for now, we will output a bunch of debug info on the screen
+	
+	// game modes by name	
+	char modes[9][16] = {"Select", "Turn", "WeaponSel", "Pause", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
+	
+	// draw the current and previous game mode on the scren
 	DrawStr(0,0,modes[(short)Game_mode], A_XOR);
 	DrawStr(0,10,modes[(short)Game_previousMode], A_XOR);
 	
+	// draw the current grace time, turn time, and retreat time on the screen
+	// NOTE: for some reason, drawing sudden death time instead of retreat time crashes the game)
 	char timeStr[40];
-	//short time = Game_timer/100;  
 	sprintf(timeStr, "time: %d, %d, %d", (short)(Game_graceTimer/TIME_MULTIPLIER), (short)(Game_timer/TIME_MULTIPLIER), (short)(Game_retreatTimer));
 	DrawStr(0,30,timeStr, A_XOR);	
-	
+
+	// draw the current team on the screen	
 	DrawStr(0,40, (Game_currentTeam ? "Team: Black" : "Team: White") , A_XOR);	
 	
+	// drwa the current worm on the screen
 	char wormStr[20];
 	sprintf(wormStr, "Worm Up: %d", (short)Game_currentWormUp[(short)Game_currentTeam]);
-	
 	DrawStr(0,50, wormStr , A_XOR);	
 	
-	
+	// draw the camera's position on the screen
 	char camStr[40];
 	sprintf(camStr, "Cam: %d, %d", (short)camX, (short)camY);
 	DrawStr(0,60, camStr , A_XOR);
 	
+	// draw our free memory on the screen
 	char heapStr[40];
 	sprintf(heapStr, "heap: %lu", (unsigned long)HeapAvail());
 	DrawStr(0,70, heapStr , A_XOR);
@@ -202,9 +227,11 @@ void Draw_renderGame()
 // main drawing routine for the pause menu
 void Draw_renderPauseMenu(char menuItem)
 {
+	// clear the screen
 	ClrScr();
-	DrawStr(0,0,"pause menu", A_XOR);
 	
+	// draw the pause menu, and which menu item is currently selected
+	DrawStr(0,0,"pause menu", A_XOR);
 	DrawStr(0,10,(!menuItem ? "Continue" : "Quit Game"), A_NORMAL);
 }
 
@@ -212,13 +239,12 @@ void Draw_renderPauseMenu(char menuItem)
 // main drawing routine for the weapons menu
 void Draw_renderWeaponsMenu(char wx, char wy)
 {
+	// clear the screen
 	ClrScr();
+	
+	// draw the weapons menu and the X/Y position of the selected weapon in the menu
 	DrawStr(0,0,"Weapons Menu", A_NORMAL);
-	
-	
 	char weapStr[32];  
 	sprintf(weapStr, "Selected: %d, %d", (short)wx, (short)wy);
-	DrawStr(0,10,weapStr, A_NORMAL);
-	
-	
+	DrawStr(0,10,weapStr, A_NORMAL);	
 }

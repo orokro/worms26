@@ -188,7 +188,7 @@ void updateHoming(short index)
 void updateMovement(short index)
 {
 	// here we need to provide custom logic for moving weapon objects,
-	// for instance, sheep should move whatever directly their facing
+	// for instance, sheep should move whatever direction their facing
 	// and sheep should jump occasionally
 	
 	// TO-DO: implement
@@ -196,7 +196,7 @@ void updateMovement(short index)
 }
 
 
-// if a weapon requires user input (such as sheep, or machine gun) this will take input from the user
+// if a weapon requires user input (such as super-sheep, or machine gun) this will take input from the user
 void updateController(short index)
 {
 	// some weapons, like super sheep require user input to steer

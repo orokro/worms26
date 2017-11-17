@@ -16,7 +16,7 @@ void Pause_update()
 	  if either up or down are pressed, we should toggle the pause menu item
 	  since there are only two menu items, there is no "direction", if the top item is selected
 	  pressing up would loop it to the bottom item, and pressing down would move down to the bottom item
-	  thus, we can keys for either key at once by masking them together: keyUp | keyDown and then just
+	  thus, we can test for either key at once by masking them together: keyUp | keyDown and then just
 	  toggle the state of the variable
 	*/
 	if(Keys_keyDown(keyUp | keyDown)==TRUE)
@@ -31,7 +31,6 @@ void Pause_update()
 			return;
 		}else
 		{
-			extern char GameRunning;
 			// setting this will exit the next tick of our main loop
 			GameRunning=FALSE;
 			return;

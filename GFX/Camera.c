@@ -70,8 +70,9 @@ void Camera_update()
 		short moveY = (short)(deltaY * 0.2f);
 		
 		// if the deltas aren't zero (camera perfectly focused) but our moves
-		// are 0, then just set the camera to the target
-		// since move will never be 
+		// just make them 1 pixel in the correct direction. The camera always
+		// gets within 4 pixels of it's target (due to the 0.2f) so we will
+		// allways move one pixel at a time towards the target within 4 pixels
 		if(deltaX!=0 && moveX==0)
 			moveX = deltaX / abs(deltaX);
 		if(deltaY!=0 && moveY==0)

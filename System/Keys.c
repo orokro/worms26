@@ -6,7 +6,7 @@
 /*
 	As desribed in our Keys.h file,
 	
-	these three unsigned its will use bit masks to store the state of each
+	these three longs will use bit masks to store the state of each
 	logical key we care about. Bitwise defines have been provided in Keys.h
 	with the proper bit masks for each key
 	

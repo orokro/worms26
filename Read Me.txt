@@ -1,0 +1,174 @@
+How this program works:
+
+The Main file has a typical void _main(void) method to kick everything, do initialization, and house a main loop.
+
+The main loop is sparse - a keycode to exit (2ND+ESC), and just calls Game_update();
+
+While C is not OOP, there are a number of naming conventions I used to make it appear more readable like OOP.
+
+Like-methods and variables for items in the game are grouped in files.
+
+The format is as follows:
+
+ClassName_methodName()
+
+or
+
+ClassName_variableName()
+
+Now, I realize there's no "Classes" but I use that for lack of better term. Anyway, each file has a number of
+global/extern variables that start with their logical name with an Uppercase, followed by an underscore and
+then the specific variable name.
+
+This keeps things organized in the code.
+
+Methods follow the same convention, with their logical name with an Uppercase, followed by an underscore and
+then the specific method name.
+
+The Game.c file is the heart of the game - it's a state machine with a method to change the games state.
+
+The games lifecyle takes place over a number of states:
+	gameMode_WormSelect
+	gameMode_Turn
+	gameMode_WeaponSelect
+	gameMode_Pause
+	gameMode_Cursor
+	gameMode_TurnEnd
+	gameMode_Death
+	gameMode_AfterTurn
+	gameMode_GameOver
+
+Note that, you can read more in detail about these states in the Game.h header file.
+
+Anyway, each state has its own:
+
+	_enter()
+	_update()
+	_exit()
+
+Methods. When states are changed, the current state has it's <State>_exit() method fire,
+then the state is changed, and the new state has it's <State>_enter() method fire.
+On every frame, the current state has its <State>_update() method fire.
+
+So for example, in the Turn state, there are three methods defined:
+
+	Turn_enter()
+	Turn_update()
+	Turn_exit()
+
+With this state machine I can logically and (sanely!) manage the state of the game.
+Each state can use its _enter() method to set up variables for that state (like reset times, for instance)
+Each state can use its _exit() method to clean anything up for that state
+and of course, each state uses its _update() method to update whatever it manages.
+
+This prevents a giant rats nest of nested if-thens.
+
+I realize that some of the <State>_enter or <State>_exit methods are currently unused. I will
+leave their unused methods in place until the game is done.
+
+Now, the state machine was becomming a very long .c file.
+
+I decided to take advantage of the nature of C's #include preprocessor directive, and include the code
+for each state as a separate C file. At compile time, they will all be compounded into one giant file
+but for now, the states live as separate C files and are included in the main Game.c file.
+
+It's important to note that, TIGCC has some weird stuff going on with it's header include system.
+It doesn't seem to use local file paths for the #include directive, but instead, it uses the paths
+defined in the IDE. So, the .c files for the states are actually under the HEADERS section in the TIGCC IDE.
+
+On disk, they are located appropriately in a sub folder in the .c source code, but the IDE wants them elsewhere.
+
+Anyway, the state machine has _update() methods for each of it's states, and those methods can selectively call
+_update methods on other game objects.
+
+For instance, there is a Camera, a set of Mines, a set of Crates, a set of Worms, etc.
+
+each has it's own _update() method, such as:
+	Camera_update()
+	Mines_update()
+	Crates_udpate()
+	Worms_update()
+
+Each update handles the loop over those objects and their logic. This way, all the like-code is compartmentalized.
+Each of these _updates is defined in its corresponding .c file. So Crates_update() is defined in Crates.c
+Crates.c also defines the global/extern variables for Crates, such as Crate_x, Crate_y, Crate_health, etc.
+
+The code is broken up into folders to logically group like code and similar conceptual items:
+	- GameObjects: this includes objects on the screen, Crates, Explosions, Mines, OilDrums, Weapons, Worms
+	- Game: the main state machine and game-related items that aren't objects on the screen
+	- GFX: the camera and drawing routines (and later, sprites)
+	- System: general purpose things not specific to the game, in this case a new and improved keyinput system and _main
+
+Regarding the new KeyInput system:
+
+Previously I was doing some hackish code and using _keytest everywhere. Now instead, I test all the keys we care about only
+once per frame, and assign their truthiness to bits in a long.
+
+Using some clever AND/XOR bitwise logic, there are three longs defined and updated everyframe: keysDown, keysState, keysUp
+	keysDown: the bits in this long will be 1 or 0 if the corresponding key was down on THAT FRAME and that frame only
+	keysState: the bits will be 1 or 0 if that key is down on ANY FRAME
+	keysUp: the bits will be 1 or 0 if the key is up on THAT FRAME and that frame only
+
+This way, I can do some bit-mask testing and test for the exact frame a key was pressed-down on, without having to
+wait for it to release to prevent multipe-fires.
+
+Please see Keys.h for more.
+
+The camera system is improved:
+
+Instead of having to set a focus for the camera on each frame, when a focus is set, it's target X/Y positions
+are set as pointers. This way, when the item moves (e.g. a worm, weapon, etc) the camera automatically knows the new
+position, because it's referencing the same memory.
+
+Instead of dead-locking the camera on the target, it now interpolates towards the target, so the camera will spend
+a few frames moving towards the target, for smooth movement, instead of just jumping to the item it's focused on.
+
+During WormSelect mode, try pressing the [APPS] key to switch between worms, you'll see the Camera pan smoothly between
+locations. The only time the camera is directly controlled is if the user is holding [SHIFT]+[U/D/L/R]
+
+The map system is improved:
+
+Previously the Map used four separate buffers and could only draw in-bounds of the total buffer area.
+
+Now the drawing system allows the map to be drawn anywhere on screen, so the Camera can pan beyond the map without
+crashing. This is more true to the real Worms World Party: if a weapon goes high in the sky, or a worm flies
+far off the map, the Camera can now track it, leaving the map behind.
+
+I make a lot of use of bitwise operations. For the Crates, Mines, etc I typically have a variable like:
+	- Crates_active
+	- Mines_active
+
+Each bit in this variable corresponds to one of the Crates/Mines array incidies. If the mine explodes,
+or the Crate is picked up / explodes, it's bit is set to 0. If a new crate or mine needs to spawn,
+it can check bits till it finds a free slot (0 bit).
+
+Also, if Crates_active==0 or Mines_active==0, that means there are no active crates or mines in the game.
+Thus, we don't have to call Crates_update() or Mines_update() if their active variables == 0
+
+Anyway, so the game is pretty simple so far, here's a high-level over view of how it works:
+
+	- Game enters in void _main
+	- Initial TIGCC init, such as setting up buffers
+	- Main loop in Main.c, just calls Game_update() every frame
+	- Game_update() calls the appropriate <State>_update() method for the current state
+	- Game_changeState() changes the state and calls the appropriate <State>_exit() and <State>_enter() methods
+	- The states cyle in the following manner:
+		- WormSelect (user picks a worm)
+		- Turn	(user has his turn)
+		- TurnEnd (time runs out, or the user users a weapon)
+		- Death sequences (for worms blowing themselves up that died that turn)
+		- AfterTurn (craws spawn, water rises if sudden death, etc)
+	- States that don't loop, but can interupt are:
+		- Pause (shows pause menu)
+		- Weaponselect (shows weapon menu)
+		- Cursor (when the user is using an item that needs a cursor)
+		- GameOver (when one or both teams are eliminated)
+	- When the game has ended, due to GameOver or user exiting, the main loop will exit
+	- Buffrs are free'd, and TIGCC things are uninitialized
+
+That's about it! I haven't had a chance to implement Physics or Item spawning yet, because I'm waiting for the Map
+system to be perfected. After that, I can get gravity and such working, and then controlling worms.
+
+The code seems to be running well, but has some weird quirks..
+
+
