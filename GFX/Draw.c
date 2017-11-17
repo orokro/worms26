@@ -43,56 +43,83 @@ void Draw_renderGame()
 	short mapOriginX=239;
 	short mapOriginY=127;
 	
-	// it should start 64 pixels above the cameras offset from the maps center
-	camStartY = mapOriginY+camY-64;
+	// camera top position, in world-space
+	short camTop = camY-64;
 	
-	// if it's less than 0, just start drawing the map at row 0
-	if(camStartY<0)
+	// camera bottom position, in wrold-space
+	short camBottom = camY+64;
+	
+	// we shouldn't continue if either is out of bounds
+	if(!(camBottom<0) && !(camTop>254) && !(camTop<0))
 	{
-		screenStartOffset = -camStartY;
-		screenEndOffset = camStartY;
-		camStartY=0;
-	}
 		
+		// the of the screen we should start copying the buffer to
+		short screenTop=0;
 		
-	// if the camera is super below the map, we dont need to draw the map at all:
-	if(camStartY>254)
-		return;
+		// the top row from the buffer we should start copying from
+		short bufferTop=camTop;
 		
-	// we should STOP drawing 63 pixels below the cameras offset from the maps center
-	camEndY = mapOriginY+camY+63;
-	
-	// if the end point is greater than 254, it shoudl stop drawing the map after 254 in the map buffer
-	if(camEndY>254)
-	{
-		screenStartOffset = 0;
-		camEndY = camStartY+(camEndY-254);
-	}
+		// the bottom of the screen we should stop copying the buffer to
+		short screenBottom=127;
 		
+		// the bottom of the buffer should stop copying from
+		short bufferBottom=camBottom;
 		
-	// if the camera is super high up, no need to draw the map
-	if(camEndY<0)
-		return;
-	
-	// where in memory should it copy the map?
-	
-	char *lcd = virtual;
-	char *map = mapBuffer;
-	short x,y;
-	short lcdY=0;
-	for(x=0; x<30; x++)
-	{
-		lcdY=0;
-		for(y=camStartY; y<camEndY; y++)
+		// if both the top and the bottom of the buffer points are inbounds
+		// we can simplly draw the whole screen worth!
+		// we don't need to change any variables
+		
+		// if, however, the top of the camera is is above the map
+		// we need to change our render bounds..
+		if(camTop<0)
 		{
-			lcd[lcdY*30+x+screenStartOffset] = map[y*60+x];
-			lcdY++;
-		}
+			// whatever we draw, will be from the top row of the buffer
+			bufferTop = 0;
 			
-	}
-	
-//	memcpy (virtual, mapBuffer, LCD_SIZE);
-	
+			// we want to draw lower on the screen... by how far the camera is beyond
+			screenTop = -(camTop);
+			
+			// we want to only copy pixels for the rest of the screen
+			screenBottom = (127-screenTop);
+			
+			// we dont need to copy any more pixels from the buffer:
+			bufferBottom = bufferTop+(127-screenTop);
+		
+		// also check if the bottom of the camera is beyond the map buffer
+		}else if(camBottom>254)
+		{
+			// always draw on the top of the screen:
+			screenTop = 0;
+			
+			// always draw from the camera-top in the buffer:
+			bufferTop = camTop;
+			
+			// always draw the remaining rows in the buffer:
+			bufferBottom = 254;
+			
+			// only draw that many rows:
+			screenBottom = (254-bufferTop);
+		}
+		
+		short *lcd = virtual;
+		short *map = mapBuffer;
+		short x,y;
+		short lcdY=0;
+		for(x=0; x<15; x++)
+		{
+			lcdY=0;
+			for(y=screenTop; y<screenBottom; y++)
+			{
+				lcd[lcdY*15+x+screenStartOffset] = map[(bufferTop+y)*30+x];
+				lcdY++;
+			}
+				
+		}
+		
+		//	memcpy (virtual, mapBuffer, LCD_SIZE);
+		
+	}// end if draw map
+
 	DrawStr(0,0,modes[(short)Game_mode], A_XOR);
 	DrawStr(0,10,modes[(short)Game_previousMode], A_XOR);
 	
