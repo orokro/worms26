@@ -55,8 +55,14 @@ void drawMap()
 	// camera bottom position, in wrold-space
 	short camBottom = camY+50;
 	
+	// camera left position, in world-space
+	short camLeft = camX-80;
+	
+	// camera right position, in world-space
+	short camRight = camX+80;
+	
 	// we shouldn't continue if either is out of bounds
-	if(!(camBottom<0) && !(camTop>199))
+	if(!(camBottom<0) && !(camTop>199) && !(camLeft>319) && !(camRight<0))
 	{
 		
 		// the of the screen we should start copying the buffer to
@@ -100,13 +106,133 @@ void drawMap()
 			screenBottom = (200-bufferTop);
 		}
 		
+		// the left side of the screen, we should start drawing to
+		short screenLeft = 0;
+		
+		// the right side of the screen, we should stop drawing at
+		short screenRight = 160;
+		
+		// the position in the buffer we should start copying left-to-right
+		short bufferLeft = camLeft;
+		
+		// if the screen's left is out of bounds of our map buffer
+		// then we should start drawing in the middle of the screen...
+		if(camLeft<0)
+		{
+			// the screen left should be the same as how far OB the camera is.
+			// if the camera is 10 pixels to the left of the map, the map
+			// should draw at 10px right on the screen...
+			screenLeft = (camLeft*-1);
+			
+			// since we're starting at the left of the map, we will draw
+			// all the way to the right edge o the screen:
+			screenRight = 160;
+			
+			// since we're starting at the left of the screen, we will
+			// start at the left of the buffer:
+			bufferLeft=0;
+			
+		// if the right of the camera is beyond the right edge of the buffer...
+		}else if(camRight>319)
+		{
+			// we will definately start drawing on the left side of the screen
+			screenLeft = 0;
+			
+			// we will start the buffer at the left-camera edge:
+			bufferLeft = camLeft;
+			
+			// we only need to draw until the buffer runs out..
+			screenRight = 160; //320-bufferLeft;
+		}
+		
+		// because we are going to be copying bits in blocks of 16 at a time below
+		// we need to convert our screenLeft, screenRight and bufferLeft into columns
+		short colLeft = (screenLeft-(screenLeft%16))/16;
+		short colRight = (screenRight-(screenRight%16))/16;
+		short colBuff = (bufferLeft-(bufferLeft%16))/16;
+
 		// loop to manually copy memory from a sub-section of our map
-		short *lcd = virtual;
-		short *map = mapBuffer;
-		short x,y;
+		unsigned short *lcd = virtual;
+		unsigned short *map = mapBuffer;
+		short x,y, bufferCol;
+		
+		// loop through the visible rows on the screen
 		for(y=0; y<=(screenBottom-screenTop); y++)
-			for(x=0; x<15; x++)
-				lcd[(screenTop+y)*15+x] = map[(bufferTop+y)*30+x];
+		{
+			bufferCol=0;
+			
+			// loop over the visible columns of the map on screen, or till our buffer runs out
+			for(x=colLeft; (x<colRight && (colBuff+bufferCol)<20); x++)
+			{
+			
+				// we want to bit-shift the map if the camera's position isn't on an even division of 8
+				unsigned short screenData = map[(bufferTop+y)*30+colBuff+bufferCol];
+				short offset = camLeft%16;
+				if(offset!=0)
+				{
+				
+					// if the camera is negative we need slightly different logic
+					if(offset<0)
+					{
+						// make our off set positive, since it was the result of % on a negative camLeft
+						offset *= -1;
+						
+						// shift right by the scroll offset:
+						screenData = (screenData >> offset);
+						
+						// we don't need to copy from the previous tile, if we're in the first row:
+						if((colBuff+bufferCol)>0)
+						{
+								
+							// we also want to copy the lower bits from the previous tile over:
+							unsigned short previousTile = map[(bufferTop+y)*30+colBuff+bufferCol-1];
+							
+							// move these bits left, so the lower bits become the missing upper bits on our data
+							// if our camera is offset by 6, we will have shift everything 16-6, and have 6 open spots on the right
+							previousTile = previousTile << (16-offset);
+							
+							// now if we OR our two data sets together, we should have the correctly scrolled data
+							screenData |= previousTile;
+							
+							// also note, that, since we're negative, our screenX should increase by 1
+							screenLeft++;
+							
+						}// end if left edge of buffer
+					
+					// otherwise, we're offset, but in a positive region
+					}else
+					{
+						// shift left by the scroll offset:
+						screenData = (screenData << offset);
+						
+						// we don't need to copy from the next tile, if we're on the last tile of the map:
+						if((colBuff+bufferCol+1) < 20)
+						{
+								
+							// we also want to copy the upper bits from the next tile over:
+							unsigned short nextTile = map[(bufferTop+y)*30+colBuff+bufferCol+1];
+							
+							// move these bits right, so the upper bits become the missing lower bits on our data
+							// if our camera is offset by 6, we will have shift everything 6, and have 6 open spots on the right
+							// therefore, this needs to be shift 16-6 to the right:
+							nextTile = nextTile >> (16-offset);
+							
+							// now if we OR our two data sets together, we should have the correctly scrolled data
+							screenData |= nextTile;
+							
+						}// end if right edge of buffer
+					}// end if negative scroll
+				}// end if is offset
+				
+				// copy the scroll-offset memory to our screen location
+				lcd[(screenTop+y)*15+x] = screenData;
+				
+				// on the next iteration we will be on the next buffer colum
+				bufferCol++;
+			
+			}// next x
+			
+		}// next y		
 		
 		//	memcpy (virtual, mapBuffer, LCD_SIZE);
 		

@@ -43,6 +43,9 @@ void Map_makeMap(void *mapBuffer)
 	// draw to this memory
 	PortSet(segment, 239, 127);
 	
+	// clear screen (our buffer)
+	ClrScr();
+	
 	// loop to draw a bunch of circles on the map for Camera-scroll debugging
 	for(x=10; x<screenWidth; x+=30)
 		for(y=10; y<90; y+=30)
@@ -59,9 +62,9 @@ void Map_makeMap(void *mapBuffer)
 	// we will use modulus to have one set of loops copy it to all four places at once
 	short *seg = segment;
 	short *map = mapBuffer;
-	for(x=0; x<30; x++)
-		for(y=0; y<200; y++)
-			map[y*30+x] = seg[((y%100)*15)+(x%15)];
+	for(y=0; y<200; y++)
+		for(x=0; x<20; x++)
+			map[y*30+x] = seg[((y%100)*15)+(x%10)];
 	
 	// free our temporary map segment buffer
 	free(segment);
