@@ -38,7 +38,7 @@ char Weapon_xVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 char Weapon_yVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 char Weapon_time[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 char Weapon_uses[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-short Weapon_active = 0;
+unsigned short Weapon_active = 0;
 short Weapon_targetX = 0;
 short Weapon_targetY = 0;
 
@@ -68,7 +68,7 @@ short findFreeWeaponSlot()
 	return -1;
 }
 // spawns a weapon... simple enough
-void Weapons_spawn(char type, char x, char y, char xVelocity, char yVelocity, char time, char properties)
+void Weapons_spawn(char type, short x, short y, char xVelocity, char yVelocity, char time, char properties)
 {
 	// find a free slot, if none are available, we are unable to spawn this weapon (should never happen)
 	short slot = findFreeWeaponSlot();

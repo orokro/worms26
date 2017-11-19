@@ -50,7 +50,7 @@ Use Return Value=0
 Enable Error Return=0
 Save Screen=1
 [File Editing]
-Open File=C:\Users\Dude\Documents\worms17\GameObjects\Crates.c
+Open File=C:\Users\Dude\Documents\worms17\GameObjects\Weapons.c
 [Included Files]
 C File 1=GameObjects\Weapons.c
 C File 1 Folder=GameObjects

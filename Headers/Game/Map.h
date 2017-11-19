@@ -18,6 +18,6 @@ extern short Map_lastRequestedSpawnY;
 extern void *mapBuffer;
 
 // function prototypes
-char Map_testPoint(short, short);
-void Map_getSpawnPoint();
-void Map_makeMap(void*);
+extern char Map_testPoint(short, short);
+extern void Map_getSpawnPoint();
+extern void Map_makeMap(void*);

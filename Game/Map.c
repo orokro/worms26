@@ -12,6 +12,13 @@ short Map_lastRequestedSpawnY=0;
 #define screenWidth 159
 #define screenHeight 99
 
+
+// function prototypes
+char Map_testPoint(short, short);
+void Map_getSpawnPoint();
+void Map_makeMap(void*);
+
+
 // builds a random map for the worms to play on
 void Map_makeMap(void *mapBuffer)
 {

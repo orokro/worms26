@@ -115,7 +115,7 @@ extern char Weapon_time[10];
 extern char Weapon_uses[10];
 
 // bit mask if the weapon is active in this slot
-extern short Weapon_active;
+extern unsigned short Weapon_active;
 
 // because Weapons are defined BEFORE the Game header file, we cant access the cursor target
 // thus, whever a target is set, it will have to update our weapon target
@@ -123,7 +123,7 @@ extern short Weapon_targetX;
 extern short Weapon_targetY;
 
 // function prototypes
-void Weapons_spawn(char, char, char, char, char, char, char);
+void Weapons_spawn(char, short, short, char, char, char, char);
 void Weapons_update();
 char Weapons_weaponsActive();
 void Weapons_setTarget(short, short);

@@ -14,78 +14,6 @@ void setMapPtr(void *ptr)
 // draw the map.. but I can't call this, crashes
 void drawMap()
 {
-	// camera top position, in world-space
-	short camTop = camY-50;
-	
-	// camera bottom position, in wrold-space
-	short camBottom = camY+50;
-	
-	// we shouldn't continue if either is out of bounds
-	if(!(camBottom<0) && !(camTop>199))
-	{
-		
-		// the of the screen we should start copying the buffer to
-		short screenTop=0;
-		
-		// the top row from the buffer we should start copying from
-		short bufferTop=camTop;
-		
-		// the bottom of the screen we should stop copying the buffer to
-		short screenBottom=99;
-
-		// if both the top and the bottom of the buffer points are inbounds
-		// we can simplly draw the whole screen worth!
-		// we don't need to change any variables
-		
-		// if, however, the top of the camera is is above the map
-		// we need to change our render bounds..
-		if(camTop<0)
-		{
-			// whatever we draw, will be from the top row of the buffer
-			bufferTop = 0;
-			
-			// we want to draw lower on the screen... by how far the camera is beyond
-			screenTop = (camTop*-1);
-			
-			// we want to only copy pixels for the rest of the screen
-			screenBottom = 99;
-
-		// also check if the bottom of the camera is beyond the map buffer
-		}else if(camBottom>199)
-		{
-			// always draw on the top of the screen:
-			screenTop = 0;
-			
-			// always draw from the camera-top in the buffer:
-			bufferTop = camTop;
-
-			// only draw that many rows:
-			screenBottom = (200-bufferTop);
-		}
-		
-		short *lcd = virtual;
-		short *map = mapBuffer;
-		short x,y;
-		for(y=0; y<=(screenBottom-screenTop); y++)
-			for(x=0; x<15; x++)
-				lcd[(screenTop+y)*15+x] = map[(bufferTop+y)*30+x];
-		
-		//	memcpy (virtual, mapBuffer, LCD_SIZE);
-		
-	}// end if draw map
-}
-
-
-// main drawing routine for the game, e.g. map, worms, weapons, etc
-void Draw_renderGame()
-{
-	// clear screen
-	ClrScr();
-	
-	/* ======================================================================================================================
-		 DRAWING THE MAP +++ DRAWING THE MAP +++ DRAWING THE MAP +++ DRAWING THE MAP +++ DRAWING THE MAP +++ DRAWING THE MAP ++
-	 	 ====================================================================================================================== */
-	
 	/*
 			How this works:
 			
@@ -121,8 +49,6 @@ void Draw_renderGame()
 			into the sky.
 	*/
 	
-	// for some reason I can't put this in a method... the identical code copied from the method below
-	//drawMap();	
 	// camera top position, in world-space
 	short camTop = camY-50;
 	
@@ -185,10 +111,18 @@ void Draw_renderGame()
 		//	memcpy (virtual, mapBuffer, LCD_SIZE);
 		
 	}// end if draw map
-	/* ======================================================================================================================
-		 END MAP +++ END MAP +++ END MAP +++ END MAP +++ END MAP +++ END MAP +++ END MAP +++ END MAP +++ END MAP +++ END MAP ++
-	 	 ====================================================================================================================== */
-	 	
+}
+
+
+// main drawing routine for the game, e.g. map, worms, weapons, etc
+void Draw_renderGame()
+{
+	// clear screen
+	ClrScr();
+	
+	// for some reason I can't put this in a method... the identical code copied from the method below
+	drawMap();	
+	 
 	// for now, we will output a bunch of debug info on the screen
 	
 	// game modes by name	
@@ -221,6 +155,8 @@ void Draw_renderGame()
 	char heapStr[40];
 	sprintf(heapStr, "heap: %lu", (unsigned long)HeapAvail());
 	DrawStr(0,70, heapStr , A_XOR);
+	
+	DrawStr(0,80, ((Weapon_active>0)?"W on" : "W off") , A_XOR);
 }
 
 
