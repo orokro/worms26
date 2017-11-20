@@ -7,6 +7,9 @@ void *doubleBuffer;
 void *virtual;
 void *mapBuffer;
 
+//GLOBAL DOUBLE BUFFER
+void *GblDBuffer;
+
 // global method to calculate distance between two points
 // maybe I'll move this into a math file one day
 short dist(short x1, short y1, short x2, short y2)
@@ -60,15 +63,25 @@ void _main(void)
 	
 	// allocat and set a virtual screen to render to
 	// (this will be black and white until I implement graphics and double buffering)
-	virtual = malloc(LCD_SIZE);
+	//virtual = malloc(LCD_SIZE);
 	mapBuffer = malloc(LCD_SIZE*4);
 	Map_makeMap(mapBuffer);
 	//setMapPtr(mapBuffer);
 	
+	
+	GrayOn();
+	// allocate space for double-buffering
+	void *dbuffer=malloc(GRAYDBUFFER_SIZE);
+	
+	// enable double-buffering
+  GrayDBufInit(dbuffer);
+  GblDBuffer=dbuffer;
+  
+  
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	Game_changeMode(gameMode_WormSelect);
 	
-	PortSet (virtual, 239, 127);
+	//PortSet (virtual, 239, 127);
 	
 	// main loop!
 	GameRunning=TRUE;
@@ -83,16 +96,28 @@ void _main(void)
 		Game_update();
 		
 		// copy whtaever was rendered to the screen!
-		memcpy (LCD_MEM, virtual, LCD_SIZE);
+		//memcpy (LCD_MEM, virtual, LCD_SIZE);
+		
+	  // now flip the planes
+	  GrayDBufToggleSync();
+	    
+	  /* On HW1, the flip will be effective only after 1 or 2 plane switches
+	       depending on the phase. We must not draw to the "hidden" planes before
+	       they are really hidden! */
+	  if (!_GrayIsRealHW2()) GrayWaitNSwitches(2);
+  
 	}
 	
 	// retstore our virtual screen and free the memory before we return to the OS
-	LCD_restore (virtual);
-	PortRestore();
+	//LCD_restore (virtual);
+	//PortRestore();
 	
 	// free our buffers:
-	free(virtual);
+	//free(virtual);
 	free(mapBuffer);
+	
+	GrayOff();
+	free(GblDBuffer);
 	
 	// free our double buffering buffer
 	// free(doubleBuffer);

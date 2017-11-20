@@ -157,7 +157,7 @@ void drawMap()
 		short colBuff = (bufferLeft-(bufferLeft%16))/16;
 
 		// loop to manually copy memory from a sub-section of our map
-		unsigned short *lcd = virtual;
+		unsigned short *lcd = GrayDBufGetHiddenPlane(DARK_PLANE); //virtual;
 		unsigned short *map = mapBuffer;
 		short x,y, bufferCol;
 		
@@ -370,24 +370,33 @@ void drawCrates()
 // main drawing routine for the game, e.g. map, worms, weapons, etc
 void Draw_renderGame()
 {
-	// clear screen
+	GrayDBufSetHiddenAMSPlane(DARK_PLANE);
+	ClrScr();
+	GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
 	ClrScr();
 	
 	// for some reason I can't put this in a method... the identical code copied from the method below
 	drawMap();	
 	
-	// draw oil drums first, as everything else should overlap them
-	drawOilDrums();
+	// draw on both planes for now
+	short z=0;
+	for(z=0; z<2; z++)
+	{
+		GrayDBufSetHiddenAMSPlane((z%2==0) ? DARK_PLANE : LIGHT_PLANE);
+		
+		// draw oil drums first, as everything else should overlap them
+		drawOilDrums();
+		
+		// draw crates ontop of oil drums...
+		drawCrates();
+		
+		// draw our wormy bros
+		drawWorms();
+		
+		// mines are important, so draw them on top of everything else
+		drawMines();
 	
-	// draw crates ontop of oil drums...
-	drawCrates();
-	
-	// draw our wormy bros
-	drawWorms();
-	
-	// mines are important, so draw them on top of everything else
-	drawMines();
-	
+	}
 	// for now, we will output a bunch of debug info on the screen
 	
 	// game modes by name	
@@ -425,6 +434,8 @@ void Draw_renderGame()
 // main drawing routine for the pause menu
 void Draw_renderPauseMenu(char menuItem)
 {
+	GrayDBufSetHiddenAMSPlane(DARK_PLANE);
+	
 	// clear the screen
 	ClrScr();
 	
@@ -437,6 +448,8 @@ void Draw_renderPauseMenu(char menuItem)
 // main drawing routine for the weapons menu
 void Draw_renderWeaponsMenu(char wx, char wy)
 {
+	GrayDBufSetHiddenAMSPlane(DARK_PLANE);
+	
 	// clear the screen
 	ClrScr();
 	

@@ -60,9 +60,13 @@
 
 // how many frames consist of one second?
 #define TIME_MULTIPLIER 40
+       
 
 // has to be extern so our draw routines can see it
 extern void *virtual;
+
+// global double buffer for grayscale
+extern void *GblDBuffer;
 
 // super-global variables
 char GameRunning;
