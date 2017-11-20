@@ -201,7 +201,7 @@ void startSuddenDeath();
 void gameTimers()
 {
 	// always decreates the sudden death timer
-	Game_suddenDeathTimer--;
+	// Game_suddenDeathTimer--;
 	
 	// note: technically suddenDeathTimer will go negative, but I doubt anyone will play
 	// long enough to get a negative overflow without drowning, so no need to check for negatives

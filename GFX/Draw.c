@@ -385,33 +385,30 @@ void Draw_renderGame()
 	
 	// draw the current and previous game mode on the scren
 	DrawStr(0,0,modes[(short)Game_mode], A_XOR);
-	DrawStr(0,10,modes[(short)Game_previousMode], A_XOR);
-	
+
 	// draw the current grace time, turn time, and retreat time on the screen
 	// NOTE: for some reason, drawing sudden death time instead of retreat time crashes the game)
 	char timeStr[40];
 	sprintf(timeStr, "time: %d, %d, %d", (short)(Game_graceTimer/TIME_MULTIPLIER), (short)(Game_timer/TIME_MULTIPLIER), (short)(Game_retreatTimer));
-	DrawStr(0,30,timeStr, A_XOR);	
+	DrawStr(0,10,timeStr, A_XOR);	
 
 	// draw the current team on the screen	
-	DrawStr(0,40, (Game_currentTeam ? "Team: Black" : "Team: White") , A_XOR);	
+	//DrawStr(0,40, (Game_currentTeam ? "Team: Black" : "Team: White") , A_XOR);	
 	
 	// drwa the current worm on the screen
-	char wormStr[20];
-	sprintf(wormStr, "Worm Up: %d", (short)Game_currentWormUp[(short)Game_currentTeam]);
-	DrawStr(0,50, wormStr , A_XOR);	
+	//char wormStr[20];
+	//sprintf(wormStr, "Worm Up: %d", (short)Game_currentWormUp[(short)Game_currentTeam]);
+	//DrawStr(0,50, wormStr , A_XOR);	
 	
 	// draw the camera's position on the screen
-	char camStr[40];
-	sprintf(camStr, "Cam: %d, %d", (short)camX, (short)camY);
-	DrawStr(0,60, camStr , A_XOR);
+	//char camStr[40];
+	//sprintf(camStr, "Cam: %d, %d", (short)camX, (short)camY);
+	//DrawStr(0,60, camStr , A_XOR);
 	
 	// draw our free memory on the screen
 	char heapStr[40];
 	sprintf(heapStr, "heap: %lu", (unsigned long)HeapAvail());
-	DrawStr(0,70, heapStr , A_XOR);
-	
-	DrawStr(0,80, ((Weapon_active>0)?"W on" : "W off") , A_XOR);
+	DrawStr(0,20, heapStr , A_XOR);
 }
 
 
