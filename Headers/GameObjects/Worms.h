@@ -62,3 +62,5 @@ extern char Worm_mode[16];
 // the game-logic will update this variable, such that worms that are alive, and on the current team, will cycle
 extern char Worm_currentWorm;
 
+// funtions
+extern void Worm_spawnWorms();

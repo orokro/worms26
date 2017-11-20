@@ -11,6 +11,35 @@ char Worm_yVelo[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 long Worm_dir = 0;
 char Worm_health[16] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 long Worm_isDead = 0;
-long Worm_active = 1;
+long Worm_active = 0;
 char Worm_mode[16] = {wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle };
 char Worm_currentWorm = 0;
+
+void Worm_spawnWorms();
+void spawnWorm(short);
+
+// spawns worms on the map
+void Worm_spawnWorms()
+{
+	short i=0;
+	for(i=0;i<Match_wormCount[0]; i++)
+		spawnWorm(i);
+	for(i=0;i<Match_wormCount[1]; i++)
+		spawnWorm(8+i);
+	
+}
+
+// spawns a single worm on the map
+void spawnWorm(short i)
+{
+	// find a free place for it on the map
+	Map_getSpawnPoint();
+	Worm_x[i] = Map_lastRequestedSpawnX;
+	Worm_y[i] = Map_lastRequestedSpawnY;
+	
+	// set active
+	Worm_active |= (long)1<<(i);
+	
+	// random direction
+	Worm_dir |= (long)(random(2))<<(i);
+}

@@ -38,7 +38,7 @@ extern char Mine_yVelo[10];
 extern char Mine_fuse[10];
 
 // is the mine active?
-int Mine_active;
+extern int Mine_active;
 
 // function prototypes
 void Mines_spawnMines();

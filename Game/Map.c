@@ -209,15 +209,22 @@ void Map_makeMap(void *mapBuffer)
 		// just generate them at our current x, and the tops of the current land
 		if(x%12==0 && spawnIndex<53)
 		{
-			// upper spawn point:
-			spawnPoint_x[(short)spawnIndex]=x;
-			spawnPoint_y[(short)spawnIndex]=50-upperLineTop;
-			spawnIndex++;
+			// upper spawn point, if land isn't 0:
+			if(!(upperLineTop==0 && upperLineBottom==0))
+			{
+				spawnPoint_x[(short)spawnIndex]=x;
+				spawnPoint_y[(short)spawnIndex]=50-upperLineTop;
+				spawnIndex++;
+			}
 			
-			// lower spawn point:
-			spawnPoint_x[(short)spawnIndex]=x;
-			spawnPoint_y[(short)spawnIndex]=170+lowerLineTop;
-			spawnIndex++;
+			
+			// lower spawn point, if land isn't 0:
+			if(lowerLineTop<30)
+			{
+				spawnPoint_x[(short)spawnIndex]=x;
+				spawnPoint_y[(short)spawnIndex]=170+lowerLineTop;
+				spawnIndex++;
+			}
 		}
 		
 		// now we need to draw the lines on the map...
@@ -242,6 +249,12 @@ void Map_makeMap(void *mapBuffer)
 			
 		}// next y
 	}// next x
+	
+	// part of generating the map will be generating the objects on it..
+	Mines_spawnMines();
+	OilDrums_spawnDrums();
+	Worm_spawnWorms();
+	
 }
 
 // tests a point on the map
@@ -258,8 +271,22 @@ char Map_testPoint(short x, short y)
 // find a free point to spawn something, that doesn't overlap with something else existing
 void Map_getSpawnPoint()
 {
-	// TO-DO: implement
-	Map_lastRequestedSpawnX=0;
-	Map_lastRequestedSpawnY=0;
-	
+	// loop over our available spawn points till we find one:
+	while(TRUE)
+	{
+			char index = random(53);
+			if(spawnPoint_x[(short)index]!=-1)
+			{
+				// save the spawn point
+				Map_lastRequestedSpawnX=spawnPoint_x[(short)index];
+				Map_lastRequestedSpawnY=spawnPoint_y[(short)index];
+				
+				// deactivate it
+				spawnPoint_x[(short)index]=-1;
+				spawnPoint_y[(short)index]=-1;
+				
+				// gtfo
+				return;
+			}
+	}	
 }

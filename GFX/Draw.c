@@ -2,6 +2,11 @@
 // Created 11/11/2017; 11:34:12 PM
 #include "../Headers/System/Main.h"
 
+char worldToScreen(short*, short*);
+void drawWorms();
+void drawMines();
+void drawOilDrums();
+void drawCrates();
 
 static void *mapPtr;
 
@@ -239,6 +244,118 @@ void drawMap()
 	}// end if draw map
 }
 
+// convert world coordinates to screen coordinates
+char worldToScreen(short *x, short *y)
+{
+	*x = *x-(camX-80);
+	*y = *y-(camY-50);
+	
+	// if anything is out of bounds, return false:
+	if(*x<-8 || *x>168 || *y<-16 || *y>116)
+		return FALSE;
+	else
+		return TRUE;
+}
+
+// draw all the worms in the game
+void drawWorms()
+{
+	short screenX, screenY;
+	
+	// loop over all worms and draw them if active:
+	short i;
+	for(i=0; i<16; i++)
+	{
+		if(Worm_active & (long)1<<(i))
+		{
+			screenX=Worm_x[i];
+			screenY=Worm_y[i];
+			if(worldToScreen(&screenX, &screenY)==TRUE)
+				DrawClipChar(screenX-4, screenY-8, ((i<8) ? 'W' : 'B'), (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR); 
+		}
+	}
+}
+
+// draw all the mines active in the game
+void drawMines()
+{
+	short screenX, screenY;
+	
+	char fuseStr[8];
+	
+	// loop over all mines and draw them if active:
+	short i;
+	for(i=0; i<10; i++)
+	{
+		if(Mine_active & (int)1<<(i))
+		{
+			screenX=Mine_x[i];
+			screenY=Mine_y[i];
+			if(worldToScreen(&screenX, &screenY)==TRUE)
+			{
+				DrawClipChar(screenX-4, screenY-6, '*', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
+				
+				// if the mine has an active fuse, draw that too
+				if(Mine_fuse[i]>0)
+				{
+					sprintf(fuseStr, "%d", Mine_fuse[i]);
+					DrawStr(screenX-4, screenY-16, fuseStr, A_NORMAL);
+				}// end if fuse
+			}// end if on screen
+		}// end if active
+	}// next i
+}
+
+// draw all the oil drums active in the game
+void drawOilDrums()
+{
+	short screenX, screenY;
+
+	// loop over all mines and draw them if active:
+	short i;
+	for(i=0; i<8; i++)
+	{
+		if(OilDrum_active & (int)1<<(i))
+		{
+			screenX=OilDrum_x[i];
+			screenY=OilDrum_y[i];
+			if(worldToScreen(&screenX, &screenY)==TRUE)
+			{
+				DrawStr(screenX-4, screenY-8, "[]", A_XOR);
+			}// end if on screen
+		}// end if active
+	}// next i
+	
+}
+
+// draw all the crates active in the game
+void drawCrates()
+{
+	short screenX, screenY;
+	
+	// loop over all mines and draw them if active:
+	short i;
+	for(i=0; i<8; i++)
+	{
+		if(Crate_active & (int)1<<(i))
+		{
+			screenX=Crate_x[i];
+			screenY=Crate_y[i];
+			if(worldToScreen(&screenX, &screenY)==TRUE)
+			{
+				DrawClipChar(screenX-4, screenY-8, 'C', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
+				if(Crate_type[i]==crateHealth)
+					DrawClipChar(screenX-4, screenY-16, 'H', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
+				else if(Crate_type[i]==crateWeapon)
+					DrawClipChar(screenX-4, screenY-16, 'W', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
+				else
+					DrawClipChar(screenX-4, screenY-16, 'T', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
+				
+			}// end if on screen
+		}// end if active
+	}// next i
+}
+
 
 // main drawing routine for the game, e.g. map, worms, weapons, etc
 void Draw_renderGame()
@@ -248,7 +365,19 @@ void Draw_renderGame()
 	
 	// for some reason I can't put this in a method... the identical code copied from the method below
 	drawMap();	
-	 
+	
+	// draw oil drums first, as everything else should overlap them
+	drawOilDrums();
+	
+	// draw crates ontop of oil drums...
+	drawCrates();
+	
+	// draw our wormy bros
+	drawWorms();
+	
+	// mines are important, so draw them on top of everything else
+	drawMines();
+	
 	// for now, we will output a bunch of debug info on the screen
 	
 	// game modes by name	

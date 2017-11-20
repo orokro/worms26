@@ -38,8 +38,8 @@ void spawnMine(char index)
 	Mine_x[(short)index] = Map_lastRequestedSpawnX;
 	Mine_y[(short)index] = Map_lastRequestedSpawnY;
 	
-	// set timer for the mine
-	Mine_fuse[(short)index] = Match_mineFuseLength;
+	// make this mine active:
+	Mine_active |= (int)1<<(index);
 }
 
 // main update for Mines
