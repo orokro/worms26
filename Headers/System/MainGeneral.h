@@ -59,7 +59,7 @@
 	 0b0000000000000000}
 
 // how many frames consist of one second?
-#define TIME_MULTIPLIER 40
+#define TIME_MULTIPLIER 15
        
 
 // has to be extern so our draw routines can see it

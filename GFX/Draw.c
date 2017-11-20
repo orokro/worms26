@@ -435,13 +435,19 @@ void Draw_renderGame()
 void Draw_renderPauseMenu(char menuItem)
 {
 	GrayDBufSetHiddenAMSPlane(DARK_PLANE);
-	
-	// clear the screen
+	ClrScr();
+	GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
 	ClrScr();
 	
-	// draw the pause menu, and which menu item is currently selected
-	DrawStr(0,0,"pause menu", A_XOR);
-	DrawStr(0,10,(!menuItem ? "Continue" : "Quit Game"), A_NORMAL);
+	short z=0;
+	for(z=0; z<2; z++)
+	{
+		GrayDBufSetHiddenAMSPlane((z%2==0) ? DARK_PLANE : LIGHT_PLANE);
+		
+		// draw the pause menu, and which menu item is currently selected
+		DrawStr(0,0,"pause menu", A_XOR);
+		DrawStr(0,10,(!menuItem ? "Continue" : "Quit Game"), A_NORMAL);
+	}
 }
 
 
@@ -449,13 +455,19 @@ void Draw_renderPauseMenu(char menuItem)
 void Draw_renderWeaponsMenu(char wx, char wy)
 {
 	GrayDBufSetHiddenAMSPlane(DARK_PLANE);
-	
-	// clear the screen
+	ClrScr();
+	GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
 	ClrScr();
 	
-	// draw the weapons menu and the X/Y position of the selected weapon in the menu
-	DrawStr(0,0,"Weapons Menu", A_NORMAL);
-	char weapStr[32];  
-	sprintf(weapStr, "Selected: %d, %d", (short)wx, (short)wy);
-	DrawStr(0,10,weapStr, A_NORMAL);	
+	short z=0;
+	for(z=0; z<2; z++)
+	{
+		GrayDBufSetHiddenAMSPlane((z%2==0) ? DARK_PLANE : LIGHT_PLANE);
+
+		// draw the weapons menu and the X/Y position of the selected weapon in the menu
+		DrawStr(0,0,"Weapons Menu", A_NORMAL);
+		char weapStr[32];  
+		sprintf(weapStr, "Selected: %d, %d", (short)wx, (short)wy);
+		DrawStr(0,10,weapStr, A_NORMAL);	
+	}
 }

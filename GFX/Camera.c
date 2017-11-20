@@ -28,7 +28,7 @@ short *cameraTargetY;
 short userX=0;
 short userY=0;
 
-#define camSpeed 3
+#define camSpeed 6
 
 // this is the main update function for the logic of the Camera.
 void Camera_update()
@@ -63,8 +63,8 @@ void Camera_update()
 		short deltaY = (*cameraTargetY - camY);
 		
 		// move just some small percent
-		short moveX = (short)(deltaX * 0.2f);
-		short moveY = (short)(deltaY * 0.2f);
+		short moveX = (short)(deltaX * 0.3f);
+		short moveY = (short)(deltaY * 0.3f);
 		
 		// if the deltas aren't zero (camera perfectly focused) but our moves
 		// just make them 1 pixel in the correct direction. The camera always
