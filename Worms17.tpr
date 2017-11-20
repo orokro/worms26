@@ -50,7 +50,7 @@ Use Return Value=0
 Enable Error Return=0
 Save Screen=1
 [File Editing]
-Open File=C:\Users\Dude\Documents\worms17\GFX\Draw.c
+Open File=C:\Users\Dude\Documents\worms17\extgraph.a
 [Included Files]
 C File 1=GameObjects\Weapons.c
 C File 1 Folder=GameObjects
@@ -79,6 +79,7 @@ C File 12 Folder=System
 C File 13=System\Main.c
 C File 13 Folder=System
 Archive File 1=extgraph.a
+Text File 1=Read Me.txt
 Header File 1=Headers\extgraph.h
 Header File 1 Folder=Headers
 Header File 2=Headers\GameObjects\Crates.h
@@ -127,4 +128,3 @@ Header File 23=Game\States\WeaponSelect.c
 Header File 23 Folder=States
 Header File 24=Game\States\AfterTurn.c
 Header File 24 Folder=States
-Text File 1=Read Me.txt
