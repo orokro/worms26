@@ -54,12 +54,9 @@ void Camera_update()
 		camX = userX;
 		camY = userY;
 		
-		// and we out
-		return;
-	}
-	
-	// if we are focusing on a target, we should move towards it...
-	if(cameraIsFocused==TRUE)
+		
+	// otherwise if we are focusing on a target, we should move towards it...
+	}else if(cameraIsFocused==TRUE)
 	{
 		// calc deltas:
 		short deltaX = (*cameraTargetX - camX);
@@ -82,6 +79,16 @@ void Camera_update()
 		camX += moveX;
 		camY += moveY;
 	}
+	
+	//  make sure the camera is always within bounds
+	if(camY>200-50)
+		camY=200-50;
+	if(camY<-100)
+		camY=-100;
+	if(camX<-100)
+		camX=-100;
+	if(camX>320+100)
+		camX=320+100;
 }
 
 // tell the Camera to focus on a pair of X/Y coordinates

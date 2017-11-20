@@ -5,8 +5,7 @@
 	Map
 	---
 	
-	This file defines the globals for our Map system
-
+	This file defines the globals for our Map system.
 */
 
 // when a spawn point is requested of the map, it will find one
