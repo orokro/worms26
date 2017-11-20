@@ -8,7 +8,7 @@ short Worm_x[16] = {15, 81, 120, 65, 90, 35, 150, 40, 175, 95, 250, 210, 25, 140
 short Worm_y[16] = {100, 195, 55, 40, 15, 140, 20, 135, 30, 20, 150, 45, 170, 15, 75, 5};
 char Worm_xVelo[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 char Worm_yVelo[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-long Worm_dir = 0;
+unsigned long Worm_dir = 0;
 char Worm_health[16] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 long Worm_isDead = 0;
 long Worm_active = 0;
@@ -41,5 +41,6 @@ void spawnWorm(short i)
 	Worm_active |= (long)1<<(i);
 	
 	// random direction
-	Worm_dir |= (long)(random(2))<<(i);
+	if(random(2)==0)
+		Worm_dir |= (unsigned long)1<<(i);
 }

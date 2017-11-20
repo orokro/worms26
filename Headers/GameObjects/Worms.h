@@ -39,7 +39,7 @@ extern char Worm_xVelo[16];
 extern char Worm_yVelo[16];
 
 // the direction the worm is currently FACING.. 0 = LEFT 1 = RIGHT
-extern long Worm_dir;
+extern unsigned long Worm_dir;
 
 // the current HEALTH of the worm
 extern char Worm_health[16];

@@ -56,6 +56,9 @@ void Map_makeMap(void*);
 // builds a random map for the worms to play on
 void Map_makeMap(void *mapBuffer)
 {
+	// gotta be random!
+	randomize();
+	
 	// iteration vars
 	short x, y;
 	

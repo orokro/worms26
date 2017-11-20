@@ -271,9 +271,19 @@ void drawWorms()
 			screenX=Worm_x[i];
 			screenY=Worm_y[i];
 			if(worldToScreen(&screenX, &screenY)==TRUE)
-				DrawClipChar(screenX-4, screenY-8, ((i<8) ? 'W' : 'B'), (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR); 
-		}
-	}
+			{
+				// for some reason testing the facing direction of the worm crashes the game... weird
+				// char facing = (Worm_dir & (unsigned long)1<<(i));
+				DrawClipChar(screenX-4, screenY-7, (char)111, (&(SCR_RECT){{0, 0, 159, 99}}), A_NORMAL); 
+				DrawClipChar(screenX+(FALSE ? -6 : -2), screenY-11, (char)111, (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
+				if(i>=8)
+				{
+					DrawClipChar(screenX-4, screenY-6, (char)127, (&(SCR_RECT){{0, 0, 159, 99}}), A_NORMAL); 
+					DrawClipChar(screenX+(FALSE ? -6 : -2), screenY-10, (char)127, (&(SCR_RECT){{0, 0, 159, 99}}), A_NORMAL);
+				} // end if black team
+			}// end if on screen
+		}// end if active
+	}// next i
 }
 
 // draw all the mines active in the game
@@ -293,7 +303,7 @@ void drawMines()
 			screenY=Mine_y[i];
 			if(worldToScreen(&screenX, &screenY)==TRUE)
 			{
-				DrawClipChar(screenX-4, screenY-6, '*', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
+				DrawClipChar(screenX-4, screenY-6, (char)240, (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR); //'©'
 				
 				// if the mine has an active fuse, draw that too
 				if(Mine_fuse[i]>0)
@@ -321,7 +331,7 @@ void drawOilDrums()
 			screenY=OilDrum_y[i];
 			if(worldToScreen(&screenX, &screenY)==TRUE)
 			{
-				DrawStr(screenX-4, screenY-8, "[]", A_XOR);
+				DrawClipChar(screenX-4, screenY-6, (char)139, (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
 			}// end if on screen
 		}// end if active
 	}// next i
