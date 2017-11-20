@@ -384,13 +384,13 @@ void Draw_renderGame()
 	char modes[9][16] = {"Select", "Turn", "WeaponSel", "Pause", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
 	
 	// draw the current and previous game mode on the scren
-	DrawStr(0,0,modes[(short)Game_mode], A_XOR);
+	DrawStr(0,1,modes[(short)Game_mode], A_XOR);
 
 	// draw the current grace time, turn time, and retreat time on the screen
 	// NOTE: for some reason, drawing sudden death time instead of retreat time crashes the game)
 	char timeStr[40];
 	sprintf(timeStr, "time: %d, %d, %d", (short)(Game_graceTimer/TIME_MULTIPLIER), (short)(Game_timer/TIME_MULTIPLIER), (short)(Game_retreatTimer));
-	DrawStr(0,10,timeStr, A_XOR);	
+	DrawStr(60,1,timeStr, A_XOR);	
 
 	// draw the current team on the screen	
 	//DrawStr(0,40, (Game_currentTeam ? "Team: Black" : "Team: White") , A_XOR);	
@@ -408,7 +408,7 @@ void Draw_renderGame()
 	// draw our free memory on the screen
 	char heapStr[40];
 	sprintf(heapStr, "heap: %lu", (unsigned long)HeapAvail());
-	DrawStr(0,20, heapStr , A_XOR);
+	DrawStr(0,10, heapStr , A_XOR);
 }
 
 
