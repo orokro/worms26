@@ -4,7 +4,22 @@
 #include "../Headers/System/Main.h"
 
 /*
-	These array values will store eligible spawn points on the map.
+	Map
+	---
+	
+	This file defines our Map system.
+
+	The map will be made up of a large buffer, four times the screen size
+	(double vertical and double horizontal)
+
+	The map will be generated in this buffer, and when explosions erase land,
+	the land will be removed from this buffer.
+
+	Pixels in this buffer will be tested for collision.
+*/
+
+/*
+	Below, these array values will store eligible spawn points on the map.
 	
 	Everytime an object requests a spawn point we will pick from one of
 	these, then deactivate it.
@@ -37,20 +52,15 @@
 short spawnPoint_x[53];
 short spawnPoint_y[53];
 
-// declare our external/global variables
+// when a spawn point is requested of the map, it will find one
+// and update these global map variables:
 short Map_lastRequestedSpawnX=0;
 short Map_lastRequestedSpawnY=0;
 
-//void *mapBuffer;
-
-#define screenWidth 159
-#define screenHeight 99
 
 
-// function prototypes
-char Map_testPoint(short, short);
-void Map_getSpawnPoint();
-void Map_makeMap(void*);
+// --------------------------------------------------------------------------------------------------------------------------------------
+
 
 
 // builds a random map for the worms to play on

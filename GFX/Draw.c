@@ -1,7 +1,19 @@
 // C Source File
 // Created 11/11/2017; 11:34:12 PM
+
 #include "../Headers/System/Main.h"
 
+/*
+	Draw
+	----
+	
+	Here we define our global drawing routines, for drawing each kind of scene:
+		- Main game
+		- Pause Menu
+		- Weapons Menu
+*/
+
+// local function prototypes
 char worldToScreen(short*, short*);
 void drawWorms();
 void drawMines();
@@ -9,6 +21,12 @@ void drawOilDrums();
 void drawCrates();
 
 static void *mapPtr;
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 // crashes if I try this...
 void setMapPtr(void *ptr)
@@ -20,38 +38,38 @@ void setMapPtr(void *ptr)
 void drawMap()
 {
 	/*
-			How this works:
+		How this works:
+		
+		Our mapBuffer pointer points a buffer that's four times the normal LCD_SIZE.
+		
+		We only want to draw a sub-section of that buffer on the screen.
+		
+		For vertical:
+		
+		The calculators screen height is 100 pixels, so we should draw 50 pixels above and below
+		the camera's "center"
+		
+		So: CameraTop = CameraY-50, and CameraBottom = CameraY+50
+		
+		The rows we draw on the screen will always be between 0 and 99 inclusive.
+		
+		So we need to determine the following:
+			- The top most row on the screen to draw
+			- The bottom most row on the screen to draw
+			- The top row from the buffer we should start copying.
 			
-			Our mapBuffer pointer points a buffer that's four times the normal LCD_SIZE.
-			
-			We only want to draw a sub-section of that buffer on the screen.
-			
-			For vertical:
-			
-			The calculators screen height is 100 pixels, so we should draw 50 pixels above and below
-			the camera's "center"
-			
-			So: CameraTop = CameraY-50, and CameraBottom = CameraY+50
-			
-			The rows we draw on the screen will always be between 0 and 99 inclusive.
-			
-			So we need to determine the following:
-				- The top most row on the screen to draw
-				- The bottom most row on the screen to draw
-				- The top row from the buffer we should start copying.
+		If the camera goes out of bounds of the map buffer, we can still draw part of the map
+		In this case, there are a few conditions:
+			- If the Camera goes above the map (CameraTop is less than 0 in the map-buffer)
+				then we can still draw the map, but ScreenTop will be lower on the screen
+			- If the Camera goes below the map (CameraBottom is more than 200 in the map-buffer)
+				then we can still draw the map. ScreenTop will be 0, but we'll only draw till the end of the buffer
+			- If either the CameraBottom is less than 0 or CameraTop is greater than 200 then the map is compeltey
+				off screen, and we don't need to draw it at all.
 				
-			If the camera goes out of bounds of the map buffer, we can still draw part of the map
-			In this case, there are a few conditions:
-				- If the Camera goes above the map (CameraTop is less than 0 in the map-buffer)
-					then we can still draw the map, but ScreenTop will be lower on the screen
-				- If the Camera goes below the map (CameraBottom is more than 200 in the map-buffer)
-					then we can still draw the map. ScreenTop will be 0, but we'll only draw till the end of the buffer
-				- If either the CameraBottom is less than 0 or CameraTop is greater than 200 then the map is compeltey
-					off screen, and we don't need to draw it at all.
-					
-			This way, the camera can still pan outside the map, into nothingness.
-			This is useful for following weapons or worms that fly far off the map, or projectiles that fly high
-			into the sky.
+		This way, the camera can still pan outside the map, into nothingness.
+		This is useful for following weapons or worms that fly far off the map, or projectiles that fly high
+		into the sky.
 	*/
 	
 	// camera top position, in world-space

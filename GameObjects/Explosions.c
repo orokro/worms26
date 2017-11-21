@@ -3,17 +3,54 @@
 
 #include "../Headers/System/Main.h"
 
-// define our extern/global variables
+/*
+	Explosions
+	----------
+	
+	This defines Explosions
+	
+	About Explosions:
+	
+	They will have a max-radius size
+	They will have a damage amount, more powerful explosions will propell worms further
+	They can optionally spawn fire-particles
+*/
+
+// x/y positions of our Explosions
 short Explosion_x[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 short Explosion_y[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+// current time of our explosion
+// note that we will consider <=0 time an inactive explosion
 char Explosion_time[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+// the size of the explosion
 char Explosion_size[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+// the damage power of the explosion
 char Explosion_power[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+/*
+	this int will store a bitmask for the first-frame of an explosion
+	when an explosion is created, it will set it's corresponding bit to 1
+	after it's first update the bit will be zero.
+	
+	since explosions update AFTER other objects, they will have a chance to see the first
+	frame of an explosion.
+	
+	explosions will only cause damage on the first frame
+*/
 int Explosion_firstFrame = 0;
 
-// function prototypes
+// local function prototypes
 void updateExplosion(short);
 void spawnFire();
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 // spawns a new explosion
 void Explosion_spawn(short x, short y, char size, char power, char hasFire)
@@ -42,9 +79,9 @@ void Explosion_spawn(short x, short y, char size, char power, char hasFire)
 	
 	/*
 		If the explosion index was not set (still -1) then all explosions must be in use
-	  we will just use the one that was closest to being over.
-	  further-more we will just set it's frame to 1 (last frame) and call it's update manually
-	  this will have the affect of erasing the map the full-size and damaging worms or items
+		we will just use the one that was closest to being over.
+		further-more we will just set it's frame to 1 (last frame) and call it's update manually
+		this will have the affect of erasing the map the full-size and damaging worms or items
 	  
 	 	Essentially, we will be skipping it's inbetween animation frames, and skipping to the last
 	 	frame of our explosion before we replace it!

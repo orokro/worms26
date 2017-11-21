@@ -32,7 +32,7 @@ void WeaponSelect_update()
 	else
 		weaponFastMove = 0;
 		
-	// if our weapons-fast move timer is over 30 frames, we will auto-move the cursor every 5 frames
+	// if our weapons-fast move timer is over 15 frames, we will auto-move the cursor every 3 frames
 	if(weaponFastMove>=15 && weaponFastMove%3==0)
 	{
 		if(Keys_keyState(keyLeft)==TRUE)

@@ -1,15 +1,44 @@
 #include "../Headers/System/Main.h"
 
-// define our extern/global variables
+/*
+	Crates
+	------
+	
+	This defines Crates on the map.
+	
+	About Crates:
+	
+	There are 3 types of crates: weapon, health, tool.
+	Each type can either be enabled, or disabled for a match.
+	If disabled, they will not spawn.
+	
+	Crates have no velocity - they can fall down, but not moved otherwise.
+	
+	Crates have health, and will explode if drained of health.
+*/
+
+// x/y positions of our Crates
 short Crate_x[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 short Crate_y[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+// health of our crates
 char Crate_health[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
+
+// type of each Crate
 char Crate_type[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+// is the crate active?
 int Crate_active=0;
 
-// function prototypes
+// local function prototypes
 void spawnCrate(char);
 void checkExplosions(short);
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 // spawns a Crate on the map, if they're enabled
 void Crates_spawnCrate(char type)

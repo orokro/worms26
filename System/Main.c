@@ -1,14 +1,28 @@
-
 #include "../Headers/System/Main.h"
 
-void keyTestRoutine();
+/*
+	Main
+	----
 
-void *doubleBuffer;
-void *virtual;
+	It all begins here... as any C program.
+
+	Here we kick off the gray scale rendering, interupt hooks for key presses
+	and other INIT.
+
+	The main loop, though sparse, is also here.
+*/
+
+// the main buffer for the map
 void *mapBuffer;
 
-//GLOBAL DOUBLE BUFFER
+// the main double buffer for gray scale rendering
 void *GblDBuffer;
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 // global method to calculate distance between two points
 // maybe I'll move this into a math file one day
@@ -23,66 +37,35 @@ short dist(short x1, short y1, short x2, short y2)
 	return c;
 }
 
-// debug routine for the key-system. Looks like it's working!
-void keyTestRoutine()
-{
-	// read keys
-	Keys_update();
-	
-	// loop and display the Down, State, and Up states of each key
-	short i=0;
-	for(i=0; i<18; i++)
-	{
-		long mask = (long)((long)1<<(i));
-		DrawChar(0+i*6, 0, (Keys_keyDown(mask)==TRUE ? '1' : '0'), A_NORMAL);
-		DrawChar(0+i*6, 10, (Keys_keyState(mask)==TRUE ? '1' : '0'), A_NORMAL);
-		DrawChar(0+i*6, 20, (Keys_keyUp(mask)==TRUE ? '1' : '0'), A_NORMAL);
-	}
-	
-	// exit with this key-combo
-	if(Keys_keyState(keyAction) && Keys_keyDown(keyEscape))
-		GameRunning=FALSE;
-	
-	// copy or gfx to the screen
-	memcpy (LCD_MEM, virtual, LCD_SIZE);
-}
-
-
 
 // Main Function
 void _main(void)
 {
-	// enable double-buffering
-  // GrayDBufInit(doubleBuffer);
- 
-  // Sets It Up For _keytest usage..
+	// Sets It Up For _keytest usage..
 	INT_HANDLER save_1 = GetIntVec(AUTO_INT_1); 
 	INT_HANDLER save_5 = GetIntVec(AUTO_INT_5); 
 	SetIntVec(AUTO_INT_1, DUMMY_HANDLER); 
 	SetIntVec(AUTO_INT_5, DUMMY_HANDLER); 
-	
-	// allocat and set a virtual screen to render to
-	// (this will be black and white until I implement graphics and double buffering)
-	//virtual = malloc(LCD_SIZE);
+
+	// allocate our map buffer
 	mapBuffer = malloc(LCD_SIZE*4);
+
+	// render the map and spawn items on the map (worms, oil drums, etc)
 	Map_makeMap(mapBuffer);
-	//setMapPtr(mapBuffer);
 	
-	
+	// enable grayscale
 	GrayOn();
+
 	// allocate space for double-buffering
 	void *dbuffer=malloc(GRAYDBUFFER_SIZE);
 	
 	// enable double-buffering
-  GrayDBufInit(dbuffer);
-  GblDBuffer=dbuffer;
-  
+	GrayDBufInit(dbuffer);
+	GblDBuffer=dbuffer;
   
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	Game_changeMode(gameMode_WormSelect);
-	
-	//PortSet (virtual, 239, 127);
-	
+
 	// main loop!
 	GameRunning=TRUE;
 	while(GameRunning==TRUE)
@@ -95,32 +78,21 @@ void _main(void)
 		// handles all updates for the game!
 		Game_update();
 		
-		// copy whtaever was rendered to the screen!
-		//memcpy (LCD_MEM, virtual, LCD_SIZE);
-		
-	  // now flip the planes
-	  GrayDBufToggleSync();
+		// now flip the planes
+		GrayDBufToggleSync();
 	    
-	  /* On HW1, the flip will be effective only after 1 or 2 plane switches
+	  	/* On HW1, the flip will be effective only after 1 or 2 plane switches
 	       depending on the phase. We must not draw to the "hidden" planes before
 	       they are really hidden! */
-	  if (!_GrayIsRealHW2()) GrayWaitNSwitches(2);
-  
+	  	if (!_GrayIsRealHW2()) GrayWaitNSwitches(2);
 	}
 	
-	// retstore our virtual screen and free the memory before we return to the OS
-	//LCD_restore (virtual);
-	//PortRestore();
-	
-	// free our buffers:
-	//free(virtual);
-	free(mapBuffer);
-	
+	// disable grayscale
 	GrayOff();
+
+	// free our buffers:
+	free(mapBuffer);
 	free(GblDBuffer);
-	
-	// free our double buffering buffer
-	// free(doubleBuffer);
 	
 	//resets key stuff
 	SetIntVec(AUTO_INT_1, save_1); 

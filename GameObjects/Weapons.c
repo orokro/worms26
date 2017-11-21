@@ -4,6 +4,57 @@
 #include "../Headers/System/Main.h"
 
 /*
+	Weapons
+	-------
+	
+	This defines Weapons on the map.
+	
+	About Weapons:
+	
+	The weapons system defines a number of arrays for on-screen weapon objects.
+	Each weapon object has or optionally can have:
+	- an X/Y position
+	- an X/Y velocity
+	- a timer
+	- a target
+	- gravity
+	- .. and more
+	
+	Each weapon has it's on unique behavoir, however, some behavoirs can be
+	shared between many weapons. For example, hand grenands and cluster bombs
+	both are fired and have physics. When the cluser explodes it will create
+	more bomb particles, where as the grenade just explodes.
+	
+	Physics for grenades, therefore, is shared between the two.
+
+	A note about how Weapons are indexed:
+	
+	For the weapons menu, and inventory, the weapons are stored in a 5x14 array, like so:
+	[5][14] = [5][14] = { 
+												{0,9,9,9,9,1,1,3,5,0,2,0,9,1},
+												{0,1,3,9,9,2,1,3,2,0,1,0,9,1},
+												{0,5,0,9,1,1,0,3,2,0,0,0,3,1},
+												{0,0,2,0,0,0,0,1,2,0,0,0,0,1},
+												{0,0,0,2,9,0,0,0,0,0,0,0,0,1}
+											};
+											
+	This pattern reflects the same position they are in the WWP menu on the PC.
+	However, it can also be indexed directly, such that [0][0]=0 and [0][1]=1,
+	where as [1][0] would actually be weapon 15.
+	
+	Regarding the total number of weapons on screen at once:
+	Fire particles, either for napalm or fire, will be handled with a fire system separately,
+	since fire doesn't need to take up weapon slots, and lots of weapons may need to spawn fire
+	
+	Thus, if a cluster bomb clusters into 5 small cluser fragments, there needs to be a total of 6 weapon
+	slots availalbe:
+	1 for the initial bomb, room to spawn 5 clusters on the same frame the bomb is deactivated
+	
+	For the uzi and gattling gun, there may need to be more than 6 bullets on screen tho, which would
+	by far be the most in-game weapons at once.
+	
+	Let's say for now, 10 weapons, but we will only loop to 6 unless the "bullets" flag is set																		
+
 	For Reference:
 	
 	usesVelocity 		1 	// 00000001
@@ -30,15 +81,29 @@
 
 */
 
-// define our extern/global variables
+// the type of the weapon!
 char Weapon_type[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+// x/y positions of our weapons
 short Weapon_x[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 short Weapon_y[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+// velocities of weapons
 char Weapon_xVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 char Weapon_yVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+// timer: various weapons can make use of a fuse timer, or timers for other reasons
 char Weapon_time[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+// each weapon has varius properties it can have: uses velocity, uses gravity, etc.
+// this is an array of bit masks for the current weapons, and what features they have
 char Weapon_uses[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+// bit mask if the weapon is active in this slot
 unsigned short Weapon_active = 0;
+
+// because Weapons are defined BEFORE the Game header file, we cant access the cursor target
+// thus, whever a target is set, it will have to update our weapon target
 short Weapon_targetX = 0;
 short Weapon_targetY = 0;
 
@@ -51,6 +116,12 @@ void updateHoming(short);
 void updateMovement(short);
 void updateController(short);
 void updateCollision(short);
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 // finds a free weapon slot available
 short findFreeWeaponSlot()
