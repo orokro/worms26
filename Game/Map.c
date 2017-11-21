@@ -64,7 +64,7 @@ short Map_lastRequestedSpawnY=0;
 
 
 // builds a random map for the worms to play on
-void Map_makeMap(void *mapBuffer)
+void Map_makeMap()
 {
 	// gotta be random!
 	randomize();
@@ -73,7 +73,7 @@ void Map_makeMap(void *mapBuffer)
 	short x, y;
 	
 	// map buffer pointer for memory copying
-	short *map = mapBuffer;
+	unsigned short *map = mapBuffer;
 
 	// before we generate the map, lets clear the memory entirely
 	// clear the buffer entirely:
@@ -273,12 +273,36 @@ void Map_makeMap(void *mapBuffer)
 // tests a point on the map
 char Map_testPoint(short x, short y)
 {
-	// prevent warnings for now
-	x=x;
-	y=y;
-	
-	// TO-DO: implement
 	return FALSE;
+	
+	// map buffer pointer for memory copying
+	unsigned short *map = (unsigned short*)mapBuffer;
+
+	// our X/Y position will be passed in world space.
+	// luckily, our map buffer is also world space.
+
+	// if the point is out of bounds, it's automatially a non-hit:
+	if((x<0) || (x>=320) || (y<0) || (y>=200))
+		return FALSE;
+
+	// since we now know it's in bounds, we need to translate
+	// the X/Y to a byte / bit address in the map buffer
+	short bufferX = ((x-(x%16))/16);
+	short bufferY = (y * 30);
+
+	// we need to check the exact pixel. lets get the byte at that location
+	unsigned short mapData = map[bufferY+bufferX];
+
+	// imagine x pixel 14. That's technically this pixel: 0000000000000010
+	// since the lowest bit is index 0, there's 15 total indexable bits (165 bits total)
+	// thus, the pixel we want is: 15-pixelX, where pixelX is x%16 (which will only ever be 0-15)
+	short pixelBitIndex = (15-(x%16));
+	
+	// test the exact pixel.
+	char pixelOn = (char)((mapData & (unsigned short)1<<(pixelBitIndex)));
+
+	// return the status of this map pixel
+	return pixelOn;
 }
 
 // find a free point to spawn something, that doesn't overlap with something else existing

@@ -18,6 +18,9 @@ void *mapBuffer;
 // the main double buffer for gray scale rendering
 void *GblDBuffer;
 
+// is the game running?
+char GameRunning = TRUE;
+
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -51,7 +54,7 @@ void _main(void)
 	mapBuffer = malloc(LCD_SIZE*4);
 
 	// render the map and spawn items on the map (worms, oil drums, etc)
-	Map_makeMap(mapBuffer);
+	Map_makeMap();
 	
 	// enable grayscale
 	GrayOn();

@@ -5,6 +5,27 @@
 #include "../Headers/System/MainGeneral.h"
 #include "../Headers/extgraph.h"
 
+/*
+	Below the externs for all our global variables and global functions are defined.
+
+	They are segmented into sections with large comment headers.
+
+	For reference, this is the order of dependency:
+		- Keys
+		- Camera
+		- Draw
+		- Map
+		- Exposions
+		- Worms
+		- Oil Drums
+		- Mines
+		- Crates
+		- Weapons
+		- Game
+
+	The varibles and functions are defined in the above order,
+	so latter items cannot reference things defined after them.
+*/
 
 /* ======================================================================================================================================
    MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++
@@ -17,7 +38,8 @@
 	       
 	// main globals
 	extern void *GblDBuffer;
-	char GameRunning;
+	extern char GameRunning;
+	extern void *mapBuffer;
 	
 	// main prototypes
 
@@ -260,10 +282,8 @@ extern void Map_getSpawnPoint();
  * Renders a map playfield for the worms to play on, as well as spawns in game items.
  *
  * This builds the map as well as spawns Worms, OilDrums (if active), and Mines (if active)
- *
- * @param *mapBuffer a pointer to the block of memory to render the map to.
 */
-extern void Map_makeMap(void*);
+extern void Map_makeMap();
 
 
 
