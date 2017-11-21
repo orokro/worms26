@@ -264,6 +264,7 @@ extern void *mapBuffer;
  *
  * @param x the x position to test
  * @param y the y position to test
+ * @return a char boolean if the point is land or not.
 */
 extern char Map_testPoint(short, short);
 
