@@ -1,6 +1,7 @@
 /* ----------------------------------------------------------------------------------------
 	 AFTER TURN +++ AFTER TURN +++ AFTER TURN +++ AFTER TURN +++ AFTER TURN +++ AFTER TURN ++
    ---------------------------------------------------------------------------------------- */
+
 // during the after turn in sudden death, the water will take 10 frames to advance 10 pixels...
 // this is that timer
 char waterLevelTimer=0;

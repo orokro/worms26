@@ -43,7 +43,19 @@ char Explosion_power[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 int Explosion_firstFrame = 0;
 
 // local function prototypes
+
+/**
+ * Updates an individual explosion at the given index.
+ *
+ * @param index the explosion to update.
+*/
 void updateExplosion(short);
+
+/**
+ * Spawns fire at an explosion point, for explosions that use fire.
+ *
+ * Explosions, such as those from OilDrums or Molotov Cocktains spawn fire particles
+*/
 void spawnFire();
 
 

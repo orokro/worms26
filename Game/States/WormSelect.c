@@ -2,7 +2,12 @@
 /* ----------------------------------------------------------------------------------------
 	 WORM SELECT +++ WORM SELECT +++ WORM SELECT +++ WORM SELECT +++ WORM SELECT +++ WORM SEL
    ---------------------------------------------------------------------------------------- */
+
 // local prototypes for worm-select methods below
+
+/**
+	Selects the next available Worm on the current team, during WormSelect mode.
+*/
 void nextWorm();
 
 void WormSelect_enter()

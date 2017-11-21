@@ -40,9 +40,33 @@ char Mine_fuse[10] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 int Mine_active=0;
 
 // local function prototypes
+
+/**
+ * Spawns a single mine of the given index.
+ * 
+ * @param index the mine to spawn.
+*/
 void spawnMine(char);
+
+/**
+ * Checks if any explosions affect the mine of the given index.
+ *
+ * @param index the mine to check to see if explostions affected it.
+*/
 void checkExplosions(short);
+
+/**
+ * Check if the Mine of given index is within proximity of worm and should explode.
+ * 
+ * @param index the mine to check for worm proximity.
+*/
 void checkProximity(short);
+
+/**
+ * Updates a Mine of given index, should be called every frame by Mines_update().
+ * 
+ * @param index the mine to udpate.
+*/
 void updateMine(short);
 
 // local vars

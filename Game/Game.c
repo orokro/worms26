@@ -161,32 +161,113 @@ char Game_cursorEndTurn = FALSE;
 */
 
 // function prototypes for our local game-mode logic methods!
+/**
+	Called on the first-frame when the Games state machine is set to WormSelect mode.
+*/
 void WormSelect_enter();
+/**
+	Called every frame that the Games state machine is in WormSelect mode.
+*/
 void WormSelect_update();
+/**
+	Called on the first-frame when the Games state machine leaves WormSelect mode.
+*/
 void WormSelect_exit();
+/**
+	Called on the first-frame when the Games state machine is set to Turn mode.
+*/
 void Turn_enter();
+/**
+	Called every frame that the Games state machine is in Turn mode.
+*/
 void Turn_update();
+/**
+	Called on the first-frame when the Games state machine leaves Turn mode.
+*/
 void Turn_exit();
+/**
+	Called on the first-frame when the Games state machine is set to WeaponSelect mode.
+*/
 void WeaponSelect_enter();
+/**
+	Called every frame that the Games state machine is in WeaponSelect mode.
+*/
 void WeaponSelect_update();
+/**
+	Called on the first-frame when the Games state machine leaves WeaponSelect mode.
+*/
 void WeaponSelect_exit();
+/**
+	Called on the first-frame when the Games state machine is set to Pause mode.
+*/
 void Pause_enter();
+/**
+	Called every frame that the Games state machine is in Pause mode.
+*/
 void Pause_update();
+/**
+	Called on the first-frame when the Games state machine leaves Pause mode.
+*/
 void Pause_exit();
+/**
+	Called on the first-frame when the Games state machine is set to Cursor mode.
+*/
 void Cursor_enter();
+/**
+	Called every frame that the Games state machine is in Cursor mode.
+*/
 void Cursor_update();
+/**
+	Called on the first-frame when the Games state machine leaves Cursor mode.
+*/
 void Cursor_exit();
+/**
+	Called on the first-frame when the Games state machine is set to TurnEnd mode.
+*/
 void TurnEnd_enter();
+/**
+	Called every frame that the Games state machine is in TurnEnd mode.
+*/
 void TurnEnd_update();
+/**
+	Called on the first-frame when the Games state machine leaves TurnEnd mode.
+*/
 void TurnEnd_exit();
+/**
+	Called on the first-frame when the Games state machine is set to Death mode.
+*/
 void Death_enter();
+/**
+	Called every frame that the Games state machine is in Death mode.
+*/
 void Death_update();
+/**
+	Called on the first-frame when the Games state machine leaves Death mode.
+*/
 void Death_exit();
+/**
+	Called on the first-frame when the Games state machine is set to AfterTurn mode.
+*/
 void AfterTurn_enter();
+/**
+	Called every frame that the Games state machine is in AfterTurn mode.
+*/
 void AfterTurn_update();
+/**
+	Called on the first-frame when the Games state machine leaves AfterTurn mode.
+*/
 void AfterTurn_exit();
+/**
+	Called on the first-frame when the Games state machine is set to GameOver mode.
+*/
 void GameOver_enter();
+/**
+	Called every frame that the Games state machine is in GameOver mode.
+*/
 void GameOver_update();
+/**
+	Called on the first-frame when the Games state machine leaves GameOver mode.
+*/
 void GameOver_exit();
 
 
@@ -324,8 +405,26 @@ void Game_changeMode(char newMode)
 /* ----------------------------------------------------------------------------------------
 	 GLOBAL GAME METHODS +++ GLOBAL GAME METHODS +++ GLOBAL GAME METHODS +++ GLOBAL GAME METH
    ---------------------------------------------------------------------------------------- */
+/**
+ * Updates all the Games main timers each frame, should be called every frame.
+ *
+ * Updates the sudden death timer. (Frames till sudden death mode)
+ * Updates the grace timer. (Frames till worm-select grace timer is up)
+ * Updates the games main turn timer. (Frames till a turn is up)
+*/
 void gameTimers();
+
+/**
+ * Handles all the main updates for the Game mode, should be called every frame.
+ *
+ * That is, weather it's a worm-select mode, turn mode, or whatever,
+ * the state of the game needs to be updating everyframe.
+*/
 void gameUpdates();
+
+/**
+ * Starts the sudden death mode, by setting all worms to 1 HP
+*/
 void startSuddenDeath();
 
 // decrement's all Game Timers

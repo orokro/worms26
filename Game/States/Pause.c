@@ -1,6 +1,7 @@
 /* ----------------------------------------------------------------------------------------
 	 PAUSE +++ PAUSE +++ PAUSE +++ PAUSE +++ PAUSE +++ PAUSE +++ PAUSE +++ PAUSE +++ PAUSE ++
    ---------------------------------------------------------------------------------------- */
+
 // there will be TWO menu items for the pause menu: continue (0) and exit (1)
 char pauseMenuItem=0;
 

@@ -47,6 +47,12 @@ char Worm_mode[16] = {wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle
 char Worm_currentWorm = 0;
 
 // local function prototypes
+
+/**
+ * Spawns a Worm of given index on the Map.
+ * 
+ * @param index the worm to spawn.
+*/
 void spawnWorm(short);
 
 
@@ -66,17 +72,17 @@ void Worm_spawnWorms()
 }
 
 // spawns a single worm on the map
-void spawnWorm(short i)
+void spawnWorm(short index)
 {
 	// find a free place for it on the map
 	Map_getSpawnPoint();
-	Worm_x[i] = Map_lastRequestedSpawnX;
-	Worm_y[i] = Map_lastRequestedSpawnY;
+	Worm_x[index] = Map_lastRequestedSpawnX;
+	Worm_y[index] = Map_lastRequestedSpawnY;
 	
 	// set active
-	Worm_active |= (long)1<<(i);
+	Worm_active |= (long)1<<(index);
 	
 	// random direction
 	if(random(2)==0)
-		Worm_dir |= (unsigned long)1<<(i);
+		Worm_dir |= (unsigned long)1<<(index);
 }

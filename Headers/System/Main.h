@@ -19,7 +19,17 @@
 	extern void *GblDBuffer;
 	char GameRunning;
 	
-	// main rototypes
+	// main prototypes
+
+	/**
+	 * Calculates the distance between two 2D points.
+  	 * 
+  	 * @param x1 the x value of the first coordinate
+  	 * @param y1 the y value of the first coordinate
+  	 * @param x2 the x value of the second coordinate
+  	 * @param y2 the y value of the second coordinate
+  	 * @return the distance between 2 points, via Pythags thereom
+	*/
 	short dist(short, short, short, short);
 	
 	
@@ -83,10 +93,41 @@ extern short Match_defaultWeapons[5][14];
 #define keyCursors (long)1920			//00000000000000000000011110000000
 
 // keys function prototypes
+
+/**
+ * Reads the current state of the key unput, and updates our bitwise buffers.
+ * 
+ * Three longs are defined: keysDown, keysState, keysUp.
+ * These bits in these longs mirror the key states for each key matching our #defined bitmasks.
+ * keysDown only has it's bits true on the single-frame a key is down on.
+ * keysUp only has it's bits true for the single-frame a key is up on.
+ * keysState has it's bits true on every frame the key is pressed.
+*/
 extern void Keys_update();
-extern char Keys_keyDown();
-extern char Keys_keyState();
-extern char Keys_keyUp();
+
+/**
+ * Checks if a key is FIRST down ON THIS FRAME using it's bitmask.
+ *
+ * @param keyCode the bitmask for our logical key
+ * @return a boolean char set to 0 or 1 if the key is down
+*/
+extern char Keys_keyDown(long);
+
+/**
+ * Checks if a key is pressed on this frame using it's bitmask.
+ *
+ * @param keyCode the bitmask for our logical key
+ * @return a boolean char set to 0 or 1 if the key is pressed
+*/
+extern char Keys_keyState(long);
+
+/**
+ * Checks if a key is LET up ON THIS FRAME using it's bitmask.
+ *
+ * @param keyCode the bitmask for our logical key
+ * @return a boolean char set to 0 or 1 if the key is let up
+*/
+extern char Keys_keyUp(long);
 
 
 
@@ -102,8 +143,30 @@ extern int camX;
 extern int camY;
 
 // camera function prototypes
+
+/**
+ * Updates the current state of the Camera, should be called once per frame.
+*/
 extern void Camera_update();
-extern void Camera_focusOn();
+
+/**
+ * Sets the Camera to focus on a pair of short points.
+ *
+ * The Camera will follow the pointers set each frame.
+ * If the variavles that were passed in as pointers are updated,
+ * the Camera will have new coordinates to follow each frame.
+ *
+ * @param targetX a pointer to a short x variable for the Camera to track
+ * @param targetY a pointer to a short y variable for the Camera to track
+*/
+extern void Camera_focusOn(short*, short*);
+
+/**
+ * Removes the current focal reference pointers from the camera.
+ *
+ * After calling, the Camera will be static until moved by the user,
+ * or a new target is set with Camera_focusOn(*x, *y)
+*/
 extern void Camera_clearFocus();
 
 
@@ -113,9 +176,48 @@ extern void Camera_clearFocus();
    ====================================================================================================================================== */
 
 // draw function prototypes
+
+/**
+ * Renders the map, items on it, and all game elements in general.
+ *
+ * Renders what is essential for the Game play, including:
+ * 	- Map
+ * 	- Worms
+ * 	- Crates
+ * 	- Mines
+ * 	- Oil Drums
+ * 	- Active Weapons
+ * 	- Active particles
+ *	- Game timer
+ * 	- Wind
+ * 	- etc
+*/
 extern void Draw_renderGame();
+
+/**
+ * Draws the pause menu, with current menu item selected.
+ * 
+ * The pause menu has three options: continue, quit, show controls.
+ * This draws the pause menu instead of the current Game.
+ * The pause menu will highlight whichever option is selected.
+ *
+ * @param menuItem the index of the menu item that is currently selected (continue, quit, show controls)
+*/
 extern void Draw_renderPauseMenu(char);
+
+/**
+ * Draws the weapons menu for when a player is selecting a weapon.
+ * 
+ * @param wx a char that contatins the x-position of the current weapon selected in the matrix of weapons
+ * @param wy a char that contatins the y-position of the current weapon selected in the matrix of weapons
+*/
 extern void Draw_renderWeaponsMenu(char, char);
+
+/**
+ * Expirimental, now depricated method, to set a local pointer to the maps memory.
+ *
+ * @param ptr a pointer to the memory of the map buffer
+*/
 extern void setMapPtr(void *ptr);
 
 
@@ -130,8 +232,37 @@ extern short Map_lastRequestedSpawnY;
 extern void *mapBuffer;
 
 // map function prototypes
+
+/**
+ * Checks if a point on the map is land or not.
+ *
+ * The map is a large buffer, and this method will take an X/Y position,
+ * with X==0/Y==0 being the top left.
+ * It will return a char boolean TRUE/FALSE if the pixel is LAND/NOT LAND.
+ *
+ * @param x the x position to test
+ * @param y the y position to test
+*/
 extern char Map_testPoint(short, short);
+
+/**
+ * Sets globals, Map_lastRequestedSpawnX and Map_lastRequestedSpawnY to a valid spawn point for an item on the map.
+ *
+ * When the map is being generated a number of valid spawn-points are also generated.
+ * This doesn't exactly "return" a point, but it selects from one of the generated ones and makes
+ * the aforementioned globals equal to the valid spawn point.
+ *
+ * This method will also nullify the spawn point from the pool so no other items can spawn there.
+*/
 extern void Map_getSpawnPoint();
+
+/**
+ * Renders a map playfield for the worms to play on, as well as spawns in game items.
+ *
+ * This builds the map as well as spawns Worms, OilDrums (if active), and Mines (if active)
+ *
+ * @param *mapBuffer a pointer to the block of memory to render the map to.
+*/
 extern void Map_makeMap(void*);
 
 
@@ -149,7 +280,21 @@ extern char Explosion_power[8];
 extern int Explosion_firstFrame;
 
 // explosion unction prototypes
+
+/**
+ * Spawns an explosion at the area, with the max radius size, power and if it spawns fire particles or not.
+ *
+ * @param x the x position in world space to spawn the explosion
+ * @param y the y position in world space to spawn the explosion
+ * @param size the max radious the explosion should achieve
+ * @param power the max health damagine, and velocity causing power of the explosion
+ * @param hasFire a char boolean if the explosion should generate fire particles or not
+*/
 extern void Explosion_spawn(short, short, char, char, char);
+
+/**
+ * Updates all the explisions currently active, should be called once per frame.
+*/
 extern void Explosion_update();
 
 
@@ -174,6 +319,12 @@ extern char Worm_mode[16];
 extern char Worm_currentWorm;
 
 // worm function prototypes
+
+/**
+ * At the beginning of the game, this places all the worms on the map and sets them active.
+ *
+ * This also gives them a random initial direction to face: left or right.
+*/
 extern void Worm_spawnWorms();
 
 
@@ -189,7 +340,18 @@ extern char OilDrum_health[8];
 extern int OilDrum_active;
 
 // OilDrum function prototypes
+
+/**
+ * This spawns all the Oil Drums on the map.
+ *
+ * This method is always called in the Map_build method, and will check if OilDrums are enabled on it's own.
+ * This sets up, and makes active all the OilDrums.
+*/
 extern void OilDrums_spawnDrums();
+
+/**
+ * Updates the Oil Drums currently active, should be called once per frame.
+*/
 extern void OilDrums_update();
 
 
@@ -210,7 +372,18 @@ extern char Mine_fuse[10];
 extern int Mine_active;
 
 // mine function prototypes
+
+/**
+ * This spawns all the Mines on the map.
+ *
+ * This method is always called in the Map_build method, and will check if Mines are enabled on it's own.
+ * This sets up, and makes active all the Mines.
+*/
 extern void Mines_spawnMines();
+
+/**
+ * Updates the Mines currently active, should be called once per frame.
+*/
 extern void Mines_update();
 
 
@@ -232,7 +405,17 @@ extern char Crate_type[8];
 extern int Crate_active;
 
 // crate function prototypes
+
+/**
+ * This spawns a single Crate in the game, of the given type.
+ * 
+ * @param type the type of crate to spawn, as one of our defines: crateHealth, crateWeapon, crateTool
+*/
 extern void Crates_spawnCrate(char);
+
+/**
+ * Updates the Crates currently active, should be called once per frame.
+*/
 extern void Crates_update();
 
 
@@ -293,9 +476,48 @@ extern short Weapon_targetX;
 extern short Weapon_targetY;
 
 // weapons function prototypes
+
+/**
+ * This spawns a Weapon item in the game.
+ *
+ * Weapons have a type, position, initial x/y velocity, time and various properties.
+ * The properties are bitmasked onto a char.
+ * Valid Properties:
+   - usesVelocity
+ * - usesGravity
+ * - usesTimer
+ * - usesHoming
+ * - usesMovement
+ * - usesController
+ *
+ * @param type a char storing the type of weapon item this is, as defined by the enumeration Weapons.
+ * @param x the starting x position of the weapon
+ * @param y the starting y position of the weapon
+ * @param xVelocity the starting x velocity of the weapon
+ * @param yVelocity the staarting y velocity of the weapon
+ * @param time weapons use time for different purposes, (e.g. fuse length)
+ * @param properties a char that is used as a bitmasked variable for the types of properties this weapon requires
+*/
 extern void Weapons_spawn(char, short, short, char, char, char, char);
+
+/**
+ * Updates all the currently active weapons, should be called once per frame.
+*/
 extern void Weapons_update();
+
+/**
+ * Returns TRUE or FALSE if a any weapon at all is active.
+ *
+ * @return a char boolean if any weapon at all is active.
+*/
 extern char Weapons_weaponsActive();
+
+/**
+ * When a weapon is a targeted weapon, such as Air Strike or Homing Missle, this sets the current X/Y target.
+ *
+ * @param x the x position in world space for the weapon target.
+ * @param y the y posiiion in world space for the weapon target.
+*/
 extern void Weapons_setTarget(short, short);
 
 
@@ -327,5 +549,19 @@ extern char Game_xMarkAllowedOverLand;
 extern char Game_cursorEndTurn;
 
 // game function prototypes
+
+/**
+ * Changes the Games primary state machine to a new mode.
+ *
+ * @param newMode a char representing a game mode as defined in the GameModes enum.
+*/
 extern void Game_changeMode(char);
+
+/**
+ * The main update method for the entire game, should be called once per frame.
+ *
+ * The Game_update() method handles general every-frame logic,
+ * as well as calling the current game states update method as well.
+ * This is called every frame in the main-loop.
+*/
 extern void Game_update();

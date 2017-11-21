@@ -14,10 +14,47 @@
 */
 
 // local function prototypes
+
+/**
+ * Convents world coordinates to screen coordinates, mutates the passed in pointers, and returns TRUE/FLASE if on screen (roughly).
+ * 
+ * The game is updated in world coordinates, but when it comes time to draw,
+ * everything needs to be in screen coordinates.
+ *
+ * This method takes in the Camera's X/Y position and adjusts the passed in X/Y pointers accordingly.
+ * 
+ * If the final X/Y screen position determined is out of bounds for the screen, the method will return FALSE.
+ * Otherwise, TRUE.
+ *
+ * The current bounding for the screen is +/- 8 pixels horizzontal on each side of the screen, and
+ * +/- 16 pixels vertically.
+ *
+ * This may need to be changed, as the final sprites are decided
+ *
+ * @param x a pointer reference to the x value to change to screen coordinates
+ * @param y a poitner reference to the y value to change to screen coordinates
+ * @return a char boolean either TRUE or FALSE if the coordinates are roughly on screen
+*/
 char worldToScreen(short*, short*);
+
+/**
+	Draws all the in-game, on-screen Worms.
+*/
 void drawWorms();
+
+/**
+	Draws all the in-game, on-screen Mines.
+*/
 void drawMines();
+
+/**
+	Draws all the in-game, on-screen Oil Drums.
+*/
 void drawOilDrums();
+
+/**
+	Draws all the in-game, on-screen Crates.
+*/
 void drawCrates();
 
 static void *mapPtr;

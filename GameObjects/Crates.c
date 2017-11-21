@@ -31,7 +31,19 @@ char Crate_type[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 int Crate_active=0;
 
 // local function prototypes
+
+/**
+ * Spawns a crate of the given type
+ *
+ *@ param type the type of crate to spawn
+*/
 void spawnCrate(char);
+
+/**
+ * Checks if nearby explosions affect any of the given Crates index.
+ *
+ * @param index the index of the Crate to check for nearby explosions.
+*/
 void checkExplosions(short);
 
 

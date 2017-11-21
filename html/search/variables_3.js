@@ -1,0 +1,24 @@
+var searchData=
+[
+  ['game_5fcurrentteam',['Game_currentTeam',['../_game_8c.html#abab760e3f900866e0462f515ede41378',1,'Game_currentTeam():&#160;Game.c'],['../_main_8h.html#abab760e3f900866e0462f515ede41378',1,'Game_currentTeam():&#160;Game.c']]],
+  ['game_5fcurrentwormup',['Game_currentWormUp',['../_game_8c.html#af21b654eeb4fdaaab679cc8295a5c20c',1,'Game_currentWormUp():&#160;Game.c'],['../_main_8h.html#af21b654eeb4fdaaab679cc8295a5c20c',1,'Game_currentWormUp():&#160;Game.c']]],
+  ['game_5fcursirdir',['Game_cursirDir',['../_game_8c.html#a75e3f9f4518f232f731303af90905620',1,'Game_cursirDir():&#160;Game.c'],['../_main_8h.html#a75e3f9f4518f232f731303af90905620',1,'Game_cursirDir():&#160;Game.c']]],
+  ['game_5fcursorendturn',['Game_cursorEndTurn',['../_game_8c.html#ad57c056516b1d35b2716c344abcecbf9',1,'Game_cursorEndTurn():&#160;Game.c'],['../_main_8h.html#ad57c056516b1d35b2716c344abcecbf9',1,'Game_cursorEndTurn():&#160;Game.c']]],
+  ['game_5fcursorx',['Game_cursorX',['../_game_8c.html#ac46327f7b3fa30b44acc6c25d1d756c9',1,'Game_cursorX():&#160;Game.c'],['../_main_8h.html#ac46327f7b3fa30b44acc6c25d1d756c9',1,'Game_cursorX():&#160;Game.c']]],
+  ['game_5fcursory',['Game_cursorY',['../_game_8c.html#a77cd5e7deab2fef3bb5cd06e67d2deed',1,'Game_cursorY():&#160;Game.c'],['../_main_8h.html#a77cd5e7deab2fef3bb5cd06e67d2deed',1,'Game_cursorY():&#160;Game.c']]],
+  ['game_5fgracetimer',['Game_graceTimer',['../_game_8c.html#ab2ce529ba4a8c46b1fb719d6b5ed4ec1',1,'Game_graceTimer():&#160;Game.c'],['../_main_8h.html#ab2ce529ba4a8c46b1fb719d6b5ed4ec1',1,'Game_graceTimer():&#160;Game.c']]],
+  ['game_5fmode',['Game_mode',['../_game_8c.html#a2fb79b26e99f2fec47a62e04a6fac5e7',1,'Game_mode():&#160;Game.c'],['../_main_8h.html#a2fb79b26e99f2fec47a62e04a6fac5e7',1,'Game_mode():&#160;Game.c']]],
+  ['game_5fpreviousmode',['Game_previousMode',['../_game_8c.html#aec9514e55fcb4b50d7bfbb690cf35565',1,'Game_previousMode():&#160;Game.c'],['../_main_8h.html#aec9514e55fcb4b50d7bfbb690cf35565',1,'Game_previousMode():&#160;Game.c']]],
+  ['game_5fretreattimer',['Game_retreatTimer',['../_game_8c.html#ae783927076fe72a491104169c505822c',1,'Game_retreatTimer():&#160;Game.c'],['../_main_8h.html#ae783927076fe72a491104169c505822c',1,'Game_retreatTimer():&#160;Game.c']]],
+  ['game_5fsuddendeathtimer',['Game_suddenDeathTimer',['../_game_8c.html#a7cf3a8e1afff4f21e9fe6d58557fb7e9',1,'Game_suddenDeathTimer():&#160;Game.c'],['../_main_8h.html#a7cf3a8e1afff4f21e9fe6d58557fb7e9',1,'Game_suddenDeathTimer():&#160;Game.c']]],
+  ['game_5ftimer',['Game_timer',['../_game_8c.html#a65d592a0c445ded76787cb8d8bbedab8',1,'Game_timer():&#160;Game.c'],['../_main_8h.html#a65d592a0c445ded76787cb8d8bbedab8',1,'Game_timer():&#160;Game.c']]],
+  ['game_5fwaterlevel',['Game_waterLevel',['../_game_8c.html#a9630bdbaa8cdde479b79b74af7d9c02e',1,'Game_waterLevel():&#160;Game.c'],['../_main_8h.html#a9630bdbaa8cdde479b79b74af7d9c02e',1,'Game_waterLevel():&#160;Game.c']]],
+  ['game_5fxmarkallowedoverland',['Game_xMarkAllowedOverLand',['../_game_8c.html#ab07d82fca64f8110c7e20228b7c9bdca',1,'Game_xMarkAllowedOverLand():&#160;Game.c'],['../_main_8h.html#ab07d82fca64f8110c7e20228b7c9bdca',1,'Game_xMarkAllowedOverLand():&#160;Game.c']]],
+  ['game_5fxmarkplaced',['Game_xMarkPlaced',['../_game_8c.html#abc905ac6ea55b530ec549b9d012f3ea5',1,'Game_xMarkPlaced():&#160;Game.c'],['../_main_8h.html#abc905ac6ea55b530ec549b9d012f3ea5',1,'Game_xMarkPlaced():&#160;Game.c']]],
+  ['game_5fxmarkspotx',['Game_xMarkSpotX',['../_game_8c.html#aa27fd51c8cdb72a1e40d5300fb7e3491',1,'Game_xMarkSpotX():&#160;Game.c'],['../_main_8h.html#aa27fd51c8cdb72a1e40d5300fb7e3491',1,'Game_xMarkSpotX():&#160;Game.c']]],
+  ['game_5fxmarkspoty',['Game_xMarkSpotY',['../_game_8c.html#a3208afe3a905113c33ba49b843468059',1,'Game_xMarkSpotY():&#160;Game.c'],['../_main_8h.html#a3208afe3a905113c33ba49b843468059',1,'Game_xMarkSpotY():&#160;Game.c']]],
+  ['gamerunning',['GameRunning',['../_main_8h.html#a60364f39bd53e12dd5248ac39d0847e3',1,'Main.h']]],
+  ['gamma1',['gamma1',['../struct_t_t_u_n_p_a_c_k___h_e_a_d_e_r.html#aee59d7942ac36e8b16a37adaf45f8498',1,'TTUNPACK_HEADER']]],
+  ['gamma2',['gamma2',['../struct_t_t_u_n_p_a_c_k___h_e_a_d_e_r.html#aab1f4e6e2e86b9113d4d262b92138924',1,'TTUNPACK_HEADER']]],
+  ['gbldbuffer',['GblDBuffer',['../_main_8h.html#a0da9baf7116973a8c8c313b755280738',1,'GblDBuffer():&#160;Main.c'],['../_main_8c.html#a0da9baf7116973a8c8c313b755280738',1,'GblDBuffer():&#160;Main.c']]]
+];
