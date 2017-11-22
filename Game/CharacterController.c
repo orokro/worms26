@@ -41,7 +41,7 @@ void wormWalk()
 	// test keys for a possible direction to walk
 	char moveDir=0;
 	
-	// if second was pressed, jump and exit
+	// if jump was pressed, jump and exit
 	if(Keys_keyDown(keyJump))
 	{
 		Worm_xVelo[(short)Worm_currentWorm] = (Worm_dir & wormMask) ? -1 : 1;
@@ -101,4 +101,6 @@ void CharacterController_update()
 	// if the worm is grounded, we should test for walking:
 	if(Worm_onGround |= wormMask)
 		wormWalk();
+		
+		// TO-DO: implement parachute, bunjee, and ninja rope
 }

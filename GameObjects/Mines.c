@@ -170,7 +170,7 @@ void checkProximity(short index)
 	{
 		// check if the worm is active
 		char wormIsActiveInGame = (char)((Worm_active & (unsigned long)1<<(i))>0);
-		char wormIsNotDead = (char)((Worm_isDead & (unsigned long)1<<(i))>0);
+		char wormIsNotDead = (char)((Worm_isDead & (unsigned long)1<<(i))==0);
 		
 		// only do shit if the worm is active in the game, and NOT dead
 		if(wormIsActiveInGame && wormIsNotDead)
