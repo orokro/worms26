@@ -2,12 +2,18 @@
 	 TURN END +++ TURN END +++ TURN END +++ TURN END +++ TURN END +++ TURN END +++ TURN END +
    ---------------------------------------------------------------------------------------- */
 
-void TurnEnd_enter()
+/**
+	Called on the first-frame when the Games state machine is set to TurnEnd mode.
+*/
+static void TurnEnd_enter()
 {
 	Game_timer=-1;
 }
 
-void TurnEnd_update()
+/**
+	Called every frame that the Games state machine is in TurnEnd mode.
+*/
+static void TurnEnd_update()
 {
 	// All regular game-updates during this mode
 	gameUpdates();
@@ -19,7 +25,10 @@ void TurnEnd_update()
 		Game_changeMode(gameMode_Death);
 }
 
-void TurnEnd_exit()
+/**
+	Called on the first-frame when the Games state machine leaves TurnEnd mode.
+*/
+static void TurnEnd_exit()
 {
 	
 }

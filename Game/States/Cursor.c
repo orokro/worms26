@@ -14,7 +14,10 @@
 */
 char cursorFastMove=0;
 
-void Cursor_enter()
+/**
+	Called on the first-frame when the Games state machine is set to Cursor mode.
+*/
+static void Cursor_enter()
 {
 	// when we enter this mode, always put the cursor over the current worm:
 	Game_cursorX = Worm_x[(short)Worm_currentWorm];
@@ -30,7 +33,10 @@ void Cursor_enter()
 	Camera_focusOn(&Game_cursorX, &Game_cursorY);	
 }
 
-void Cursor_update()
+/**
+	Called every frame that the Games state machine is in Cursor mode.
+*/
+static void Cursor_update()
 {
 	
 	// All regular game-updates during this mode
@@ -110,7 +116,10 @@ void Cursor_update()
 	Draw_renderGame();
 }
 
-void Cursor_exit()
+/**
+	Called on the first-frame when the Games state machine leaves Cursor mode.
+*/
+static void Cursor_exit()
 {
 	// clear the camera from focusing on our cursor
 	Camera_clearFocus();

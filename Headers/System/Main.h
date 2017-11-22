@@ -2,8 +2,8 @@
 #include <tigcclib.h>
 
 // include all our headers in dependency order
-#include "../Headers/System/MainGeneral.h"
-#include "../Headers/extgraph.h"
+#include "MainGeneral.h"
+#include "extgraph.h"
 
 /*
 	Below the externs for all our global variables and global functions are defined.

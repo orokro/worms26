@@ -1,7 +1,7 @@
 // C Source File
 // Created 11/11/2017; 11:34:08 PM
 
-#include "../Headers/System/Main.h"
+#include "Main.h"
 
 /*
 	Map
@@ -197,11 +197,11 @@ void Map_makeMap()
 		
 		// make sure the generated sections are inbounds
 		if(upperLineTop<0) upperLineTop=0;
-		if(upperLineTop>20) upperLineTop = 20;
+		else if(upperLineTop>20) upperLineTop = 20;
 		if(upperLineBottom<0) upperLineBottom=0;
-		if(upperLineBottom>30) upperLineBottom = 30;
+		else if(upperLineBottom>30) upperLineBottom = 30;
 		if(lowerLineTop>30) lowerLineTop=30;
-		if(lowerLineTop<-20) lowerLineTop=-20;
+		else if(lowerLineTop<-20) lowerLineTop=-20;
 		
 		// if we are no longer allowed to generate empty land,
 		// set new minimums

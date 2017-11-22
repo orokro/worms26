@@ -2,12 +2,18 @@
 	 DEATH +++ DEATH +++ DEATH +++ DEATH +++ DEATH +++ DEATH +++ DEATH +++ DEATH +++ DEATH ++
    ---------------------------------------------------------------------------------------- */
 
-void Death_enter()
+/**
+	Called on the first-frame when the Games state machine is set to Death mode.
+*/
+static void Death_enter()
 {
 	Game_timer=-1;
 }
 
-void Death_update()
+/**
+	Called every frame that the Games state machine is in Death mode.
+*/
+static void Death_update()
 {
 	// All regular game-updates during this mode
 	gameUpdates();
@@ -19,7 +25,10 @@ void Death_update()
 		Game_changeMode(gameMode_AfterTurn);
 }
 
-void Death_exit()
+/**
+	Called on the first-frame when the Games state machine leaves Death mode.
+*/
+static void Death_exit()
 {
 	
 }

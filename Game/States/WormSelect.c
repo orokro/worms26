@@ -8,51 +8,7 @@
 /**
 	Selects the next available Worm on the current team, during WormSelect mode.
 */
-void nextWorm();
-
-void WormSelect_enter()
-{
-	// toggle teams
-	Game_currentTeam = (Game_currentTeam==1 ? 0 : 1);
-	
-	// select next worm for this team:
-	nextWorm();
-	
-	// set the grace countdown timer and the turn timer:
-	// NOTE: for now we're not using real seconds, and instead frames,
-	// where ever 100 is an ingame-clock unit. This will be tweaked after
-	// the game is done, to get frames-to-seconds more accurate
-	Game_graceTimer = 5 * TIME_MULTIPLIER;
-	Game_timer = Match_turnTime * TIME_MULTIPLIER;
-}
-
-void WormSelect_update()
-{
-	
-	// if the current match allows worm-selection, and the user pressed
-	// the worm select button, we can goto the next-available worm, if any
-	if(Match_allowWormSelection==TRUE && Keys_keyDown(keyWormSelect)==TRUE)
-		nextWorm();
-		
-	// if any key was pressed other than the worm-select key, we exit this mode
-	if(Keys_keyDown(keyAny)==TRUE && Keys_keyDown(keyWormSelect)==FALSE)
-		Game_changeMode(gameMode_Turn);
-		
-	// All regular game-updates during this mode
-	gameUpdates();
-	
-	// the game
-	Draw_renderGame();
-}
-
-void WormSelect_exit()
-{
-	// clear the grace timer, if there was any
-	Game_graceTimer = 0;
-}
-
-// select the next available worm on the current team
-void nextWorm()
+static void nextWorm()
 {
 	// loop till we find a non-dead worm on the current team
 	// note, this while would crash the game if a team was entirely dead...
@@ -82,4 +38,54 @@ void nextWorm()
 			return;
 		}
 	}// wend
+}
+
+/**
+	Called on the first-frame when the Games state machine is set to WormSelect mode.
+*/
+static void WormSelect_enter()
+{
+	// toggle teams
+	Game_currentTeam = (Game_currentTeam==1 ? 0 : 1);
+	
+	// select next worm for this team:
+	nextWorm();
+	
+	// set the grace countdown timer and the turn timer:
+	// NOTE: for now we're not using real seconds, and instead frames,
+	// where ever 100 is an ingame-clock unit. This will be tweaked after
+	// the game is done, to get frames-to-seconds more accurate
+	Game_graceTimer = 5 * TIME_MULTIPLIER;
+	Game_timer = Match_turnTime * TIME_MULTIPLIER;
+}
+
+/**
+	Called every frame that the Games state machine is in WormSelect mode.
+*/
+static void WormSelect_update()
+{
+	
+	// if the current match allows worm-selection, and the user pressed
+	// the worm select button, we can goto the next-available worm, if any
+	if(Match_allowWormSelection==TRUE && Keys_keyDown(keyWormSelect)==TRUE)
+		nextWorm();
+		
+	// if any key was pressed other than the worm-select key, we exit this mode
+	if(Keys_keyDown(keyAny)==TRUE && Keys_keyDown(keyWormSelect)==FALSE)
+		Game_changeMode(gameMode_Turn);
+		
+	// All regular game-updates during this mode
+	gameUpdates();
+	
+	// the game
+	Draw_renderGame();
+}
+
+/**
+	Called on the first-frame when the Games state machine leaves WormSelect mode.
+*/
+static void WormSelect_exit()
+{
+	// clear the grace timer, if there was any
+	Game_graceTimer = 0;
 }

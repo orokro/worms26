@@ -1,7 +1,7 @@
 // C Source File
 // Created 11/11/2017; 11:34:12 PM
 
-#include "../Headers/System/Main.h"
+#include "Main.h"
 
 /*
 	Draw
@@ -455,7 +455,7 @@ void Draw_renderGame()
 	// for now, we will output a bunch of debug info on the screen
 	
 	// game modes by name	
-	char modes[9][16] = {"Select", "Turn", "WeaponSel", "Pause", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
+	static const char modes[9][16] = {"Select", "Turn", "WeaponSel", "Pause", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
 	
 	// draw the current and previous game mode on the scren
 	DrawStr(0,1,modes[(short)Game_mode], A_XOR);

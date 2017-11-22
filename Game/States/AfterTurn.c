@@ -6,14 +6,20 @@
 // this is that timer
 char waterLevelTimer=0;
 
-void AfterTurn_enter()
+/**
+	Called on the first-frame when the Games state machine is set to AfterTurn mode.
+*/
+static void AfterTurn_enter()
 {
 	// incase of sudden death
 	waterLevelTimer=10;
 	Game_timer=-1;
 }
 
-void AfterTurn_update()
+/**
+	Called every frame that the Games state machine is in AfterTurn mode.
+*/
+static void AfterTurn_update()
 {
 	// if sudden death is active, we should increase the water level
 	if((Game_suddenDeathTimer<=0) && waterLevelTimer>0)
@@ -32,7 +38,10 @@ void AfterTurn_update()
 		Game_changeMode(gameMode_WormSelect);
 }
 
-void AfterTurn_exit()
+/**
+	Called on the first-frame when the Games state machine leaves AfterTurn mode.
+*/
+static void AfterTurn_exit()
 {
 	
 }

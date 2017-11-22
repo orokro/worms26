@@ -1,4 +1,4 @@
-#include "../Headers/System/Main.h"
+#include "Main.h"
 
 /*
 	Mines

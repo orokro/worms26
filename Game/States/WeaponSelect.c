@@ -7,13 +7,19 @@ char weaponSelectX=0;
 char weaponSelectY=0;
 char weaponFastMove=0;
 
-void WeaponSelect_enter()
+/**
+	Called on the first-frame when the Games state machine is set to WeaponSelect mode.
+*/
+static void WeaponSelect_enter()
 {
 	// make sure our fast-move timer starts at 0
 	weaponFastMove = 0;
 }
 
-void WeaponSelect_update()
+/**
+	Called every frame that the Games state machine is in WeaponSelect mode.
+*/
+static void WeaponSelect_update()
 {
 	// for each cursor key, move the weapon selection position, when its pressed
 	if(Keys_keyDown(keyLeft)==TRUE)
@@ -78,7 +84,10 @@ void WeaponSelect_update()
 	Draw_renderWeaponsMenu(weaponSelectX, weaponSelectY);	
 }
 
-void WeaponSelect_exit()
+/**
+	Called on the first-frame when the Games state machine leaves WeaponSelect mode.
+*/
+static void WeaponSelect_exit()
 {
 	
 }

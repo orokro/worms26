@@ -2,12 +2,18 @@
 	 TURN +++ TURN +++ TURN +++ TURN +++ TURN +++ TURN +++ TURN +++ TURN +++ TURN +++ TURN ++
    ---------------------------------------------------------------------------------------- */
 
-void Turn_enter()
+/**
+	Called on the first-frame when the Games state machine is set to Turn mode.
+*/
+static void Turn_enter()
 {
 	
 }
 
-void Turn_update()
+/**
+	Called every frame that the Games state machine is in Turn mode.
+*/
+static void Turn_update()
 {
 	// all key-logic and movement logic for the worm will happen in WormsUpdate
 	
@@ -33,7 +39,10 @@ void Turn_update()
 	}
 }
 
-void Turn_exit()
+/**
+	Called on the first-frame when the Games state machine leaves Turn mode.
+*/
+static void Turn_exit()
 {
 	// note, this doesn't imply that the turn is over.
 	// just that we are switching to it

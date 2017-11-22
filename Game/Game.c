@@ -1,7 +1,7 @@
 // C Source File
 // Created 11/12/2017; 4:26:32 PM
 
-#include "../Headers/System/Main.h"
+#include "Main.h"
 
 /*
 	Game
@@ -128,7 +128,7 @@ short Game_retreatTimer = 5;
 short Game_graceTimer = 5;
 
 // sudden death timer - 10 minutes before sudden death begins
-long Game_suddenDeathTimer = (long)((long)((long)60*(long)TIME_MULTIPLIER) * (long)10);
+long Game_suddenDeathTimer = 60L * TIME_MULTIPLIER * 10;
 
 // water level for sudden death:
 char Game_waterLevel = 0;
@@ -160,116 +160,31 @@ char Game_cursorEndTurn = FALSE;
 	gameMode_AfterTurn
 */
 
-// function prototypes for our local game-mode logic methods!
-/**
-	Called on the first-frame when the Games state machine is set to WormSelect mode.
-*/
-void WormSelect_enter();
-/**
-	Called every frame that the Games state machine is in WormSelect mode.
-*/
-void WormSelect_update();
-/**
-	Called on the first-frame when the Games state machine leaves WormSelect mode.
-*/
-void WormSelect_exit();
-/**
-	Called on the first-frame when the Games state machine is set to Turn mode.
-*/
-void Turn_enter();
-/**
-	Called every frame that the Games state machine is in Turn mode.
-*/
-void Turn_update();
-/**
-	Called on the first-frame when the Games state machine leaves Turn mode.
-*/
-void Turn_exit();
-/**
-	Called on the first-frame when the Games state machine is set to WeaponSelect mode.
-*/
-void WeaponSelect_enter();
-/**
-	Called every frame that the Games state machine is in WeaponSelect mode.
-*/
-void WeaponSelect_update();
-/**
-	Called on the first-frame when the Games state machine leaves WeaponSelect mode.
-*/
-void WeaponSelect_exit();
-/**
-	Called on the first-frame when the Games state machine is set to Pause mode.
-*/
-void Pause_enter();
-/**
-	Called every frame that the Games state machine is in Pause mode.
-*/
-void Pause_update();
-/**
-	Called on the first-frame when the Games state machine leaves Pause mode.
-*/
-void Pause_exit();
-/**
-	Called on the first-frame when the Games state machine is set to Cursor mode.
-*/
-void Cursor_enter();
-/**
-	Called every frame that the Games state machine is in Cursor mode.
-*/
-void Cursor_update();
-/**
-	Called on the first-frame when the Games state machine leaves Cursor mode.
-*/
-void Cursor_exit();
-/**
-	Called on the first-frame when the Games state machine is set to TurnEnd mode.
-*/
-void TurnEnd_enter();
-/**
-	Called every frame that the Games state machine is in TurnEnd mode.
-*/
-void TurnEnd_update();
-/**
-	Called on the first-frame when the Games state machine leaves TurnEnd mode.
-*/
-void TurnEnd_exit();
-/**
-	Called on the first-frame when the Games state machine is set to Death mode.
-*/
-void Death_enter();
-/**
-	Called every frame that the Games state machine is in Death mode.
-*/
-void Death_update();
-/**
-	Called on the first-frame when the Games state machine leaves Death mode.
-*/
-void Death_exit();
-/**
-	Called on the first-frame when the Games state machine is set to AfterTurn mode.
-*/
-void AfterTurn_enter();
-/**
-	Called every frame that the Games state machine is in AfterTurn mode.
-*/
-void AfterTurn_update();
-/**
-	Called on the first-frame when the Games state machine leaves AfterTurn mode.
-*/
-void AfterTurn_exit();
-/**
-	Called on the first-frame when the Games state machine is set to GameOver mode.
-*/
-void GameOver_enter();
-/**
-	Called every frame that the Games state machine is in GameOver mode.
-*/
-void GameOver_update();
-/**
-	Called on the first-frame when the Games state machine leaves GameOver mode.
-*/
-void GameOver_exit();
+void gameUpdates();
 
+// function prototypes for our local game-mode logic methods!
+/*
+	Due to TIGCC's weird path rules, these files are stored in the Game/States folder on DISK
+	but in TIGCC IDE they are under Header Files/States
+	
+	The only way I was able to include them was to move them under Headers...
+	
+	At least in Headers they wont compile on their own, since we just want them included in this file.
+	
+	Anyway, below, each of the states for the state machine is defined, and any methods or variables they need
+	will be defined in their file.
+	
+	Each state has a State_enter, State_update, and State_exit method. Yay, state-machines!
+*/
+#include "WormSelect.c"
+#include "Turn.c"
+#include "WeaponSelect.c"
+#include "Pause.c"
+#include "Cursor.c"
+#include "TurnEnd.c"
+#include "Death.c"
+#include "AfterTurn.c"
+#include "GameOver.c"
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -405,6 +320,21 @@ void Game_changeMode(char newMode)
 /* ----------------------------------------------------------------------------------------
 	 GLOBAL GAME METHODS +++ GLOBAL GAME METHODS +++ GLOBAL GAME METHODS +++ GLOBAL GAME METH
    ---------------------------------------------------------------------------------------- */
+
+/**
+ * Starts the sudden death mode, by setting all worms to 1 HP
+ *
+ * we don't need a separate variable to know that Sudden Death is on, we can always test against
+ * the timer variable being less than 0
+ */
+static void startSuddenDeath()
+{
+	// we don't even need to test for active worms, just make 'em all 1hp
+	short i=0;
+	for(i=0; i<16; i++)
+		Worm_health[i]=1;
+}
+
 /**
  * Updates all the Games main timers each frame, should be called every frame.
  *
@@ -412,23 +342,7 @@ void Game_changeMode(char newMode)
  * Updates the grace timer. (Frames till worm-select grace timer is up)
  * Updates the games main turn timer. (Frames till a turn is up)
 */
-void gameTimers();
-
-/**
- * Handles all the main updates for the Game mode, should be called every frame.
- *
- * That is, weather it's a worm-select mode, turn mode, or whatever,
- * the state of the game needs to be updating everyframe.
-*/
-void gameUpdates();
-
-/**
- * Starts the sudden death mode, by setting all worms to 1 HP
-*/
-void startSuddenDeath();
-
-// decrement's all Game Timers
-void gameTimers()
+static void gameTimers()
 {
 	// always decreates the sudden death timer
 	// Game_suddenDeathTimer--;
@@ -452,9 +366,13 @@ void gameTimers()
 		Game_changeMode(gameMode_TurnEnd);
 }
 
-
-// this handles all the updates for the Game mode.
-// this is not called during the pause menu, but everywhere else, mostly yes
+/**
+ * Handles all the main updates for the Game mode, should be called every frame.
+ * this is not called during the pause menu, but everywhere else, mostly yes
+ *
+ * That is, weather it's a worm-select mode, turn mode, or whatever,
+ * the state of the game needs to be updating everyframe.
+*/
 void gameUpdates()
 {
 	// decrease game timers
@@ -479,38 +397,3 @@ void gameUpdates()
 	// chance to see it
 	Explosion_update();
 }
-
-
-// sets all the worm's health to 1
-// we don't need a separate variable to know that Sudden Death is on, we can always test against
-// the timer variable being less than 0
-void startSuddenDeath()
-{
-	// we don't even need to test for active worms, just make 'em all 1hp
-	short i=0;
-	for(i=0; i<16; i++)
-		Worm_health[i]=1;
-}
-
-/*
-	Due to TIGCC's weird path rules, these files are stored in the Game/States folder on DISK
-	but in TIGCC IDE they are under Header Files/States
-	
-	The only way I was able to include them was to move them under Headers...
-	
-	At least in Headers they wont compile on their own, since we just want them included in this file.
-	
-	Anyway, below, each of the states for the state machine is defined, and any methods or variables they need
-	will be defined in their file.
-	
-	Each state has a State_enter, State_update, and State_exit method. Yay, state-machines!
-*/
-#include "..\States\WormSelect.c"
-#include "..\States\Turn.c"
-#include "..\States\WeaponSelect.c"
-#include "..\States\Pause.c"
-#include "..\States\Cursor.c"
-#include "..\States\TurnEnd.c"
-#include "..\States\Death.c"
-#include "..\States\AfterTurn.c"
-#include "..\States\GameOver.c"

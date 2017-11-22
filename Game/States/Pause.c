@@ -5,13 +5,19 @@
 // there will be TWO menu items for the pause menu: continue (0) and exit (1)
 char pauseMenuItem=0;
 
-void Pause_enter()
+/**
+	Called on the first-frame when the Games state machine is set to Pause mode.
+*/
+static void Pause_enter()
 {
 	// always make sure its on continue when we enter
 	pauseMenuItem=0;
 }
 
-void Pause_update()
+/**
+	Called every frame that the Games state machine is in Pause mode.
+*/
+static void Pause_update()
 {
 	/*
 	  if either up or down are pressed, we should toggle the pause menu item
@@ -45,7 +51,10 @@ void Pause_update()
 
 }
 
-void Pause_exit()
+/**
+	Called on the first-frame when the Games state machine leaves Pause mode.
+*/
+static void Pause_exit()
 {
 	
 }
