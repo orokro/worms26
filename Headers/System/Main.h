@@ -363,10 +363,12 @@ extern char Worm_xVelo[16];
 extern char Worm_yVelo[16];
 extern unsigned long Worm_dir;
 extern char Worm_health[16];
-extern long Worm_isDead;
-extern long Worm_active;
+extern unsigned long Worm_isDead;
+extern unsigned long Worm_active;
 extern char Worm_mode[16];
 extern char Worm_currentWorm;
+extern unsigned long Worm_unstable;
+extern unsigned long Worm_onGround;
 
 // worm function prototypes
 
@@ -573,6 +575,20 @@ extern char Weapons_weaponsActive();
  * @param y the y posiiion in world space for the weapon target.
 */
 extern void Weapons_setTarget(short, short);
+
+
+
+/* ======================================================================================================================================
+   CHARACTER CONTROLLER +++ CHARACTER CONTROLLER +++ CHARACTER CONTROLLER +++ CHARACTER CONTROLLER +++ CHARACTER CONTROLLER +++ CHARACTER
+   ====================================================================================================================================== */
+
+// character controller function prototypes
+
+/**
+ * Updates the character based on user input for a frame turning the turn game mode.
+*/
+extern void CharacterController_update();
+
 
 
 

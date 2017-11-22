@@ -115,18 +115,21 @@ void Mines_update()
 	short i=0;
 	for(i=0; i<10; i++)
 	{
-		// okay we will only check proxity every 5 frames to save CPU since proxmity check is
-		// epensive
-		if(proxmityCheckTimer==0)
-			checkProximity(i);
-		
-		// unfortuntely, since blast-detomation reqiores first-frame access, we gotta check
-		// explosions every frame
-		checkExplosions(i);
-		
-		// udpates the mine (if it has a timer, decrease it and explode it if necessary)
-		updateMine(i);
-		
+		// only update active mines
+		if(Mine_active & (int)1<<(i))
+		{
+			// okay we will only check proxity every 5 frames to save CPU since proxmity check is
+			// epensive
+			if(proxmityCheckTimer==0)
+				checkProximity(i);
+			
+			// unfortuntely, since blast-detomation reqiores first-frame access, we gotta check
+			// explosions every frame
+			checkExplosions(i);
+			
+			// udpates the mine (if it has a timer, decrease it and explode it if necessary)
+			updateMine(i);
+		}	
 	}// next i
 }
 
@@ -158,19 +161,23 @@ void updateMine(short index)
 // check if a mine is within-detonation range of a Worm
 void checkProximity(short index)
 {
+	// if this mine already has a timer, gtfo
+	if(Mine_fuse[index]>=0)
+		return;
+		
 	short i=0; 
 	for(i=0; i<16; i++)
 	{
 		// check if the worm is active
-		char wormIsActiveInGame = (char)((Worm_active & (int)1<<(i))>0);
-		char wormIsNotDead = (char)((Worm_isDead & (int)1<<(i))>0);
+		char wormIsActiveInGame = (char)((Worm_active & (unsigned long)1<<(i))>0);
+		char wormIsNotDead = (char)((Worm_isDead & (unsigned long)1<<(i))>0);
 		
 		// only do shit if the worm is active in the game, and NOT dead
-		if(wormIsActiveInGame==TRUE && wormIsNotDead==TRUE)
+		if(wormIsActiveInGame && wormIsNotDead)
 		{
 					
 			// if it's in it's first frame, calculate the distance from us to it:
-			short d = dist(Worm_x[index], Worm_y[index], Mine_x[i], Mine_y[i]);
+			short d = dist(Worm_x[i], Worm_y[i], Mine_x[index], Mine_y[index]);
 			
 			// if we're withing the trigger distance, pick a timer for this mine
 			if(d <= mineTriggerDistance)

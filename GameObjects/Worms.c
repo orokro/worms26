@@ -33,10 +33,10 @@ unsigned long Worm_dir = 0;
 char Worm_health[16] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
 // bit mask if the worm is dead. bit 1 = dead, bit = 0 alive
-long Worm_isDead = 0;
+unsigned long Worm_isDead = 0;
 
 // bit mask if the worm is ACTIVE... different that dead.
-long Worm_active = 0;
+unsigned long Worm_active = 0;
 
 // store the current mode for every worm:
 char Worm_mode[16] = {wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle };
@@ -45,6 +45,14 @@ char Worm_mode[16] = {wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle
 // if worm-select is enabled, during this period the play can change the active worm.
 // the game-logic will update this variable, such that worms that are alive, and on the current team, will cycle
 char Worm_currentWorm = 0;
+
+// if any of the bits in this mask are 1, then the worm moved within
+// the last frame. We can't end a turn until all worms are "stable"
+unsigned long Worm_unstable = 0;
+
+// if the collision dection for DOWN on a worm was true, then the worm is "on the ground"
+// this is important for detecting falling for parachut or for walking
+unsigned long Worm_onGround = 0;
 
 // local function prototypes
 
@@ -87,7 +95,7 @@ void spawnWorm(short index)
 	Worm_y[index] = Map_lastRequestedSpawnY;
 	
 	// set active
-	Worm_active |= (long)1<<(index);
+	Worm_active |= (unsigned long)1<<(index);
 	
 	// random direction
 	if(random(2)==0)
@@ -103,7 +111,7 @@ void Worm_update()
 	for(i=0; i<16; i++)
 	{
 		// caculate the bitmask for this worm once, since we'll use it alot
-		wormMask = (long)1<<(i);
+		wormMask = (unsigned long)1<<(i);
 		
 		// only update worms in the game
 		if((Worm_active & wormMask) > 0)
@@ -111,12 +119,12 @@ void Worm_update()
 			// add gravity to the worm
 			Worm_yVelo[i]++;
 			
-			// add x velocity component
-			Worm_x[i] += Worm_xVelo[i];
-			
-			// if the worm is dead, it's gravestone can only have vertical velocity:
-			if((Worm_isDead ^ wormMask) == 0)
-				Worm_y[i] += Worm_yVelo[i];
+			// if the worm is dead, it's gravestone can only have vertical velocity, no X
+			if((Worm_isDead & wormMask) == 0)
+				Worm_x[i] += Worm_xVelo[i];
+		
+			// add y velocity component
+			Worm_y[i] += Worm_yVelo[i];
 				
 			// if the worm goes below 200 pixels, its drown:
 			if(Worm_y[i]>200)
@@ -125,6 +133,13 @@ void Worm_update()
 			// handle worm collision from it's new place:
 			wormCollision(i);
 			
+			// if the worm has no velocity, it either hit the ground, or isn't moving
+			// we can consider it stable:
+			if(Worm_xVelo[i]==0 && Worm_yVelo==0)
+				Worm_unstable |= wormMask;
+			else
+				Worm_unstable &= ~wormMask;
+				
 		}// end if active worm
 	}// next i
 }
@@ -171,17 +186,23 @@ void wormCollision(short index)
 	// test horizontal positions at once. If both collide, the total would the same
 	// delta needed to move the worm anyway. Also, both should never collide if our
 	// maps are generated correctly.
-	short col = Collide_test(wormX-4, wormY, COL_LEFT) + Collide_test(wormX+4, wormY, COL_RIGHT);
+	short col = Collide_test(wormX-2, wormY, COL_LEFT) + Collide_test(wormX+2, wormY, COL_RIGHT);
 	if(col)
 	{
 		Worm_x[index] += col;
 		
 		// the worm hit a wall horizontally. Flip its horizontal velocity and half it
 		Worm_xVelo[index] *= -0.5f;
+		
+		unsigned long mask = (unsigned long)1<<(index);
+		if(Worm_dir & mask)
+			Worm_dir &= ~mask;
+		else
+			Worm_dir |= mask;
 	}
 	
 	// In a similar fashion we can check both top and bottom at the same time
-	col = Collide_test(wormX, wormY-6, COL_UP) + Collide_test(wormX, wormY+6, COL_DOWN);
+	col = Collide_test(wormX, wormY-4, COL_UP) + Collide_test(wormX, wormY+6, COL_DOWN);
 	if(col)
 	{
 		Worm_y[index] += col;
@@ -189,6 +210,19 @@ void wormCollision(short index)
 		// vertical collisions will kill all velocity
 		Worm_xVelo[index]=0;
 		Worm_yVelo[index]=0;
+		
+		/*
+		  if the collision value was negative, we hit the ground at some point.
+		  this, we are grounded. (if we hit the ceiling, the would have needed to move DOWN
+			that is, a positive value.
+			
+			in theory, both the top and bottom collisions could happen and result in a negative,
+			but we will ignore that edge case and try to never generate maps that would let that happen.
+		*/
+		if(col<0)
+			Worm_onGround |= (unsigned long)1<<(index);
+		else
+			Worm_onGround &= ~((unsigned long)1<<(index));
 	}
 }
 

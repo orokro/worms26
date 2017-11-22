@@ -16,9 +16,12 @@ static void Turn_enter()
 static void Turn_update()
 {
 	// all key-logic and movement logic for the worm will happen in WormsUpdate
-	
+
 	// All regular game-updates during this mode
 	gameUpdates();
+	
+	// handle controlling the current worm!
+	CharacterController_update();
 	
 	// the game
 	Draw_renderGame();

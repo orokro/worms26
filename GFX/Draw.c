@@ -327,8 +327,8 @@ void drawWorms()
 			screenY=Worm_y[i];
 			if(worldToScreen(&screenX, &screenY)==TRUE)
 			{
-				// for some reason testing the facing direction of the worm crashes the game... weird
-				char facing = (Worm_dir & (unsigned long)1<<(i));
+				// get the direction the worm is facing..
+				char facing = (Worm_dir & (unsigned long)1<<(i))>0;
 				DrawClipChar(screenX-4, screenY-7+7, (char)111, (&(SCR_RECT){{0, 0, 159, 99}}), A_NORMAL); 
 				DrawClipChar(screenX+(facing ? -6 : -2), screenY-11+7, (char)111, (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
 				if(i>=8)
@@ -339,6 +339,17 @@ void drawWorms()
 			}// end if on screen
 		}// end if active
 	}// next i
+	
+	// for debug: draw collider for current worm:
+	/*
+	short x=Worm_x[(short)Worm_currentWorm];
+	short y=Worm_y[(short)Worm_currentWorm];
+	if(worldToScreen(&x, &y)==TRUE)
+	{
+		DrawLine(x-2, y, x+2, y, A_NORMAL);
+		DrawLine(x, y-4, x, y+6, A_NORMAL);
+	}
+	*/
 }
 
 // draw all the mines active in the game
@@ -363,7 +374,7 @@ void drawMines()
 				// if the mine has an active fuse, draw that too
 				if(Mine_fuse[i]>0)
 				{
-					sprintf(fuseStr, "%d", Mine_fuse[i]);
+					sprintf(fuseStr, "%d", (Mine_fuse[i]/TIME_MULTIPLIER));
 					DrawStr(screenX-4, screenY-16, fuseStr, A_NORMAL);
 				}// end if fuse
 			}// end if on screen
@@ -466,6 +477,8 @@ void Draw_renderGame()
 	sprintf(timeStr, "time: %d, %d, %d", (short)(Game_graceTimer/TIME_MULTIPLIER), (short)(Game_timer/TIME_MULTIPLIER), (short)(Game_retreatTimer));
 	DrawStr(60,1,timeStr, A_XOR);	
 
+	DrawStr(80,10, ((Worm_onGround |= (unsigned long)1<<(Worm_currentWorm)) ? "Grounded" : "Air"), A_XOR);
+	
 	// draw the current team on the screen	
 	//DrawStr(0,40, (Game_currentTeam ? "Team: Black" : "Team: White") , A_XOR);	
 	
