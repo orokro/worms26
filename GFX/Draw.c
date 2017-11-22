@@ -328,13 +328,13 @@ void drawWorms()
 			if(worldToScreen(&screenX, &screenY)==TRUE)
 			{
 				// for some reason testing the facing direction of the worm crashes the game... weird
-				// char facing = (Worm_dir & (unsigned long)1<<(i));
-				DrawClipChar(screenX-4, screenY-7, (char)111, (&(SCR_RECT){{0, 0, 159, 99}}), A_NORMAL); 
-				DrawClipChar(screenX+(FALSE ? -6 : -2), screenY-11, (char)111, (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
+				char facing = (Worm_dir & (unsigned long)1<<(i));
+				DrawClipChar(screenX-4, screenY-7+7, (char)111, (&(SCR_RECT){{0, 0, 159, 99}}), A_NORMAL); 
+				DrawClipChar(screenX+(facing ? -6 : -2), screenY-11+7, (char)111, (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
 				if(i>=8)
 				{
-					DrawClipChar(screenX-4, screenY-6, (char)127, (&(SCR_RECT){{0, 0, 159, 99}}), A_NORMAL); 
-					DrawClipChar(screenX+(FALSE ? -6 : -2), screenY-10, (char)127, (&(SCR_RECT){{0, 0, 159, 99}}), A_NORMAL);
+					DrawClipChar(screenX-4, screenY-6+7, (char)127, (&(SCR_RECT){{0, 0, 159, 99}}), A_NORMAL); 
+					DrawClipChar(screenX+(facing ? -6 : -2), screenY-10+7, (char)127, (&(SCR_RECT){{0, 0, 159, 99}}), A_NORMAL);
 				} // end if black team
 			}// end if on screen
 		}// end if active

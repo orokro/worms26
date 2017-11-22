@@ -50,7 +50,7 @@ Use Return Value=0
 Enable Error Return=0
 Save Screen=1
 [File Editing]
-Open File=C:\Users\Dude\Documents\worms17\Game\States\WeaponSelect.c
+Open File=C:\Users\Dude\Documents\worms17\GameObjects\Worms.c
 [Included Files]
 C File 1=GameObjects\Weapons.c
 C File 2=GameObjects\Crates.c
@@ -65,6 +65,7 @@ C File 10=GFX\Camera.c
 C File 11=GFX\Draw.c
 C File 12=System\Keys.c
 C File 13=System\Main.c
+C File 14=Game\Collide.c
 Text File 1=Read Me.txt
 Header File 1=Headers\System\Main.h
 Header File 2=Headers\System\MainGeneral.h

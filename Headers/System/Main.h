@@ -289,6 +289,35 @@ extern void Map_makeMap();
 
 
 /* ======================================================================================================================================
+   COLLISION +++ COLLISION +++ COLLISION +++ COLLISION +++ COLLISION +++ COLLISION +++ COLLISION +++ COLLISION +++ COLLISION +++ COLLISIO
+   ====================================================================================================================================== */
+   
+// collision defines
+#define COL_UP 0
+#define COL_DOWN 1
+#define COL_LEFT 2
+#define COL_RIGHT 3
+
+// collision function prototypes
+
+/*
+ * This method takes a point in world space, and a direction and tests for collision.
+ *
+ * If the point collides with the map, it will calculate the first availble point in the opposite direction.
+ * This method returns 0 if there is no collision, or the amount of pixels in the opposite direction for the
+ * first non map pixel. This return value can be added to the items X/Y so it's not colliding.
+ * The valid directions are COL_UP, COL_DOWN, COL_LEFT, COL_RIGHT
+ *
+ * @param x the x position in world space to test
+ * @param y the y position in world space to test
+ * @param dir the direction of the test. Can be: COL_UP, COL_DOWN, COL_LEFT, COL_RIGHT
+*/
+extern short Collide_test(short, short, char);
+   
+   
+   
+   
+/* ======================================================================================================================================
    EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++
    ====================================================================================================================================== */
 
@@ -300,7 +329,7 @@ extern char Explosion_size[8];
 extern char Explosion_power[8];
 extern int Explosion_firstFrame;
 
-// explosion unction prototypes
+// explosion function prototypes
 
 /**
  * Spawns an explosion at the area, with the max radius size, power and if it spawns fire particles or not.
@@ -348,6 +377,10 @@ extern char Worm_currentWorm;
 */
 extern void Worm_spawnWorms();
 
+/**
+ * This handles updates, (i.e. phsysics, gravity, and map collisions) for worms, as well as damage checking from explosions.
+*/
+extern void Worm_update();
 
 
 /* ======================================================================================================================================

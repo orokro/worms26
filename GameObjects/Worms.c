@@ -55,6 +55,13 @@ char Worm_currentWorm = 0;
 */
 void spawnWorm(short);
 
+/**
+ * Checks if the worm collided with the map, and puts it back in an OK place if it did
+ *
+ * @param index the index of the worm to collision test
+*/
+void wormCollision(short);
+
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -86,3 +93,104 @@ void spawnWorm(short index)
 	if(random(2)==0)
 		Worm_dir |= (unsigned long)1<<(index);
 }
+
+// main update method for all worms
+void Worm_update()
+{
+	// loop over worms, and any active worms should have their gravity and physics applied..
+	short i;
+	long wormMask;
+	for(i=0; i<16; i++)
+	{
+		// caculate the bitmask for this worm once, since we'll use it alot
+		wormMask = (long)1<<(i);
+		
+		// only update worms in the game
+		if((Worm_active & wormMask) > 0)
+		{
+			// add gravity to the worm
+			Worm_yVelo[i]++;
+			
+			// add x velocity component
+			Worm_x[i] += Worm_xVelo[i];
+			
+			// if the worm is dead, it's gravestone can only have vertical velocity:
+			if((Worm_isDead ^ wormMask) == 0)
+				Worm_y[i] += Worm_yVelo[i];
+				
+			// if the worm goes below 200 pixels, its drown:
+			if(Worm_y[i]>200)
+				Worm_isDead |= wormMask;
+				
+			// handle worm collision from it's new place:
+			wormCollision(i);
+			
+		}// end if active worm
+	}// next i
+}
+
+// tests for map collision for a worm
+void wormCollision(short index)
+{
+	/*
+		How this works:
+		
+		The worms origin point is it's the middle of it's sprite, not it's bottom.
+		
+		We will test for horizontal collisions first, by testing offsets left and right
+		of the worms origin. If either collide, we will push the worm in the opposite
+		direction to the first open pixel.
+		
+		Then we will test the top and bottom, and push the worm up or down in a similar fashion.
+		
+		Two problem with this is:
+		
+		If the worm falls into a crack that is more narrow than its width, the horizontal
+		tests might pass, but it will still fall.
+		
+		On future frames, both the left and right colliders will trigger and the worm
+		will be pushed into the map on the left side, since the right collider will happen
+		after.
+		
+		Thus, the worm should not be allowed to fall if both it's left and right fired
+		on this turn.
+		
+		Being flug upwards through a narrow crack is such an extreme edge case I wont
+		handle it.
+		
+		Now technically, there should be no way for the map to create such narrow cracks.
+		And damaging the map, tunneling, or drilling should never make such a narrow crack.
+		
+		As long as the map generator makes safe maps, this edge case does not need to be tested.
+	*/
+	
+	// to prevent feed back loops, we always want to test on the worms ORIGINAL position
+	short wormX = Worm_x[index];
+	short wormY = Worm_y[index];
+	
+	// test horizontal positions at once. If both collide, the total would the same
+	// delta needed to move the worm anyway. Also, both should never collide if our
+	// maps are generated correctly.
+	short col = Collide_test(wormX-4, wormY, COL_LEFT) + Collide_test(wormX+4, wormY, COL_RIGHT);
+	if(col)
+	{
+		Worm_x[index] += col;
+		
+		// the worm hit a wall horizontally. Flip its horizontal velocity and half it
+		Worm_xVelo[index] *= -0.5f;
+	}
+	
+	// In a similar fashion we can check both top and bottom at the same time
+	col = Collide_test(wormX, wormY-6, COL_UP) + Collide_test(wormX, wormY+6, COL_DOWN);
+	if(col)
+	{
+		Worm_y[index] += col;
+		
+		// vertical collisions will kill all velocity
+		Worm_xVelo[index]=0;
+		Worm_yVelo[index]=0;
+	}
+}
+
+
+

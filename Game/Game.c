@@ -378,6 +378,9 @@ void gameUpdates()
 	// decrease game timers
 	gameTimers();
 	
+	// gravity and physics for worms!
+	Worm_update();
+	
 	// update OilDrums, Crates, Mines, Weapons
 	if(OilDrum_active)
 		OilDrums_update();

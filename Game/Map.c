@@ -302,7 +302,7 @@ char Map_testPoint(short x, short y)
 	char pixelOn = (char)((mapData & (1<<(pixelBitIndex)))>0);
 
 	// comment out and it will crash
-	return FALSE;
+	// return FALSE;
 	
 	// return the status of this map pixel
 	return pixelOn;
