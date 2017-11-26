@@ -42,21 +42,46 @@ char Explosion_power[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 */
 int Explosion_firstFrame = 0;
 
-// local function prototypes
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 /**
  * Updates an individual explosion at the given index.
  *
  * @param index the explosion to update.
 */
-void updateExplosion(short);
+void updateExplosion(short index)
+{
+	// decrease it's time
+	Explosion_time[index]--;
+	
+	// no matter what, it's not a first-frame any more
+	Explosion_firstFrame &= ~((int)1<<(index));
+	
+	// calculate it's current radius
+	short radius = Explosion_size[index] - Explosion_time[index];
+	
+	// draw the explosion on our MapBuffers to erase map
+	// TO-DO: implement explosion drawing
+	
+	// prevent warnings for now
+	radius = radius;
+
+}
+
 
 /**
  * Spawns fire at an explosion point, for explosions that use fire.
  *
  * Explosions, such as those from OilDrums or Molotov Cocktains spawn fire particles
 */
-void spawnFire();
+void spawnFire()
+{
+		
+}
 
 
 
@@ -122,12 +147,6 @@ void Explosion_spawn(short x, short y, char size, char power, char hasFire)
 		spawnFire();
 }
 
-// spawns fire
-void spawnFire()
-{
-		
-}
-
 
 // updates active explosions
 void Explosion_update()
@@ -139,22 +158,4 @@ void Explosion_update()
 			updateExplosion(i);
 }
 
-// updates a single explosion
-void updateExplosion(short index)
-{
-	// decrease it's time
-	Explosion_time[index]--;
-	
-	// no matter what, it's not a first-frame any more
-	Explosion_firstFrame &= ~((int)1<<(index));
-	
-	// calculate it's current radius
-	short radius = Explosion_size[index] - Explosion_time[index];
-	
-	// draw the explosion on our MapBuffers to erase map
-	// TO-DO: implement explosion drawing
-	
-	// prevent warnings for now
-	radius = radius;
 
-}

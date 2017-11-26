@@ -82,22 +82,22 @@
 */
 
 // the type of the weapon!
-char Weapon_type[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Weapon_type[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // x/y positions of our weapons
-short Weapon_x[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-short Weapon_y[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+short Weapon_x[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+short Weapon_y[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // velocities of weapons
-char Weapon_xVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-char Weapon_yVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Weapon_xVelo[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Weapon_yVelo[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // timer: various weapons can make use of a fuse timer, or timers for other reasons
-char Weapon_time[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Weapon_time[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // each weapon has varius properties it can have: uses velocity, uses gravity, etc.
 // this is an array of bit masks for the current weapons, and what features they have
-char Weapon_uses[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Weapon_uses[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // bit mask if the weapon is active in this slot
 unsigned short Weapon_active = 0;
@@ -106,16 +106,6 @@ unsigned short Weapon_active = 0;
 // thus, whever a target is set, it will have to update our weapon target
 short Weapon_targetX = 0;
 short Weapon_targetY = 0;
-
-// local function prototypes
-short findFreeWeaponSlot();
-void updateVelocity(short);
-void updateGravity(short);
-void updateTimer(short);
-void updateHoming(short);
-void updateMovement(short);
-void updateController(short);
-void updateCollision(short);
 
 
 
@@ -128,88 +118,17 @@ short findFreeWeaponSlot()
 {
 	// loop till an active slot is found:
 	short i=0;
-	for(i=0; i<10; i++)
+	for(i=0; i<MAX_WEAPONS; i++)
 	{
 		char freeSlot = (char)((Weapon_active & (short)((short)1<<(i))) <= 0);
-		if(freeSlot==TRUE)
+		if(freeSlot)
 			return i;
 	}
 	
 	// nothing found, return error code
 	return -1;
 }
-// spawns a weapon... simple enough
-void Weapons_spawn(char type, short x, short y, char xVelocity, char yVelocity, char time, char properties)
-{
-	// find a free slot, if none are available, we are unable to spawn this weapon (should never happen)
-	short slot = findFreeWeaponSlot();
-	if(slot==-1)
-		return;
-		
-	// set the weapon active:
-	Weapon_active |= (short)1<<(slot);
-	
-	// set it's varius properties
-	Weapon_type[slot] = type;
-	Weapon_x[slot] = x;
-	Weapon_y[slot] = y;
-	Weapon_xVelo[slot] = xVelocity;
-	Weapon_yVelo[slot] = yVelocity;
-	Weapon_time[slot] = time;
-	Weapon_uses[slot] = properties;
-}
 
-// returns TRUE/FALSE if any weapon is active:
-char Weapons_weaponsActive()
-{
-	return (char)(Weapon_active>0);
-}
-
-// sets the target for our weapon
-void Weapons_setTarget(short x, short y)
-{
-	Weapon_targetX = x;
-	Weapon_targetY = y;
-}
-
-// update all weapons in game every frame
-void Weapons_update()
-{
-	// loop over all weapons, and update the active ones as necessary
-	short i=0;
-	for(i=0; i<10; i++)
-	{
-		// check if it's active
-		char activeWeapon = (char)((Weapon_active & (short)((short)1<<(i))) > 0);
-		if(activeWeapon)
-		{
-			
-			// based on the properties it has, call each subroutine with it's index
-			if(Weapon_uses[i] & usesVelocity)
-				updateVelocity(i);
-				
-			if(Weapon_uses[i] & usesGravity)
-				updateGravity(i);
-				
-			if(Weapon_uses[i] & usesTimer)
-				updateTimer(i);
-				
-			if(Weapon_uses[i] & usesHoming)
-				updateHoming(i);
-				
-			if(Weapon_uses[i] & usesMovement)
-				updateMovement(i);
-				
-			if(Weapon_uses[i] & usesController)
-				updateController(i);
-			
-			// all weapons will need to update their collision.
-			// some weapons will detonate on impact, others will bounce or something else
-			updateCollision(i);
-			
-		}// endif active
-	}// next i
-}
 	
 // if a weapon has velocity enabled, use its velocity and move it appropriately
 void updateVelocity(short index)
@@ -287,4 +206,83 @@ void updateCollision(short index)
 	// TO-DO: implement
 	index = index;
 }
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
+// spawns a weapon... simple enough
+void Weapons_spawn(char type, short x, short y, char xVelocity, char yVelocity, char time, char properties)
+{
+	// find a free slot, if none are available, we are unable to spawn this weapon (should never happen)
+	short slot = findFreeWeaponSlot();
+	if(slot==-1)
+		return;
+		
+	// set the weapon active:
+	Weapon_active |= (short)1<<(slot);
+	
+	// set it's varius properties
+	Weapon_type[slot] = type;
+	Weapon_x[slot] = x;
+	Weapon_y[slot] = y;
+	Weapon_xVelo[slot] = xVelocity;
+	Weapon_yVelo[slot] = yVelocity;
+	Weapon_time[slot] = time;
+	Weapon_uses[slot] = properties;
+}
+
+// returns TRUE/FALSE if any weapon is active:
+char Weapons_weaponsActive()
+{
+	return (char)(Weapon_active>0);
+}
+
+// sets the target for our weapon
+void Weapons_setTarget(short x, short y)
+{
+	Weapon_targetX = x;
+	Weapon_targetY = y;
+}
+
+// update all weapons in game every frame
+void Weapons_update()
+{
+	// loop over all weapons, and update the active ones as necessary
+	short i=0;
+	for(i=0; i<MAX_WEAPONS; i++)
+	{
+		// check if it's active
+		char activeWeapon = (char)((Weapon_active & (short)((short)1<<(i))) > 0);
+		if(activeWeapon)
+		{
+			
+			// based on the properties it has, call each subroutine with it's index
+			if(Weapon_uses[i] & usesVelocity)
+				updateVelocity(i);
+				
+			if(Weapon_uses[i] & usesGravity)
+				updateGravity(i);
+				
+			if(Weapon_uses[i] & usesTimer)
+				updateTimer(i);
+				
+			if(Weapon_uses[i] & usesHoming)
+				updateHoming(i);
+				
+			if(Weapon_uses[i] & usesMovement)
+				updateMovement(i);
+				
+			if(Weapon_uses[i] & usesController)
+				updateController(i);
+			
+			// all weapons will need to update their collision.
+			// some weapons will detonate on impact, others will bounce or something else
+			updateCollision(i);
+			
+		}// endif active
+	}// next i
+}
+
 

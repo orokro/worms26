@@ -357,19 +357,22 @@ extern void Explosion_update();
    WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORM
    ====================================================================================================================================== */
 
+// worm defines
+#define MAX_WORMS 16
+
 // worm enums
 enum WormModes {wormMode_idle, wormMode_walking, wormMode_jumping, wormMode_backFliping, wormMode_falling, wormMode_knockBack, wormMode_parachute, wormMode_rope, wormMode_bungie};
 
 // worm globals
-extern short Worm_x[16];
-extern short Worm_y[16];
-extern char Worm_xVelo[16];
-extern char Worm_yVelo[16];
+extern short Worm_x[MAX_WORMS];
+extern short Worm_y[MAX_WORMS];
+extern char Worm_xVelo[MAX_WORMS];
+extern char Worm_yVelo[MAX_WORMS];
 extern unsigned long Worm_dir;
-extern char Worm_health[16];
+extern char Worm_health[MAX_WORMS];
 extern unsigned long Worm_isDead;
 extern unsigned long Worm_active;
-extern char Worm_mode[16];
+extern char Worm_mode[MAX_WORMS];
 extern char Worm_currentWorm;
 extern unsigned long Worm_unstable;
 extern unsigned long Worm_onGround;
@@ -425,14 +428,14 @@ extern void OilDrums_update();
 
 // mine defines
 #define mineTriggerDistance 10
-#define TOTAL_MINES 6
+#define MAX_MINES 6
 
 // mine globals
-extern short Mine_x[TOTAL_MINES];
-extern short Mine_y[TOTAL_MINES];
-extern char Mine_xVelo[TOTAL_MINES];
-extern char Mine_yVelo[TOTAL_MINES];
-extern char Mine_fuse[TOTAL_MINES];
+extern short Mine_x[MAX_MINES];
+extern short Mine_y[MAX_MINES];
+extern char Mine_xVelo[MAX_MINES];
+extern char Mine_yVelo[MAX_MINES];
+extern char Mine_fuse[MAX_MINES];
 extern int Mine_active;
 
 // mine function prototypes
@@ -457,15 +460,16 @@ extern void Mines_update();
    ====================================================================================================================================== */
 
 // crate defines
+#define MAX_CRATES 8
 #define crateHealth 0
 #define crateWeapon 1
 #define crateTool 2
 
 // crate globals
-extern short Crate_x[8];
-extern short Crate_y[8];
-extern char Crate_health[8];
-extern char Crate_type[8];
+extern short Crate_x[MAX_CRATES];
+extern short Crate_y[MAX_CRATES];
+extern char Crate_health[MAX_CRATES];
+extern char Crate_type[MAX_CRATES];
 extern int Crate_active;
 
 // crate function prototypes
@@ -487,6 +491,9 @@ extern void Crates_update();
 /* ======================================================================================================================================
    WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WE
    ====================================================================================================================================== */
+
+// Weapons defines
+#define MAX_WEAPONS 10
 
 // Define bitmask flags for the types of properties a weapon can have:
 // when spawning a weapon, these can be ORed together to create it's logic
@@ -528,13 +535,13 @@ enum Weapons {
 	WClusterFrag, WBananaFrag, 	WComet,				WSuperSheep };
 
 // weapons globals
-extern char Weapon_type[10];
-extern short Weapon_x[10];
-extern short Weapon_y[10];
-extern char Weapon_xVelo[10];
-extern char Weapon_yVelo[10];
-extern char Weapon_time[10];
-extern char Weapon_uses[10];
+extern char Weapon_type[MAX_WEAPONS];
+extern short Weapon_x[MAX_WEAPONS];
+extern short Weapon_y[MAX_WEAPONS];
+extern char Weapon_xVelo[MAX_WEAPONS];
+extern char Weapon_yVelo[MAX_WEAPONS];
+extern char Weapon_time[MAX_WEAPONS];
+extern char Weapon_uses[MAX_WEAPONS];
 extern unsigned short Weapon_active;
 extern short Weapon_targetX;
 extern short Weapon_targetY;

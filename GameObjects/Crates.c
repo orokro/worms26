@@ -18,19 +18,23 @@
 */
 
 // x/y positions of our Crates
-short Crate_x[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-short Crate_y[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+short Crate_x[MAX_CRATES] = {0, 0, 0, 0, 0, 0, 0, 0};
+short Crate_y[MAX_CRATES] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 // health of our crates
-char Crate_health[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
+char Crate_health[MAX_CRATES] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
 // type of each Crate
-char Crate_type[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+char Crate_type[MAX_CRATES] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 // is the crate active?
 int Crate_active=0;
 
-// local function prototypes
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 /**
  * Spawns a single crate of the given type
@@ -44,7 +48,7 @@ static void spawnCrate(char type)
 	// we will assume that crates with less than 0 health are unactive
 	short index=-1;
 	short i=0;
-	for(i=0; i<8; i++)
+	for(i=0; i<MAX_CRATES; i++)
 	{
 		char enabled = (char)((Crate_active & (int)1<<(i)) > 0);
 		if(enabled==TRUE)
@@ -75,6 +79,7 @@ static void spawnCrate(char type)
 	// set active!
 	Crate_active |= (int)1<<(index);
 }
+
 
 /**
  * Checks if nearby explosions affect any of the given Crates index.
@@ -146,7 +151,7 @@ void Crates_update()
 	// if any of the active Crates have less than 0 health, create an explosion
 	// and set it inactive for the rest of the game
 	short i=0;
-	for(i=0; i<8; i++)
+	for(i=0; i<MAX_CRATES; i++)
 	{
 		// check if enabled and health is <= 0... then boom
 		char enabled = (char)((Crate_active & (int)1<<(i)) > 0);

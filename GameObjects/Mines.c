@@ -26,15 +26,15 @@
 */
 
 // x/y positions of our Mines
-short Mine_x[TOTAL_MINES] = {0, 0, 0, 0, 0, 0};
-short Mine_y[TOTAL_MINES] = {0, 0, 0, 0, 0, 0};
+short Mine_x[MAX_MINES] = {0, 0, 0, 0, 0, 0};
+short Mine_y[MAX_MINES] = {0, 0, 0, 0, 0, 0};
 
 // velocity of mines
-char Mine_xVelo[TOTAL_MINES] = {0, 0, 0, 0, 0, 0};
-char Mine_yVelo[TOTAL_MINES] = {0, 0, 0, 0, 0, 0};
+char Mine_xVelo[MAX_MINES] = {0, 0, 0, 0, 0, 0};
+char Mine_yVelo[MAX_MINES] = {0, 0, 0, 0, 0, 0};
 
 // fuse of mines
-char Mine_fuse[TOTAL_MINES] = {-1, -1, -1, -1, -1, -1};
+char Mine_fuse[MAX_MINES] = {-1, -1, -1, -1, -1, -1};
 
 // is the mine active? using bits for booleans
 int Mine_active=0;
@@ -204,7 +204,7 @@ void Mines_spawnMines()
 	if(Match_minesEnabled==TRUE)
 	{
 		char i=0;
-		for(i=0; i<TOTAL_MINES; i++)
+		for(i=0; i<MAX_MINES; i++)
 			spawnMine(i);
 	}
 }
@@ -220,7 +220,7 @@ void Mines_update()
 	// if any of the active Crates have less than 0 health, create an explosion
 	// and set it inactive for the rest of the game
 	short i=0;
-	for(i=0; i<10; i++)
+	for(i=0; i<MAX_MINES; i++)
 	{
 		// only update active mines
 		if(Mine_active & (int)1<<(i))

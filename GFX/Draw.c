@@ -63,7 +63,7 @@ void drawWorms()
 	
 	// loop over all worms and draw them if active:
 	short i;
-	for(i=0; i<16; i++)
+	for(i=0; i<MAX_WORMS; i++)
 	{
 		if(Worm_active & (long)1<<(i))
 		{
@@ -111,7 +111,7 @@ void drawMines()
 	
 	// loop over all mines and draw them if active:
 	short i;
-	for(i=0; i<TOTAL_MINES; i++)
+	for(i=0; i<MAX_MINES; i++)
 	{
 		if(Mine_active & (int)1<<(i))
 		{
@@ -170,7 +170,7 @@ void drawCrates()
 	
 	// loop over all mines and draw them if active:
 	short i;
-	for(i=0; i<8; i++)
+	for(i=0; i<MAX_CRATES; i++)
 	{
 		if(Crate_active & (int)1<<(i))
 		{
