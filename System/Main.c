@@ -51,7 +51,6 @@ void _main(void)
 	SetIntVec(AUTO_INT_5, DUMMY_HANDLER); 
 
 	// allocate our map buffer
-	mapBuffer = malloc(200*10*sizeof(unsigned long));// malloc(LCD_SIZE*4);
 	mapLight = malloc(200*10*sizeof(unsigned long));
 	mapDark = malloc(200*10*sizeof(unsigned long));
 	
@@ -99,7 +98,6 @@ void _main(void)
 	GrayOff();
 
 	// free our buffers:
-	free(mapBuffer);
 	free(mapLight);
 	free(mapDark);
 	free(GblDBuffer);

@@ -263,7 +263,7 @@ extern void setMapPtr(void *ptr);
 // map globals
 extern short Map_lastRequestedSpawnX;
 extern short Map_lastRequestedSpawnY;
-extern void *mapBuffer, *mapLight, *mapDark;
+extern void *mapLight, *mapDark;
 
 // map function prototypes
 
