@@ -185,7 +185,7 @@ void drawMap()
 			screenLeft = (camLeft*-1);
 			
 			// since we're starting at the left of the map, we will draw
-			// all the way to the right edge o the screen:
+			// all the way to the right edge of the screen:
 			screenRight = 160;
 			
 			// since we're starting at the left of the screen, we will
@@ -211,97 +211,23 @@ void drawMap()
 		short colRight = (screenRight-(screenRight%32))/32+1;
 		short colBuff = (bufferLeft-(bufferLeft%32))/32;
 
-		// loop to manually copy memory from a sub-section of our map
-//		unsigned short *lcd = GrayDBufGetHiddenPlane(DARK_PLANE); //virtual;
-		unsigned long *map = mapBuffer;
-		short x,y, bufferCol;
+		// loop to manually copy memory from a sub-section of our map, via ClipSprite32
+		unsigned long *map = (unsigned long*)mapBuffer;
+		short x;
+		short bufferCol = 0;
 		
-		// loop through the visible rows on the screen
-		for(y=0; y<=(screenBottom-screenTop); y++)
+		// loop over the visible columns of the map on screen, or till our buffer runs out
+		for(x=colLeft; (x<colRight && (colBuff+bufferCol)<10); x++)
 		{
-			bufferCol=0;
-			
-			// loop over the visible columns of the map on screen, or till our buffer runs out
-			for(x=colLeft; (x<colRight && (colBuff+bufferCol)<10); x++)
-			{
-				short offset = screenLeft==0 ? camLeft%32 : 0;
-				
-				unsigned long screenData = map[(bufferTop+y)*15+colBuff+bufferCol];
+			short offset = screenLeft==0 ? camLeft%32 : 0;
 
-				// take advantage of extgrah's sprite method to handle bit shiting and mem copying in one swoop!
-				ClipSprite32_OR_R(screenLeft+(bufferCol*32)-offset, screenTop+y, 1, (unsigned long*)&screenData, GrayDBufGetHiddenPlane(DARK_PLANE));
-				
-				// we want to bit-shift the map if the camera's position isn't on an even division of 8
-				
-				/*
-				if(offset!=0)
-				{
-				
-					// if the camera is negative we need slightly different logic
-					if(offset<0)
-					{
-						// make our off set positive, since it was the result of % on a negative camLeft
-						offset *= -1;
-						
-						// shift right by the scroll offset:
-						screenData = (screenData >> offset);
-						
-						// we don't need to copy from the previous tile, if we're in the first row:
-						if((colBuff+bufferCol)>0)
-						{
-								
-							// we also want to copy the lower bits from the previous tile over:
-							unsigned short previousTile = map[(bufferTop+y)*30+colBuff+bufferCol-1];
-							
-							// move these bits left, so the lower bits become the missing upper bits on our data
-							// if our camera is offset by 6, we will have shift everything 16-6, and have 6 open spots on the right
-							previousTile = previousTile << (16-offset);
-							
-							// now if we OR our two data sets together, we should have the correctly scrolled data
-							screenData |= previousTile;
-							
-							// also note, that, since we're negative, our screenX should increase by 1
-							screenLeft++;
-							
-						}// end if left edge of buffer
-					
-					// otherwise, we're offset, but in a positive region
-					}else
-					{
-						// shift left by the scroll offset:
-						screenData = (screenData << offset);
-						
-						// we don't need to copy from the next tile, if we're on the last tile of the map:
-						if((colBuff+bufferCol+1) < 20)
-						{
-								
-							// we also want to copy the upper bits from the next tile over:
-							unsigned short nextTile = map[(bufferTop+y)*30+colBuff+bufferCol+1];
-							
-							// move these bits right, so the upper bits become the missing lower bits on our data
-							// if our camera is offset by 6, we will have shift everything 6, and have 6 open spots on the right
-							// therefore, this needs to be shift 16-6 to the right:
-							nextTile = nextTile >> (16-offset);
-							
-							// now if we OR our two data sets together, we should have the correctly scrolled data
-							screenData |= nextTile;
-							
-						}// end if right edge of buffer
-					}// end if negative scroll
-				}// end if is offset
-				
-				// copy the scroll-offset memory to our screen location
-				lcd[(screenTop+y)*15+x] = screenData;
-				*/
-				
-				// on the next iteration we will be on the next buffer colum
-				bufferCol++;
+			// take advantage of extgrah's sprite method to handle bit shiting and mem copying in one swoop!
+			ClipSprite32_OR_R(screenLeft+(bufferCol*32)-offset, screenTop, screenBottom-screenTop, &map[((colBuff+bufferCol)*200)+bufferTop], GrayDBufGetHiddenPlane(DARK_PLANE));
 			
-			}// next x
-			
-		}// next y		
+			// on the next iteration we will be on the next buffer 32 bit colum
+			bufferCol++;
 		
-		//	memcpy (virtual, mapBuffer, LCD_SIZE);
+		}// next x
 		
 	}// end if draw map
 }

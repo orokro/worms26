@@ -72,8 +72,9 @@ void Map_makeMap()
 	// iteration vars
 	short x, y;
 	
-	// map buffer pointer for memory copying
-	unsigned short *map = malloc(LCD_SIZE*4); //malloc(20*200*sizeof(short));//mapBuffer;
+	// let's make a buffer to draw the map to.
+	// when we're done, we'll copy it to ur real map buffer, with rows and colums swaped so we can draw with sprites
+	unsigned short *map = malloc(LCD_SIZE*4);
 
 	// before we generate the map, lets clear the memory entirely
 	// clear the buffer entirely:
@@ -281,8 +282,7 @@ void Map_makeMap()
 		xOut=0;
 		for(xIn=0; xIn<16; xIn++)
 		{
-			//mapB[yOut+(xOut*200)] = mapL[(yIn*15)+xIn];	
-			mapB[(yIn*15)+xIn] = mapL[(yIn*15)+xIn];
+			mapB[yOut+(xOut*200)] = mapL[(yIn*15)+xIn];	
 			xOut++;
 		}
 		yOut++;
