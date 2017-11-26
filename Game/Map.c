@@ -300,33 +300,35 @@ void Map_makeMap()
 // tests a point on the map
 char Map_testPoint(short x, short y)
 {
-	// map buffer pointer for memory testing
-	unsigned short *map = mapBuffer;
-
 	// our X/Y position will be passed in world space.
 	// luckily, our map buffer is also world space.
 
 	// if the point is out of bounds, it's automatially a non-hit:
 	if((x<0) || (x>=320) || (y<0) || (y>=200))
 		return FALSE;
+		
+	// map buffer pointer for memory testing
+	unsigned long *map = (unsigned long*)mapBuffer;
 
 	// since we now know it's in bounds, we need to translate
-	// the X/Y to a byte / bit address in the map buffer
-	// bufferX = short column
-	// bufferY = row of shorts
-	short bufferX = ((x-(x%16))/16);
-	short bufferY = (y * 30);
+	// the X/Y to a long / bit address in the map buffer
+	// bufferX = the row of 200 unsigned longs in the buffer
+	// bufferY = the unsigned long in that row
+	short bufferX = ((x-(x%32))/32)*200;
+	short bufferY = y;
 
 	// we need to check the exact pixel. lets get the short (16 bits) at that location
-	unsigned short mapData = map[bufferY+bufferX];
+	unsigned long mapData = map[bufferY+bufferX];
 
 	// imagine x is pixel 14. That's technically this pixel: 0000000000000010
 	// since the lowest bit is index 0, there's 15 total indexable bits (16 bits total)
 	// thus, the pixel we want is: 15-pixelX, where pixelX is x%16 (which will only ever be 0-15)
-	short pixelBitIndex = (15-(x%16));
+	short pixelBitIndex = (32-(x%32));
 	
 	// test the exact pixel.
-	char pixelOn = (char)((mapData & (1<<(pixelBitIndex)))>0);
+	unsigned long mask = 1;
+	mask = (mask<<(pixelBitIndex));
+	char pixelOn = (char)((mapData & mask)>0);
 
 	// comment out and it will crash
 	// return FALSE;

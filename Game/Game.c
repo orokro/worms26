@@ -377,7 +377,7 @@ void gameUpdates()
 {
 	// decrease game timers
 	gameTimers();
-	return;
+	//return;
 	// gravity and physics for worms!
 	Worm_update();
 	
