@@ -72,15 +72,13 @@ void Map_makeMap()
 	// iteration vars
 	short x, y;
 	
-	// let's make a buffer to draw the map to.
-	// when we're done, we'll copy it to ur real map buffer, with rows and colums swaped so we can draw with sprites
-	unsigned short *map = malloc(LCD_SIZE*4);
+	// map buffer reference as unsigned long
+	unsigned long *map = (unsigned long*)mapBuffer;
 
 	// before we generate the map, lets clear the memory entirely
 	// clear the buffer entirely:
-	for(x=0; x<30; x++)
-		for(y=0; y<200; y++)
-			map[(y*30)+x]=0;
+	for(x=0; x<2000; x++)
+		map[x]=0;
 	
 	/*
 		Generating the map...
@@ -251,13 +249,15 @@ void Map_makeMap()
 			if(pixelOn>0)
 			{
 				// what colum are we in?
-				short col = (x-(x%16))/16;
+				short row = (x-(x%32))/32;
 				
 				// we want to find the bit to draw... starting with the highest bit workign right
-				// therefore, we want 16-(x%16)
+				// therefore, we want 32-(x%32)
 				// then shift that bit to be 1..
 				// then OR it on the map
-				map[(y*30)+col] |= (unsigned short)1<<(15-(x%16));
+				unsigned long mask = 1;
+				mask = mask<<(31-(x%32));
+				map[(row*200)+y] |= mask;
 				
 			}// pixel on
 			
@@ -270,25 +270,6 @@ void Map_makeMap()
 		each set of bytes be horizontal rows of pixels, we want to make 32 bite rows...
 		this way an entire row can be drawn at a time during map drawing
 	*/
-	unsigned long *mapL = (unsigned long*)map;
-	unsigned long *mapB = (unsigned long*)mapBuffer;
-	short yIn=0;
-	short yOut=0;
-	short xIn=0;
-	short xOut=0;
-	
-	for(yIn=0;yIn<200;yIn++)
-	{
-		xOut=0;
-		for(xIn=0; xIn<16; xIn++)
-		{
-			mapB[yOut+(xOut*200)] = mapL[(yIn*15)+xIn];	
-			xOut++;
-		}
-		yOut++;
-	}// next y
-
-	free(map);
 
 	// part of generating the map will be generating the objects on it..
 	Mines_spawnMines();

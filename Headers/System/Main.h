@@ -6,6 +6,9 @@
 #include "MainGeneral.h"
 
 
+#define MAP_WIDTH 320
+#define MAP_HEIGHT 200
+
 /*
 	Below the externs for all our global variables and global functions are defined.
 

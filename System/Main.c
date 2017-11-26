@@ -51,7 +51,7 @@ void _main(void)
 	SetIntVec(AUTO_INT_5, DUMMY_HANDLER); 
 
 	// allocate our map buffer
-	mapBuffer = malloc(LCD_SIZE*4);
+	mapBuffer = malloc(200*10*sizeof(unsigned long));// malloc(LCD_SIZE*4);
 
 	// render the map and spawn items on the map (worms, oil drums, etc)
 	Map_makeMap();
