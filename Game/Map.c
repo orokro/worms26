@@ -334,42 +334,43 @@ void Map_makeMap()
 	}
 	
 	// now we need to loop over the map and calculate dark-pixels
-	// this will be S L O W
-	for(y=0; y<200; y++)
-	{
-		for(x=0; x<320; x++)
+	// this will be S L O W, so only run it if shift is held at start
+	if(_keytest(RR_SHIFT))
+		for(y=0; y<200; y++)
 		{
-			// if our pixel is empty, we can skip this pixel:
-			if(Map_testPoint(x, y))
+			for(x=0; x<320; x++)
 			{
-				// check all four sides, if any of them are empty, we can blacken this edge-pixel
-				char set=FALSE;
-				if(Map_testPoint(x, y-1)==FALSE)
-					set=TRUE;
-				else if(Map_testPoint(x, y-2)==FALSE)
-					set=TRUE;
-				else if(Map_testPoint(x, y+1)==FALSE)
-					set=TRUE;
-				else if(Map_testPoint(x, y+2)==FALSE)
-					set=TRUE;
-				else if(Map_testPoint(x-1, y)==FALSE)
-					set=TRUE;
-				else if(Map_testPoint(x-2, y)==FALSE)
-					set=TRUE;
-				else if(Map_testPoint(x+1, y)==FALSE)
-					set=TRUE;
-				else if(Map_testPoint(x+2, y)==FALSE)
-					set=TRUE;
-				
-				if(set)
+				// if our pixel is empty, we can skip this pixel:
+				if(Map_testPoint(x, y))
 				{
-					Map_setPoint(mapLight, TRUE, x, y);
-					Map_setPoint(mapDark, TRUE, x, y);
-				}
-				
-			}// end if
-		}// next x
-	}// next y
+					// check all four sides, if any of them are empty, we can blacken this edge-pixel
+					char set=FALSE;
+					if(Map_testPoint(x, y-1)==FALSE)
+						set=TRUE;
+					else if(Map_testPoint(x, y-2)==FALSE)
+						set=TRUE;
+					else if(Map_testPoint(x, y+1)==FALSE)
+						set=TRUE;
+					else if(Map_testPoint(x, y+2)==FALSE)
+						set=TRUE;
+					else if(Map_testPoint(x-1, y)==FALSE)
+						set=TRUE;
+					else if(Map_testPoint(x-2, y)==FALSE)
+						set=TRUE;
+					else if(Map_testPoint(x+1, y)==FALSE)
+						set=TRUE;
+					else if(Map_testPoint(x+2, y)==FALSE)
+						set=TRUE;
+					
+					if(set)
+					{
+						Map_setPoint(mapLight, TRUE, x, y);
+						Map_setPoint(mapDark, TRUE, x, y);
+					}
+					
+				}// end if
+			}// next x
+		}// next y
 
 	// part of generating the map will be generating the objects on it..
 	Mines_spawnMines();
