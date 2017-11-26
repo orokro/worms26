@@ -143,7 +143,7 @@ void Explosion_spawn(short x, short y, char size, char power, char hasFire)
 	Explosion_firstFrame |= (int)1<<(expIndex);
 	
 	// if this explosion has fire, let's spawn it now
-	if(hasFire==TRUE)
+	if(hasFire)
 		spawnFire();
 }
 

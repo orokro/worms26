@@ -49,7 +49,7 @@ void checkExplosions(short index)
 		char firstFrame = (char)((Explosion_firstFrame & (int)1<<(i))>0);
 		
 		// only do shit if first frame, yo
-		if(firstFrame==TRUE)
+		if(firstFrame)
 		{
 				
 			// if it's in it's first frame, calculate the distance from us to it:
@@ -111,7 +111,7 @@ void spawnDrum(short index)
 // spawns OilDrums on the map, if they're enabled
 void OilDrums_spawnDrums()
 {
-	if(Match_oilDrumsEnabled==TRUE)
+	if(Match_oilDrumsEnabled)
 	{
 		short i=0;
 		for(i=0; i<MAX_OILDRUMS; i++)
@@ -130,9 +130,8 @@ void OilDrums_update()
 	{
 		// check if enabled and health is <= 0... then boom
 		char enabled = (char)((OilDrum_active & (int)1<<(i)) > 0);
-		if(enabled==TRUE)
+		if(enabled)
 		{
-			
 			// check all explosions if they are near-by and damaging this oildrum
 			checkExplosions(i);
 			

@@ -26,11 +26,11 @@ static void Pause_update()
 	  thus, we can test for either key at once by masking them together: keyUp | keyDown and then just
 	  toggle the state of the variable
 	*/
-	if(Keys_keyDown(keyUp | keyDown)==TRUE)
+	if(Keys_keyDown(keyUp | keyDown))
 		pauseMenuItem = ((pauseMenuItem==0) ? 1 : 0);
 		
 	// if the user presses the action key, we should either quit the game, or exit the pause menu
-	if(Keys_keyDown(keyAction)==TRUE)
+	if(Keys_keyDown(keyAction))
 	{
 		if(pauseMenuItem==0)
 		{

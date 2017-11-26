@@ -27,7 +27,7 @@ static void Turn_update()
 	Draw_renderGame();
 	
 	// if the user pressed escape, we should goto the pause menu
-	if(Keys_keyDown(keyEscape)==TRUE)
+	if(Keys_keyDown(keyEscape))
 	{
 		Game_previousMode = Game_mode;
 		Game_changeMode(gameMode_Pause);
@@ -35,7 +35,7 @@ static void Turn_update()
 	}
 	
 	// if the user pressed weapon select, we should goto the weapons menu
-	if(Keys_keyDown(keyWeaponsSelect)==TRUE)
+	if(Keys_keyDown(keyWeaponsSelect))
 	{
 		Game_changeMode(gameMode_WeaponSelect);
 		return;

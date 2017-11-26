@@ -64,14 +64,14 @@ void Camera_update()
 	// if this is the first frame that shift was pressed,
 	// we should reset the user offsets to whatever the camera's current
 	// position is..
-	if(Keys_keyDown(keyCameraControl)==TRUE)
+	if(Keys_keyDown(keyCameraControl))
 	{
 		userX = camX;
 		userY = camY;
 	}
 	
 	// if shift is down, we should test for the arrow keys for camera control:
-	if(Keys_keyState(keyCameraControl)==TRUE)
+	if(Keys_keyState(keyCameraControl))
 	{
 		if(Keys_keyState(keyLeft)==TRUE) userX-=camSpeed;
 		if(Keys_keyState(keyRight)==TRUE) userX+=camSpeed;

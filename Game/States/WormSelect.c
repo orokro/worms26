@@ -67,11 +67,11 @@ static void WormSelect_update()
 	
 	// if the current match allows worm-selection, and the user pressed
 	// the worm select button, we can goto the next-available worm, if any
-	if(Match_allowWormSelection==TRUE && Keys_keyDown(keyWormSelect)==TRUE)
+	if(Match_allowWormSelection && Keys_keyDown(keyWormSelect))
 		nextWorm();
 		
 	// if any key was pressed other than the worm-select key, we exit this mode
-	if(Keys_keyDown(keyAny)==TRUE && Keys_keyDown(keyWormSelect)==FALSE)
+	if(Keys_keyDown(keyAny) && Keys_keyDown(keyWormSelect)==FALSE)
 		Game_changeMode(gameMode_Turn);
 		
 	// All regular game-updates during this mode

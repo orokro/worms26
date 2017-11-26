@@ -73,7 +73,7 @@ void _main(void)
 
 	// main loop!
 	GameRunning=TRUE;
-	while(GameRunning==TRUE)
+	while(GameRunning)
 	{	
 		// temporary (maybe perminant) short cut to always exit the game
 		// (the pause menu also provides a method to exit the game)

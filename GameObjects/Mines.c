@@ -149,7 +149,7 @@ void checkExplosions(short index)
 		char firstFrame = (char)((Explosion_firstFrame & (int)1<<(i))>0);
 
 		// only do shit if first frame, yo
-		if(firstFrame==TRUE)
+		if(firstFrame)
 		{
 						
 			// the power of the velcotity
@@ -201,7 +201,7 @@ void checkExplosions(short index)
 // spawns Mines on the map, if they're enabled
 void Mines_spawnMines()
 {
-	if(Match_minesEnabled==TRUE)
+	if(Match_minesEnabled)
 	{
 		char i=0;
 		for(i=0; i<MAX_MINES; i++)

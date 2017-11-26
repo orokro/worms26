@@ -51,7 +51,7 @@ static void spawnCrate(char type)
 	for(i=0; i<MAX_CRATES; i++)
 	{
 		char enabled = (char)((Crate_active & (int)1<<(i)) > 0);
-		if(enabled==TRUE)
+		if(enabled)
 		{
 			index = i;
 			break;	
@@ -95,7 +95,7 @@ static void checkExplosions(short index)
 		char firstFrame = (char)((Explosion_firstFrame & (int)1<<(i))>0);
 		
 		// only do shit if first frame, yo
-		if(firstFrame==TRUE)
+		if(firstFrame)
 		{
 				
 			// if it's in it's first frame, calculate the distance from us to it:
@@ -155,7 +155,7 @@ void Crates_update()
 	{
 		// check if enabled and health is <= 0... then boom
 		char enabled = (char)((Crate_active & (int)1<<(i)) > 0);
-		if(enabled==TRUE)
+		if(enabled)
 		{
 
 			// check all explosions if they are near-by and damaging this crate

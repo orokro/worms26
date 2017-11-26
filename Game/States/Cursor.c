@@ -43,18 +43,18 @@ static void Cursor_update()
 	gameUpdates();
 	
 	// for each cursor key, move the cursor position, when its pressed
-	if(Keys_keyDown(keyLeft)==TRUE)
+	if(Keys_keyDown(keyLeft))
 		Game_cursorX--;
-	else if(Keys_keyDown(keyRight)==TRUE)
+	else if(Keys_keyDown(keyRight))
 		Game_cursorX++;
 		
-	if(Keys_keyDown(keyUp)==TRUE)
+	if(Keys_keyDown(keyUp))
 		Game_cursorY--;
-	else if(Keys_keyDown(keyDown)==TRUE)
+	else if(Keys_keyDown(keyDown))
 		Game_cursorY++;
 		
 	// as long as ANY of the arrow keys are down, increment our fast-move timer:
-	if(Keys_keyState(keyCursors)==TRUE)
+	if(Keys_keyState(keyCursors))
 		cursorFastMove++;
 	else
 		cursorFastMove = 0;
@@ -62,14 +62,14 @@ static void Cursor_update()
 	// if our weapons-fast move timer is over 30 frames, we will auto-move the cursor every 5 frames
 	if(cursorFastMove>=30 && cursorFastMove%5==0)
 	{
-		if(Keys_keyState(keyLeft)==TRUE)
+		if(Keys_keyState(keyLeft))
 			Game_cursorX--;
-		else if(Keys_keyState(keyRight)==TRUE)
+		else if(Keys_keyState(keyRight))
 			Game_cursorX++;
 			
-		if(Keys_keyState(keyUp)==TRUE)
+		if(Keys_keyState(keyUp))
 			Game_cursorY--;
-		else if(Keys_keyState(keyDown)==TRUE)
+		else if(Keys_keyState(keyDown))
 			Game_cursorY++;
 	}
 	
@@ -85,7 +85,7 @@ static void Cursor_update()
 		Game_cursorY=190;
 	
 	// if the user pressed ESCAPE we should just exit cursor mode
-	if(Keys_keyDown(keyEscape)==TRUE)
+	if(Keys_keyDown(keyEscape))
 	{
 		Game_changeMode(Game_previousMode);
 		return;
@@ -93,9 +93,9 @@ static void Cursor_update()
 	
 	// if the user pressed the action key, we should test if it's a valid point,
 	// place the xMark spot and exit...
-	if(Keys_keyDown(keyAction)==TRUE)
+	if(Keys_keyDown(keyAction))
 	{
-		if(Game_xMarkAllowedOverLand==TRUE || Map_testPoint(Game_cursorX, Game_cursorY)==TRUE )
+		if(Game_xMarkAllowedOverLand || Map_testPoint(Game_cursorX, Game_cursorY) )
 		{
 			Game_xMarkSpotX = Game_cursorX;
 			Game_xMarkSpotY = Game_cursorY;

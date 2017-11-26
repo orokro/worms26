@@ -69,7 +69,7 @@ void drawWorms()
 		{
 			screenX=Worm_x[i];
 			screenY=Worm_y[i];
-			if(worldToScreen(&screenX, &screenY)==TRUE)
+			if(worldToScreen(&screenX, &screenY))
 			{
 				// get the postion and direction the worm is facing..
 				short x = screenX-8;
@@ -117,7 +117,7 @@ void drawMines()
 		{
 			screenX=Mine_x[i];
 			screenY=Mine_y[i];
-			if(worldToScreen(&screenX, &screenY)==TRUE)
+			if(worldToScreen(&screenX, &screenY))
 			{				
 				// draw the mines fill and outline
 				ClipSprite8_OR_R(screenX-3, screenY-3, 4, spr_Mine_Dark, GrayDBufGetHiddenPlane(DARK_PLANE));
@@ -149,7 +149,7 @@ void drawOilDrums()
 		{
 			screenX=OilDrum_x[i];
 			screenY=OilDrum_y[i];
-			if(worldToScreen(&screenX, &screenY)==TRUE)
+			if(worldToScreen(&screenX, &screenY))
 			{
 				// draw the oil drums fill and outline
 				ClipSprite16_OR_R(screenX-4, screenY-10, 11, spr_Oil_Dark, GrayDBufGetHiddenPlane(DARK_PLANE));
@@ -176,7 +176,7 @@ void drawCrates()
 		{
 			screenX=Crate_x[i];
 			screenY=Crate_y[i];
-			if(worldToScreen(&screenX, &screenY)==TRUE)
+			if(worldToScreen(&screenX, &screenY))
 			{
 				DrawClipChar(screenX-4, screenY-8, 'C', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
 				if(Crate_type[i]==crateHealth)
@@ -369,7 +369,7 @@ void drawSelectArrow()
 	short x=Worm_x[(short)Worm_currentWorm]-9;
 	short y=Worm_y[(short)Worm_currentWorm]-24;
 	
-	if(worldToScreen(&x, &y)==TRUE)
+	if(worldToScreen(&x, &y))
 	{
 		// take advantage of extgrah's sprite method to handle bit shiting and mem copying in one swoop!
 		ClipSprite16_XOR_R(x, y, 16, ((frame<4) ? spr_SelectionArrowFrame1 : spr_SelectionArrowFrame2), GrayDBufGetHiddenPlane(DARK_PLANE));
