@@ -306,18 +306,84 @@ extern void Map_makeMap();
 
 
 /* ======================================================================================================================================
-   COLLISION +++ COLLISION +++ COLLISION +++ COLLISION +++ COLLISION +++ COLLISION +++ COLLISION +++ COLLISION +++ COLLISION +++ COLLISIO
+   PHYSICS/COLLISION +++ PHYSICS/COLLISION +++ PHYSICS/COLLISION +++ PHYSICS/COLLISION +++ PHYSICS/COLLISION +++ PHYSICS/COLLISION +++ PH
    ====================================================================================================================================== */
-   
+
 // collision defines
-#define COL_UP 0
-#define COL_DOWN 1
-#define COL_LEFT 2
-#define COL_RIGHT 3
+#define COL_UP 1
+#define COL_DOWN 2
+#define COL_LEFT 4
+#define COL_RIGHT 8
+#define COL_UD 16
+#define COL_LR 32
+#define COL_UDLR 64
+
+// I can't help but abstract this... we'll see how it goes..
+// this is a Collider struct for remembering the specific collider properties of an object
+typedef struct{
+	
+	// the type of collider:
+	char type;
+	
+	// the list of point distances to check. size varies by type
+	char p1, p2, p3, p4;
+	
+}Collider;
+
+
+// I can't help but abstract this... we'll see how it goes..
+// this is a physics object, so we can reuse physics code for many types of objects
+typedef struct{
+	
+	// references to the x and y, position and velocity this physics object managers:
+	short *x, *y;
+	char *xVelo, *yVelo;
+	
+	// the last X and Y position this object was on the previous frame
+	short lastX, lastY;
+	
+	// the objects bouciness:
+	// 0.0 = doesn't bounce.
+	// 1.0 = bounces back with full velocity
+	float bounciness;
+	
+	// the objects smoothness
+	// 0.0 = the object picks a random direction to bounce.
+	// 1.0 = the object always bounces it it's headed direction
+	float smoothness;
+	
+	// the index this of this object in it's corresponding arrays
+	char index;
+	
+	// references to the settled and grounded arrays for this object
+	void *settled, *grounded;
+	
+	// the collider for this object
+	Collider col;
+	
+}PhysObj;
 
 // collision function prototypes
 
-/*
+/**
+ * to be used like a pseudo constructor for a new Collider
+*/
+extern Collider new_Collider(char, char, char, char, char);
+
+/**
+ * to be used like a pseudo constructor for a new PhysObj
+*/
+extern PhysObj new_PhysObj(short*, short*, char*, char*, float, float, char, void*, void*, Collider);
+
+/**
+ * updates a physics object, including map collision
+ *
+ * @param obj the PhysObj struct to apply
+ * @return TRUE or FALSE weather or not the object moved on this frame
+*/
+extern char Physics_apply(PhysObj*);
+
+/**
  * This method takes a point in world space, and a direction and tests for collision.
  *
  * If the point collides with the map, it will calculate the first availble point in the opposite direction.

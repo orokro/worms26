@@ -72,7 +72,10 @@ void _main(void)
   
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	Game_changeMode(gameMode_WormSelect);
-
+	
+	// done loading
+	Draw_cake(1,1);
+	
 	// main loop!
 	GameRunning=TRUE;
 	while(GameRunning)
@@ -88,10 +91,10 @@ void _main(void)
 		// now flip the planes
 		GrayDBufToggleSync();
 	    
-	  	/* On HW1, the flip will be effective only after 1 or 2 plane switches
-	       depending on the phase. We must not draw to the "hidden" planes before
-	       they are really hidden! */
-	  	if (!_GrayIsRealHW2()) GrayWaitNSwitches(2);
+  	/* On HW1, the flip will be effective only after 1 or 2 plane switches
+       depending on the phase. We must not draw to the "hidden" planes before
+       they are really hidden! */
+  	if (!_GrayIsRealHW2()) GrayWaitNSwitches(2);
 	}
 	
 	// disable grayscale

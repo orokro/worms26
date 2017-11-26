@@ -50,7 +50,7 @@ Use Return Value=0
 Enable Error Return=0
 Save Screen=1
 [File Editing]
-Open File=C:\Users\Dude\Documents\worms17\GameObjects\Weapons.c
+Open File=C:\Users\Dude\Documents\worms17\Game\PhysCol.c
 [Included Files]
 C File 1=GameObjects\Weapons.c
 C File 2=GameObjects\Crates.c
@@ -66,7 +66,7 @@ C File 11=GFX\Draw.c
 C File 12=System\Keys.c
 C File 13=System\Main.c
 C File 14=Game\CharacterController.c
-C File 15=Game\Collide.c
+C File 15=Game\PhysCol.c
 Archive File 1=lib\extgraph.a
 Text File 1=Read Me.txt
 Header File 1=Headers\System\Main.h

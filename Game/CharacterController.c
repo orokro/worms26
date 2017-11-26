@@ -69,7 +69,7 @@ void wormWalk()
 	if(moveDir<0)
 		Worm_dir |= wormMask;
 	else
-		Worm_dir &= !wormMask;
+		Worm_dir &= ~wormMask;
 		
 	// worms can't move up slops steeper than MAX_WORM_SLOPE pixels.
 	// lets test pixels to the left or right +MAX_WORM_SLOPE pixels higher
@@ -93,14 +93,14 @@ void CharacterController_update()
 {
 	// worm mask...
 	wormMask = 1;
-	wormMask = wormMask<<(Worm_currentWorm);
+	wormMask = (unsigned long)((unsigned long)wormMask<<(Worm_currentWorm));
 	
 	// save references to our pos
 	wX = &Worm_x[(short)Worm_currentWorm];
 	wY = &Worm_y[(short)Worm_currentWorm];
 	
 	// if the worm is grounded, we should test for walking:
-	if(Worm_onGround |= wormMask)
+	if(Worm_onGround | wormMask)
 		wormWalk();
 		
 		// TO-DO: implement parachute, bunjee, and ninja rope

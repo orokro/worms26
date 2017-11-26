@@ -26,6 +26,9 @@ short Worm_y[MAX_WORMS] = {100, 195, 55, 40, 15, 140, 20, 135, 30, 20, 150, 45, 
 char Worm_xVelo[MAX_WORMS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 char Worm_yVelo[MAX_WORMS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+// physics objects for this worm
+PhysObj Worm_physObj[MAX_WORMS];
+
 // the direction the worm is currently FACING.. 0 = LEFT 1 = RIGHT
 unsigned long Worm_dir = 0;
 
@@ -69,19 +72,24 @@ unsigned long Worm_onGround = 0;
 */
 void spawnWorm(short index)
 {
+	unsigned long mask = 1;
+	mask = mask<<(index);
+	
 	// find a free place for it on the map
 	Map_getSpawnPoint();
 	Worm_x[index] = Map_lastRequestedSpawnX;
 	Worm_y[index] = Map_lastRequestedSpawnY;
 	
 	// set active
-	Worm_active |= (unsigned long)1<<(index);
+	Worm_active |= mask;
+
+	// make a new collider and physics object for this worm
+	//Collider col = new_Collider(COL_UDLR, -4, 6, -2, 2);
+	//Worm_physObj[index] = new_PhysObj(&Worm_x[index], &Worm_y[index], &Worm_xVelo[index], &Worm_yVelo[index], 0.2f, 1.0f, (char)index, &Worm_unstable, &Worm_onGround, col);
 	
 	// random direction
-	unsigned long dir = 1;
-	dir = dir<<(index);
 	if(random(2)==0)
-		Worm_dir |= dir;
+		Worm_dir |= mask;
 }
 
 
@@ -93,6 +101,9 @@ void spawnWorm(short index)
 */
 void wormCollision(short index)
 {
+	unsigned long mask = 1;
+	mask = (unsigned long)((unsigned long)mask<<(index));
+		
 	/*
 		How this works:
 		
@@ -139,8 +150,7 @@ void wormCollision(short index)
 		
 		// the worm hit a wall horizontally. Flip its horizontal velocity and half it
 		Worm_xVelo[index] *= -0.5f;
-		
-		unsigned long mask = (unsigned long)1<<(index);
+
 		if(Worm_dir & mask)
 			Worm_dir &= ~mask;
 		else
@@ -166,9 +176,9 @@ void wormCollision(short index)
 			but we will ignore that edge case and try to never generate maps that would let that happen.
 		*/
 		if(col<0)
-			Worm_onGround |= (unsigned long)1<<(index);
+			Worm_onGround |= mask;
 		else
-			Worm_onGround &= ~((unsigned long)1<<(index));
+			Worm_onGround &= ~mask;
 	}
 }
 
@@ -199,7 +209,8 @@ void Worm_update()
 	for(i=0; i<MAX_WORMS; i++)
 	{
 		// caculate the bitmask for this worm once, since we'll use it alot
-		wormMask = (unsigned long)1<<(i);
+		wormMask = 1;
+		wormMask = (unsigned long)((unsigned long)wormMask<<(i));
 		
 		// only update worms in the game
 		if((Worm_active & wormMask) > 0)

@@ -450,8 +450,10 @@ void Draw_renderGame()
 	char timeStr[40];
 	sprintf(timeStr, "time: %d, %d, %d", (short)(Game_graceTimer/TIME_MULTIPLIER), (short)(Game_timer/TIME_MULTIPLIER), (short)(Game_retreatTimer));
 	DrawStr(60,1,timeStr, A_XOR);	
-
-	DrawStr(80,10, ((Worm_onGround |= (unsigned long)1<<(Worm_currentWorm)) ? "Grounded" : "Air"), A_XOR);
+	
+	unsigned long currentMask = 1;
+	currentMask = (unsigned long)((unsigned long)currentMask<<(Worm_currentWorm));
+	DrawStr(80,10, (((Worm_onGround & currentMask)>0) ? "Grounded" : "Air"), A_XOR);
 	
 	// draw the current team on the screen	
 	//DrawStr(0,40, (Game_currentTeam ? "Team: Black" : "Team: White") , A_XOR);	
