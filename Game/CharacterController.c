@@ -92,7 +92,8 @@ void wormWalk()
 void CharacterController_update()
 {
 	// worm mask...
-	wormMask = (unsigned long)1<<(Worm_currentWorm);
+	wormMask = 1;
+	wormMask = wormMask<<(Worm_currentWorm);
 	
 	// save references to our pos
 	wX = &Worm_x[(short)Worm_currentWorm];

@@ -268,6 +268,11 @@ extern void *mapBuffer, *mapLight, *mapDark;
 // map function prototypes
 
 /**
+ * Outlines the edges of land in the light and dark map buffers
+*/
+extern void Map_traceEdges();
+
+/**
  * Checks if a point on the map is land or not.
  *
  * The map is a large buffer, and this method will take an X/Y position,

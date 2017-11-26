@@ -78,8 +78,10 @@ void spawnWorm(short index)
 	Worm_active |= (unsigned long)1<<(index);
 	
 	// random direction
+	unsigned long dir = 1;
+	dir = dir<<(index);
 	if(random(2)==0)
-		Worm_dir |= (unsigned long)1<<(index);
+		Worm_dir |= dir;
 }
 
 

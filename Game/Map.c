@@ -98,28 +98,74 @@ static unsigned long spr_LandTexture[] = { // 32 tall
 
 
 
-/**
- * Sets a pixel on or off on the map
- * 
- * @param buff either the mapLight or mapDark plane buffer
- * @param on either TRUE or FALSE to set the pixel ON or OFF
- * @param x the x position
- * @param y the y position
-*/	
-void Map_setPoint(unsigned long *buff, char on, short x, short y)
+// trace the edges of the map with a black line
+void Map_traceEdges()
 {
-	// this logic is very similar to Map_getPoint, check comments there
-	if((x<0) || (x>=320) || (y<0) || (y>=200))
-		return;
-	short pixelBitIndex = (31-(x%32));
-	unsigned long mask = 1;
-	mask = (mask<<(pixelBitIndex));
-	short bufferX = ((x-(x%32))/32)*200;
-	short bufferY = y;
-	buff[bufferY+bufferX] = on ? (buff[bufferY+bufferX] | mask) : (buff[bufferY+bufferX] & ~mask);
-}
-
-
+	// iteration vars
+	short x, y;
+	
+	// map buffer reference as unsigned long
+	unsigned long *light = (unsigned long*)mapLight;
+	unsigned long *dark = (unsigned long*)mapDark;
+	
+	// make a mask that looks like 10000000000000000000000000000001
+	unsigned long changeEdges = 1;
+	changeEdges = changeEdges | changeEdges<<(31);
+	
+	// loop thru every 32bit value in our 32 bit y columns
+	for(x=0; x<10; x++)
+	{
+		// update loading screen
+		Draw_cake(320+(x*20), 620);
+		
+		// at the top of every colum, this is 0 since it's "outside" the top of the buffer
+		unsigned long lastValues = 0;
+		
+		// now we need to loop over the map and calculate dark-pixels for the maps edges
+		for(y=0; y<200; y++)
+		{			
+			// the long index to sample from
+			unsigned short pos = (x*200)+y;
+			
+			// get current 32 pixels
+			unsigned long current = light[pos] | dark[pos];
+			
+			// get the pixels that were previously above these pixels
+			// note that we cant use (light[pos-1] | dark[pos-1]) because we might have changed pixels and we'll get feedback
+			// we need to use lastValues so we know what the pixels were before they were changed
+			unsigned long above = lastValues;
+			
+			// we can just read the next row of pixels below these... (pos+1)
+			unsigned long below = (y<200) ? (light[pos+1] | dark[pos+1]) : 0;
+			
+			// see which pixels change from the above and below row to the current:
+			unsigned long changedAbove = current ^ above;
+			unsigned long changedBelow = current ^ below;
+			
+			// we can see which pixels changed horizontally by comparing with bit-shifts
+			// note that, on the edegs of our 32 bit map columns it will fail to draw horizontally changed pixels edge
+			// it will still draw vertical changed pixels, however
+			unsigned long changedLeft = current ^ current<<1;
+			unsigned long changedRight = current ^ current>>1;
+			
+			// add them to get total pixels changed:
+			// note that we turn the edge pixels OFF if they are on in our current segment
+			// this is to prevent it from always drawing borders every 32 px
+			unsigned long changed = (changedAbove | changedBelow | changedLeft | changedRight) & ~(changeEdges & current);
+			
+			// subtract pixels that are currently off, because we don't
+			// want to darken empty pixels
+			changed &= ~current;
+			
+			// darken the vertically changed pixels in both buffers:
+			light[pos] |= changed;
+			dark[pos] |= changed;
+			
+			// save for next loop, so it can see what was above
+			lastValues = current;
+		}// next x
+	}// next y
+}\
 // builds a random map for the worms to play on
 void Map_makeMap()
 {
@@ -129,16 +175,18 @@ void Map_makeMap()
 	// iteration vars
 	short x, y;
 	
-	// should we outline the map?
-	char doOutlineMap = _keytest(RR_ALPHA);
-	
 	// map buffer reference as unsigned long
-	unsigned long *map = (unsigned long*)mapBuffer;
-
+	unsigned long *light = (unsigned long*)mapLight;
+	unsigned long *dark = (unsigned long*)mapDark;
+	
 	// before we generate the map, lets clear the memory entirely
 	// clear the buffer entirely:
 	for(x=0; x<2000; x++)
-		map[x]=0;
+	{
+		light[x]=0;
+		dark[x]=0;
+	}
+		
 	
 	/*
 		Generating the map...
@@ -200,7 +248,7 @@ void Map_makeMap()
 		
 		// update loading screen
 		if(x%20==0)
-			Draw_cake(x, doOutlineMap ? 620 : 320);
+			Draw_cake(x, 620);
 		
 		/*
 		  move the lines randomly.
@@ -308,88 +356,31 @@ void Map_makeMap()
 		{
 			// determine if the pixel is on or off:
 			char pixelOn = (y>=(50-upperLineTop) && y<(50+upperLineBottom)) || (y>(170+lowerLineTop));
-			
+
 			// if it's on, we should OR it on to the current memory of the map
 			if(pixelOn>0)
 			{
-				// what colum are we in?
-				short row = (x-(x%32))/32;
-				
 				// we want to find the bit to draw... starting with the highest bit workign right
-				// therefore, we want 32-(x%32)
+				// therefore, we want 31-(x%32)
 				// then shift that bit to be 1..
 				// then OR it on the map
 				unsigned long mask = 1;
 				mask = mask<<(31-(x%32));
-				map[(row*200)+y] |= mask;
 				
+				// what colum are we in?
+				short row = (x-(x%32))/32;
+				
+				// the texture will just loop its y colums, every 200 pixels
+				light[(row*200)+y] |= (~spr_LandTexture[y%32] & mask);
+				dark[(row*200)+y] |= (spr_LandTexture[y%32] & mask);
+		
 			}// pixel on
 			
 		}// next y
 	}// next x
 	
-
-	// create the light and dark map buffers with land texture!
-	unsigned long *light = (unsigned long*)mapLight;
-	unsigned long *dark = (unsigned long*)mapDark;
-	for(y=0; y<2000; y++)
-	{
-		// the texture will just loop its y colums, every 200 pixels
-		short texRow = (y%200)%32;
-		light[y] = map[y] & ~spr_LandTexture[texRow];
-		dark[y] = map[y] & spr_LandTexture[texRow];
-	}
-	
-	// now we need to loop over the map and calculate dark-pixels
-	// this will be S L O W, so only run it if shift is held at start
-	if(doOutlineMap)
-		for(y=0; y<200; y++)
-		{
-			// update loading screen
-			if(y%10==0)
-				Draw_cake(320+y, 620);
-			
-			for(x=0; x<320; x++)
-			{
-				// if our pixel is empty, we can skip this pixel:
-				if(Map_testPoint(x, y))
-				{
-					// check all four sides, if any of them are empty, we can blacken this edge-pixel
-					char set=FALSE;
-					if(Map_testPoint(x, y-1)==FALSE)
-						set=TRUE;
-					//else if(Map_testPoint(x, y-2)==FALSE)
-					//	set=TRUE;
-					else if(Map_testPoint(x, y+1)==FALSE)
-						set=TRUE;
-					//else if(Map_testPoint(x, y+2)==FALSE)
-					//	set=TRUE;
-					else if(Map_testPoint(x-1, y)==FALSE)
-						set=TRUE;
-				//	else if(Map_testPoint(x-2, y)==FALSE)
-				//		set=TRUE;
-					else if(Map_testPoint(x+1, y)==FALSE)
-						set=TRUE;
-					//else if(Map_testPoint(x+2, y)==FALSE)
-					//	set=TRUE;
-					//else if(Map_testPoint(x-1, y-1)==FALSE)
-					//	set=TRUE;
-					//else if(Map_testPoint(x+1, y-1)==FALSE)
-					//	set=TRUE;
-					//else if(Map_testPoint(x-1, y+1)==FALSE)
-					//	set=TRUE;
-					//else if(Map_testPoint(x+1, y+1)==FALSE)
-					//	set=TRUE;
-					
-					if(set)
-					{
-						Map_setPoint(mapLight, TRUE, x, y);
-						Map_setPoint(mapDark, TRUE, x, y);
-					}
-					
-				}// end if
-			}// next x
-		}// next y
+	// trace edges in the buffers
+	Map_traceEdges();
 
 	// part of generating the map will be generating the objects on it..
 	Mines_spawnMines();
@@ -409,8 +400,9 @@ char Map_testPoint(short x, short y)
 		return FALSE;
 		
 	// map buffer pointer for memory testing
-	unsigned long *map = (unsigned long*)mapBuffer;
-
+	unsigned long *light = (unsigned long*)mapLight;
+	unsigned long *dark = (unsigned long*)mapDark;
+		
 	// since we now know it's in bounds, we need to translate
 	// the X/Y to a long / bit address in the map buffer
 	// bufferX = the row of 200 unsigned longs in the buffer
@@ -419,7 +411,7 @@ char Map_testPoint(short x, short y)
 	short bufferY = y;
 
 	// we need to check the exact pixel. lets get the short (32 bits) at that location
-	unsigned long mapData = map[bufferY+bufferX];
+	unsigned long mapData = light[bufferY+bufferX] | dark[bufferY+bufferX];
 
 	// imagine x is pixel 14. That's technically this pixel: 0000000000000010
 	// since the lowest bit is index 0, there's 31 total indexable bits (32 bits total)
