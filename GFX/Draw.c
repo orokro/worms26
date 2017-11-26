@@ -3,6 +3,9 @@
 
 #include "Main.h"
 
+
+#include "SpriteData.c"
+  
 /*
 	Draw
 	----
@@ -13,7 +16,11 @@
 		- Weapons Menu
 */
 
-// local function prototypes
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 /**
  * Convents world coordinates to screen coordinates, mutates the passed in pointers, and returns TRUE/FLASE if on screen (roughly).
@@ -35,41 +42,154 @@
  * @param y a poitner reference to the y value to change to screen coordinates
  * @return a char boolean either TRUE or FALSE if the coordinates are roughly on screen
 */
-char worldToScreen(short*, short*);
+char worldToScreen(short *x, short *y)
+{
+	*x = *x-(camX-80);
+	*y = *y-(camY-50);
+	
+	// if anything is out of bounds, return false:
+	if(*x<-8 || *x>168 || *y<-16 || *y>116)
+		return FALSE;
+	else
+		return TRUE;
+}
 
 /**
 	Draws all the in-game, on-screen Worms.
 */
-void drawWorms();
+void drawWorms()
+{
+	short screenX, screenY;
+	
+	// loop over all worms and draw them if active:
+	short i;
+	for(i=0; i<16; i++)
+	{
+		if(Worm_active & (long)1<<(i))
+		{
+			screenX=Worm_x[i];
+			screenY=Worm_y[i];
+			if(worldToScreen(&screenX, &screenY)==TRUE)
+			{
+				// get the postion and direction the worm is facing..
+				short x = screenX-8;
+				short y = screenY-8;
+				char facing = (Worm_dir & (unsigned long)1<<(i))>0;
+
+				// use the worms fill to erase the background on it's opposite color plane, acting as a mask
+				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Fill : spr_WormRight_Fill), ((i>=8) ? GrayDBufGetHiddenPlane(LIGHT_PLANE) : GrayDBufGetHiddenPlane(DARK_PLANE)));
+				ClipSprite16_XOR_R(x, y, 15, (facing ? spr_WormLeft_Fill : spr_WormRight_Fill), ((i>=8) ? GrayDBufGetHiddenPlane(LIGHT_PLANE) : GrayDBufGetHiddenPlane(DARK_PLANE)));
+				
+				// draw the worms fill and outline
+				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Fill : spr_WormRight_Fill), ((i>=8) ? GrayDBufGetHiddenPlane(DARK_PLANE) : GrayDBufGetHiddenPlane(LIGHT_PLANE)));
+				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), ((i>=8) ? GrayDBufGetHiddenPlane(LIGHT_PLANE) : GrayDBufGetHiddenPlane(DARK_PLANE)));
+
+			}// end if on screen
+		}// end if active
+	}// next i
+	
+	// for debug: draw collider for current worm:
+	/*
+	short x=Worm_x[(short)Worm_currentWorm];
+	short y=Worm_y[(short)Worm_currentWorm];
+	if(worldToScreen(&x, &y)==TRUE)
+	{
+		DrawLine(x-2, y, x+2, y, A_NORMAL);
+		DrawLine(x, y-4, x, y+6, A_NORMAL);
+	}
+	*/
+}
 
 /**
 	Draws all the in-game, on-screen Mines.
 */
-void drawMines();
+void drawMines()
+{
+	short screenX, screenY;
+	
+	char fuseStr[8];
+	
+	// loop over all mines and draw them if active:
+	short i;
+	for(i=0; i<10; i++)
+	{
+		if(Mine_active & (int)1<<(i))
+		{
+			screenX=Mine_x[i];
+			screenY=Mine_y[i];
+			if(worldToScreen(&screenX, &screenY)==TRUE)
+			{				
+				// draw the mines fill and outline
+				ClipSprite8_OR_R(screenX-3, screenY-3, 4, spr_Mine_Dark, GrayDBufGetHiddenPlane(DARK_PLANE));
+				ClipSprite8_OR_R(screenX-3, screenY-3, 4, spr_Mine_Light, GrayDBufGetHiddenPlane(LIGHT_PLANE));
+				
+				// if the mine has an active fuse, draw that too
+				if(Mine_fuse[i]>0)
+				{
+					sprintf(fuseStr, "%d", (Mine_fuse[i]/TIME_MULTIPLIER));
+					DrawStr(screenX-4, screenY-16, fuseStr, A_NORMAL);
+				}// end if fuse
+			}// end if on screen
+		}// end if active
+	}// next i
+}
 
 /**
 	Draws all the in-game, on-screen Oil Drums.
 */
-void drawOilDrums();
+void drawOilDrums()
+{
+	short screenX, screenY;
+
+	// loop over all mines and draw them if active:
+	short i;
+	for(i=0; i<8; i++)
+	{
+		if(OilDrum_active & (int)1<<(i))
+		{
+			screenX=OilDrum_x[i];
+			screenY=OilDrum_y[i];
+			if(worldToScreen(&screenX, &screenY)==TRUE)
+			{
+				// draw the oil drums fill and outline
+				ClipSprite16_OR_R(screenX-4, screenY-10, 15, spr_Oil_Dark, GrayDBufGetHiddenPlane(DARK_PLANE));
+				ClipSprite16_OR_R(screenX-4, screenY-10, 15, spr_Oil_Light, GrayDBufGetHiddenPlane(LIGHT_PLANE));
+			}// end if on screen
+		}// end if active
+	}// next i
+	
+}
 
 /**
 	Draws all the in-game, on-screen Crates.
 */
-void drawCrates();
-
-static void *mapPtr;
-
-
-
-// --------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-// crashes if I try this...
-void setMapPtr(void *ptr)
+void drawCrates()
 {
-	mapPtr=ptr;
+	short screenX, screenY;
+	
+	// loop over all mines and draw them if active:
+	short i;
+	for(i=0; i<8; i++)
+	{
+		if(Crate_active & (int)1<<(i))
+		{
+			screenX=Crate_x[i];
+			screenY=Crate_y[i];
+			if(worldToScreen(&screenX, &screenY)==TRUE)
+			{
+				DrawClipChar(screenX-4, screenY-8, 'C', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
+				if(Crate_type[i]==crateHealth)
+					DrawClipChar(screenX-4, screenY-16, 'H', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
+				else if(Crate_type[i]==crateWeapon)
+					DrawClipChar(screenX-4, screenY-16, 'W', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
+				else
+					DrawClipChar(screenX-4, screenY-16, 'T', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
+				
+			}// end if on screen
+		}// end if active
+	}// next i
 }
+
 
 // draw the map.. but I can't call this, crashes
 void drawMap()
@@ -232,138 +352,33 @@ void drawMap()
 	}// end if draw map
 }
 
-// convert world coordinates to screen coordinates
-char worldToScreen(short *x, short *y)
-{
-	*x = *x-(camX-80);
-	*y = *y-(camY-50);
-	
-	// if anything is out of bounds, return false:
-	if(*x<-8 || *x>168 || *y<-16 || *y>116)
-		return FALSE;
-	else
-		return TRUE;
-}
 
-// draw all the worms in the game
-void drawWorms()
+/**
+ * Draws either the selection arrow, or current worm arrow in Worm Select mode.
+*/
+void drawSelectArrow()
 {
-	short screenX, screenY;
+	static char frame=0;
+	frame++;
+	if(frame>7)
+		frame=0;
 	
-	// loop over all worms and draw them if active:
-	short i;
-	for(i=0; i<16; i++)
-	{
-		if(Worm_active & (long)1<<(i))
-		{
-			screenX=Worm_x[i];
-			screenY=Worm_y[i];
-			if(worldToScreen(&screenX, &screenY)==TRUE)
-			{
-				// get the direction the worm is facing..
-				char facing = (Worm_dir & (unsigned long)1<<(i))>0;
-				DrawClipChar(screenX-4, screenY-7+7, (char)111, (&(SCR_RECT){{0, 0, 159, 99}}), A_NORMAL); 
-				DrawClipChar(screenX+(facing ? -6 : -2), screenY-11+7, (char)111, (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
-				if(i>=8)
-				{
-					DrawClipChar(screenX-4, screenY-6+7, (char)127, (&(SCR_RECT){{0, 0, 159, 99}}), A_NORMAL); 
-					DrawClipChar(screenX+(facing ? -6 : -2), screenY-10+7, (char)127, (&(SCR_RECT){{0, 0, 159, 99}}), A_NORMAL);
-				} // end if black team
-			}// end if on screen
-		}// end if active
-	}// next i
+	short x=Worm_x[(short)Worm_currentWorm]-9;
+	short y=Worm_y[(short)Worm_currentWorm]-24;
 	
-	// for debug: draw collider for current worm:
-	/*
-	short x=Worm_x[(short)Worm_currentWorm];
-	short y=Worm_y[(short)Worm_currentWorm];
 	if(worldToScreen(&x, &y)==TRUE)
 	{
-		DrawLine(x-2, y, x+2, y, A_NORMAL);
-		DrawLine(x, y-4, x, y+6, A_NORMAL);
+		// take advantage of extgrah's sprite method to handle bit shiting and mem copying in one swoop!
+		ClipSprite16_XOR_R(x, y, 16, ((frame<4) ? spr_SelectionArrowFrame1 : spr_SelectionArrowFrame2), GrayDBufGetHiddenPlane(DARK_PLANE));
+		ClipSprite16_XOR_R(x, y, 16, ((frame<4) ? spr_SelectionArrowFrame1 : spr_SelectionArrowFrame2), GrayDBufGetHiddenPlane(LIGHT_PLANE));	
 	}
-	*/
 }
 
-// draw all the mines active in the game
-void drawMines()
-{
-	short screenX, screenY;
-	
-	char fuseStr[8];
-	
-	// loop over all mines and draw them if active:
-	short i;
-	for(i=0; i<10; i++)
-	{
-		if(Mine_active & (int)1<<(i))
-		{
-			screenX=Mine_x[i];
-			screenY=Mine_y[i];
-			if(worldToScreen(&screenX, &screenY)==TRUE)
-			{
-				DrawClipChar(screenX-4, screenY-6, (char)240, (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR); //'©'
-				
-				// if the mine has an active fuse, draw that too
-				if(Mine_fuse[i]>0)
-				{
-					sprintf(fuseStr, "%d", (Mine_fuse[i]/TIME_MULTIPLIER));
-					DrawStr(screenX-4, screenY-16, fuseStr, A_NORMAL);
-				}// end if fuse
-			}// end if on screen
-		}// end if active
-	}// next i
-}
 
-// draw all the oil drums active in the game
-void drawOilDrums()
-{
-	short screenX, screenY;
 
-	// loop over all mines and draw them if active:
-	short i;
-	for(i=0; i<8; i++)
-	{
-		if(OilDrum_active & (int)1<<(i))
-		{
-			screenX=OilDrum_x[i];
-			screenY=OilDrum_y[i];
-			if(worldToScreen(&screenX, &screenY)==TRUE)
-			{
-				DrawClipChar(screenX-4, screenY-6, (char)139, (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
-			}// end if on screen
-		}// end if active
-	}// next i
-	
-}
+// --------------------------------------------------------------------------------------------------------------------------------------
 
-// draw all the crates active in the game
-void drawCrates()
-{
-	short screenX, screenY;
-	
-	// loop over all mines and draw them if active:
-	short i;
-	for(i=0; i<8; i++)
-	{
-		if(Crate_active & (int)1<<(i))
-		{
-			screenX=Crate_x[i];
-			screenY=Crate_y[i];
-			if(worldToScreen(&screenX, &screenY)==TRUE)
-			{
-				DrawClipChar(screenX-4, screenY-8, 'C', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
-				if(Crate_type[i]==crateHealth)
-					DrawClipChar(screenX-4, screenY-16, 'H', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
-				else if(Crate_type[i]==crateWeapon)
-					DrawClipChar(screenX-4, screenY-16, 'W', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
-				else
-					DrawClipChar(screenX-4, screenY-16, 'T', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
-				
-			}// end if on screen
-		}// end if active
-	}// next i
-}
+
 
 
 // main drawing routine for the game, e.g. map, worms, weapons, etc
@@ -381,7 +396,7 @@ void Draw_renderGame()
 	short z=0;
 	for(z=0; z<2; z++)
 	{
-		GrayDBufSetHiddenAMSPlane((z%2==0) ? DARK_PLANE : LIGHT_PLANE);
+		//GrayDBufSetHiddenAMSPlane((z%2==0) ? DARK_PLANE : LIGHT_PLANE);
 		
 		// draw oil drums first, as everything else should overlap them
 		drawOilDrums();
@@ -396,6 +411,11 @@ void Draw_renderGame()
 		drawMines();
 	
 	}
+	
+	// if the game mode is worm select, draw the selection arrow
+	if(Game_mode==gameMode_WormSelect)
+		drawSelectArrow();
+		
 	// for now, we will output a bunch of debug info on the screen
 	
 	// game modes by name	
