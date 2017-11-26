@@ -111,7 +111,7 @@ void drawMines()
 	
 	// loop over all mines and draw them if active:
 	short i;
-	for(i=0; i<10; i++)
+	for(i=0; i<TOTAL_MINES; i++)
 	{
 		if(Mine_active & (int)1<<(i))
 		{

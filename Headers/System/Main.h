@@ -422,13 +422,14 @@ extern void OilDrums_update();
 
 // mine defines
 #define mineTriggerDistance 10
+#define TOTAL_MINES 6
 
 // mine globals
-extern short Mine_x[10];
-extern short Mine_y[10];
-extern char Mine_xVelo[10];
-extern char Mine_yVelo[10];
-extern char Mine_fuse[10];
+extern short Mine_x[TOTAL_MINES];
+extern short Mine_y[TOTAL_MINES];
+extern char Mine_xVelo[TOTAL_MINES];
+extern char Mine_yVelo[TOTAL_MINES];
+extern char Mine_fuse[TOTAL_MINES];
 extern int Mine_active;
 
 // mine function prototypes

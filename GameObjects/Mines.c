@@ -16,7 +16,7 @@
 	Mines can optionally have duds, which fizzle out and do not explode
 	when their fuse runs out.
 	
-	Note about dudes: since 10 mines will spawn per round, randomly all over
+	Note about dudes: since 6 mines will spawn per round, randomly all over
 	the map, we can say: the mine at index 0 will be a dud, if dudes are enabled.
 	
 	There will never be more than one dud, and if duds are enabled we can
@@ -26,48 +26,18 @@
 */
 
 // x/y positions of our Mines
-short Mine_x[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-short Mine_y[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+short Mine_x[TOTAL_MINES] = {0, 0, 0, 0, 0, 0};
+short Mine_y[TOTAL_MINES] = {0, 0, 0, 0, 0, 0};
 
 // velocity of mines
-char Mine_xVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-char Mine_yVelo[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Mine_xVelo[TOTAL_MINES] = {0, 0, 0, 0, 0, 0};
+char Mine_yVelo[TOTAL_MINES] = {0, 0, 0, 0, 0, 0};
 
 // fuse of mines
-char Mine_fuse[10] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+char Mine_fuse[TOTAL_MINES] = {-1, -1, -1, -1, -1, -1};
 
 // is the mine active? using bits for booleans
 int Mine_active=0;
-
-// local function prototypes
-
-/**
- * Spawns a single mine of the given index.
- * 
- * @param index the mine to spawn.
-*/
-void spawnMine(char);
-
-/**
- * Checks if any explosions affect the mine of the given index.
- *
- * @param index the mine to check to see if explostions affected it.
-*/
-void checkExplosions(short);
-
-/**
- * Check if the Mine of given index is within proximity of worm and should explode.
- * 
- * @param index the mine to check for worm proximity.
-*/
-void checkProximity(short);
-
-/**
- * Updates a Mine of given index, should be called every frame by Mines_update().
- * 
- * @param index the mine to udpate.
-*/
-void updateMine(short);
 
 // local vars
 char proxmityCheckTimer = 0;
@@ -78,18 +48,11 @@ char proxmityCheckTimer = 0;
 
 
 
-// spawns Mines on the map, if they're enabled
-void Mines_spawnMines()
-{
-	if(Match_minesEnabled==TRUE)
-	{
-		char i=0;
-		for(i=0; i<10; i++)
-			spawnMine(i);
-	}
-}
-
-// spawns a single Mine
+/**
+ * Spawns a single mine of the given index.
+ * 
+ * @param index the mine to spawn.
+*/
 void spawnMine(char index)
 {
 	// find a free place for it on the map
@@ -103,38 +66,13 @@ void spawnMine(char index)
 	Mine_active |= (int)1<<(index);
 }
 
-// main update for Mines
-void Mines_update()
-{
-	proxmityCheckTimer++;
-	if(proxmityCheckTimer>5)
-		proxmityCheckTimer=0;
-		
-	// if any of the active Crates have less than 0 health, create an explosion
-	// and set it inactive for the rest of the game
-	short i=0;
-	for(i=0; i<10; i++)
-	{
-		// only update active mines
-		if(Mine_active & (int)1<<(i))
-		{
-			// okay we will only check proxity every 5 frames to save CPU since proxmity check is
-			// epensive
-			if(proxmityCheckTimer==0)
-				checkProximity(i);
-			
-			// unfortuntely, since blast-detomation reqiores first-frame access, we gotta check
-			// explosions every frame
-			checkExplosions(i);
-			
-			// udpates the mine (if it has a timer, decrease it and explode it if necessary)
-			updateMine(i);
-		}	
-	}// next i
-}
 
 
-// updates a mine
+/**
+ * Updates a Mine of given index, should be called every frame by Mines_update().
+ * 
+ * @param index the mine to udpate.
+*/
 void updateMine(short index)
 {
 	// if the mine has time on it, decrement it
@@ -158,7 +96,11 @@ void updateMine(short index)
 }
 
 
-// check if a mine is within-detonation range of a Worm
+/**
+ * Check if the Mine of given index is within proximity of worm and should explode.
+ * 
+ * @param index the mine to check for worm proximity.
+*/
 void checkProximity(short index)
 {
 	// if this mine already has a timer, gtfo
@@ -193,8 +135,11 @@ void checkProximity(short index)
 }
 
 
-
-// loop over explosions, and if there are any first-frame explosions, see if they hit us
+/**
+ * Checks if any explosions affect the mine of the given index.
+ *
+ * @param index the mine to check to see if explostions affected it.
+*/
 void checkExplosions(short index)
 {
 	short i=0; 
@@ -244,5 +189,53 @@ void checkExplosions(short index)
 			
 		}// end if first frame
 		
+	}// next i
+}
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+// spawns Mines on the map, if they're enabled
+void Mines_spawnMines()
+{
+	if(Match_minesEnabled==TRUE)
+	{
+		char i=0;
+		for(i=0; i<TOTAL_MINES; i++)
+			spawnMine(i);
+	}
+}
+
+
+// main update for Mines
+void Mines_update()
+{
+	proxmityCheckTimer++;
+	if(proxmityCheckTimer>5)
+		proxmityCheckTimer=0;
+		
+	// if any of the active Crates have less than 0 health, create an explosion
+	// and set it inactive for the rest of the game
+	short i=0;
+	for(i=0; i<10; i++)
+	{
+		// only update active mines
+		if(Mine_active & (int)1<<(i))
+		{
+			// okay we will only check proxity every 5 frames to save CPU since proxmity check is
+			// epensive
+			if(proxmityCheckTimer==0)
+				checkProximity(i);
+			
+			// unfortuntely, since blast-detomation reqiores first-frame access, we gotta check
+			// explosions every frame
+			checkExplosions(i);
+			
+			// udpates the mine (if it has a timer, decrease it and explode it if necessary)
+			updateMine(i);
+		}	
 	}// next i
 }
