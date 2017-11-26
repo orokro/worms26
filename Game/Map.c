@@ -129,6 +129,9 @@ void Map_makeMap()
 	// iteration vars
 	short x, y;
 	
+	// should we outline the map?
+	char doOutlineMap = _keytest(RR_ALPHA);
+	
 	// map buffer reference as unsigned long
 	unsigned long *map = (unsigned long*)mapBuffer;
 
@@ -194,6 +197,10 @@ void Map_makeMap()
 	// loop from left of buffer to right of buffer
 	for(x=0; x<320; x++)
 	{
+		
+		// update loading screen
+		if(x%20==0)
+			Draw_cake(x, doOutlineMap ? 620 : 320);
 		
 		/*
 		  move the lines randomly.
@@ -335,9 +342,13 @@ void Map_makeMap()
 	
 	// now we need to loop over the map and calculate dark-pixels
 	// this will be S L O W, so only run it if shift is held at start
-	if(_keytest(RR_SHIFT))
+	if(doOutlineMap)
 		for(y=0; y<200; y++)
 		{
+			// update loading screen
+			if(y%10==0)
+				Draw_cake(320+y, 620);
+			
 			for(x=0; x<320; x++)
 			{
 				// if our pixel is empty, we can skip this pixel:
@@ -347,20 +358,28 @@ void Map_makeMap()
 					char set=FALSE;
 					if(Map_testPoint(x, y-1)==FALSE)
 						set=TRUE;
-					else if(Map_testPoint(x, y-2)==FALSE)
-						set=TRUE;
+					//else if(Map_testPoint(x, y-2)==FALSE)
+					//	set=TRUE;
 					else if(Map_testPoint(x, y+1)==FALSE)
 						set=TRUE;
-					else if(Map_testPoint(x, y+2)==FALSE)
-						set=TRUE;
+					//else if(Map_testPoint(x, y+2)==FALSE)
+					//	set=TRUE;
 					else if(Map_testPoint(x-1, y)==FALSE)
 						set=TRUE;
-					else if(Map_testPoint(x-2, y)==FALSE)
-						set=TRUE;
+				//	else if(Map_testPoint(x-2, y)==FALSE)
+				//		set=TRUE;
 					else if(Map_testPoint(x+1, y)==FALSE)
 						set=TRUE;
-					else if(Map_testPoint(x+2, y)==FALSE)
-						set=TRUE;
+					//else if(Map_testPoint(x+2, y)==FALSE)
+					//	set=TRUE;
+					//else if(Map_testPoint(x-1, y-1)==FALSE)
+					//	set=TRUE;
+					//else if(Map_testPoint(x+1, y-1)==FALSE)
+					//	set=TRUE;
+					//else if(Map_testPoint(x-1, y+1)==FALSE)
+					//	set=TRUE;
+					//else if(Map_testPoint(x+1, y+1)==FALSE)
+					//	set=TRUE;
 					
 					if(set)
 					{

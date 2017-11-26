@@ -383,6 +383,24 @@ void drawSelectArrow()
 
 
 
+// draws cake loading screen
+void Draw_cake(short amount, short total)
+{
+	GrayDBufSetHiddenAMSPlane(DARK_PLANE);
+	ClrScr();
+	GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
+	ClrScr();
+	
+	ClipSprite32_OR_R(64, 38, 23, spi_CandleCake_Dark, GrayDBufGetHiddenPlane(DARK_PLANE));
+	ClipSprite32_OR_R(64, 38, 23, spi_CandleCake_Light, GrayDBufGetHiddenPlane(LIGHT_PLANE));	
+	
+	char progStr[40];
+	sprintf(progStr, "Loading... %d%%", (short)((float)((float)amount/(float)total)*100));
+	DrawStr(40,70,progStr, A_NORMAL);	
+
+	// now flip the planes
+	GrayDBufToggleSync();
+}
 
 // main drawing routine for the game, e.g. map, worms, weapons, etc
 void Draw_renderGame()

@@ -55,14 +55,17 @@ void _main(void)
 	mapLight = malloc(200*10*sizeof(unsigned long));
 	mapDark = malloc(200*10*sizeof(unsigned long));
 	
-	// render the map and spawn items on the map (worms, oil drums, etc)
-	Map_makeMap();
-	
 	// enable grayscale
 	GrayOn();
 
 	// allocate space for double-buffering
 	void *dbuffer=malloc(GRAYDBUFFER_SIZE);
+	
+	// show the cake loading screen
+	Draw_cake(0, 100);
+	
+	// render the map and spawn items on the map (worms, oil drums, etc)
+	Map_makeMap();
 	
 	// enable double-buffering
 	GrayDBufInit(dbuffer);

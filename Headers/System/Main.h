@@ -204,6 +204,14 @@ extern void Camera_clearFocus();
 // draw function prototypes
 
 /**
+ * Draws the cake loading screen
+ *
+ * @param amount the current progress out of the current total
+ * @param total amount of progress to be completed
+*/
+extern void Draw_cake(short amount, short total);
+
+/**
  * Renders the map, items on it, and all game elements in general.
  *
  * Renders what is essential for the Game play, including:
