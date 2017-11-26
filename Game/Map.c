@@ -73,7 +73,7 @@ void Map_makeMap()
 	short x, y;
 	
 	// map buffer pointer for memory copying
-	unsigned short *map = mapBuffer;
+	unsigned short *map = malloc(LCD_SIZE*4); //malloc(20*200*sizeof(short));//mapBuffer;
 
 	// before we generate the map, lets clear the memory entirely
 	// clear the buffer entirely:
@@ -263,6 +263,33 @@ void Map_makeMap()
 		}// next y
 	}// next x
 	
+	/*
+		this is a temporary hack to test drawing the map with clipsrite32
+		basically, we want to copy our temporary map to the mapbuffer, but, instead of having
+		each set of bytes be horizontal rows of pixels, we want to make 32 bite rows...
+		this way an entire row can be drawn at a time during map drawing
+	*/
+	unsigned long *mapL = (unsigned long*)map;
+	unsigned long *mapB = (unsigned long*)mapBuffer;
+	short yIn=0;
+	short yOut=0;
+	short xIn=0;
+	short xOut=0;
+	
+	for(yIn=0;yIn<200;yIn++)
+	{
+		xOut=0;
+		for(xIn=0; xIn<16; xIn++)
+		{
+			//mapB[yOut+(xOut*200)] = mapL[(yIn*15)+xIn];	
+			mapB[(yIn*15)+xIn] = mapL[(yIn*15)+xIn];
+			xOut++;
+		}
+		yOut++;
+	}// next y
+
+	free(map);
+
 	// part of generating the map will be generating the objects on it..
 	Mines_spawnMines();
 	OilDrums_spawnDrums();

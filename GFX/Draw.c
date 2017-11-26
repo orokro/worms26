@@ -205,15 +205,15 @@ void drawMap()
 			screenRight = 160; //320-bufferLeft;
 		}
 		
-		// because we are going to be copying bits in blocks of 16 at a time below
+		// because we are going to be copying bits in blocks of 32 at a time below
 		// we need to convert our screenLeft, screenRight and bufferLeft into columns
-		short colLeft = (screenLeft-(screenLeft%16))/16;
-		short colRight = (screenRight-(screenRight%16))/16;
-		short colBuff = (bufferLeft-(bufferLeft%16))/16;
+		short colLeft = (screenLeft-(screenLeft%32))/32;
+		short colRight = (screenRight-(screenRight%32))/32+1;
+		short colBuff = (bufferLeft-(bufferLeft%32))/32;
 
 		// loop to manually copy memory from a sub-section of our map
-		unsigned short *lcd = GrayDBufGetHiddenPlane(DARK_PLANE); //virtual;
-		unsigned short *map = mapBuffer;
+//		unsigned short *lcd = GrayDBufGetHiddenPlane(DARK_PLANE); //virtual;
+		unsigned long *map = mapBuffer;
 		short x,y, bufferCol;
 		
 		// loop through the visible rows on the screen
@@ -222,12 +222,18 @@ void drawMap()
 			bufferCol=0;
 			
 			// loop over the visible columns of the map on screen, or till our buffer runs out
-			for(x=colLeft; (x<colRight && (colBuff+bufferCol)<20); x++)
+			for(x=colLeft; (x<colRight && (colBuff+bufferCol)<10); x++)
 			{
-			
+				short offset = screenLeft==0 ? camLeft%32 : 0;
+				
+				unsigned long screenData = map[(bufferTop+y)*15+colBuff+bufferCol];
+
+				// take advantage of extgrah's sprite method to handle bit shiting and mem copying in one swoop!
+				ClipSprite32_OR_R(screenLeft+(bufferCol*32)-offset, screenTop+y, 1, (unsigned long*)&screenData, GrayDBufGetHiddenPlane(DARK_PLANE));
+				
 				// we want to bit-shift the map if the camera's position isn't on an even division of 8
-				unsigned short screenData = map[(bufferTop+y)*30+colBuff+bufferCol];
-				short offset = camLeft%16;
+				
+				/*
 				if(offset!=0)
 				{
 				
@@ -286,6 +292,7 @@ void drawMap()
 				
 				// copy the scroll-offset memory to our screen location
 				lcd[(screenTop+y)*15+x] = screenData;
+				*/
 				
 				// on the next iteration we will be on the next buffer colum
 				bufferCol++;
