@@ -143,7 +143,7 @@ void drawOilDrums()
 
 	// loop over all mines and draw them if active:
 	short i;
-	for(i=0; i<8; i++)
+	for(i=0; i<MAX_OILDRUMS; i++)
 	{
 		if(OilDrum_active & (int)1<<(i))
 		{
@@ -152,13 +152,14 @@ void drawOilDrums()
 			if(worldToScreen(&screenX, &screenY)==TRUE)
 			{
 				// draw the oil drums fill and outline
-				ClipSprite16_OR_R(screenX-4, screenY-10, 15, spr_Oil_Dark, GrayDBufGetHiddenPlane(DARK_PLANE));
-				ClipSprite16_OR_R(screenX-4, screenY-10, 15, spr_Oil_Light, GrayDBufGetHiddenPlane(LIGHT_PLANE));
+				ClipSprite16_OR_R(screenX-4, screenY-10, 11, spr_Oil_Dark, GrayDBufGetHiddenPlane(DARK_PLANE));
+				ClipSprite16_OR_R(screenX-4, screenY-10, 11, spr_Oil_Light, GrayDBufGetHiddenPlane(LIGHT_PLANE));
 			}// end if on screen
 		}// end if active
 	}// next i
 	
 }
+
 
 /**
 	Draws all the in-game, on-screen Crates.

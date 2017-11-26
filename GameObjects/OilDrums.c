@@ -20,85 +20,26 @@
 */
 
 // x/y positions of our oil drums
-short OilDrum_x[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-short OilDrum_y[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+short OilDrum_x[MAX_OILDRUMS] = {0, 0, 0, 0, 0, 0};
+short OilDrum_y[MAX_OILDRUMS] = {0, 0, 0, 0, 0, 0};
 
 // health of our oil drums
-char OilDrum_health[8] = {30, 30, 30, 30, 30, 30, 30, 30};
+char OilDrum_health[MAX_OILDRUMS] = {30, 30, 30, 30, 30, 30};
 
 // this int will be a bit-wise mask for the drums
 // the first 8 bits will represent if the drums are active or not
 int OilDrum_active = 0;
-
-// local function prototypes
-void spawnDrum(short);
-void checkExplosions(short);
-
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 
 
-// spawns OilDrums on the map, if they're enabled
-void OilDrums_spawnDrums()
-{
-	if(Match_oilDrumsEnabled==TRUE)
-	{
-		short i=0;
-		for(i=0; i<8; i++)
-			spawnDrum(i);
-	}
-}
-
-// spawns a single OilDrum
-void spawnDrum(short index)
-{
-	// find a free place for it on the map
-	Map_getSpawnPoint();
-	
-	// save the last requested point:
-	OilDrum_x[index] = Map_lastRequestedSpawnX;
-	OilDrum_y[index] = Map_lastRequestedSpawnY;
-	
-	// health is already set in the header file
-	// so let's just enable it:
-	OilDrum_active |= (int)1<<(index);
-}
-
-// main update for oil drums
-void OilDrums_update()
-{
-	// if any of the active OilDrums have less than 0 health, create an explosion
-	// and set it inactive for the rest of the game
-	short i=0;
-	for(i=0; i<8; i++)
-	{
-		// check if enabled and health is <= 0... then boom
-		char enabled = (char)((OilDrum_active & (int)1<<(i)) > 0);
-		if(enabled==TRUE)
-		{
-			
-			// check all explosions if they are near-by and damaging this oildrum
-			checkExplosions(i);
-			
-			// if ded
-			if(OilDrum_health[i]<=0)
-			{
-				// boom
-				Explosion_spawn(OilDrum_x[i], OilDrum_y[i], 10, 10, TRUE);
-				
-				// no longer active
-				OilDrum_active &= ~((int)1<<(i));
-				
-				// nothing left to check on this drum
-				continue;
-			}// end if health<=0
-		}// end if active		
-	}// next i
-}
-
-// loop over explosions, and if there are any first-frame explosions, see if they hit us
+/**
+ * loop over explosions, and if there are any first-frame explosions, see if they hit this oil drum
+ *
+ * @param the index of the OilDrum to check
+*/
 void checkExplosions(short index)
 {
 	short i=0; 
@@ -140,3 +81,75 @@ void checkExplosions(short index)
 		}// end if first frame		
 	}// next i
 }
+
+
+/**
+ * spawns an OilDrum with the given index
+ *
+ * @param the index of the OilDrum to spawn
+*/
+void spawnDrum(short index)
+{
+	// find a free place for it on the map
+	Map_getSpawnPoint();
+	
+	// save the last requested point:
+	OilDrum_x[index] = Map_lastRequestedSpawnX;
+	OilDrum_y[index] = Map_lastRequestedSpawnY;
+	
+	// health is already set in the header file
+	// so let's just enable it:
+	OilDrum_active |= (int)1<<(index);
+}
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+// spawns OilDrums on the map, if they're enabled
+void OilDrums_spawnDrums()
+{
+	if(Match_oilDrumsEnabled==TRUE)
+	{
+		short i=0;
+		for(i=0; i<MAX_OILDRUMS; i++)
+			spawnDrum(i);
+	}
+}
+
+
+// main update for oil drums
+void OilDrums_update()
+{
+	// if any of the active OilDrums have less than 0 health, create an explosion
+	// and set it inactive for the rest of the game
+	short i=0;
+	for(i=0; i<MAX_OILDRUMS; i++)
+	{
+		// check if enabled and health is <= 0... then boom
+		char enabled = (char)((OilDrum_active & (int)1<<(i)) > 0);
+		if(enabled==TRUE)
+		{
+			
+			// check all explosions if they are near-by and damaging this oildrum
+			checkExplosions(i);
+			
+			// if ded
+			if(OilDrum_health[i]<=0)
+			{
+				// boom
+				Explosion_spawn(OilDrum_x[i], OilDrum_y[i], 10, 10, TRUE);
+				
+				// no longer active
+				OilDrum_active &= ~((int)1<<(i));
+				
+				// nothing left to check on this drum
+				continue;
+			}// end if health<=0
+		}// end if active		
+	}// next i
+}
+
+

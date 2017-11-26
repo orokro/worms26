@@ -393,10 +393,13 @@ extern void Worm_update();
    OIL DRUMS +++ OIL DRUMS +++ OIL DRUMS +++ OIL DRUMS +++ OIL DRUMS +++ OIL DRUMS +++ OIL DRUMS +++ OIL DRUMS +++ OIL DRUMS +++ OIL DRUM
    ====================================================================================================================================== */
 
+// OilDrum defines
+#define MAX_OILDRUMS 6
+
 // OilDrum globals
-extern short OilDrum_x[8];
-extern short OilDrum_y[8];
-extern char OilDrum_health[8];
+extern short OilDrum_x[MAX_OILDRUMS];
+extern short OilDrum_y[MAX_OILDRUMS];
+extern char OilDrum_health[MAX_OILDRUMS];
 extern int OilDrum_active;
 
 // OilDrum function prototypes
