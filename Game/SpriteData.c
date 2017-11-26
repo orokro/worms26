@@ -1,4 +1,5 @@
 
+	
 static unsigned short spr_WormLeft_Outline[] = { //15 tall
   0b0001111100000000,
   0b0110000010000000,

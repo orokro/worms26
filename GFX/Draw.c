@@ -332,7 +332,8 @@ void drawMap()
 		short colBuff = (bufferLeft-(bufferLeft%32))/32;
 
 		// loop to manually copy memory from a sub-section of our map, via ClipSprite32
-		unsigned long *map = (unsigned long*)mapBuffer;
+		unsigned long *light = (unsigned long*)mapLight;
+		unsigned long *dark = (unsigned long*)mapDark;
 		short x;
 		short bufferCol = 0;
 		
@@ -342,8 +343,9 @@ void drawMap()
 			short offset = screenLeft==0 ? camLeft%32 : 0;
 
 			// take advantage of extgrah's sprite method to handle bit shiting and mem copying in one swoop!
-			ClipSprite32_OR_R(screenLeft+(bufferCol*32)-offset, screenTop, screenBottom-screenTop, &map[((colBuff+bufferCol)*200)+bufferTop], GrayDBufGetHiddenPlane(DARK_PLANE));
-			
+			ClipSprite32_OR_R(screenLeft+(bufferCol*32)-offset, screenTop, screenBottom-screenTop, &light[((colBuff+bufferCol)*200)+bufferTop], GrayDBufGetHiddenPlane(LIGHT_PLANE));
+			ClipSprite32_OR_R(screenLeft+(bufferCol*32)-offset, screenTop, screenBottom-screenTop, &dark[((colBuff+bufferCol)*200)+bufferTop], GrayDBufGetHiddenPlane(DARK_PLANE));
+
 			// on the next iteration we will be on the next buffer 32 bit colum
 			bufferCol++;
 		

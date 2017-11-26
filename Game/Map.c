@@ -57,10 +57,67 @@ short spawnPoint_y[53];
 short Map_lastRequestedSpawnX=0;
 short Map_lastRequestedSpawnY=0;
 
-
+// the texture pattern for the land
+static unsigned long spr_LandTexture[] = { // 32 tall
+	0b11000000100000000000001000000000,
+	0b01110000000111111110000000010010,
+	0b01111111111111111111100001000000,
+	0b00011111111111111111111110000000,
+	0b10000011111111100000111111100010,
+	0b00010000100000000100000111110000,
+	0b00000000000000100000001000000000,
+	0b01000011111100000000100001000010,
+	0b00001111110000010001111100000000,
+	0b11111110000010000011111111111111,
+	0b11111100100000000010000111111111,
+	0b11110000001001001000100000000111,
+	0b00000000000000000000000100010000,
+	0b10000010111110000000000000000000,
+	0b00010001111111111100100001000010,
+	0b00000011111111111111111000000000,
+	0b00100111100001111111111111111110,
+	0b00000000000010001111111111111000,
+	0b10000001000000000000000000000001,
+	0b00000000000100000010001000000000,
+	0b00111111100000010000000001001000,
+	0b11111111111000000001000000000011,
+	0b11111111111110000000000000100111,
+	0b00100011111111100001111100000111,
+	0b00000000001111111111111000001000,
+	0b01000100000011111110000001000000,
+	0b11100000100000000000001000000111,
+	0b11111000000000100010000000111111,
+	0b01111100001000000001111111111110,
+	0b00001110000000111111111111110000,
+	0b00100000100100011111111110000100,
+	0b00000000000000000000000001000000};
+	
+	
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 
+
+
+/**
+ * Sets a pixel on or off on the map
+ * 
+ * @param buff either the mapLight or mapDark plane buffer
+ * @param on either TRUE or FALSE to set the pixel ON or OFF
+ * @param x the x position
+ * @param y the y position
+*/	
+void Map_setPoint(unsigned long *buff, char on, short x, short y)
+{
+	// this logic is very similar to Map_getPoint, check comments there
+	if((x<0) || (x>=320) || (y<0) || (y>=200))
+		return;
+	short pixelBitIndex = (31-(x%32));
+	unsigned long mask = 1;
+	mask = (mask<<(pixelBitIndex));
+	short bufferX = ((x-(x%32))/32)*200;
+	short bufferY = y;
+	buff[bufferY+bufferX] = on ? (buff[bufferY+bufferX] | mask) : (buff[bufferY+bufferX] & ~mask);
+}
 
 
 // builds a random map for the worms to play on
@@ -264,12 +321,55 @@ void Map_makeMap()
 		}// next y
 	}// next x
 	
-	/*
-		this is a temporary hack to test drawing the map with clipsrite32
-		basically, we want to copy our temporary map to the mapbuffer, but, instead of having
-		each set of bytes be horizontal rows of pixels, we want to make 32 bite rows...
-		this way an entire row can be drawn at a time during map drawing
-	*/
+
+	// create the light and dark map buffers with land texture!
+	unsigned long *light = (unsigned long*)mapLight;
+	unsigned long *dark = (unsigned long*)mapDark;
+	for(y=0; y<2000; y++)
+	{
+		// the texture will just loop its y colums, every 200 pixels
+		short texRow = (y%200)%32;
+		light[y] = map[y] & ~spr_LandTexture[texRow];
+		dark[y] = map[y] & spr_LandTexture[texRow];
+	}
+	
+	// now we need to loop over the map and calculate dark-pixels
+	// this will be S L O W
+	for(y=0; y<200; y++)
+	{
+		for(x=0; x<320; x++)
+		{
+			// if our pixel is empty, we can skip this pixel:
+			if(Map_testPoint(x, y))
+			{
+				// check all four sides, if any of them are empty, we can blacken this edge-pixel
+				char set=FALSE;
+				if(Map_testPoint(x, y-1)==FALSE)
+					set=TRUE;
+				else if(Map_testPoint(x, y-2)==FALSE)
+					set=TRUE;
+				else if(Map_testPoint(x, y+1)==FALSE)
+					set=TRUE;
+				else if(Map_testPoint(x, y+2)==FALSE)
+					set=TRUE;
+				else if(Map_testPoint(x-1, y)==FALSE)
+					set=TRUE;
+				else if(Map_testPoint(x-2, y)==FALSE)
+					set=TRUE;
+				else if(Map_testPoint(x+1, y)==FALSE)
+					set=TRUE;
+				else if(Map_testPoint(x+2, y)==FALSE)
+					set=TRUE;
+				
+				if(set)
+				{
+					Map_setPoint(mapLight, TRUE, x, y);
+					Map_setPoint(mapDark, TRUE, x, y);
+				}
+				
+			}// end if
+		}// next x
+	}// next y
 
 	// part of generating the map will be generating the objects on it..
 	Mines_spawnMines();
@@ -298,13 +398,13 @@ char Map_testPoint(short x, short y)
 	short bufferX = ((x-(x%32))/32)*200;
 	short bufferY = y;
 
-	// we need to check the exact pixel. lets get the short (16 bits) at that location
+	// we need to check the exact pixel. lets get the short (32 bits) at that location
 	unsigned long mapData = map[bufferY+bufferX];
 
 	// imagine x is pixel 14. That's technically this pixel: 0000000000000010
-	// since the lowest bit is index 0, there's 15 total indexable bits (16 bits total)
-	// thus, the pixel we want is: 15-pixelX, where pixelX is x%16 (which will only ever be 0-15)
-	short pixelBitIndex = (32-(x%32));
+	// since the lowest bit is index 0, there's 31 total indexable bits (32 bits total)
+	// thus, the pixel we want is: 31-pixelX, where pixelX is x%32 (which will only ever be 0-31)
+	short pixelBitIndex = (31-(x%32));
 	
 	// test the exact pixel.
 	unsigned long mask = 1;
@@ -317,6 +417,8 @@ char Map_testPoint(short x, short y)
 	// return the status of this map pixel
 	return pixelOn;
 }
+
+
 
 // find a free point to spawn something, that doesn't overlap with something else existing
 void Map_getSpawnPoint()

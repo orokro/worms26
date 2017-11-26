@@ -13,7 +13,7 @@
 */
 
 // the main buffer for the map
-void *mapBuffer;
+void *mapBuffer, *mapLight, *mapDark;
 
 // the main double buffer for gray scale rendering
 void *GblDBuffer;
@@ -52,7 +52,9 @@ void _main(void)
 
 	// allocate our map buffer
 	mapBuffer = malloc(200*10*sizeof(unsigned long));// malloc(LCD_SIZE*4);
-
+	mapLight = malloc(200*10*sizeof(unsigned long));
+	mapDark = malloc(200*10*sizeof(unsigned long));
+	
 	// render the map and spawn items on the map (worms, oil drums, etc)
 	Map_makeMap();
 	
@@ -95,6 +97,8 @@ void _main(void)
 
 	// free our buffers:
 	free(mapBuffer);
+	free(mapLight);
+	free(mapDark);
 	free(GblDBuffer);
 	
 	//resets key stuff
