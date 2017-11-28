@@ -30,7 +30,7 @@
 // these will be updated by CharacterController_update()
 // so we don't have to constantly calculate them...
 short *wX, *wY;
-unsigned long wormMask=0;
+unsigned short wormMask=0;
 
 /**
 	* Handles moving the worm in the character controller, if its on the ground.
@@ -93,7 +93,7 @@ void CharacterController_update()
 {
 	// worm mask...
 	wormMask = 1;
-	wormMask = (unsigned long)((unsigned long)wormMask<<(Worm_currentWorm));
+	wormMask = (unsigned short)((unsigned short)wormMask<<(Worm_currentWorm));
 	
 	// save references to our pos
 	wX = &Worm_x[(short)Worm_currentWorm];

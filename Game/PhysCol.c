@@ -13,63 +13,144 @@
 */
 
 // makes a new collider
-Collider new_Collider(char type, char p1, char p2, char p3, char p4)
+Collider new_Collider(unsigned char type, char up, char down, char left, char right)
 {
 	Collider new;
 	new.type = type;
-	
-	// make a new reference since the 
-	new.p1 = p1;
-	new.p2 = p2;
-	new.p3 = p3;
-	new.p4 = p4;
-	
+	new.u = up;
+	new.d = down;
+	new.l = left;
+	new.r = right;
+	new.collisions = 0;
 	return new;
 }
 
 // makes a new PhysObj
-PhysObj new_PhysObj(short *x, short *y, char *xVelo, char *yVelo, float bounciness, float smoothness, char objIndex, void *settled, void *grounded, Collider c)
+PhysObj new_PhysObj(short *x, short *y, char *xVelo, char *yVelo, float bounciness, float smoothness, char objIndex, unsigned short *settled, Collider c)
 {
 	PhysObj new;
 	new.x = x;
 	new.y = y;
 	new.xVelo = xVelo;
 	new.yVelo = yVelo;
-	new.bounciness = bounciness;
-	new.smoothness = smoothness;
+	new.bouncinessX = bounciness;
+	new.bouncinessY = bounciness;
+	new.smoothness = (char)(smoothness*100);
 	new.settled = settled;
-	new.grounded = grounded;
 	new.col = c;
 	new.index = objIndex;
 	new.lastX = 0;
 	new.lastY = 0;
+	new.staticFrames = 0;
 	return new;
 }
 
 /**
- * Spplys an objects collider. This can mutate it's X/Y.
+ * Applys an objects collider. This can mutate it's X/Y.
  *
- * @param *col the Collider struct to apply
- * @param the x position to test relatively
- * @param the y position to test relatively
- * @return TRUE or FALSE if the collider hit/moved the object.
+ * @param *col pointer the Collider struct to apply
+ * @param *x pointer the x position to test relatively
+ * @param *y pointer the y position to test relatively
+ * @return an unsigned char with bits masked based on which collisions were responded to
 */
-char Collider_apply(Collider col, short *x, short *y)
+unsigned char Collider_apply(Collider *col, short *x, short *y)
 {
-	return FALSE;
-	/*
-	short x = 0;
-	short y = 0;
-	char dir = 1;
+
+	// reset the collisions bitmask for this collider
+	col->collisions = 0;
 	
-	// based on the directions involed, test various states
-	
-	// do we need to test up and down?
-	if(col.type & (COL_UD | COL_UDLR))
+	// do we need to test up and/or down?
+	if(col->type & COL_UD)
 	{
-		// testing down takes precedence
-		if(Collide_test(*x, *y-col.
-	}*/
+		// perform up and down tests if need be:
+		char movedUp = (col->type & COL_UP) ? Collide_test(*x, *y-col->u, COL_UP) : 0;
+		char movedDown = (col->type & COL_DOWN) ? Collide_test(*x, *y+col->d, COL_DOWN) : 0;
+		
+		// testing down takes precedence, so if we moved down at all, just apply that
+		if(movedDown!=0)
+		{
+			*y = *y + movedDown;
+			col->collisions |= COL_DOWN;
+		// otherwise, we will apply the up movement
+		}else if(movedUp!=0)
+		{
+			*y = *y + movedUp;
+			col->collisions |= COL_UP;
+		}		
+	}// end if up or down collision
+	
+	// do we need to test left and/or right?
+	if(col->type & COL_LR)
+	{
+		// perform left and right tests if need be:
+		char movedLeft = (col->type & COL_LEFT) ? Collide_test(*x-col->l, *y, COL_LEFT) : 0;
+		char movedRight = (col->type & COL_RIGHT) ? Collide_test(*x+col->r, *y, COL_RIGHT) : 0;
+		
+		/*
+			unlike up and down colliders, neither can take prescendence.
+			we don't want to push the object off the edges of the map, which can happen with a feedback
+			loop of collisions. If the left colider and right collider both hit something, instead
+			we want to push the item UP since both it's edges are "on ground"
+			
+			This might end up in some unrealistic behavoir, but its better than pushing the object to the
+			far edges of the map.
+			
+			in this case, we will push the object up, and test again, until neither collider hits.
+			
+			also note that this mode only needs to apply if we're testing both COL_LEFT and COL_RIGHT
+			such as in COL_LR or COL_UDLR
+			
+			also note that, the movedLeft or movedRight variables would default to 0 if this wasn't
+			the case so this IF will only pass if we're testing both LEFT and RIGHT and they both collided
+		*/
+		if(movedLeft && movedRight)
+		{
+			// move until neither is colliding any more
+			// note that, the worst case scenario is that the worm is moved to the top of the map,
+			// in which case both colliders will definately return false, so this won't be an endless while
+			while(movedLeft && movedRight)
+			{
+				// move the object up:
+				*y = *y - 1;
+				
+				// test again. No need for ternarys since the only way to get to this loop is if both are tested
+				movedLeft = Collide_test(*x-col->l, *y, COL_LEFT);
+				movedRight = Collide_test(*x+col->r, *y, COL_RIGHT);
+			}
+			
+			// we will consider colliding both LEFT and RIGHT the same as colliding with DOWN (the ground)
+			col->collisions |= COL_DOWN;
+			
+		// other wise we can just move the object left or right by the some of movedLeft and movedRight
+		}else{
+			
+			/*
+				so, we can end up here in 3 scenarios:
+					- we are testing both left and right, but one was 0 (i.e. didn't collide)
+					- we are testing left, and right defaulted to 0
+					- we are testing right, and left defaulted to 0
+					
+				thus, no matter how you look at it, one will always be 0.
+				
+				if we add movedLeft and movedRight it will return the ammount to move the x
+				value left or right.
+				
+				if both movedLeft and movedRight were non zero, then the above while loop would have happened
+				instead.
+				
+				Note that, movedLeft and movedRight can be negative for their corresponding direction.
+			*/
+			*x = *x + (movedLeft+movedRight);
+			
+			// save which side we hit
+			// if our net total is negative, the right collider hit and pushed the object left:
+			col->collisions |= ((movedLeft+movedRight)<0 ? COL_RIGHT : COL_LEFT);
+		}// end if both hit
+		
+	}// end if left or right
+	
+	// return what we collided with, if anything
+	return col->collisions;
 }
 
 
@@ -77,52 +158,94 @@ char Collider_apply(Collider col, short *x, short *y)
 char Physics_apply(PhysObj *obj)
 {
 	// before we apply physics, save the inital state of the X/Y
-	short x = *obj->x;
-	short y = *obj->y;
+	short initX = *obj->x;
+	short initY = *obj->y;
 	
-	// apply the velocity
+	// apply the velocities (which may be 0)
 	*obj->x += (*obj->xVelo);
 	*obj->y += (*obj->yVelo);
 	
 	// apply the collider, which might move our object
-	char moved = Collider_apply(obj->col, obj->x, obj->y);
+	unsigned char hits = Collider_apply(&obj->col, obj->x, obj->y);
 	
-	return TRUE;
+	// calculate if the object moved at all, either from velo or the collider:
+	char moved = (*obj->x!=initX || *obj->y!=initY);
+	
+	// if hit nothing, nothing to do here:
+	if(hits!=0)
+	{
+		// for left and right hits
+		if(hits & COL_LR)
+		{
+			// shrink xVelo based on bounciness
+			// and make sure its positive or negative based on which side hit
+			*obj->xVelo = abs(*obj->xVelo) * obj->bouncinessX * ((hits & COL_LEFT) ? 1 : -1);
+		}
+		
+		// for up and down hits
+		if(hits & COL_UD)
+		{
+			// shrink yVelo based on bounciness
+			// and make sure its positive or negative based on which side hit
+			*obj->yVelo = abs(*obj->yVelo) * obj->bouncinessY * ((hits & COL_UP) ? 1 : -1);
+			
+			/*
+				smoothness only applies to ground objects.
+				based on it's smoothness pick a random number and decided to flip the xVelocity or not
+				note that, the smoothness constructor takes a float from 0.0 to 1.0, but internally
+				converts it to 0-100
+			*/
+			if(random(100) > obj->smoothness)
+				*obj->xVelo *= -1;
+		}
+		
+	}// end if hit something
+	
+	// if this object moved at all, it can't be considered "setteled"
+	if(moved)
+	{
+		*obj->settled &= ~((unsigned short)1<<(obj->index));
+	
+	// otherwise, increase our frame count of static frames, and if its over 3, consider it settled
+	}else
+	{
+		obj->staticFrames++;
+		if(obj->staticFrames>3)
+			*obj->settled |= (unsigned short)1<<(obj->index);
+	}
+	
+	// return weather or not the object was moved in this frame
+	return moved;
 }
 
 // tests for a collision and moves the opposite direction until a free pixel is found, if it did collide
 short Collide_test(short x, short y, char dir)
 {
-	// these arrays will old the values we should move by, based on the direction
-	// note: opposite values of actual direction, since we want to move opposite
-	static const char xDirs[] = { 0, 0, 1, -1};
-	static const char yDirs[] = { 1, -1, 0, 0};
-	
 	// test for a collision, and if none, just return 0
 	if(Map_testPoint(x, y)==FALSE)
 		return 0;
 		
 	// get the direction to move:
-	char xDir;// = xDirs[(short)dir];
-	char yDir;// = yDirs[(short)dir];
+	char xDir=0;
+	char yDir=0;
 	
 	switch(dir)
 	{
 		case COL_UP:
-			xDir=xDirs[0];
-			yDir=yDirs[0];
+			xDir=0;
+			yDir=1;
 			break;
 		case COL_DOWN:
-			xDir=xDirs[1];
-			yDir=yDirs[1];
+			xDir=0;
+			yDir=-1;
 			break;
 		case COL_LEFT:
-			xDir=xDirs[2];
-			yDir=yDirs[2];
+			xDir=1;
+			yDir=0;
 			break;
 		case COL_RIGHT:
-			xDir=xDirs[3];
-			yDir=yDirs[3];
+			xDir=-1;
+			yDir=0;
 			break;
 	}
 	

@@ -26,18 +26,21 @@
 */
 
 // x/y positions of our Mines
-short Mine_x[MAX_MINES] = {0, 0, 0, 0, 0, 0};
-short Mine_y[MAX_MINES] = {0, 0, 0, 0, 0, 0};
+short Mine_x[MAX_MINES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+short Mine_y[MAX_MINES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // velocity of mines
-char Mine_xVelo[MAX_MINES] = {0, 0, 0, 0, 0, 0};
-char Mine_yVelo[MAX_MINES] = {0, 0, 0, 0, 0, 0};
+char Mine_xVelo[MAX_MINES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Mine_yVelo[MAX_MINES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // fuse of mines
-char Mine_fuse[MAX_MINES] = {-1, -1, -1, -1, -1, -1};
+char Mine_fuse[MAX_MINES] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
 // is the mine active? using bits for booleans
-int Mine_active=0;
+unsigned short Mine_active=0;
+
+// is the mine settled on the map?
+unsigned short Mine_settled=0;
 
 // local vars
 char proxmityCheckTimer = 0;
@@ -63,7 +66,7 @@ void spawnMine(char index)
 	Mine_y[(short)index] = Map_lastRequestedSpawnY;
 	
 	// make this mine active:
-	Mine_active |= (int)1<<(index);
+	Mine_active |= (unsigned short)1<<(index);
 }
 
 
@@ -85,7 +88,7 @@ void updateMine(short index)
 		{
 			// disable the mine
 			Mine_fuse[index] = -1;
-			Mine_active &= ~((int)1<<(index));
+			Mine_active &= ~((unsigned short)1<<(index));
 
 			// boom
 			Explosion_spawn(Mine_x[index], Mine_y[index], 30, 30, TRUE);
@@ -111,8 +114,8 @@ void checkProximity(short index)
 	for(i=0; i<16; i++)
 	{
 		// check if the worm is active
-		char wormIsActiveInGame = (char)((Worm_active & (unsigned long)1<<(i))>0);
-		char wormIsNotDead = (char)((Worm_isDead & (unsigned long)1<<(i))==0);
+		char wormIsActiveInGame = (char)((Worm_active & (unsigned short)1<<(i))>0);
+		char wormIsNotDead = (char)((Worm_isDead & (unsigned short)1<<(i))==0);
 		
 		// only do shit if the worm is active in the game, and NOT dead
 		if(wormIsActiveInGame && wormIsNotDead)
@@ -146,7 +149,7 @@ void checkExplosions(short index)
 	for(i=0; i<8; i++)
 	{
 		// check if the explosion is in it's first-frame
-		char firstFrame = (char)((Explosion_firstFrame & (int)1<<(i))>0);
+		char firstFrame = (char)((Explosion_firstFrame & (unsigned short)1<<(i))>0);
 
 		// only do shit if first frame, yo
 		if(firstFrame)
@@ -201,10 +204,13 @@ void checkExplosions(short index)
 // spawns Mines on the map, if they're enabled
 void Mines_spawnMines()
 {
+
 	if(Match_minesEnabled)
 	{
 		char i=0;
-		for(i=0; i<MAX_MINES; i++)
+		
+		// only spawn 6 mines, leaving 4 free slots for user placeable mines
+		for(i=0; i<6; i++)
 			spawnMine(i);
 	}
 }
@@ -223,7 +229,7 @@ void Mines_update()
 	for(i=0; i<MAX_MINES; i++)
 	{
 		// only update active mines
-		if(Mine_active & (int)1<<(i))
+		if(Mine_active & (unsigned short)1<<(i))
 		{
 			// okay we will only check proxity every 5 frames to save CPU since proxmity check is
 			// epensive

@@ -30,16 +30,16 @@ char Worm_yVelo[MAX_WORMS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 PhysObj Worm_physObj[MAX_WORMS];
 
 // the direction the worm is currently FACING.. 0 = LEFT 1 = RIGHT
-unsigned long Worm_dir = 0;
+unsigned short Worm_dir = 0;
 
 // the current HEALTH of the worm
 char Worm_health[MAX_WORMS] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
 // bit mask if the worm is dead. bit 1 = dead, bit = 0 alive
-unsigned long Worm_isDead = 0;
+unsigned short Worm_isDead = 0;
 
 // bit mask if the worm is ACTIVE... different that dead.
-unsigned long Worm_active = 0;
+unsigned short Worm_active = 0;
 
 // store the current mode for every worm:
 char Worm_mode[MAX_WORMS] = {wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle };
@@ -51,11 +51,11 @@ char Worm_currentWorm = 0;
 
 // if any of the bits in this mask are 1, then the worm moved within
 // the last frame. We can't end a turn until all worms are "stable"
-unsigned long Worm_unstable = 0;
+unsigned short Worm_settled = 0;
 
 // if the collision dection for DOWN on a worm was true, then the worm is "on the ground"
 // this is important for detecting falling for parachut or for walking
-unsigned long Worm_onGround = 0;
+unsigned short Worm_onGround = 0;
 
 
 
@@ -72,7 +72,7 @@ unsigned long Worm_onGround = 0;
 */
 void spawnWorm(short index)
 {
-	unsigned long mask = 1;
+	unsigned short mask = 1;
 	mask = mask<<(index);
 	
 	// find a free place for it on the map
@@ -84,8 +84,8 @@ void spawnWorm(short index)
 	Worm_active |= mask;
 
 	// make a new collider and physics object for this worm
-	//Collider col = new_Collider(COL_UDLR, -4, 6, -2, 2);
-	//Worm_physObj[index] = new_PhysObj(&Worm_x[index], &Worm_y[index], &Worm_xVelo[index], &Worm_yVelo[index], 0.2f, 1.0f, (char)index, &Worm_unstable, &Worm_onGround, col);
+	Collider col = new_Collider(COL_UDLR, -4, 6, -2, 2);
+	Worm_physObj[index] = new_PhysObj(&Worm_x[index], &Worm_y[index], &Worm_xVelo[index], &Worm_yVelo[index], 0.2f, 1.0f, (char)index, &Worm_settled, col);
 	
 	// random direction
 	if(random(2)==0)
@@ -101,8 +101,8 @@ void spawnWorm(short index)
 */
 void wormCollision(short index)
 {
-	unsigned long mask = 1;
-	mask = (unsigned long)((unsigned long)mask<<(index));
+	unsigned short mask = 1;
+	mask = (unsigned short)((unsigned short)mask<<(index));
 		
 	/*
 		How this works:
@@ -210,7 +210,7 @@ void Worm_update()
 	{
 		// caculate the bitmask for this worm once, since we'll use it alot
 		wormMask = 1;
-		wormMask = (unsigned long)((unsigned long)wormMask<<(i));
+		wormMask = (unsigned short)((unsigned short)wormMask<<(i));
 		
 		// only update worms in the game
 		if((Worm_active & wormMask) > 0)
@@ -235,9 +235,9 @@ void Worm_update()
 			// if the worm has no velocity, it either hit the ground, or isn't moving
 			// we can consider it stable:
 			if(Worm_xVelo[i]==0 && Worm_yVelo==0)
-				Worm_unstable |= wormMask;
+				Worm_settled |= wormMask;
 			else
-				Worm_unstable &= ~wormMask;
+				Worm_settled &= ~wormMask;
 				
 		}// end if active worm
 	}// next i

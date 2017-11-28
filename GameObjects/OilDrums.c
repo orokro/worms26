@@ -28,7 +28,14 @@ char OilDrum_health[MAX_OILDRUMS] = {30, 30, 30, 30, 30, 30};
 
 // this int will be a bit-wise mask for the drums
 // the first 8 bits will represent if the drums are active or not
-int OilDrum_active = 0;
+unsigned short OilDrum_active = 0;
+
+// is the oil drum settled on the map?
+unsigned short OilDrum_settled = 0;
+
+PhysObj OilDrum_physObj[MAX_OILDRUMS];
+char OilDrum_xVelo[MAX_OILDRUMS] = {0, 0, 0, 0, 0, 0};
+char OilDrum_yVelo[MAX_OILDRUMS] = {0, 0, 0, 0, 0, 0};
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -46,7 +53,7 @@ void checkExplosions(short index)
 	for(i=0; i<8; i++)
 	{
 		// check if the explosion is in it's first-frame
-		char firstFrame = (char)((Explosion_firstFrame & (int)1<<(i))>0);
+		char firstFrame = (char)((Explosion_firstFrame & (unsigned short)1<<(i))>0);
 		
 		// only do shit if first frame, yo
 		if(firstFrame)
@@ -99,7 +106,12 @@ void spawnDrum(short index)
 	
 	// health is already set in the header file
 	// so let's just enable it:
-	OilDrum_active |= (int)1<<(index);
+	OilDrum_active |= (unsigned short)1<<(index);
+	
+	// make a new collider and physics object for this worm
+	Collider col = new_Collider(COL_DOWN, 0, 5, 0, 0);
+	OilDrum_physObj[index] = new_PhysObj(&OilDrum_x[index], &OilDrum_y[index], &OilDrum_xVelo[index], &OilDrum_yVelo[index], 0.0f, 1.0f, (char)index, &OilDrum_settled, col);
+	
 }
 
 
@@ -129,7 +141,7 @@ void OilDrums_update()
 	for(i=0; i<MAX_OILDRUMS; i++)
 	{
 		// check if enabled and health is <= 0... then boom
-		char enabled = (char)((OilDrum_active & (int)1<<(i)) > 0);
+		char enabled = (char)((OilDrum_active & (unsigned short)1<<(i)) > 0);
 		if(enabled)
 		{
 			// check all explosions if they are near-by and damaging this oildrum
@@ -142,11 +154,22 @@ void OilDrums_update()
 				Explosion_spawn(OilDrum_x[i], OilDrum_y[i], 10, 10, TRUE);
 				
 				// no longer active
-				OilDrum_active &= ~((int)1<<(i));
+				OilDrum_active &= ~((unsigned short)1<<(i));
 				
 				// nothing left to check on this drum
 				continue;
 			}// end if health<=0
+			
+			// if the OilDrum is considered "settled" no need for physics
+			if(!(OilDrum_settled & (unsigned short)1<<(i)))
+			{
+				// add gravity to oil drum
+				OilDrum_yVelo[i]++;
+				
+				// do physics and collision for OilDrum
+				Physics_apply(&OilDrum_physObj[i]);
+			}
+			
 		}// end if active		
 	}// next i
 }

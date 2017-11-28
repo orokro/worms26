@@ -28,8 +28,10 @@ char Crate_health[MAX_CRATES] = {-1, -1, -1, -1, -1, -1, -1, -1};
 char Crate_type[MAX_CRATES] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 // is the crate active?
-int Crate_active=0;
+unsigned short Crate_active=0;
 
+// is the crate settled on land?
+unsigned short Crate_settled=0;
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -50,7 +52,7 @@ static void spawnCrate(char type)
 	short i=0;
 	for(i=0; i<MAX_CRATES; i++)
 	{
-		char enabled = (char)((Crate_active & (int)1<<(i)) > 0);
+		char enabled = (char)((Crate_active & (unsigned short)1<<(i)) > 0);
 		if(enabled)
 		{
 			index = i;
@@ -77,7 +79,7 @@ static void spawnCrate(char type)
 	Crate_health[index] = 30;
 
 	// set active!
-	Crate_active |= (int)1<<(index);
+	Crate_active |= (unsigned short)1<<(index);
 }
 
 
@@ -92,7 +94,7 @@ static void checkExplosions(short index)
 	for(i=0; i<8; i++)
 	{
 		// check if the explosion is in it's first-frame
-		char firstFrame = (char)((Explosion_firstFrame & (int)1<<(i))>0);
+		char firstFrame = (char)((Explosion_firstFrame & (unsigned short)1<<(i))>0);
 		
 		// only do shit if first frame, yo
 		if(firstFrame)
@@ -154,7 +156,7 @@ void Crates_update()
 	for(i=0; i<MAX_CRATES; i++)
 	{
 		// check if enabled and health is <= 0... then boom
-		char enabled = (char)((Crate_active & (int)1<<(i)) > 0);
+		char enabled = (char)((Crate_active & (unsigned short)1<<(i)) > 0);
 		if(enabled)
 		{
 
@@ -168,7 +170,7 @@ void Crates_update()
 				Explosion_spawn(OilDrum_x[i], OilDrum_y[i], 10, 10, TRUE);
 
 				// no longer active
-				Crate_active &= ~((int)1<<(i));
+				Crate_active &= ~((unsigned short)1<<(i));
 
 				// nothing left to check on this drum
 				continue;

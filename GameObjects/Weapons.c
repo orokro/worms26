@@ -120,7 +120,7 @@ short findFreeWeaponSlot()
 	short i=0;
 	for(i=0; i<MAX_WEAPONS; i++)
 	{
-		char freeSlot = (char)((Weapon_active & (short)((short)1<<(i))) <= 0);
+		char freeSlot = (char)((Weapon_active & (unsigned short)((unsigned short)1<<(i))) <= 0);
 		if(freeSlot)
 			return i;
 	}
@@ -155,7 +155,7 @@ void updateTimer(short index)
 	if(Weapon_time[index]<=0)
 	{
 		// weapon is no longer active:
-		Weapon_active &= ~((short)1<<(index));
+		Weapon_active &= ~((unsigned short)1<<(index));
 		
 		// here we will call custom methods for when time expires
 		// TO-DO: implement detonation
@@ -221,7 +221,7 @@ void Weapons_spawn(char type, short x, short y, char xVelocity, char yVelocity, 
 		return;
 		
 	// set the weapon active:
-	Weapon_active |= (short)1<<(slot);
+	Weapon_active |= (unsigned short)1<<(slot);
 	
 	// set it's varius properties
 	Weapon_type[slot] = type;
@@ -254,7 +254,7 @@ void Weapons_update()
 	for(i=0; i<MAX_WEAPONS; i++)
 	{
 		// check if it's active
-		char activeWeapon = (char)((Weapon_active & (short)((short)1<<(i))) > 0);
+		char activeWeapon = (char)((Weapon_active & (unsigned short)((unsigned short)1<<(i))) > 0);
 		if(activeWeapon)
 		{
 			

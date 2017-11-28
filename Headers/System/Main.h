@@ -310,23 +310,26 @@ extern void Map_makeMap();
    ====================================================================================================================================== */
 
 // collision defines
-#define COL_UP 1
-#define COL_DOWN 2
-#define COL_LEFT 4
-#define COL_RIGHT 8
-#define COL_UD 16
-#define COL_LR 32
-#define COL_UDLR 64
+#define COL_UP 0b00000001
+#define COL_DOWN 0b00000010
+#define COL_LEFT 0b00000100
+#define COL_RIGHT 0b00001000
+#define COL_UD 0b00000011
+#define COL_LR 0b00001100
+#define COL_UDLR 0b00001111
 
 // I can't help but abstract this... we'll see how it goes..
 // this is a Collider struct for remembering the specific collider properties of an object
 typedef struct{
 	
 	// the type of collider:
-	char type;
+	unsigned char type;
 	
 	// the list of point distances to check. size varies by type
-	char p1, p2, p3, p4;
+	char u, d, l, r;
+	
+	// a bit masked byte with whatever collisions happened on the last frame it was tested
+	unsigned char collisions;
 	
 }Collider;
 
@@ -342,21 +345,25 @@ typedef struct{
 	// the last X and Y position this object was on the previous frame
 	short lastX, lastY;
 	
-	// the objects bouciness:
+	// the objects bouciness on X and Y:
 	// 0.0 = doesn't bounce.
 	// 1.0 = bounces back with full velocity
-	float bounciness;
+	float bouncinessX, bouncinessY;
 	
 	// the objects smoothness
-	// 0.0 = the object picks a random direction to bounce.
-	// 1.0 = the object always bounces it it's headed direction
-	float smoothness;
+	// 0 = the object picks a random direction to bounce every time it hits the ground
+	// 100 = the object always bounces it it's headed direction
+	char smoothness;
 	
 	// the index this of this object in it's corresponding arrays
 	char index;
 	
-	// references to the settled and grounded arrays for this object
-	void *settled, *grounded;
+	// the number of frames since this object hasnt moved
+	// when this reaches 3, it will be considered "setteled"
+	char staticFrames;
+	
+	// references to the settled bit wise long for this object
+	unsigned short *settled;
 	
 	// the collider for this object
 	Collider col;
@@ -367,13 +374,31 @@ typedef struct{
 
 /**
  * to be used like a pseudo constructor for a new Collider
+ *
+ * a collider can test various points around an objects center, and reposition the object appropriately if it colides with the land.
+ *
+ * @param type the type of collider, which can be COL_UP, COL_DOWN, COL_LEFT, COL_RIGHT, COL_UP, COL_LR, or COL_UDLR
+ * @param up the up amount to check, if its COL_UP, COL_UD, or COL_UDLR
+ * @param down the down amount to check, if its COL_DOWN, COL_UD, or COL_UDLR
+ * @param left the left amount to check, if its COL_LEFT, COL_LR, or COL_UDLR
+ * @param right the right amount to check, if its COL_RIGHT, COL_LR, or COL_UDLR
+ * @return a new Collider struct preinitialized with these params.
 */
-extern Collider new_Collider(char, char, char, char, char);
+extern Collider new_Collider(unsigned char type, char up, char down, char left, char right);
 
 /**
  * to be used like a pseudo constructor for a new PhysObj
+ * 
+ * @param *x pointer to the objects x value
+ * @param *y pointer to the objects y value
+ * @param *xVelo pointer to the objects x velocity
+ * @param *yVelo pointer to the objects y velocity
+ * @param bounciness the percent amount (0.0 - 1.0) the objets velocity should be after colliding. Note: this sets both bouncinessX and bouncinessY. They can manually be set later if they need to be different.
+ * @param smoothness the percent amount (0.0 - 1.0) the object should randomly change x directly when bouncing with the ground. 1.0 = always the same x direction. 0.0 = random direction.
+ * @param settled the value that should be bit-masked if the object is considered settelted (e.g. hasn't moved in multiple frames)
+ * @param c the objects Collider struct to test collisions with
 */
-extern PhysObj new_PhysObj(short*, short*, char*, char*, float, float, char, void*, void*, Collider);
+extern PhysObj new_PhysObj(short *x, short *y, char *xVelo, char *yVelo, float bounciness, float smoothness, char objIndex, unsigned short *settled, Collider c);
 
 /**
  * updates a physics object, including map collision
@@ -410,7 +435,9 @@ extern short Explosion_y[8];
 extern char Explosion_time[8];
 extern char Explosion_size[8];
 extern char Explosion_power[8];
-extern int Explosion_firstFrame;
+extern unsigned short Explosion_active;
+extern unsigned short Explosion_firstFrame;
+
 
 // explosion function prototypes
 
@@ -447,14 +474,14 @@ extern short Worm_x[MAX_WORMS];
 extern short Worm_y[MAX_WORMS];
 extern char Worm_xVelo[MAX_WORMS];
 extern char Worm_yVelo[MAX_WORMS];
-extern unsigned long Worm_dir;
+extern unsigned short Worm_dir;
 extern char Worm_health[MAX_WORMS];
-extern unsigned long Worm_isDead;
-extern unsigned long Worm_active;
+extern unsigned short Worm_isDead;
+extern unsigned short Worm_active;
 extern char Worm_mode[MAX_WORMS];
 extern char Worm_currentWorm;
-extern unsigned long Worm_unstable;
-extern unsigned long Worm_onGround;
+extern unsigned short Worm_settled;
+extern unsigned short Worm_onGround;
 
 // worm function prototypes
 
@@ -482,7 +509,8 @@ extern void Worm_update();
 extern short OilDrum_x[MAX_OILDRUMS];
 extern short OilDrum_y[MAX_OILDRUMS];
 extern char OilDrum_health[MAX_OILDRUMS];
-extern int OilDrum_active;
+extern unsigned short OilDrum_active;
+extern unsigned short OilDrum_settled;
 
 // OilDrum function prototypes
 
@@ -507,7 +535,7 @@ extern void OilDrums_update();
 
 // mine defines
 #define mineTriggerDistance 10
-#define MAX_MINES 6
+#define MAX_MINES 10
 
 // mine globals
 extern short Mine_x[MAX_MINES];
@@ -515,7 +543,10 @@ extern short Mine_y[MAX_MINES];
 extern char Mine_xVelo[MAX_MINES];
 extern char Mine_yVelo[MAX_MINES];
 extern char Mine_fuse[MAX_MINES];
-extern int Mine_active;
+extern unsigned short Mine_active;
+extern unsigned short Mine_settled;
+extern char OilDrum_xVelo[MAX_OILDRUMS];
+extern char OilDrum_yVelo[MAX_OILDRUMS];
 
 // mine function prototypes
 
@@ -549,7 +580,8 @@ extern short Crate_x[MAX_CRATES];
 extern short Crate_y[MAX_CRATES];
 extern char Crate_health[MAX_CRATES];
 extern char Crate_type[MAX_CRATES];
-extern int Crate_active;
+extern unsigned short Crate_active;
+extern unsigned short Crate_settled;
 
 // crate function prototypes
 

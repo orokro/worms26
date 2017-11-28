@@ -65,7 +65,7 @@ void drawWorms()
 	short i;
 	for(i=0; i<MAX_WORMS; i++)
 	{
-		if(Worm_active & (long)1<<(i))
+		if(Worm_active & (unsigned short)1<<(i))
 		{
 			screenX=Worm_x[i];
 			screenY=Worm_y[i];
@@ -74,7 +74,7 @@ void drawWorms()
 				// get the postion and direction the worm is facing..
 				short x = screenX-8;
 				short y = screenY-8;
-				char facing = (Worm_dir & (unsigned long)1<<(i))>0;
+				char facing = (Worm_dir & (unsigned short)1<<(i))>0;
 
 				// use the worms fill to erase the background on it's opposite color plane, acting as a mask
 				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Fill : spr_WormRight_Fill), ((i>=8) ? GrayDBufGetHiddenPlane(LIGHT_PLANE) : GrayDBufGetHiddenPlane(DARK_PLANE)));
@@ -113,7 +113,7 @@ void drawMines()
 	short i;
 	for(i=0; i<MAX_MINES; i++)
 	{
-		if(Mine_active & (int)1<<(i))
+		if(Mine_active & (unsigned short)1<<(i))
 		{
 			screenX=Mine_x[i];
 			screenY=Mine_y[i];
@@ -145,15 +145,27 @@ void drawOilDrums()
 	short i;
 	for(i=0; i<MAX_OILDRUMS; i++)
 	{
-		if(OilDrum_active & (int)1<<(i))
+		if(OilDrum_active & (unsigned short)1<<(i))
 		{
 			screenX=OilDrum_x[i];
 			screenY=OilDrum_y[i];
 			if(worldToScreen(&screenX, &screenY))
 			{
 				// draw the oil drums fill and outline
-				ClipSprite16_OR_R(screenX-4, screenY-10, 11, spr_Oil_Dark, GrayDBufGetHiddenPlane(DARK_PLANE));
-				ClipSprite16_OR_R(screenX-4, screenY-10, 11, spr_Oil_Light, GrayDBufGetHiddenPlane(LIGHT_PLANE));
+				ClipSprite16_OR_R(screenX-4, screenY-5, 11, spr_Oil_Dark, GrayDBufGetHiddenPlane(DARK_PLANE));
+				ClipSprite16_OR_R(screenX-4, screenY-5, 11, spr_Oil_Light, GrayDBufGetHiddenPlane(LIGHT_PLANE));
+				
+				
+				// if the oil drum is "settled" draw an arrow above it, for debug
+				if(OilDrum_settled & (unsigned short)1<<(i))
+					DrawChar(screenX, screenY-10, (char)20, A_NORMAL);
+				
+				/*
+				char txt[4];
+				sprintf(txt, "%d", (short)OilDrum_yVelo[i]);
+				DrawStr(screenX-4, screenY-20, txt, A_NORMAL);
+				*/
+				
 			}// end if on screen
 		}// end if active
 	}// next i
@@ -172,7 +184,7 @@ void drawCrates()
 	short i;
 	for(i=0; i<MAX_CRATES; i++)
 	{
-		if(Crate_active & (int)1<<(i))
+		if(Crate_active & (unsigned short)1<<(i))
 		{
 			screenX=Crate_x[i];
 			screenY=Crate_y[i];
@@ -451,8 +463,8 @@ void Draw_renderGame()
 	sprintf(timeStr, "time: %d, %d, %d", (short)(Game_graceTimer/TIME_MULTIPLIER), (short)(Game_timer/TIME_MULTIPLIER), (short)(Game_retreatTimer));
 	DrawStr(60,1,timeStr, A_XOR);	
 	
-	unsigned long currentMask = 1;
-	currentMask = (unsigned long)((unsigned long)currentMask<<(Worm_currentWorm));
+	unsigned short currentMask = 1;
+	currentMask = (unsigned short)((unsigned short)currentMask<<(Worm_currentWorm));
 	DrawStr(80,10, (((Worm_onGround & currentMask)>0) ? "Grounded" : "Air"), A_XOR);
 	
 	// draw the current team on the screen	

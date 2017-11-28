@@ -30,6 +30,9 @@ char Explosion_size[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 // the damage power of the explosion
 char Explosion_power[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
+// if any explosion is active
+unsigned short Explosion_active = 0;
+
 /*
 	this int will store a bitmask for the first-frame of an explosion
 	when an explosion is created, it will set it's corresponding bit to 1
@@ -40,7 +43,8 @@ char Explosion_power[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	
 	explosions will only cause damage on the first frame
 */
-int Explosion_firstFrame = 0;
+unsigned short Explosion_firstFrame = 0;
+
 
 
 
@@ -59,7 +63,7 @@ void updateExplosion(short index)
 	Explosion_time[index]--;
 	
 	// no matter what, it's not a first-frame any more
-	Explosion_firstFrame &= ~((int)1<<(index));
+	Explosion_firstFrame &= ~((unsigned short)1<<(index));
 	
 	// calculate it's current radius
 	short radius = Explosion_size[index] - Explosion_time[index];
@@ -69,7 +73,10 @@ void updateExplosion(short index)
 	
 	// prevent warnings for now
 	radius = radius;
-
+	
+	// if the explosions time is up, set it inactive
+	if(Explosion_time[index]<0)
+		Explosion_active &= ~((unsigned short)1<<(index));
 }
 
 
@@ -140,7 +147,10 @@ void Explosion_spawn(short x, short y, char size, char power, char hasFire)
 	Explosion_power[expIndex] = power;
 	
 	// set first-frame bit for this explosion to 1 (TRUE)
-	Explosion_firstFrame |= (int)1<<(expIndex);
+	Explosion_firstFrame |= (unsigned short)1<<(expIndex);
+	
+	// set this explosion active
+	Explosion_active |= (unsigned short)1<<(expIndex);
 	
 	// if this explosion has fire, let's spawn it now
 	if(hasFire)
