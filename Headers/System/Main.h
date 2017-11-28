@@ -319,6 +319,22 @@ extern void Map_makeMap();
 #define COL_DLR 0b00001110
 #define COL_UDLR 0b00001111
 
+/*
+	This one is special
+	
+	In some cases, both the LEFT and RIGHT collider can hit in a frame.
+	
+	If this is the case, we will move the object UP until neither left or right are hitting.
+	But this means, most likely, the DOWN collider will test nothing, allowing the object
+	to fall, which will once again trigger it's LEFT and RIGHT colliders.
+	
+	When this happens, the object will NEVER come to be settled.
+	
+	So, whenever we move the object by colliding both LEFT and RIGHT, we will return this special
+	code, which the physics system can use to remove its velocity and set it rested. Hackish, but works.
+*/
+#define COL_BOTHLR 0b10000000
+
 // I can't help but abstract this... we'll see how it goes..
 // this is a Collider struct for remembering the specific collider properties of an object
 typedef struct{
@@ -410,6 +426,16 @@ extern PhysObj new_PhysObj(short *x, short *y, char *xVelo, char *yVelo, float b
 extern char Physics_apply(PhysObj*);
 
 /**
+ * Sets a physics objects velocity
+ *
+ * @param *obj the physics object to set velocity
+ * @param x the new x velocity
+ * @param y the new y velocity
+ * @param additive if set to TRUE the X/Y are added to the current velocity instead of replacing it.
+*/
+extern void Physics_setVelocity(PhysObj *obj, char x, char y, char additive);
+
+/**
  * This method takes a point in world space, and a direction and tests for collision.
  *
  * If the point collides with the map, it will calculate the first availble point in the opposite direction.
@@ -423,7 +449,7 @@ extern char Physics_apply(PhysObj*);
 */
 extern short Collide_test(short, short, char);
    
-   
+
    
    
 /* ======================================================================================================================================

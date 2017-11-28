@@ -376,7 +376,7 @@ static void gameTimers()
 void gameUpdates()
 {
 	// decrease game timers
-	gameTimers();
+	//gameTimers();
 	//return;
 	// gravity and physics for worms!
 	Worm_update();
@@ -393,7 +393,7 @@ void gameUpdates()
 		
 	if(Weapon_active>0)
 		Weapons_update();
-	
+		
 	// update explosions
 	// NOTE: this comes last because after an explosion has had its first frame
 	// it disables that bit... gotta make sure everyone else on this frame has a

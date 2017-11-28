@@ -63,8 +63,8 @@ unsigned char Collider_apply(Collider *col, short *x, short *y)
 	if(col->type & COL_UD)
 	{
 		// perform up and down tests if need be:
-		char movedUp = (col->type & COL_UP) ? Collide_test(*x, *y-col->u, COL_UP) : 0;
-		char movedDown = (col->type & COL_DOWN) ? Collide_test(*x, *y+col->d, COL_DOWN) : 0;
+		char movedUp = (col->type & COL_UP) ? (Collide_test(*x, (*y)-col->u, COL_UP)) : 0;
+		char movedDown = (col->type & COL_DOWN) ? (Collide_test(*x, (*y)+col->d, COL_DOWN)) : 0;
 		
 		// testing down takes precedence, so if we moved down at all, just apply that
 		if(movedDown!=0)
@@ -83,8 +83,8 @@ unsigned char Collider_apply(Collider *col, short *x, short *y)
 	if(col->type & COL_LR)
 	{
 		// perform left and right tests if need be:
-		char movedLeft = (col->type & COL_LEFT) ? Collide_test(*x-col->l, *y, COL_LEFT) : 0;
-		char movedRight = (col->type & COL_RIGHT) ? Collide_test(*x+col->r, *y, COL_RIGHT) : 0;
+		char movedLeft = (col->type & COL_LEFT) ? (Collide_test((*x)-col->l, *y, COL_LEFT)) : 0;
+		char movedRight = (col->type & COL_RIGHT) ? (Collide_test((*x)+col->r, *y, COL_RIGHT)) : 0;
 		
 		/*
 			unlike up and down colliders, neither can take prescendence.
@@ -119,10 +119,12 @@ unsigned char Collider_apply(Collider *col, short *x, short *y)
 			}
 			
 			// we will consider colliding both LEFT and RIGHT the same as colliding with DOWN (the ground)
-			col->collisions |= COL_DOWN;
+			// special case: both left and right hit. We should stop movement on this object and settle it ASAP
+			col->collisions |= COL_BOTHLR;
 			
 		// other wise we can just move the object left or right by the some of movedLeft and movedRight
-		}else{
+		}else if(movedLeft || movedRight)
+		{
 			
 			/*
 				so, we can end up here in 3 scenarios:
@@ -171,15 +173,23 @@ char Physics_apply(PhysObj *obj)
 	// calculate if the object moved at all, either from velo or the collider:
 	char moved = (*obj->x!=initX || *obj->y!=initY);
 	
+	// if both our left and right colliders hit, lets just stop the object in its tracks
+	if(hits & COL_BOTHLR)
+	{
+		*obj->xVelo=0;
+		*obj->yVelo=0;
+		*obj->settled |= ((unsigned short)1<<(obj->index));
+		return 0;
+		
 	// if hit nothing, nothing to do here:
-	if(hits!=0)
+	}else if(hits!=0)
 	{
 		// for left and right hits
 		if(hits & COL_LR)
 		{
 			// shrink xVelo based on bounciness
 			// and make sure its positive or negative based on which side hit
-			*obj->xVelo = abs(*obj->xVelo) * obj->bouncinessX * ((hits & COL_LEFT) ? 1 : -1);
+			*obj->xVelo = (abs(*obj->xVelo) * ((hits & COL_LEFT) ? 1 : -1))  * obj->bouncinessX;
 		}
 		
 		// for up and down hits
@@ -187,8 +197,8 @@ char Physics_apply(PhysObj *obj)
 		{
 			// shrink yVelo based on bounciness
 			// and make sure its positive or negative based on which side hit
-			*obj->yVelo = abs(*obj->yVelo) * obj->bouncinessY * ((hits & COL_UP) ? 1 : -1);
-			
+			*obj->yVelo = (abs(*obj->yVelo) * ((hits & COL_UP) ? 1 : -1))  * obj->bouncinessY;
+
 			/*
 				smoothness only applies to ground objects.
 				based on it's smoothness pick a random number and decided to flip the xVelocity or not
@@ -198,6 +208,23 @@ char Physics_apply(PhysObj *obj)
 			if(random(100) > obj->smoothness)
 				*obj->xVelo *= -1;
 		}
+		
+		// if it only hit LR and not UD, we should shrink the y bounciness due to friction
+		if((hits & COL_LR) && !(hits & COL_UD))
+			*obj->yVelo = (*obj->yVelo * obj->bouncinessY);
+			
+		// like wise for UD and not LR
+		if((hits & COL_UD) && !(hits & COL_LR))
+			*obj->xVelo = (*obj->xVelo * obj->bouncinessX);
+		
+		
+		// if either of the velocities are 1, we will make them 0, since rounding errors can sometimes
+		// force objects to never "settle"
+		if(abs(*obj->xVelo) <= 1)
+			*obj->xVelo = 0;
+		if(abs(*obj->yVelo) <= 1)
+			*obj->yVelo = 0;
+		
 		
 	}// end if hit something
 	
@@ -211,11 +238,36 @@ char Physics_apply(PhysObj *obj)
 	{
 		obj->staticFrames++;
 		if(obj->staticFrames>3)
+		{
+			// reset counter and set object settled
+			obj->staticFrames = 0;
 			*obj->settled |= (unsigned short)1<<(obj->index);
+		}
+			
 	}
 	
 	// return weather or not the object was moved in this frame
 	return moved;
+}
+
+// sets or adds velocity to an object
+void Physics_setVelocity(PhysObj *obj, char x, char y, char additive)
+{
+
+	// add or set the velocity
+	if(additive)
+	{
+		*obj->xVelo += x;
+		*obj->yVelo += y;
+	}else
+	{
+		*obj->xVelo = x;
+		*obj->yVelo = y;
+	}
+	
+	// any object that had velocity added is definately "not" settled
+	obj->staticFrames = 0;
+	*obj->settled &= ~((unsigned short)1<<(obj->index));
 }
 
 // tests for a collision and moves the opposite direction until a free pixel is found, if it did collide

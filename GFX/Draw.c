@@ -120,8 +120,8 @@ void drawMines()
 			if(worldToScreen(&screenX, &screenY))
 			{				
 				// draw the mines fill and outline
-				ClipSprite8_OR_R(screenX-3, screenY-3, 4, spr_Mine_Dark, GrayDBufGetHiddenPlane(DARK_PLANE));
-				ClipSprite8_OR_R(screenX-3, screenY-3, 4, spr_Mine_Light, GrayDBufGetHiddenPlane(LIGHT_PLANE));
+				ClipSprite8_OR_R(screenX-3, screenY-1, 4, spr_Mine_Dark, GrayDBufGetHiddenPlane(DARK_PLANE));
+				ClipSprite8_OR_R(screenX-3, screenY-1, 4, spr_Mine_Light, GrayDBufGetHiddenPlane(LIGHT_PLANE));
 				
 				// if the mine has an active fuse, draw that too
 				if(Mine_fuse[i]>0)

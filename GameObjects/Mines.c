@@ -69,8 +69,8 @@ void spawnMine(char index)
 	Mine_active |= (unsigned short)1<<(index);
 	
 	// make a new collider and physics object for this mine
-	Collider col = new_Collider(COL_DLR, 0, 2, 3, 3);
-	Mine_physObj[(short)index] = new_PhysObj(&Mine_x[(short)index], &Mine_y[(short)index], &Mine_xVelo[(short)index], &Mine_yVelo[(short)index], 0.5f, 1.0f, (char)index, &Mine_settled, col);
+	Collider col = new_Collider(COL_UDLR, 2, 2, 3, 3);
+	Mine_physObj[(short)index] = new_PhysObj(&Mine_x[(short)index], &Mine_y[(short)index], &Mine_xVelo[(short)index], &Mine_yVelo[(short)index], 0.65f, 1.0f, (char)index, &Mine_settled, col);
 }
 
 
@@ -237,6 +237,27 @@ void Mines_update()
 	if(proxmityCheckTimer>5)
 		proxmityCheckTimer=0;
 		
+	// for debugging, we'll allow the user to switch between mines, and add velocity to
+	// test physics
+	static short testMine = 0;
+	if(Keys_keyDown(key1))
+	{
+		testMine++;
+		if(testMine>5)
+			testMine=0;
+		Camera_focusOn(&Mine_x[(short)testMine], &Mine_y[(short)testMine]);
+	}
+	if(Keys_keyDown(key2))
+	{
+		//Mine_y[testMine]-=6;
+		Physics_setVelocity(&Mine_physObj[testMine], -4, -7, FALSE);
+	}
+	if(Keys_keyDown(key3))
+	{
+		//Mine_y[testMine]-=6;
+		Physics_setVelocity(&Mine_physObj[testMine], 4, -7, FALSE);
+	}
+	
 	// if any of the active Crates have less than 0 health, create an explosion
 	// and set it inactive for the rest of the game
 	short i=0;
