@@ -129,6 +129,17 @@ void drawMines()
 					sprintf(fuseStr, "%d", (Mine_fuse[i]/TIME_MULTIPLIER));
 					DrawStr(screenX-4, screenY-16, fuseStr, A_NORMAL);
 				}// end if fuse
+				
+				// if the oil drum is "settled" draw an arrow above it, for debug
+				//if(Mine_settled & (unsigned short)1<<(i))
+				char foo = (Mine_settled & (unsigned short)1<<(i));
+					DrawChar(screenX, screenY-8, (foo ? (char)20 : 'X'), A_NORMAL);
+				/*
+				char txt[4];
+				sprintf(txt, "%d", (short)Mine_yVelo[i]);
+				DrawStr(screenX-3, screenY-8, txt, A_NORMAL);
+				*/
+				
 			}// end if on screen
 		}// end if active
 	}// next i

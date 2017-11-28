@@ -316,6 +316,7 @@ extern void Map_makeMap();
 #define COL_RIGHT 0b00001000
 #define COL_UD 0b00000011
 #define COL_LR 0b00001100
+#define COL_DLR 0b00001110
 #define COL_UDLR 0b00001111
 
 // I can't help but abstract this... we'll see how it goes..

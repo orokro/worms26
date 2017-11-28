@@ -108,7 +108,7 @@ void spawnDrum(short index)
 	// so let's just enable it:
 	OilDrum_active |= (unsigned short)1<<(index);
 	
-	// make a new collider and physics object for this worm
+	// make a new collider and physics object for this oil drum
 	Collider col = new_Collider(COL_DOWN, 0, 5, 0, 0);
 	OilDrum_physObj[index] = new_PhysObj(&OilDrum_x[index], &OilDrum_y[index], &OilDrum_xVelo[index], &OilDrum_yVelo[index], 0.0f, 1.0f, (char)index, &OilDrum_settled, col);
 	

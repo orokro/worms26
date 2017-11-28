@@ -44,7 +44,7 @@ unsigned short Mine_settled=0;
 
 // local vars
 char proxmityCheckTimer = 0;
-
+PhysObj Mine_physObj[MAX_MINES];
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -67,6 +67,10 @@ void spawnMine(char index)
 	
 	// make this mine active:
 	Mine_active |= (unsigned short)1<<(index);
+	
+	// make a new collider and physics object for this mine
+	Collider col = new_Collider(COL_DLR, 0, 2, 3, 3);
+	Mine_physObj[(short)index] = new_PhysObj(&Mine_x[(short)index], &Mine_y[(short)index], &Mine_xVelo[(short)index], &Mine_yVelo[(short)index], 0.5f, 1.0f, (char)index, &Mine_settled, col);
 }
 
 
@@ -96,6 +100,16 @@ void updateMine(short index)
 		}// end if 
 		
 	}//end if active fuse
+	
+	// if the Mine is considered "settled" no need for physics
+	if(!(Mine_settled & (unsigned short)1<<(index)))
+	{
+		// add gravity to mine
+		Mine_yVelo[index]++;
+		
+		// do physics and collision for OilDrum
+		Physics_apply(&Mine_physObj[index]);
+	}
 }
 
 
@@ -233,8 +247,8 @@ void Mines_update()
 		{
 			// okay we will only check proxity every 5 frames to save CPU since proxmity check is
 			// epensive
-			if(proxmityCheckTimer==0)
-				checkProximity(i);
+			//if(proxmityCheckTimer==0)
+			//	checkProximity(i);
 			
 			// unfortuntely, since blast-detomation reqiores first-frame access, we gotta check
 			// explosions every frame

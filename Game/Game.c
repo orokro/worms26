@@ -388,8 +388,8 @@ void gameUpdates()
 	if(Crate_active>0)
 		Crates_update();
 	
-	//if(Mine_active>0)
-	//	Mines_update();
+	if(Mine_active>0)
+		Mines_update();
 		
 	if(Weapon_active>0)
 		Weapons_update();
