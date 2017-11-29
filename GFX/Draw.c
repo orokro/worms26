@@ -83,7 +83,10 @@ void drawWorms()
 				// draw the worms fill and outline
 				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Fill : spr_WormRight_Fill), ((i>=8) ? GrayDBufGetHiddenPlane(DARK_PLANE) : GrayDBufGetHiddenPlane(LIGHT_PLANE)));
 				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), ((i>=8) ? GrayDBufGetHiddenPlane(LIGHT_PLANE) : GrayDBufGetHiddenPlane(DARK_PLANE)));
-
+				
+				//char foo = (char)((Worm_settled & ((unsigned short)1<<(i)))>0);
+				//DrawChar(x, y-15, (foo ? (char)20 : 'X'), A_NORMAL);
+				
 			}// end if on screen
 		}// end if active
 	}// next i
@@ -131,9 +134,9 @@ void drawMines()
 				}// end if fuse
 				
 				// if the oil drum is "settled" draw an arrow above it, for debug
-				//if(Mine_settled & (unsigned short)1<<(i))
-				char foo = (Mine_settled & (unsigned short)1<<(i));
-					DrawChar(screenX, screenY-8, (foo ? (char)20 : 'X'), A_NORMAL);
+				//char foo = (Mine_settled & (unsigned short)1<<(i));
+				//DrawChar(screenX, screenY-8, (foo ? (char)20 : 'X'), A_NORMAL);
+				
 				/*
 				char txt[4];
 				sprintf(txt, "%d", (short)Mine_yVelo[i]);
@@ -168,8 +171,8 @@ void drawOilDrums()
 				
 				
 				// if the oil drum is "settled" draw an arrow above it, for debug
-				if(OilDrum_settled & (unsigned short)1<<(i))
-					DrawChar(screenX, screenY-10, (char)20, A_NORMAL);
+				//if(OilDrum_settled & (unsigned short)1<<(i))
+				//	DrawChar(screenX, screenY-10, (char)20, A_NORMAL);
 				
 				/*
 				char txt[4];
@@ -474,9 +477,9 @@ void Draw_renderGame()
 	sprintf(timeStr, "time: %d, %d, %d", (short)(Game_graceTimer/TIME_MULTIPLIER), (short)(Game_timer/TIME_MULTIPLIER), (short)(Game_retreatTimer));
 	DrawStr(60,1,timeStr, A_XOR);	
 	
-	unsigned short currentMask = 1;
-	currentMask = (unsigned short)((unsigned short)currentMask<<(Worm_currentWorm));
-	DrawStr(80,10, (((Worm_onGround & currentMask)>0) ? "Grounded" : "Air"), A_XOR);
+	//unsigned short currentMask = 1;
+	//currentMask = (unsigned short)((unsigned short)currentMask<<(Worm_currentWorm));
+	//DrawStr(80,10, (((Worm_onGround & currentMask)>0) ? "Grounded" : "Air"), A_XOR);
 	
 	// draw the current team on the screen	
 	//DrawStr(0,40, (Game_currentTeam ? "Team: Black" : "Team: White") , A_XOR);	

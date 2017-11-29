@@ -44,15 +44,13 @@ void wormWalk()
 	// if jump was pressed, jump and exit
 	if(Keys_keyDown(keyJump))
 	{
-		Worm_xVelo[(short)Worm_currentWorm] = (Worm_dir & wormMask) ? -1 : 1;
-		Worm_yVelo[(short)Worm_currentWorm] = -4;
+		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], ((Worm_dir & wormMask) ? -2 : 2), -5, FALSE);
 		return;
 		
 	// backflip
 	}else if(Keys_keyDown(keyBackflip))
 	{
-		Worm_xVelo[(short)Worm_currentWorm] = (Worm_dir & wormMask) ? 1 : -1;
-		Worm_yVelo[(short)Worm_currentWorm] = -6;
+		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], ((Worm_dir & wormMask) ? -1 : 1), -6, FALSE);
 		return;
 		
 	// test for directions left/right
@@ -85,6 +83,11 @@ void wormWalk()
 		 // save the worms new position:
 		 *wX += moveDir;
 		 *wY = (short)((*wY)-MAX_WORM_SLOPE+y);
+		 
+		 // unsettle worm
+		 Worm_physObj[(short)Worm_currentWorm].staticFrames=0;
+		 Worm_settled &= ~wormMask;
+		 
 	}
 }
 
@@ -100,7 +103,7 @@ void CharacterController_update()
 	wY = &Worm_y[(short)Worm_currentWorm];
 	
 	// if the worm is grounded, we should test for walking:
-	if(Worm_onGround | wormMask)
+	if(Worm_onGround & wormMask)
 		wormWalk();
 		
 		// TO-DO: implement parachute, bunjee, and ninja rope

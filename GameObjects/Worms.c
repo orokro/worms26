@@ -85,103 +85,15 @@ void spawnWorm(short index)
 
 	// make a new collider and physics object for this worm
 	Collider col = new_Collider(COL_UDLR, -4, 6, -2, 2);
-	Worm_physObj[index] = new_PhysObj(&Worm_x[index], &Worm_y[index], &Worm_xVelo[index], &Worm_yVelo[index], 0.2f, 1.0f, (char)index, &Worm_settled, col);
+	Worm_physObj[index] = new_PhysObj(&Worm_x[index], &Worm_y[index], &Worm_xVelo[index], &Worm_yVelo[index], 0.4f, 1.0f, (char)index, &Worm_settled, col);
+	
+	// allow worms to bounce of walls, but not land
+	Worm_physObj[index].bouncinessY = 0.0f;
 	
 	// random direction
 	if(random(2)==0)
 		Worm_dir |= mask;
 }
-
-
-
-/**
- * Checks if the worm collided with the map, and puts it back in an OK place if it did
- *
- * @param index the index of the worm to collision test
-*/
-void wormCollision(short index)
-{
-	unsigned short mask = 1;
-	mask = (unsigned short)((unsigned short)mask<<(index));
-		
-	/*
-		How this works:
-		
-		The worms origin point is it's the middle of it's sprite, not it's bottom.
-		
-		We will test for horizontal collisions first, by testing offsets left and right
-		of the worms origin. If either collide, we will push the worm in the opposite
-		direction to the first open pixel.
-		
-		Then we will test the top and bottom, and push the worm up or down in a similar fashion.
-		
-		Two problem with this is:
-		
-		If the worm falls into a crack that is more narrow than its width, the horizontal
-		tests might pass, but it will still fall.
-		
-		On future frames, both the left and right colliders will trigger and the worm
-		will be pushed into the map on the left side, since the right collider will happen
-		after.
-		
-		Thus, the worm should not be allowed to fall if both it's left and right fired
-		on this turn.
-		
-		Being flug upwards through a narrow crack is such an extreme edge case I wont
-		handle it.
-		
-		Now technically, there should be no way for the map to create such narrow cracks.
-		And damaging the map, tunneling, or drilling should never make such a narrow crack.
-		
-		As long as the map generator makes safe maps, this edge case does not need to be tested.
-	*/
-	
-	// to prevent feed back loops, we always want to test on the worms ORIGINAL position
-	short wormX = Worm_x[index];
-	short wormY = Worm_y[index];
-	
-	// test horizontal positions at once. If both collide, the total would the same
-	// delta needed to move the worm anyway. Also, both should never collide if our
-	// maps are generated correctly.
-	short col = Collide_test(wormX-2, wormY, COL_LEFT) + Collide_test(wormX+2, wormY, COL_RIGHT);
-	if(col)
-	{
-		Worm_x[index] += col;
-		
-		// the worm hit a wall horizontally. Flip its horizontal velocity and half it
-		Worm_xVelo[index] *= -0.5f;
-
-		if(Worm_dir & mask)
-			Worm_dir &= ~mask;
-		else
-			Worm_dir |= mask;
-	}
-	
-	// In a similar fashion we can check both top and bottom at the same time
-	col = Collide_test(wormX, wormY-4, COL_UP) + Collide_test(wormX, wormY+6, COL_DOWN);
-	if(col)
-	{
-		Worm_y[index] += col;
-		
-		// vertical collisions will kill all velocity
-		Worm_xVelo[index]=0;
-		Worm_yVelo[index]=0;
-		
-		/*
-		  if the collision value was negative, we hit the ground at some point.
-		  this, we are grounded. (if we hit the ceiling, the would have needed to move DOWN
-			that is, a positive value.
-			
-			in theory, both the top and bottom collisions could happen and result in a negative,
-			but we will ignore that edge case and try to never generate maps that would let that happen.
-		*/
-		if(col<0)
-			Worm_onGround |= mask;
-		else
-			Worm_onGround &= ~mask;
-	}
-}
-
 
 
 
@@ -215,29 +127,32 @@ void Worm_update()
 		// only update worms in the game
 		if((Worm_active & wormMask) > 0)
 		{
-			// add gravity to the worm
-			Worm_yVelo[i]++;
-			
-			// if the worm is dead, it's gravestone can only have vertical velocity, no X
-			if((Worm_isDead & wormMask) == 0)
-				Worm_x[i] += Worm_xVelo[i];
-		
-			// add y velocity component
-			Worm_y[i] += Worm_yVelo[i];
+			// if the Mine is considered "settled" no need for physics
+			if(!(Worm_settled & wormMask))
+			{
+				// add gravity to the worm
+				Worm_yVelo[i]++;
 				
+				// if the worm is dead, it's gravestone can only have vertical velocity, no X
+				if(Worm_isDead & wormMask)
+					Worm_xVelo[i]=0;
+
+				// do physics and collision for worm
+				Physics_apply(&Worm_physObj[i]);
+				
+				// if we collided with the ground on the last frame, assume the worm is grounded.
+				// (it should collide with the ground ever frame its grounded, due to gravity.
+				// if the worm was settled on this frame, we won't get here on the next frame
+				// so we can just mark it as settled and it will stay that way till moved again
+				if(Worm_physObj[i].col.collisions & COL_DOWN || (Worm_settled & wormMask))
+					Worm_onGround |= wormMask;
+				else
+					Worm_onGround &= ~wormMask;
+			}
+			
 			// if the worm goes below 200 pixels, its drown:
 			if(Worm_y[i]>200)
 				Worm_isDead |= wormMask;
-				
-			// handle worm collision from it's new place:
-			wormCollision(i);
-			
-			// if the worm has no velocity, it either hit the ground, or isn't moving
-			// we can consider it stable:
-			if(Worm_xVelo[i]==0 && Worm_yVelo==0)
-				Worm_settled |= wormMask;
-			else
-				Worm_settled &= ~wormMask;
 				
 		}// end if active worm
 	}// next i
