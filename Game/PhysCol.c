@@ -228,22 +228,39 @@ char Physics_apply(PhysObj *obj)
 		
 	}// end if hit something
 	
-	// if this object moved at all, it can't be considered "setteled"
-	if(moved)
+	/*
+		So, when objects move, sometimes their colliders can put them in a state
+		where they move every frame no matter once, thus never becomming settled.
+		
+		Because they aren't really in-motion at this point, their velocities should
+		be very low, or 0.
+		
+		So basically, we want to count static frames only when the object was moved
+		with a velocity that's big enough.
+		
+		If the velocity is small, it doesn't matter if it was moved (since it will
+		sometimes move on every frame).
+		
+		If the velocity is small for 6 frames in a row, we will consider the object
+		to be settled. If the object truely was in motion, it's velocity would
+		never stay less than 2 for more than 6 frames, just due to gravity alone.
+	*/
+	if((abs(*obj->xVelo)>2 || abs(*obj->yVelo)>2) && moved)
 	{
+		// reset counter and set object settled
+		obj->staticFrames = 0;
 		*obj->settled &= ~((unsigned short)1<<(obj->index));
 	
-	// otherwise, increase our frame count of static frames, and if its over 3, consider it settled
+	// otherwise, increase our frame count of static frames, and if its over 6, consider it settled
 	}else
 	{
 		obj->staticFrames++;
-		if(obj->staticFrames>3)
+		if(obj->staticFrames>6)
 		{
 			// reset counter and set object settled
 			obj->staticFrames = 0;
 			*obj->settled |= (unsigned short)1<<(obj->index);
 		}
-			
 	}
 	
 	// return weather or not the object was moved in this frame
