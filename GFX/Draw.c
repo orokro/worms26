@@ -405,6 +405,16 @@ void drawSelectArrow()
 
 
 
+void drawMountains()
+{
+	short i;
+	short offsetX = (camX-160)/5;
+	short offsetY = camY/5;
+	for(i=0; i<5; i++)
+		ClipSprite32_OR_R(i*32-offsetX, 60-offsetY, 38, spr_Mountain[i], GrayDBufGetHiddenPlane(LIGHT_PLANE));
+
+}
+
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -436,29 +446,24 @@ void Draw_renderGame()
 	GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
 	ClrScr();
 	
+	// draw background mountains
+	drawMountains();
+	
 	// for some reason I can't put this in a method... the identical code copied from the method below
 	drawMap();	
 	
-	// draw on both planes for now
-	short z=0;
-	for(z=0; z<2; z++)
-	{
-		//GrayDBufSetHiddenAMSPlane((z%2==0) ? DARK_PLANE : LIGHT_PLANE);
-		
-		// draw oil drums first, as everything else should overlap them
-		drawOilDrums();
-		
-		// draw crates ontop of oil drums...
-		drawCrates();
-		
-		// draw our wormy bros
-		drawWorms();
-		
-		// mines are important, so draw them on top of everything else
-		drawMines();
+	// draw oil drums first, as everything else should overlap them
+	drawOilDrums();
 	
-	}
+	// draw crates ontop of oil drums...
+	drawCrates();
 	
+	// draw our wormy bros
+	drawWorms();
+	
+	// mines are important, so draw them on top of everything else
+	drawMines();
+
 	// if the game mode is worm select, draw the selection arrow
 	if(Game_mode==gameMode_WormSelect)
 		drawSelectArrow();
