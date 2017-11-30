@@ -84,6 +84,10 @@ void drawWorms()
 				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Fill : spr_WormRight_Fill), ((i>=8) ? GrayDBufGetHiddenPlane(DARK_PLANE) : GrayDBufGetHiddenPlane(LIGHT_PLANE)));
 				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), ((i>=8) ? GrayDBufGetHiddenPlane(LIGHT_PLANE) : GrayDBufGetHiddenPlane(DARK_PLANE)));
 				
+				// draw health above worm
+				ClipSprite16_OR_R(x, y-8, 7, Worm_HealthSprite[i], GrayDBufGetHiddenPlane(LIGHT_PLANE));
+				ClipSprite16_OR_R(x, y-8, 7, Worm_HealthSprite[i], GrayDBufGetHiddenPlane(DARK_PLANE));
+				
 				//char foo = (char)((Worm_settled & ((unsigned short)1<<(i)))>0);
 				//DrawChar(x, y-15, (foo ? (char)20 : 'X'), A_NORMAL);
 				
@@ -393,7 +397,7 @@ void drawSelectArrow()
 		frame=0;
 	
 	short x=Worm_x[(short)Worm_currentWorm]-9;
-	short y=Worm_y[(short)Worm_currentWorm]-24;
+	short y=Worm_y[(short)Worm_currentWorm]-32;
 	
 	if(worldToScreen(&x, &y))
 	{

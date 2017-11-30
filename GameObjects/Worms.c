@@ -33,7 +33,7 @@ PhysObj Worm_physObj[MAX_WORMS];
 unsigned short Worm_dir = 0;
 
 // the current HEALTH of the worm
-char Worm_health[MAX_WORMS] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+short Worm_health[MAX_WORMS] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
 // bit mask if the worm is dead. bit 1 = dead, bit = 0 alive
 unsigned short Worm_isDead = 0;
@@ -57,12 +57,138 @@ unsigned short Worm_settled = 0;
 // this is important for detecting falling for parachut or for walking
 unsigned short Worm_onGround = 0;
 
+// the sprites for the worms health will be rendered into this array when their health changes
+unsigned short Worm_HealthSprite[MAX_WORMS][7];
 
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 
+
+/**
+ * So we don't have to render text every time, this routine will generate a the sprites to use for a worms health.
+ *
+ * This way, we can redraw the sprite, only when the health changes.
+ *
+ * @param index the index of the worm to draw the health sprite for
+*/
+void renderHealthSprite(short index)
+{
+	// the sprites for the numbers. only 5 entries because:
+	// 0-4 are the high nibble on each byte, and 5-9 are the low nibble on each byte
+	static unsigned char smallNumbers[5][3] = {
+		{
+		0b11100110,
+		0b10100100,
+		0b11101100},
+		{
+		0b10001000,
+		0b10001100,
+		0b10001100},
+		{
+		0b11001110,
+		0b01000010,
+		0b01100010},
+		{
+		0b11101100,
+		0b01101100,
+		0b11101100},
+		{
+		0b01001100,
+		0b11001100,
+		0b01000100}
+	};
+	// get the health of the worm:
+	short health = Worm_health[index];
+	
+	// reference to the sprite's short bytes for each row:
+	unsigned short *spriteData = &Worm_HealthSprite[index][0];
+	
+	// clear the current sprite:
+	short i;
+	for(i=0; i<7; i++)
+		spriteData[i] = 0;
+		
+	// get number of chars:
+	char digits = (health<10) ? 1 : ((health<100) ? 2 : 3);
+	
+	// get in dividual digits:
+	char low = health%10;
+	char mid = (health%100 - low)/10;
+	char high = (health%1000 - mid - low)/100;
+	
+	static unsigned char widths[10] = {3, 1, 3, 3, 2, 3, 2, 3, 2, 2};
+	
+	// total width of chars, add (digits-1) for spaces between chars
+	char txtWidth = widths[(short)low] + ((digits>1) ? widths[(short)mid] : 0) + ((digits>2) ? widths[(short)high] : 0) + (digits-1);
+	
+	// loop to copy the chars to our sprite buffer
+	short r, d, n;
+	char numbers[3] = { high, mid, low };
+	for(r=0; r<3; r++)
+	{
+		// the first bit to start at in this row:
+		char bit = 8 + (txtWidth/2);
+		
+		// the row to draw, with left and right borders included
+		unsigned short row = 0;
+		row |= ((unsigned short)1<<(8 - (txtWidth/2)-2));
+		row |= ((unsigned short)1<<(8 + (txtWidth/2)+2));
+
+		// draw numbers:
+		for(d=(3-digits); d<3; d++)
+		{
+			// the number
+			char num = numbers[d];
+			
+			// get number row from the sprites:
+			unsigned char digitData = smallNumbers[num%5][r];
+			
+			// if its less than 5, shift the high bits lower, otherwise, remove the upper digits
+			digitData = (num<5) ? ((unsigned char)digitData>>(4)) : (digitData & 0b00001111);
+
+			// copy its total widths worth of bits
+			for(n=0; n<widths[(short)num]; n++)
+			{
+				// digit mask and row mask:
+				unsigned char dMask = (unsigned char)1<<(3-n);
+				unsigned short rMask = (unsigned short)1<<(bit);
+				
+				// if the bit is on, we can turn that bit on, otherwise, leave it at 0
+				if(digitData & dMask)
+					row |= rMask;
+				
+				bit--;
+			}// next n 
+			
+			// move bit over for a space
+			bit--;
+			
+		}// next x
+		
+		// update the row in the sprite:
+		spriteData[2+r] = row;
+		
+	}// next r
+	
+	// add the top and bottom borders:
+	unsigned short border = 0;
+	for(i=(8 - (txtWidth/2)-1); i<(8 + (txtWidth/2)+2); i++)
+		border |= ((unsigned short)1<<(i));
+		
+	// add borders
+	spriteData[0] = border;
+	spriteData[6] = border;
+	
+	unsigned short row = 0;
+	row |= ((unsigned short)1<<(8 - (txtWidth/2)-2));
+	row |= ((unsigned short)1<<(8 + (txtWidth/2)+2));
+	spriteData[1] = row;
+	spriteData[5] = row;
+	
+	// sprite done!
+}
 
 
 /**
@@ -90,10 +216,17 @@ void spawnWorm(short index)
 	// allow worms to bounce of walls, but not land
 	Worm_physObj[index].bouncinessY = 0.0f;
 	
+	// for debug, give random health:
+	Worm_health[index] = random(200)+1;
+	
+	// render initial health sprite
+	renderHealthSprite(index);
+	
 	// random direction
 	if(random(2)==0)
 		Worm_dir |= mask;
 }
+
 
 
 

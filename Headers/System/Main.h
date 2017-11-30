@@ -503,13 +503,14 @@ extern char Worm_xVelo[MAX_WORMS];
 extern char Worm_yVelo[MAX_WORMS];
 extern PhysObj Worm_physObj[MAX_WORMS];
 extern unsigned short Worm_dir;
-extern char Worm_health[MAX_WORMS];
+extern short Worm_health[MAX_WORMS];
 extern unsigned short Worm_isDead;
 extern unsigned short Worm_active;
 extern char Worm_mode[MAX_WORMS];
 extern char Worm_currentWorm;
 extern unsigned short Worm_settled;
 extern unsigned short Worm_onGround;
+extern unsigned short Worm_HealthSprite[MAX_WORMS][7];
 
 // worm function prototypes
 
