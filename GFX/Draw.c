@@ -77,12 +77,20 @@ void drawWorms()
 				char facing = (Worm_dir & (unsigned short)1<<(i))>0;
 
 				// use the worms fill to erase the background on it's opposite color plane, acting as a mask
-				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Fill : spr_WormRight_Fill), ((i>=8) ? GrayDBufGetHiddenPlane(LIGHT_PLANE) : GrayDBufGetHiddenPlane(DARK_PLANE)));
-				ClipSprite16_XOR_R(x, y, 15, (facing ? spr_WormLeft_Fill : spr_WormRight_Fill), ((i>=8) ? GrayDBufGetHiddenPlane(LIGHT_PLANE) : GrayDBufGetHiddenPlane(DARK_PLANE)));
+				ClipSprite16_AND_R(x, y, 15, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), ((i>=8) ? GrayDBufGetHiddenPlane(LIGHT_PLANE) : GrayDBufGetHiddenPlane(DARK_PLANE)));
 				
 				// draw the worms fill and outline
-				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Fill : spr_WormRight_Fill), ((i>=8) ? GrayDBufGetHiddenPlane(DARK_PLANE) : GrayDBufGetHiddenPlane(LIGHT_PLANE)));
-				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), ((i>=8) ? GrayDBufGetHiddenPlane(LIGHT_PLANE) : GrayDBufGetHiddenPlane(DARK_PLANE)));
+				if(i<8)
+				{
+					ClipSprite16_AND_R(x, y, 15, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), GrayDBufGetHiddenPlane(LIGHT_PLANE));
+					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), GrayDBufGetHiddenPlane(DARK_PLANE));
+					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), GrayDBufGetHiddenPlane(LIGHT_PLANE));
+				}	
+				else
+				{
+					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Fill : spr_WormRight_Fill), GrayDBufGetHiddenPlane(DARK_PLANE));
+					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), GrayDBufGetHiddenPlane(LIGHT_PLANE));
+				}
 				
 				// draw health above worm
 				ClipSprite16_OR_R(x, y-8, 7, Worm_HealthSprite[i], GrayDBufGetHiddenPlane(LIGHT_PLANE));
