@@ -77,24 +77,24 @@ void drawWorms()
 				char facing = (Worm_dir & (unsigned short)1<<(i))>0;
 
 				// use the worms fill to erase the background on it's opposite color plane, acting as a mask
-				ClipSprite16_AND_R(x, y, 15, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), ((i>=8) ? GrayDBufGetHiddenPlane(LIGHT_PLANE) : GrayDBufGetHiddenPlane(DARK_PLANE)));
+				ClipSprite16_AND_R(x, y, 15, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), ((i>=8) ? lightPlane : darkPlane));
 				
 				// draw the worms fill and outline
 				if(i<8)
 				{
-					ClipSprite16_AND_R(x, y, 15, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), GrayDBufGetHiddenPlane(LIGHT_PLANE));
-					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), GrayDBufGetHiddenPlane(DARK_PLANE));
-					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), GrayDBufGetHiddenPlane(LIGHT_PLANE));
+					ClipSprite16_AND_R(x, y, 15, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), lightPlane);
+					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), darkPlane);
+					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), lightPlane);
 				}	
 				else
 				{
-					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Fill : spr_WormRight_Fill), GrayDBufGetHiddenPlane(DARK_PLANE));
-					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), GrayDBufGetHiddenPlane(LIGHT_PLANE));
+					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Fill : spr_WormRight_Fill), darkPlane);
+					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), lightPlane);
 				}
 				
 				// draw health above worm
-				ClipSprite16_OR_R(x, y-8, 7, Worm_HealthSprite[i], GrayDBufGetHiddenPlane(LIGHT_PLANE));
-				ClipSprite16_OR_R(x, y-8, 7, Worm_HealthSprite[i], GrayDBufGetHiddenPlane(DARK_PLANE));
+				ClipSprite16_OR_R(x, y-8, 7, Worm_HealthSprite[i], lightPlane);
+				ClipSprite16_OR_R(x, y-8, 7, Worm_HealthSprite[i], darkPlane);
 				
 				//char foo = (char)((Worm_settled & ((unsigned short)1<<(i)))>0);
 				//DrawChar(x, y-15, (foo ? (char)20 : 'X'), A_NORMAL);
@@ -135,8 +135,8 @@ void drawMines()
 			if(worldToScreen(&screenX, &screenY))
 			{				
 				// draw the mines fill and outline
-				ClipSprite8_OR_R(screenX-3, screenY-1, 4, spr_Mine_Dark, GrayDBufGetHiddenPlane(DARK_PLANE));
-				ClipSprite8_OR_R(screenX-3, screenY-1, 4, spr_Mine_Light, GrayDBufGetHiddenPlane(LIGHT_PLANE));
+				ClipSprite8_OR_R(screenX-3, screenY-1, 4, spr_Mine_Dark, darkPlane);
+				ClipSprite8_OR_R(screenX-3, screenY-1, 4, spr_Mine_Light, lightPlane);
 				
 				// if the mine has an active fuse, draw that too
 				if(Mine_fuse[i]>0)
@@ -178,8 +178,8 @@ void drawOilDrums()
 			if(worldToScreen(&screenX, &screenY))
 			{
 				// draw the oil drums fill and outline
-				ClipSprite16_OR_R(screenX-4, screenY-5, 11, spr_Oil_Dark, GrayDBufGetHiddenPlane(DARK_PLANE));
-				ClipSprite16_OR_R(screenX-4, screenY-5, 11, spr_Oil_Light, GrayDBufGetHiddenPlane(LIGHT_PLANE));
+				ClipSprite16_OR_R(screenX-4, screenY-5, 11, spr_Oil_Dark, darkPlane);
+				ClipSprite16_OR_R(screenX-4, screenY-5, 11, spr_Oil_Light, lightPlane);
 				
 				
 				// if the oil drum is "settled" draw an arrow above it, for debug
@@ -382,8 +382,8 @@ void drawMap()
 			short offset = screenLeft==0 ? camLeft%32 : 0;
 
 			// take advantage of extgrah's sprite method to handle bit shiting and mem copying in one swoop!
-			ClipSprite32_OR_R(screenLeft+(bufferCol*32)-offset, screenTop, screenBottom-screenTop, &light[((colBuff+bufferCol)*200)+bufferTop], GrayDBufGetHiddenPlane(LIGHT_PLANE));
-			ClipSprite32_OR_R(screenLeft+(bufferCol*32)-offset, screenTop, screenBottom-screenTop, &dark[((colBuff+bufferCol)*200)+bufferTop], GrayDBufGetHiddenPlane(DARK_PLANE));
+			ClipSprite32_OR_R(screenLeft+(bufferCol*32)-offset, screenTop, screenBottom-screenTop, &light[((colBuff+bufferCol)*200)+bufferTop], lightPlane);
+			ClipSprite32_OR_R(screenLeft+(bufferCol*32)-offset, screenTop, screenBottom-screenTop, &dark[((colBuff+bufferCol)*200)+bufferTop], darkPlane);
 
 			// on the next iteration we will be on the next buffer 32 bit colum
 			bufferCol++;
@@ -410,8 +410,8 @@ void drawSelectArrow()
 	if(worldToScreen(&x, &y))
 	{
 		// take advantage of extgrah's sprite method to handle bit shiting and mem copying in one swoop!
-		ClipSprite16_XOR_R(x, y, 16, ((frame<4) ? spr_SelectionArrowFrame1 : spr_SelectionArrowFrame2), GrayDBufGetHiddenPlane(DARK_PLANE));
-		ClipSprite16_XOR_R(x, y, 16, ((frame<4) ? spr_SelectionArrowFrame1 : spr_SelectionArrowFrame2), GrayDBufGetHiddenPlane(LIGHT_PLANE));	
+		ClipSprite16_XOR_R(x, y, 16, ((frame<4) ? spr_SelectionArrowFrame1 : spr_SelectionArrowFrame2), darkPlane);
+		ClipSprite16_XOR_R(x, y, 16, ((frame<4) ? spr_SelectionArrowFrame1 : spr_SelectionArrowFrame2), lightPlane);	
 	}
 }
 
@@ -423,7 +423,7 @@ void drawMountains()
 	short offsetX = (camX-160)/5;
 	short offsetY = camY/5;
 	for(i=0; i<5; i++)
-		ClipSprite32_OR_R(i*32-offsetX, 60-offsetY, 38, spr_Mountain[i], GrayDBufGetHiddenPlane(LIGHT_PLANE));
+		ClipSprite32_OR_R(i*32-offsetX, 60-offsetY, 38, spr_Mountain[i], lightPlane);
 
 }
 
@@ -439,8 +439,8 @@ void Draw_cake(short amount, short total)
 	GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
 	ClrScr();
 	
-	ClipSprite32_OR_R(64, 38, 23, spi_CandleCake_Dark, GrayDBufGetHiddenPlane(DARK_PLANE));
-	ClipSprite32_OR_R(64, 38, 23, spi_CandleCake_Light, GrayDBufGetHiddenPlane(LIGHT_PLANE));	
+	ClipSprite32_OR_R(64, 38, 23, spi_CandleCake_Dark, darkPlane);
+	ClipSprite32_OR_R(64, 38, 23, spi_CandleCake_Light, lightPlane);	
 	
 	char progStr[40];
 	sprintf(progStr, "Loading... %d%%", (short)((float)((float)amount/(float)total)*100));
@@ -448,6 +448,9 @@ void Draw_cake(short amount, short total)
 
 	// now flip the planes
 	GrayDBufToggleSync();
+	
+	lightPlane = GrayDBufGetHiddenPlane(LIGHT_PLANE);
+	darkPlane = GrayDBufGetHiddenPlane(DARK_PLANE);
 }
 
 // main drawing routine for the game, e.g. map, worms, weapons, etc

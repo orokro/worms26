@@ -44,6 +44,8 @@
 	extern void *GblDBuffer;
 	extern char GameRunning;
 	extern void *mapBuffer;
+	extern void *lightPlane;
+	extern void *darkPlane;
 	
 	// main prototypes
 

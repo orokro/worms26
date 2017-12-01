@@ -17,6 +17,8 @@ void *mapBuffer, *mapLight, *mapDark;
 
 // the main double buffer for gray scale rendering
 void *GblDBuffer;
+void *lightPlane;
+void *darkPlane;
 
 // is the game running?
 char GameRunning = TRUE;
@@ -70,6 +72,9 @@ void _main(void)
 	GrayDBufInit(dbuffer);
 	GblDBuffer=dbuffer;
   
+  lightPlane = GrayDBufGetHiddenPlane(LIGHT_PLANE);
+	darkPlane = GrayDBufGetHiddenPlane(DARK_PLANE);
+	
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	Game_changeMode(gameMode_WormSelect);
 	
@@ -95,6 +100,9 @@ void _main(void)
        depending on the phase. We must not draw to the "hidden" planes before
        they are really hidden! */
   	if (!_GrayIsRealHW2()) GrayWaitNSwitches(2);
+  	
+  	lightPlane = GrayDBufGetHiddenPlane(LIGHT_PLANE);
+		darkPlane = GrayDBufGetHiddenPlane(DARK_PLANE);
 	}
 	
 	// disable grayscale
