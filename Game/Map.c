@@ -158,7 +158,7 @@ void Map_traceEdges()
 			changed &= ~current;
 			
 			// darken the vertically changed pixels in both buffers:
-			light[pos] |= changed;
+			//light[pos] |= changed;
 			dark[pos] |= changed;
 			
 			// save for next loop, so it can see what was above
@@ -371,7 +371,7 @@ void Map_makeMap()
 				short row = (x-(x%32))/32;
 				
 				// the texture will just loop its y colums, every 200 pixels
-				light[(row*200)+y] |= (~spr_LandTexture[y%32] & mask);
+				light[(row*200)+y] |= (mask);
 				dark[(row*200)+y] |= (spr_LandTexture[y%32] & mask);
 		
 			}// pixel on
