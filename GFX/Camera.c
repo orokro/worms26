@@ -73,16 +73,15 @@ void Camera_update()
 	// if shift is down, we should test for the arrow keys for camera control:
 	if(Keys_keyState(keyCameraControl))
 	{
-		if(Keys_keyState(keyLeft)==TRUE) userX-=camSpeed;
-		if(Keys_keyState(keyRight)==TRUE) userX+=camSpeed;
-		if(Keys_keyState(keyUp)==TRUE) userY-=camSpeed;
-		if(Keys_keyState(keyDown)==TRUE) userY+=camSpeed;
+		if(Keys_keyState(keyLeft) && camX>-100) userX-=camSpeed;
+		if(Keys_keyState(keyRight) && camX<320+100) userX+=camSpeed;
+		if(Keys_keyState(keyUp) && camY>-100) userY-=camSpeed;
+		if(Keys_keyState(keyDown) && camY<230-50) userY+=camSpeed;
 		
 		// at this point, the camera should just be the user-set value:
 		camX = userX;
 		camY = userY;
-		
-		
+
 	// otherwise if we are focusing on a target, we should move towards it...
 	}else if(cameraIsFocused==TRUE)
 	{
@@ -109,8 +108,8 @@ void Camera_update()
 	}
 	
 	//  make sure the camera is always within bounds
-	if(camY>200-50)
-		camY=200-50;
+	if(camY>220-WATER_HEIGHT-50)
+		camY=220-WATER_HEIGHT-50;
 	if(camY<-100)
 		camY=-100;
 	if(camX<-100)
