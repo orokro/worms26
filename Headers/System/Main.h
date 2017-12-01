@@ -204,19 +204,11 @@ extern void Camera_clearFocus();
    ====================================================================================================================================== */
 
 // Draw defines
-#define WATER_FRAMES 5
-#define WATER_HEIGHT 6
 
 // Draw globals
 extern unsigned long windSprites[3][3];
-extern unsigned long waterSprites[2][WATER_FRAMES][WATER_HEIGHT];
 
 // draw function prototypes
-
-/**
- * Renders the water sprites once at the beginning of the game. Maybe replaced with hard-coded sprites in the future.
-*/
-extern void renderWaterSprites();
 
 /**
  * Draws the cake loading screen

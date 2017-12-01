@@ -19,9 +19,6 @@
 // these sprites will be generated at the begining of the each turn to match the current wind conditions
 unsigned long windSprites[3][3];
 
-// these sprites will be used for the water animation, generated once at the beginning of the game
-unsigned long waterSprites[2][WATER_FRAMES][WATER_HEIGHT];
-
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 
@@ -444,10 +441,10 @@ void drawHUD()
 {		
 
 	// copy the wind bar to both buffers:
-	ClipSprite32_AND_R(126, 92, 5, spr_WindMeter_Mask, lightPlane);
-	ClipSprite32_AND_R(126, 92, 5, spr_WindMeter_Mask, darkPlane);
-	ClipSprite32_OR_R(126, 92, 5, spr_WindMeter, lightPlane);
-	ClipSprite32_OR_R(126, 92, 5, spr_WindMeter, darkPlane);
+	ClipSprite32_AND_R(126, 93, 5, spr_WindMeter_Mask, lightPlane);
+	ClipSprite32_AND_R(126, 93, 5, spr_WindMeter_Mask, darkPlane);
+	ClipSprite32_OR_R(126, 93, 5, spr_WindMeter, lightPlane);
+	ClipSprite32_OR_R(126, 93, 5, spr_WindMeter, darkPlane);
 	
 	// current frame of annimation:
 	static char frame=0;
@@ -455,7 +452,7 @@ void drawHUD()
 		frame=0;
 	
 	// draw current frame of animated bar
-	ClipSprite32_OR_R(127, 93, 3, windSprites[(short)((frame/3)%3)], darkPlane);
+	ClipSprite32_OR_R(127, 94, 3, windSprites[(short)((frame/3)%3)], darkPlane);
 	
 	// only draw the timer if the game is in select or turn mode!
 	if(Game_timer>0 && (Game_mode==gameMode_WormSelect || Game_mode==gameMode_Turn || Game_mode==gameMode_Cursor))
@@ -495,7 +492,7 @@ void drawHUD()
 
 
 /**
- * draws the water
+ * draws the water infront of the map / objects
 */
 void drawWater()
 {
@@ -505,22 +502,23 @@ void drawWater()
 	if(++frameTimer>=2)
 	{
 		frameTimer=0;
-		if(++frame>=(WATER_FRAMES*2-2))
+		if(++frame>7)
 			frame=0;
 	}		
 	
-	short f = (short)abs((WATER_FRAMES-1)-frame);
-	if(f>=WATER_FRAMES)
-		f = WATER_FRAMES-1;
-
+	static char frames[] = {0, 1, 2, 3, 4, 3, 2, 1};
+	short f = frames[(short)frame];
+	
+	short waterY = 241-camY;
 	short i;
 	for(i=0; i<7; i++)
 	{
-		ClipSprite32_OR_R(i*32 - (camX+8)%32, 250-WATER_HEIGHT-3-camY, WATER_HEIGHT, waterSprites[0][f], darkPlane);
-		ClipSprite32_OR_R(i*32 - (camX+8)%32, 250-WATER_HEIGHT-3-camY, WATER_HEIGHT, waterSprites[1][f], lightPlane);
-		ClipSprite32_OR_R(i*32 - camX%32, 250-WATER_HEIGHT-camY, WATER_HEIGHT, waterSprites[0][f], darkPlane);
-		ClipSprite32_OR_R(i*32 - camX%32, 250-WATER_HEIGHT-camY, WATER_HEIGHT, waterSprites[1][f], lightPlane);
-		ClipSprite32_OR_R(i*32, 250-WATER_HEIGHT-camY, 20, spr_SolidWater, lightPlane);
+		short waterX = i*32 - (camX+328)%32;
+	
+		// draw just the and dark light planes:
+		ClipSprite32_MASK_R(waterX, waterY, 9, &spr_Water_Dark[0+(f*9)], &spr_Water_Mask[0+(f*9)], darkPlane);
+		ClipSprite32_AND_R(waterX, waterY, 9, &spr_Water_Mask[0+(f*9)], lightPlane);
+		ClipSprite32_OR_R(waterX, waterY, 23, &spr_Water_Light[0+(f*23)], lightPlane);
 	}
 	
 }
@@ -562,10 +560,8 @@ void Draw_renderGame()
 	// draw background mountains
 	drawMountains();
 	
-	// for some reason I can't put this in a method... the identical code copied from the method below
+	// draw the map
 	drawMap();	
-	
-	drawWater();
 	
 	// draw oil drums first, as everything else should overlap them
 	drawOilDrums();
@@ -578,6 +574,9 @@ void Draw_renderGame()
 	
 	// mines are important, so draw them on top of everything else
 	drawMines();
+	
+	// draw water that's infront of everything but the HUD
+	drawWater(FALSE);
 	
 	// HUD stuff is drawn last since it needs to go on top of all game elements
 	drawHUD();
@@ -667,70 +666,6 @@ void Draw_renderWeaponsMenu(char wx, char wy)
 		DrawStr(0,10,weapStr, A_NORMAL);	
 	}
 }
-
-// renders water sprites
-void renderWaterSprites()
-{
-	/*
-		We will use a sin curve to render the waves over a serries of frames.
-		
-		Even though SIN is slow, this only happens once at the beginning of the game.
-	*/	
-	
-	// calculate all sin points upfront
-	float sinData[16];
-	short p;
-	for(p=0; p<16; p++)
-	{
-		// normalize pixel
-		float n = (float)p/16.0f;
-		sinData[p] = (sin(n*2.0*3.14159f)*WATER_HEIGHT);
-	}
-	
-	// render each frame
-	short f;
-	for(f=0; f<WATER_FRAMES; f++)
-	{
-		// calculate at which position the sin curve should be scaled by
-		float scale = 0.5f-(1.0f*(float)f/(float)WATER_FRAMES);
-			
-		// loop over all 32 pixels
-		for(p=0; p<32; p++)
-		{
-			// calculate the pixel sine-value at this point. Sine goes from -1 to 1, and we want to go from 0-6
-			// also, we want to loop every 32 pixels, so convert pixel to degrees
-			short pixelY = (WATER_HEIGHT/2)+(sinData[p%16]*scale);
-			
-			// current bit mask
-			unsigned long mask=1;
-			mask = (unsigned long)mask<<(p);
-			
-			// draw one row at a time for each frame
-			short r;
-			for(r=0; r<WATER_HEIGHT; r++)
-			{
-				// if p is 0, clear this row before drawing
-				if(p==0){
-					waterSprites[0][f][r]=(unsigned long)0;
-					waterSprites[1][f][r]=(unsigned long)0;
-				}
-				
-				// if the pixel is exactly equal to our row we can draw it on both planes
-				if(r==pixelY)
-				{
-					waterSprites[0][f][r] |= mask;
-					waterSprites[1][f][r] |= mask;		
-					
-				// if the pixel is greater than or equal to this pixel, draw it only on the light plane			
-				}else if(r>pixelY)
-					waterSprites[1][f][r] |= mask;
-										
-			}// next r
-		}// next p
-	}// next f
-	
-}
-
 
 
 

@@ -78,10 +78,7 @@ void _main(void)
 	
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	Game_changeMode(gameMode_WormSelect);
-	
-	// before we can draw the game, we need to render our water sprites:
-	renderWaterSprites();
-	
+
 	// done loading
 	Draw_cake(1,1);
 	

@@ -94,6 +94,10 @@ void wormWalk()
 // handles all update frames for controlling worms in the turn game mode
 void CharacterController_update()
 {
+	// if the camera is being controled, no need to controll the character
+	if(Keys_keyState(keyCameraControl))
+		return;
+		
 	// worm mask...
 	wormMask = 1;
 	wormMask = (unsigned short)((unsigned short)wormMask<<(Worm_currentWorm));
