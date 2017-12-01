@@ -439,9 +439,12 @@ void drawMountains()
 */
 void drawHUD()
 {		
+
 	// copy the wind bar to both buffers:
-	ClipSprite32_RPLC_R(126, 93, 5, spr_WindMeter, lightPlane);
-	ClipSprite32_RPLC_R(126, 93, 5, spr_WindMeter, darkPlane);
+	ClipSprite32_AND_R(126, 92, 5, spr_WindMeter_Mask, lightPlane);
+	ClipSprite32_AND_R(126, 92, 5, spr_WindMeter_Mask, darkPlane);
+	ClipSprite32_OR_R(126, 92, 5, spr_WindMeter, lightPlane);
+	ClipSprite32_OR_R(126, 92, 5, spr_WindMeter, darkPlane);
 	
 	// current frame of annimation:
 	static char frame=0;
@@ -449,7 +452,41 @@ void drawHUD()
 		frame=0;
 	
 	// draw current frame of animated bar
-	ClipSprite32_OR_R(127, 94, 3, windSprites[(short)((frame/3)%3)], darkPlane);
+	ClipSprite32_OR_R(127, 93, 3, windSprites[(short)((frame/3)%3)], darkPlane);
+	
+	// only draw the timer if the game is in select or turn mode!
+	if(Game_timer>0 && (Game_mode==gameMode_WormSelect || Game_mode==gameMode_Turn || Game_mode==gameMode_Cursor))
+	{
+		// exrase space for timer
+		ClipSprite16_AND_R(2, 87, 11, spr_timerMask, lightPlane);
+		ClipSprite16_AND_R(2, 87, 11, spr_timerMask, darkPlane);
+		
+		// if we have trace time, blink the border:
+		if(Game_graceTimer>0 && (Game_graceTimer/3)%6<3)
+		{
+			ClipSprite16_OR_R(2, 87, 11, spr_timerBorder, lightPlane);
+		}else
+		{
+			ClipSprite16_OR_R(2, 87, 11, spr_timerBorder, lightPlane);
+			ClipSprite16_OR_R(2, 87, 11, spr_timerBorder, darkPlane);
+		}
+		
+		// draw the time in the turn:
+		short time = (Game_graceTimer>0) ? (short)(Game_graceTimer/TIME_MULTIPLIER) : (short)(Game_timer/TIME_MULTIPLIER);
+		char txt[3];
+		sprintf(txt, "%d", time);
+		
+		GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
+		DrawStr(3 + ((time<10) ? 3 : 0), 89, txt, A_NORMAL);
+		GrayDBufSetHiddenAMSPlane(DARK_PLANE);
+		DrawStr(3 + ((time<10) ? 3 : 0), 89, txt, A_NORMAL);
+		
+		// if the game timer is less than 5, the inside, not the border
+		if((short)(Game_timer/TIME_MULTIPLIER)<=5 && (Game_timer/3)%6<3)
+			ClipSprite16_XOR_R(2, 87, 11, spr_timerBlink, darkPlane);
+		
+	}// end if draw timer	
+	
 }
 
 
@@ -515,17 +552,17 @@ void Draw_renderGame()
 		
 	// for now, we will output a bunch of debug info on the screen
 	
-	// game modes by name	
-	static const char modes[9][16] = {"Select", "Turn", "WeaponSel", "Pause", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
+	// game modes by name	{"Select", "Turn", "WeaponSel", "Pause", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
+	static const char modes[9][16] = {"", "", "", "", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
 	
 	// draw the current and previous game mode on the scren
-	DrawStr(0,1,modes[(short)Game_mode], A_XOR);
+	DrawStr(60,1,modes[(short)Game_mode], A_XOR);
 
 	// draw the current grace time, turn time, and retreat time on the screen
 	// NOTE: for some reason, drawing sudden death time instead of retreat time crashes the game)
-	char timeStr[40];
-	sprintf(timeStr, "time: %d, %d, %d", (short)(Game_graceTimer/TIME_MULTIPLIER), (short)(Game_timer/TIME_MULTIPLIER), (short)(Game_retreatTimer));
-	DrawStr(60,1,timeStr, A_XOR);	
+	//char timeStr[40];
+	//sprintf(timeStr, "time: %d, %d, %d", (short)(Game_graceTimer/TIME_MULTIPLIER), (short)(Game_timer/TIME_MULTIPLIER), (short)(Game_retreatTimer));
+	//DrawStr(60,1,timeStr, A_XOR);	
 	
 	//unsigned short currentMask = 1;
 	//currentMask = (unsigned short)((unsigned short)currentMask<<(Worm_currentWorm));
@@ -544,10 +581,13 @@ void Draw_renderGame()
 	//sprintf(camStr, "Cam: %d, %d", (short)camX, (short)camY);
 	//DrawStr(0,60, camStr , A_XOR);
 	
-	// draw our free memory on the screen
-	char heapStr[40];
-	sprintf(heapStr, "heap: %lu", (unsigned long)HeapAvail());
-	DrawStr(0,10, heapStr , A_XOR);
+	// draw our free memory on the screen, only when shift is held for debbuging
+	if(Keys_keyState(keyCameraControl))
+	{
+		char heapStr[40];
+		sprintf(heapStr, "%lu", (unsigned long)HeapAvail());
+		DrawStr(0,1, heapStr , A_XOR);
+	}
 }
 
 
