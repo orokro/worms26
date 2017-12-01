@@ -16,6 +16,9 @@
 		- Weapons Menu
 */
 
+// these sprites will be generated at the begining of the each turn to match the current wind conditions
+unsigned long windSprites[3][3];
+
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -416,7 +419,9 @@ void drawSelectArrow()
 }
 
 
-
+/**
+ * Draws a grayscale parallax mountain range in the background.
+ */
 void drawMountains()
 {
 	short i;
@@ -426,6 +431,28 @@ void drawMountains()
 		ClipSprite32_OR_R(i*32-offsetX, 60-offsetY, 38, spr_Mountain[i], lightPlane);
 
 }
+
+
+
+/**
+ * Draws the games HUD (i.e. timer, wind, etc)
+*/
+void drawHUD()
+{		
+	// copy the wind bar to both buffers:
+	ClipSprite32_RPLC_R(126, 93, 5, spr_WindMeter, lightPlane);
+	ClipSprite32_RPLC_R(126, 93, 5, spr_WindMeter, darkPlane);
+	
+	// current frame of annimation:
+	static char frame=0;
+	if(++frame>33)
+		frame=0;
+	
+	// draw current frame of animated bar
+	ClipSprite32_OR_R(127, 94, 3, windSprites[(short)((frame/3)%3)], darkPlane);
+}
+
+
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 
@@ -478,7 +505,10 @@ void Draw_renderGame()
 	
 	// mines are important, so draw them on top of everything else
 	drawMines();
-
+	
+	// HUD stuff is drawn last since it needs to go on top of all game elements
+	drawHUD();
+	
 	// if the game mode is worm select, draw the selection arrow
 	if(Game_mode==gameMode_WormSelect)
 		drawSelectArrow();

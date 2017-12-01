@@ -95,9 +95,9 @@ void renderHealthSprite(short index)
 		0b01101100,
 		0b11101100},
 		{
-		0b01001100,
-		0b11001100,
-		0b01000100}
+		0b10101100,
+		0b11101100,
+		0b00100100}
 	};
 	// get the health of the worm:
 	short health = Worm_health[index];
@@ -118,7 +118,7 @@ void renderHealthSprite(short index)
 	char mid = (health%100 - low)/10;
 	char high = (health%1000 - mid - low)/100;
 	
-	static unsigned char widths[10] = {3, 1, 3, 3, 2, 3, 2, 3, 2, 2};
+	static unsigned char widths[10] = {3, 1, 3, 3, 3, 3, 2, 3, 2, 2};
 	
 	// total width of chars, add (digits-1) for spaces between chars
 	char txtWidth = widths[(short)low] + ((digits>1) ? widths[(short)mid] : 0) + ((digits>2) ? widths[(short)high] : 0) + (digits-1);

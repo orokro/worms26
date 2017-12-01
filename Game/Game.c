@@ -133,6 +133,9 @@ long Game_suddenDeathTimer = 60L * TIME_MULTIPLIER * 10;
 // water level for sudden death:
 char Game_waterLevel = 0;
 
+// current wind speed
+char Game_wind = 0;
+
 // the current team, and the current selected worm on each team:
 char Game_currentTeam = 1;
 char Game_currentWormUp[2] = {0, 0};
@@ -376,8 +379,9 @@ static void gameTimers()
 void gameUpdates()
 {
 	// decrease game timers
-	//gameTimers();
+	gameTimers();
 	//return;
+	
 	// gravity and physics for worms!
 	Worm_update();
 	

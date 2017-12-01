@@ -3,7 +3,43 @@
 	 WORM SELECT +++ WORM SELECT +++ WORM SELECT +++ WORM SELECT +++ WORM SELECT +++ WORM SEL
    ---------------------------------------------------------------------------------------- */
 
-// local prototypes for worm-select methods below
+/**
+ * Renders the 3 sprites used to animate the window meter, for the current wind level.
+ *
+ * Should only be called once at the begininng of the turn.
+*/
+void renderWindSprites()
+{
+	// can't be static cuz we'll shift these every time we run this code
+	unsigned long arrows[] = {
+		0b01001001001001001001001001001001,
+		0b11011011011011011011011011011011};
+	
+	// if the wind is going to the right, we can switch the facing direction of our arrows by shifting the top row left one:
+	if(Game_wind>0)
+		arrows[0] = arrows[0]<<1;
+		
+	// build a bitmask that represents the wind strenth, starting from the middle, 16, and left or right if its left wind or right wind...
+	unsigned long windBar = 0;
+	short i;
+	for(i=0; i<abs(Game_wind); i++)
+		windBar = (unsigned long)((unsigned long)((Game_wind>0) ? windBar>>1 : windBar<<1) | 0b00000000000000001000000000000000);
+
+	// now we can loop to copy our bar to each sprite frame, and use AND to remove the triangles from each frame
+	short f;
+	for(f=0; f<3; f++)
+	{
+		// loop over all three pixels of the sprite
+		for(i=0; i<3; i++)
+			windSprites[f][i] = (windBar & ~arrows[i%2]);
+		
+		// shift the arrows each frame in the direction of the wind
+		arrows[0] = (unsigned long)((Game_wind>0) ? arrows[0]>>1 : arrows[0]<<1);
+		arrows[1] = (unsigned long)((Game_wind>0) ? arrows[1]>>1 : arrows[1]<<1);
+	}// next f
+	
+}
+
 
 /**
 	Selects the next available Worm on the current team, during WormSelect mode.
@@ -47,6 +83,12 @@ static void WormSelect_enter()
 {
 	// toggle teams
 	Game_currentTeam = (Game_currentTeam==1 ? 0 : 1);
+	
+	// pick a new wind speed:
+	Game_wind = -16+random(32);
+	
+	// render the new wind sprite set, so the main drawloop doesn't have to ever frame...
+	renderWindSprites();
 	
 	// select next worm for this team:
 	nextWorm();
