@@ -46,11 +46,12 @@ unsigned long windSprites[3][3];
 */
 char worldToScreen(short *x, short *y)
 {
-	*x = *x-(camX-80);
-	*y = *y-(camY-50);
+	// casting over kill because of mysterious crash
+	*x = (short)((short)80 + (short)((short)(*x)-(short)camX));
+	*y = (short)((short)50 + (short)(((short)*y)-(short)camY));
 	
 	// if anything is out of bounds, return false:
-	if(*x<-8 || *x>168 || *y<-16 || *y>116)
+	if((*x)<-32 || (*x)>160+32 || (*y)<-16 || (*y)>116)
 		return FALSE;
 	else
 		return TRUE;
@@ -233,40 +234,77 @@ void drawCrates()
 
 
 /**
- * draw falling leave wind speed indicators
+ * draw falling leave wind and cloud speed indicators
 */
-void drawLeaves()
+void drawLeavesAndClouds()
 {
-	// no need for external data, only four leaves at a time so we can keep it static
-	static short Leaf_x[] = {0,		40,		80,		120};
-	static short Leaf_y[] = {0, 	25,		50,		75};
+	short i;
+	
+	// use smaller wind for smoother sprites
+	short wind = Game_wind/4;
+	
+	// no need for external data, only on leaf at a time so we can keep it static
+	static short Leaf_x = 0;
+	static short Leaf_y = 0;
+	
+	// only 3 clouds at a time, keep it static:
+	static short Cloud_x[] = {0, 53, 106};
+	static short Cloud_y[] = {-50, -70, -90};
 	
 	// leaves always move down at a constant rate, and sideways by the wind rate
-	short i=0;
-	for(i=0; i<1; i++)
+	Leaf_y++;
+	Leaf_x+=wind;
+	
+	// get leafs onscreen pos
+	short xPos = Leaf_x;
+	short yPos = Leaf_y;
+	
+	// draw if if on screen
+	if(worldToScreen(&xPos, &yPos))
+		ClipSprite16_OR_R(xPos, yPos, 8, spr_Leaf, lightPlane);
+		
+	// or respawn if off screen and far enoug bloe
+	else if(yPos>80)
 	{
-		Leaf_y[i]++;
-		Leaf_x[i]+=Game_wind/4;
-		
-		short xPos = Leaf_x[i];
-		short yPos = Leaf_y[i];
-		
-		if(worldToScreen(&xPos, &yPos))
-			ClipSprite16_OR_R(xPos, yPos, 8, spr_Leaf, lightPlane);
-		else if(yPos>100)
+		if(abs(Game_wind)<5)
 		{
-			if(abs(Game_wind)<5)
-			{
-				Leaf_x[i] = camX+random(160)-80;
-				Leaf_y[i] = camY-58;
-			}else
-			{
-				Leaf_x[i] = camX + ((Game_wind<0) ? 90 : -90);
-				Leaf_y[i] = camY-61 + random(70);
-			}
-			
+			Leaf_x = camX+random(160)-80;
+			Leaf_y = camY-58;
+		}else
+		{
+			Leaf_x = camX + ((Game_wind<0) ? 90 : -90);
+			Leaf_y = camY-61 + random(70);
 		}
-	}	
+	}
+	
+	// loop thru clouds and draw or respawn
+	for(i=0; i<3; i++)
+	{
+		// clouds only move horizontally
+		Cloud_x[i] += wind;
+		
+		// get positions to muttate
+		short xPosC = Cloud_x[i];
+		short yPosC = Cloud_y[i];
+		
+		char onScreen = worldToScreen(&xPosC, &yPosC);
+		
+		// check scren pos:
+		if(onScreen)
+		{
+			// draw the cloud:
+			ClipSprite32_MASK_R(xPosC, yPosC, 14, spr_Cloud_Light, spr_Cloud_Mask, lightPlane);
+			ClipSprite32_MASK_R(xPosC, yPosC, 14, spr_Cloud_Dark, spr_Cloud_Mask, darkPlane);
+		}else if(xPosC < -32 && wind<0)
+		{
+			Cloud_x[i] = camX+80+31;
+			Cloud_y[i] = -50-random(50);
+		}else if(xPosC > 160+32 && wind>0)
+		{
+			Cloud_x[i] = camX-80-31;
+			Cloud_y[i] = -50-random(50);
+		}
+	}// next i
 }
 
 
@@ -599,7 +637,7 @@ void Draw_renderGame()
 	drawMountains();
 	
 	// leaves before map...
-	drawLeaves();
+	drawLeavesAndClouds();
 	
 	// draw the map
 	drawMap();	
