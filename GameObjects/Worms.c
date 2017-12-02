@@ -89,7 +89,7 @@ void renderHealthSprite(short index)
 		{
 		0b11001110,
 		0b01000010,
-		0b01100010},
+		0b01100100},
 		{
 		0b11101100,
 		0b01101100,

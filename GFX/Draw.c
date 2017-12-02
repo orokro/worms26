@@ -232,6 +232,44 @@ void drawCrates()
 }
 
 
+/**
+ * draw falling leave wind speed indicators
+*/
+void drawLeaves()
+{
+	// no need for external data, only four leaves at a time so we can keep it static
+	static short Leaf_x[] = {0,		40,		80,		120};
+	static short Leaf_y[] = {0, 	25,		50,		75};
+	
+	// leaves always move down at a constant rate, and sideways by the wind rate
+	short i=0;
+	for(i=0; i<1; i++)
+	{
+		Leaf_y[i]++;
+		Leaf_x[i]+=Game_wind/4;
+		
+		short xPos = Leaf_x[i];
+		short yPos = Leaf_y[i];
+		
+		if(worldToScreen(&xPos, &yPos))
+			ClipSprite16_OR_R(xPos, yPos, 8, spr_Leaf, lightPlane);
+		else if(yPos>100)
+		{
+			if(abs(Game_wind)<5)
+			{
+				Leaf_x[i] = camX+random(160)-80;
+				Leaf_y[i] = camY-58;
+			}else
+			{
+				Leaf_x[i] = camX + ((Game_wind<0) ? 90 : -90);
+				Leaf_y[i] = camY-61 + random(70);
+			}
+			
+		}
+	}	
+}
+
+
 // draw the map.. but I can't call this, crashes
 void drawMap()
 {
@@ -559,6 +597,9 @@ void Draw_renderGame()
 	
 	// draw background mountains
 	drawMountains();
+	
+	// leaves before map...
+	drawLeaves();
 	
 	// draw the map
 	drawMap();	
