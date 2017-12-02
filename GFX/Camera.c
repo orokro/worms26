@@ -28,8 +28,8 @@
 */
 
 // the current position of the camera in game-world units
-int camX = 0;
-int camY = 0;
+short camX = 0;
+short camY = 0;
 
 // boolean if Camera is focused on something
 char cameraIsFocused = FALSE;

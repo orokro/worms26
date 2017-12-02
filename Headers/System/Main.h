@@ -167,8 +167,8 @@ extern char Keys_keyUp(long);
 #define camSpeed 6
 
 // camera globals
-extern int camX;
-extern int camY;
+extern short camX;
+extern short camY;
 
 // camera function prototypes
 
