@@ -144,6 +144,7 @@ void Explosion_spawn(short x, short y, char size, char power, char hasFire)
 	Explosion_x[expIndex] = x;
 	Explosion_y[expIndex] = y;
 	Explosion_size[expIndex] = size;
+	Explosion_time[expIndex] = size;
 	Explosion_power[expIndex] = power;
 	
 	// set first-frame bit for this explosion to 1 (TRUE)
@@ -164,7 +165,7 @@ void Explosion_update()
 	// update all our explosions, (if active)
 	short i=0;
 	for(i=0; i<8; i++)
-		if(Explosion_time[i]>0)
+		if(Explosion_active & (unsigned short)1<<i)
 			updateExplosion(i);
 }
 

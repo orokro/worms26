@@ -101,7 +101,7 @@ void updateMine(short index)
 			Map_updateTiles();
 			
 			// boom
-			//Explosion_spawn(Mine_x[index], Mine_y[index], 30, 30, TRUE);
+			Explosion_spawn(Mine_x[index], Mine_y[index], 14, 14, TRUE);
 				
 		}// end if 
 		
@@ -118,44 +118,6 @@ void updateMine(short index)
 	}
 }
 
-
-/**
- * Check if the Mine of given index is within proximity of worm and should explode.
- * 
- * @param index the mine to check for worm proximity.
-*/
-void checkProximity(short index)
-{
-	// if this mine already has a timer, gtfo
-	if(Mine_fuse[index]>=0)
-		return;
-		
-	short i=0; 
-	for(i=0; i<16; i++)
-	{
-		// check if the worm is active
-		char wormIsActiveInGame = (char)((Worm_active & (unsigned short)1<<(i))>0);
-		char wormIsNotDead = (char)((Worm_isDead & (unsigned short)1<<(i))==0);
-		
-		// only do shit if the worm is active in the game, and NOT dead
-		if(wormIsActiveInGame && wormIsNotDead)
-		{
-					
-			// if it's in it's first frame, calculate the distance from us to it:
-			short d = dist(Worm_x[i], Worm_y[i], Mine_x[index], Mine_y[index]);
-			
-			// if we're withing the trigger distance, pick a timer for this mine
-			if(d <= mineTriggerDistance)
-			{
-				// based on mine timer settings pick set a time for this mine
-				// 6 will be random length, anything less will be the associated time
-				Mine_fuse[index] = ((Match_mineFuseLength<6) ? (Match_mineFuseLength*TIME_MULTIPLIER) : (random(5)*TIME_MULTIPLIER));
-			}
-			
-		}// end if first frame
-		
-	}// next i
-}
 
 
 /**
@@ -238,11 +200,7 @@ void Mines_spawnMines()
 
 // main update for Mines
 void Mines_update()
-{
-	proxmityCheckTimer++;
-	if(proxmityCheckTimer>5)
-		proxmityCheckTimer=0;
-		
+{		
 	// for debugging, we'll allow the user to switch between mines, and add velocity to
 	// test physics
 	static short testMine = 0;
@@ -255,13 +213,15 @@ void Mines_update()
 	}
 	if(Keys_keyDown(key2))
 	{
-		//Mine_y[testMine]-=6;
 		Physics_setVelocity(&Mine_physObj[testMine], -4, -7, FALSE);
 	}
 	if(Keys_keyDown(key3))
 	{
-		//Mine_y[testMine]-=6;
 		Physics_setVelocity(&Mine_physObj[testMine], 4, -7, FALSE);
+	}
+	if(Keys_keyDown(key5))
+	{
+		Mines_trigger(testMine);
 	}
 	
 	// if any of the active Crates have less than 0 health, create an explosion
@@ -272,11 +232,6 @@ void Mines_update()
 		// only update active mines
 		if(Mine_active & (unsigned short)1<<(i))
 		{
-			// okay we will only check proxity every 5 frames to save CPU since proxmity check is
-			// epensive
-			//if(proxmityCheckTimer==0)
-			//	checkProximity(i);
-			
 			// unfortuntely, since blast-detomation reqiores first-frame access, we gotta check
 			// explosions every frame
 			checkExplosions(i);

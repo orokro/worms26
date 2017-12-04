@@ -607,6 +607,43 @@ void drawWater()
 	
 }
 
+
+/**
+ * Draws active explosions, if there are any
+*/
+void drawExplosions()
+{
+	// if no explosion is active, just gtfo
+	if(Explosion_active==0)
+		return;
+		
+	// loop over explosions..
+	short i;
+	for(i=0; i<8; i++)
+	{
+		if(Explosion_active & (unsigned short)1<<i)
+		{
+			short x=Explosion_x[i];
+			short y=Explosion_y[i];
+			short r=Explosion_size[i]-Explosion_time[i];
+			
+			if(worldToScreen(&x, &y))
+			{
+				short e;
+				for(e=1; e<r; e++)
+				{
+					GrayDBufSetHiddenAMSPlane(DARK_PLANE);
+					DrawClipEllipse(x, y, e, e, &(SCR_RECT){{0, 0, 159, 99}}, A_XOR);
+					GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
+					DrawClipEllipse(x, y, e, e, &(SCR_RECT){{0, 0, 159, 99}}, A_XOR);
+				}
+			}
+		}// end if active
+	}// next i
+	
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -664,6 +701,9 @@ void Draw_renderGame()
 	
 	// draw water that's infront of everything but the HUD
 	drawWater(FALSE);
+	
+	// draw explosions over everthing except HUD, since they reverse the pixels
+	drawExplosions();
 	
 	// HUD stuff is drawn last since it needs to go on top of all game elements
 	drawHUD();

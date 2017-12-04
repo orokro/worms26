@@ -396,7 +396,7 @@ void gameUpdates()
 	if(OilDrum_active)
 		OilDrums_update();
 
-	//if(Crate_active>0)
+	if(Crate_active>0)
 		Crates_update();
 	
 	if(Mine_active>0)
