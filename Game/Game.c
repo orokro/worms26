@@ -149,7 +149,10 @@ short Game_xMarkSpotY = 0;
 char Game_xMarkPlaced = FALSE;
 char Game_xMarkAllowedOverLand = TRUE;
 char Game_cursorEndTurn = FALSE;
-	
+
+// current turn number the game is on
+char Game_turn = 0;
+
 /* 
 	For reference, Game modes:
 	
@@ -389,7 +392,7 @@ void gameUpdates()
 	if(OilDrum_active)
 		OilDrums_update();
 
-	if(Crate_active>0)
+	//if(Crate_active>0)
 		Crates_update();
 	
 	if(Mine_active>0)
@@ -404,3 +407,62 @@ void gameUpdates()
 	// chance to see it
 	Explosion_update();
 }
+
+// returns TRUE or FALSE if all game objects (crates, mines, worms, etc) are settled and not doing anything
+char Game_allSettled()
+{
+	/*
+		all active items in the game have an unsigned short, where 1 bits are for active items
+		all items in the game have an unsigned short if they're settled, where 1 bits are for settled items
+		
+		there are three scenarios:
+			- an item is active and settled
+			- an item is active and not settled
+			- an item is inactive and settled or not settled
+			
+		we don't care about inactive items weather they are settled or not.
+		
+		if we AND the active items and the setttled items, we will get an unsigned short of items that are
+		active and settled.
+		
+		If we AND the active items with the ~ inverse of the result, it should equal 0. This means, all
+		active items are settled.
+		
+		If we do this, and there's a 1 value, that means an active item (1) was ANDED with an unsettled item (0)
+		
+		Thus, we can do some nice bitwise work and determine if any active items are unsettled
+		
+		1100	- active
+		1010	- settled
+		
+		0101	- ~settled
+		
+		1100	- active
+		AND
+		0101	- ~settled
+		----
+		0100	- active and unsettled
+		
+		If the value of all these results OR'd together is not 0, then something somewhere is active
+		Explosion_active and Mine_triggered can be OR'd onto the result, since no active explosions or triggered mines are allowed.
+	*/
+	
+	// if this value is NOT 0, something somewhere is active, exploding, or is a triggered mine
+	unsigned short unsettled = (Crate_active & (~Crate_settled)) | (Worm_active & (~Worm_settled)) | (OilDrum_active & (~OilDrum_settled)) | (Mine_active & (~Mine_settled)) | Explosion_active | Mine_triggered;
+	if(unsettled)
+		return FALSE;
+	else
+		return TRUE;
+}
+
+
+
+
+
+
+
+
+
+
+
+

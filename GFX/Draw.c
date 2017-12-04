@@ -204,6 +204,10 @@ void drawOilDrums()
 
 /**
 	Draws all the in-game, on-screen Crates.
+	
+	#define crateHealth 0
+	#define crateWeapon 1
+	#define crateTool 2
 */
 void drawCrates()
 {
@@ -213,20 +217,24 @@ void drawCrates()
 	short i;
 	for(i=0; i<MAX_CRATES; i++)
 	{
-		if(Crate_active & (unsigned short)1<<(i))
+		if(Crate_active & ((unsigned short)1<<(i)))
 		{
 			screenX=Crate_x[i];
 			screenY=Crate_y[i];
 			if(worldToScreen(&screenX, &screenY))
 			{
-				DrawClipChar(screenX-4, screenY-8, 'C', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
-				if(Crate_type[i]==crateHealth)
-					DrawClipChar(screenX-4, screenY-16, 'H', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
-				else if(Crate_type[i]==crateWeapon)
-					DrawClipChar(screenX-4, screenY-16, 'W', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
-				else
-					DrawClipChar(screenX-4, screenY-16, 'T', (&(SCR_RECT){{0, 0, 159, 99}}), A_XOR);
+				// if crate has parachute
+				if(i==parachuteCrate)
+				{
+					ClipSprite16_MASK_R(screenX-6, screenY-16, 12, spr_Parachute+12, spr_Parachute, lightPlane);
+					ClipSprite16_MASK_R(screenX-6, screenY-16, 12, spr_Parachute+24, spr_Parachute, darkPlane);
+				}
 				
+				// draw crate (this comes after parachut so it can slightly overlap)
+				unsigned short *sprite = ((Crate_type[i]==crateHealth) ? (unsigned short*)&spr_CrateHealth[0] : ((Crate_type[i]==crateWeapon) ? (unsigned short*)&spr_CrateWeapon[0] : (unsigned short*)&spr_CrateTool[0]));					
+				ClipSprite16_MASK_R(screenX-6, screenY-6, 12, sprite+12, sprite, lightPlane);
+				ClipSprite16_MASK_R(screenX-6, screenY-6, 12, sprite+24, sprite, darkPlane);
+
 			}// end if on screen
 		}// end if active
 	}// next i

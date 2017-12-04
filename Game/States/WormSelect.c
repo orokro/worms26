@@ -81,6 +81,9 @@ static void nextWorm()
 */
 static void WormSelect_enter()
 {
+	// it's a new turn..
+	Game_turn++;
+	
 	// toggle teams
 	Game_currentTeam = (Game_currentTeam==1 ? 0 : 1);
 	

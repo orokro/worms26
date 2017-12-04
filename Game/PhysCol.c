@@ -163,9 +163,20 @@ char Physics_apply(PhysObj *obj)
 	short initX = *obj->x;
 	short initY = *obj->y;
 	
-	// apply the velocities (which may be 0)
-	*obj->x += (*obj->xVelo);
-	*obj->y += (*obj->yVelo);
+	// if an object is too far below the water, it is perminently settled, and we dont
+	// need to do anything with it.
+	if(initY>250)
+	{
+		*obj->settled |= ((unsigned short)1<<(obj->index));
+		return 0;
+	}
+	
+	// apply the velocities (which may be 0), if their bounciness is less than zero
+	// we don't ever change that axis
+	if(obj->bouncinessX>=0.0f)
+		*obj->x += (*obj->xVelo);
+	if(obj->bouncinessY>=0.0f)
+		*obj->y += (*obj->yVelo);
 	
 	// apply the collider, which might move our object
 	unsigned char hits = Collider_apply(&obj->col, obj->x, obj->y);
@@ -179,6 +190,13 @@ char Physics_apply(PhysObj *obj)
 		*obj->xVelo=0;
 		*obj->yVelo=0;
 		*obj->settled |= ((unsigned short)1<<(obj->index));
+		
+		// if an axis is locked, prevent it's movement
+		if(obj->bouncinessX<0.0f)
+			*obj->x = initX;
+		if(obj->bouncinessY<0.0f)
+		 	*obj->y = initY;
+		
 		return 0;
 		
 	// if hit nothing, nothing to do here:
@@ -262,6 +280,13 @@ char Physics_apply(PhysObj *obj)
 			*obj->settled |= (unsigned short)1<<(obj->index);
 		}
 	}
+	
+	// if an axis is locked, prevent it's movement
+	if(obj->bouncinessX<0.0f)
+		*obj->x = initX;
+	if(obj->bouncinessY<0.0f)
+		*obj->y = initY;
+		
 	
 	// return weather or not the object was moved in this frame
 	return moved;

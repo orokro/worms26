@@ -372,6 +372,7 @@ typedef struct{
 	// the objects bouciness on X and Y:
 	// 0.0 = doesn't bounce.
 	// 1.0 = bounces back with full velocity
+	// -1.0 = special case: object not allowed to move on that axis
 	float bouncinessX, bouncinessY;
 	
 	// the objects smoothness
@@ -580,6 +581,7 @@ extern char Mine_xVelo[MAX_MINES];
 extern char Mine_yVelo[MAX_MINES];
 extern char Mine_fuse[MAX_MINES];
 extern unsigned short Mine_active;
+extern unsigned short Mine_triggered;
 extern unsigned short Mine_settled;
 extern char OilDrum_xVelo[MAX_OILDRUMS];
 extern char OilDrum_yVelo[MAX_OILDRUMS];
@@ -618,6 +620,7 @@ extern char Crate_health[MAX_CRATES];
 extern char Crate_type[MAX_CRATES];
 extern unsigned short Crate_active;
 extern unsigned short Crate_settled;
+extern char parachuteCrate;
 
 // crate function prototypes
 
@@ -625,8 +628,9 @@ extern unsigned short Crate_settled;
  * This spawns a single Crate in the game, of the given type.
  * 
  * @param type the type of crate to spawn, as one of our defines: crateHealth, crateWeapon, crateTool
+ * @return TRUE or FALSE if a crate was successfully spawned
 */
-extern void Crates_spawnCrate(char);
+extern char Crates_spawnCrate();
 
 /**
  * Updates the Crates currently active, should be called once per frame.
@@ -780,6 +784,7 @@ extern short Game_xMarkSpotY;
 extern char Game_xMarkPlaced;
 extern char Game_xMarkAllowedOverLand;
 extern char Game_cursorEndTurn;
+extern char Game_turn;
 
 // game function prototypes
 
@@ -798,3 +803,15 @@ extern void Game_changeMode(char);
  * This is called every frame in the main-loop.
 */
 extern void Game_update();
+
+/**
+	* Returns TRUE or FALSE if all he game items in the game are settled and not doing anything.
+	* 
+	* Crates, Mines, Drums, and Worms must be settled on the ground.
+	* No active mine timers allowed.
+	* No active explosions.
+	* No active weapons
+	*
+	* @return TRUE or FALSE if everything is settled or not
+*/
+extern char Game_allSettled();

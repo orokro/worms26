@@ -39,6 +39,9 @@ char Mine_fuse[MAX_MINES] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 // is the mine active? using bits for booleans
 unsigned short Mine_active=0;
 
+// is the mine triggered, with a countdown?
+unsigned short Mine_triggered=0;
+
 // is the mine settled on the map?
 unsigned short Mine_settled=0;
 
