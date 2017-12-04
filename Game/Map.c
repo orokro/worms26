@@ -52,6 +52,16 @@
 short spawnPoint_x[53];
 short spawnPoint_y[53];
 
+/*
+	the map will keep an array of 620 tiles, (32 x 20) which represent
+	10x10 tiles on the map. When mines or crates spawn or move, they
+	will set their id in the tile they're in.
+	
+	This way, we can only check the crates and mines the tiles are in
+	for this worm.
+*/
+unsigned char mapTiles[640];
+	
 // when a spawn point is requested of the map, it will find one
 // and update these global map variables:
 short Map_lastRequestedSpawnX=0;
@@ -454,3 +464,41 @@ void Map_getSpawnPoint()
 			}
 	}	
 }
+
+// update our tile map with the positions of crates and tiles
+void Map_updateTiles()
+{
+	// make an empty array so we can quickly clear the other array
+	unsigned char clear[640];
+	memcpy(mapTiles, clear, sizeof(clear));
+	
+	// loop over active crates and mines and set their tiles:
+	unsigned short i;
+	for(i=0; i<16; i++)
+	{
+		char activeCrate = (unsigned short)(Crate_active & (unsigned short)1<<i)>0;
+		char activeMine = (unsigned short)(Mine_active & (unsigned short)1<<i)>0;
+		
+		if(activeCrate)
+		{
+			if(Crate_x[i]>=0 && Crate_x[i]<320 && Crate_y[i]>=0 && Crate_y[i]<200)
+			{
+				short crateTile = (Crate_x[i]/10)*(Crate_y[i]/10);
+				unsigned char crateID = (i<<4);
+				mapTiles[crateTile] |= crateID;
+			}// end if crate on map
+		}// end if active crate
+		
+		if(activeMine)
+		{
+			if(Mine_x[i]>=0 && Mine_x[i]<320 && Mine_y[i]>=0 && Mine_y[i]<200)
+			{
+				short mineTile = (Mine_x[i]/10)*(Mine_y[i]/10);
+				unsigned char mineID = i;
+				mapTiles[mineTile] |= mineID;
+			}// end if mine on map
+		}// end if active mine
+		
+	}// next i
+}
+

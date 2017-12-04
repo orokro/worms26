@@ -385,6 +385,10 @@ void gameUpdates()
 	gameTimers();
 	//return;
 	
+	// if any crates or mines are unsettled we need to update the map tiles
+	if(((Crate_active & ~Crate_settled) | (Mine_active & ~Mine_settled))>0)
+		Map_updateTiles();
+		
 	// gravity and physics for worms!
 	Worm_update();
 	
@@ -400,7 +404,7 @@ void gameUpdates()
 		
 	if(Weapon_active>0)
 		Weapons_update();
-		
+
 	// update explosions
 	// NOTE: this comes last because after an explosion has had its first frame
 	// it disables that bit... gotta make sure everyone else on this frame has a

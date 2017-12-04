@@ -271,6 +271,7 @@ extern void setMapPtr(void *ptr);
 extern short Map_lastRequestedSpawnX;
 extern short Map_lastRequestedSpawnY;
 extern void *mapLight, *mapDark;
+extern unsigned char mapTiles[640];
 
 // map function prototypes
 
@@ -310,6 +311,10 @@ extern void Map_getSpawnPoint();
 */
 extern void Map_makeMap();
 
+/**
+ * Updates our tile map with the positions of objects
+*/
+extern void Map_updateTiles();
 
 
 /* ======================================================================================================================================
@@ -601,6 +606,21 @@ extern void Mines_spawnMines();
 */
 extern void Mines_update();
 
+/**
+ * Allows a worm to trigger a mine
+ *
+ * @param index the mine index to trigger
+*/
+extern void Mines_trigger(short);
+
+/**
+ * Changes the heath of a worm. Updates worms health sprite.
+ *
+ * @param index the worm to change
+ * @param health the amount to set it to, or add/subtract from
+ * @param additive TRUE or FALSE if using additive mode
+*/
+extern void Worm_setHealth(short, short, char);
 
 
 /* ======================================================================================================================================
@@ -637,6 +657,13 @@ extern char Crates_spawnCrate();
 */
 extern void Crates_update();
 
+/**
+ * Allows a worm to pick up the crate
+ *
+ * @param index the crate index to pickup
+ * @param worm the index of the worm who picked up the crate
+*/
+extern void Crates_pickUp(short, short);
 
 
 /* ======================================================================================================================================

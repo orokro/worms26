@@ -466,3 +466,18 @@ void Crates_update()
 		}// end if active
 	}// next i
 }
+
+// allows a worm to pick up a crate
+void Crates_pickUp(short index, short worm)
+{
+	// no longer active
+	Crate_active &= ~((unsigned short)1<<(index));
+	
+	// based on the type, upgrade the worm
+	if(Crate_type[index]==crateHealth)
+		Worm_setHealth(worm, 50, TRUE);
+		
+	// update the map tiles..
+	Map_updateTiles();
+}
+

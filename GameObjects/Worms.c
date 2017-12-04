@@ -60,6 +60,9 @@ unsigned short Worm_onGround = 0;
 // the sprites for the worms health will be rendered into this array when their health changes
 unsigned short Worm_HealthSprite[MAX_WORMS][7];
 
+// the current worms 10x10 tile. we don't need to store both X and Y, just the tile index
+short Worm_tile[MAX_WORMS] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -229,6 +232,38 @@ void spawnWorm(short index)
 
 
 
+/**
+ * checks if a worm is close to a crate or a mine, based on the tile the worm is in
+ */
+void checkCratesAndMines(short index)
+{
+	// get the tile data at the worms tile
+	unsigned char tileData = mapTiles[Worm_tile[index]];
+	
+	// if there are no items in this tile, no checks to make
+	if(tileData==0)
+		return;
+	
+	// get the high and low word, high word being crates
+	short mine = tileData & 0b00001111;
+	short crate = (tileData & 0b11110000)>>4;
+	
+	// if there is a crate on this tile..
+	if(crate)
+	{
+		// check if we are close enough to pick it up
+		if(abs(Crate_x[crate]-Worm_x[index])<5 && abs(Crate_y[crate]-Worm_y[index])<5)
+			Crates_pickUp(crate, index);
+	}
+	
+	// if there is a mine on this tile..
+	if(mine)
+	{
+		// check if we are close enough to trigger it
+		if(abs(Mine_x[mine]-Worm_x[index])<10 && abs(Mine_y[mine]-Worm_y[index])<10)
+			Mines_trigger(mine);
+	}
+}
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 
@@ -283,14 +318,33 @@ void Worm_update()
 					Worm_onGround &= ~wormMask;
 			}
 			
+			// calculate the worms tile, and if it changed, we need to check for mine and crate updates
+			Worm_tile[i] = (Worm_x[i]/10) * (Worm_y[i]/10);
+		
+			//only check if the tile is in a valid range, and if the worm moved:
+			//if((Worm_tile[i]>=0 && Worm_tile[i]<640))
+				checkCratesAndMines(i);
+					
 			// if the worm goes below 200 pixels, its drown:
 			if(Worm_y[i]>200)
 				Worm_isDead |= wormMask;
-				
+					
 		}// end if active worm
 	}// next i
 }
 
+
+// changes the worms health
+void Worm_setHealth(short index, short health, char additive)
+{
+	if(additive)
+		Worm_health[index] += health;
+	else
+		Worm_health[index] = health;
+		
+	// update it's sprite
+	renderHealthSprite(index);
+}
 
 
 

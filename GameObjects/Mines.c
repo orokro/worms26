@@ -94,11 +94,14 @@ void updateMine(short index)
 		if(Mine_fuse[index]==0)
 		{
 			// disable the mine
-			Mine_fuse[index] = -1;
 			Mine_active &= ~((unsigned short)1<<(index));
-
+			Mine_triggered &= ~((unsigned short)1<<(index));
+			
+			// update the map..
+			Map_updateTiles();
+			
 			// boom
-			Explosion_spawn(Mine_x[index], Mine_y[index], 30, 30, TRUE);
+			//Explosion_spawn(Mine_x[index], Mine_y[index], 30, 30, TRUE);
 				
 		}// end if 
 		
@@ -282,4 +285,14 @@ void Mines_update()
 			updateMine(i);
 		}	
 	}// next i
+}
+
+// triggers a mine
+void Mines_trigger(short index)
+{
+	// mine triggered
+	Mine_triggered |= (unsigned short)1<<(index);
+	
+	// set fuse
+	Mine_fuse[index] = ((Match_mineFuseLength<6) ? (Match_mineFuseLength*TIME_MULTIPLIER) : (random(5)*TIME_MULTIPLIER));
 }
