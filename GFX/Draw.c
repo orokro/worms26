@@ -619,7 +619,7 @@ void drawExplosions()
 		
 	// loop over explosions..
 	short i;
-	for(i=0; i<8; i++)
+	for(i=0; i<MAX_EXPLOSIONS; i++)
 	{
 		if(Explosion_active & (unsigned short)1<<i)
 		{

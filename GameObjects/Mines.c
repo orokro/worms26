@@ -107,6 +107,9 @@ void updateMine(short index)
 		
 	}//end if active fuse
 	
+	// check if explosions moved this mine
+	Physics_checkExplosions(&Mine_physObj[index]);
+			
 	// if the Mine is considered "settled" no need for physics
 	if(!(Mine_settled & (unsigned short)1<<(index)))
 	{
@@ -119,63 +122,6 @@ void updateMine(short index)
 }
 
 
-
-/**
- * Checks if any explosions affect the mine of the given index.
- *
- * @param index the mine to check to see if explostions affected it.
-*/
-void checkExplosions(short index)
-{
-	short i=0; 
-	for(i=0; i<8; i++)
-	{
-		// check if the explosion is in it's first-frame
-		char firstFrame = (char)((Explosion_firstFrame & (unsigned short)1<<(i))>0);
-
-		// only do shit if first frame, yo
-		if(firstFrame)
-		{
-						
-			// the power of the velcotity
-			float velocityPower = 0.0f;
-			
-			// if it's in it's first frame, calculate the distance from us to it:
-			short d = dist(Mine_x[index], Mine_y[index], Explosion_x[i], Explosion_y[i]);
-			
-			// calculate the extranius radius, with a power-fall off
-			short largerRadius = (short)(1.5f * Explosion_size[i]);
-			
-			// if we're withing the blast radius, take full damage:
-			if(d<Explosion_size[i])
-			{
-				velocityPower = 1.0f;
-			}else if(d<largerRadius)
-			{
-				// subract the minimum radius from both:
-				short minD = d - Explosion_size[i];
-				short minL = largerRadius - Explosion_size[i];
-				
-				// calculate how far away we are:
-				float distFallOffRatio = (1.0f - ((float)minD/(float)minL));
-				
-				// set velocity power:
-				velocityPower = distFallOffRatio;
-				continue;
-				
-			}else
-			{
-				velocityPower = 0.0f;
-			}//end if
-			
-			// apply velocity from explosion:
-			Mine_xVelo[index] = (Explosion_x[i]-Mine_x[index]) * velocityPower;
-			Mine_yVelo[index] = (Explosion_y[i]-Mine_y[index]) * velocityPower;
-			
-		}// end if first frame
-		
-	}// next i
-}
 
 
 
@@ -232,10 +178,6 @@ void Mines_update()
 		// only update active mines
 		if(Mine_active & (unsigned short)1<<(i))
 		{
-			// unfortuntely, since blast-detomation reqiores first-frame access, we gotta check
-			// explosions every frame
-			checkExplosions(i);
-			
 			// udpates the mine (if it has a timer, decrease it and explode it if necessary)
 			updateMine(i);
 		}	
@@ -245,6 +187,10 @@ void Mines_update()
 // triggers a mine
 void Mines_trigger(short index)
 {
+	// if this mine is already triggered, just gtfo
+	if(Mine_triggered & (unsigned short)1<<(index))
+		return;
+		
 	// mine triggered
 	Mine_triggered |= (unsigned short)1<<(index);
 	

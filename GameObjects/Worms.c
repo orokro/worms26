@@ -293,9 +293,14 @@ void Worm_update()
 		wormMask = (unsigned short)((unsigned short)wormMask<<(i));
 		
 		// only update worms in the game
-		if((Worm_active & wormMask) > 0)
+		if(Worm_active & wormMask)
 		{
-			// if the Mine is considered "settled" no need for physics
+			
+			// check all explosions if they are near-by and damaging this worm
+			short damage = Physics_checkExplosions(&Worm_physObj[i]);
+			Worm_setHealth(i, -damage, TRUE);
+				
+			// if the worm is considered "settled" no need for physics
 			if(!(Worm_settled & wormMask))
 			{
 				// add gravity to the worm
@@ -321,9 +326,8 @@ void Worm_update()
 			// calculate the worms tile, and if it changed, we need to check for mine and crate updates
 			Worm_tile[i] = (Worm_x[i]/10) * (Worm_y[i]/10);
 		
-			//only check if the tile is in a valid range, and if the worm moved:
-			//if((Worm_tile[i]>=0 && Worm_tile[i]<640))
-				checkCratesAndMines(i);
+			//check if a worm triggered a crate or a mine
+			checkCratesAndMines(i);
 					
 			// if the worm goes below 200 pixels, its drown:
 			if(Worm_y[i]>200)

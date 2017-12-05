@@ -449,6 +449,16 @@ extern char Physics_apply(PhysObj*);
 extern void Physics_setVelocity(PhysObj *obj, char x, char y, char additive);
 
 /**
+ * Tests an object against nearby explosions, if any.
+ *
+ * Will automatically apply velocities if hit by any number of explosions.
+ *
+ * @param *obj the physics object to test with
+ * @return the total damage taken by the object, if hit by one or more explosions
+*/
+extern short Physics_checkExplosions(PhysObj *obj);
+
+/**
  * This method takes a point in world space, and a direction and tests for collision.
  *
  * If the point collides with the map, it will calculate the first availble point in the opposite direction.
@@ -469,12 +479,15 @@ extern short Collide_test(short, short, char);
    EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++
    ====================================================================================================================================== */
 
+// explosion defined
+#define MAX_EXPLOSIONS 8
+
 // explosion globals
-extern short Explosion_x[8];
-extern short Explosion_y[8];
-extern char Explosion_time[8];
-extern char Explosion_size[8];
-extern char Explosion_power[8];
+extern short Explosion_x[MAX_EXPLOSIONS];
+extern short Explosion_y[MAX_EXPLOSIONS];
+extern char Explosion_time[MAX_EXPLOSIONS];
+extern char Explosion_size[MAX_EXPLOSIONS];
+extern char Explosion_power[MAX_EXPLOSIONS];
 extern unsigned short Explosion_active;
 extern unsigned short Explosion_firstFrame;
 

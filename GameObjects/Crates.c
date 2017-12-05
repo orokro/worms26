@@ -337,53 +337,6 @@ static char spawnCrate()
 }
 
 
-/**
- * Checks if nearby explosions affect any of the given Crates index.
- *
- * @param index the index of the Crate to check for nearby explosions.
- */
-static void checkExplosions(short index)
-{
-	short i=0; 
-	for(i=0; i<8; i++)
-	{
-		// check if the explosion is in it's first-frame
-		char firstFrame = (char)((Explosion_firstFrame & (unsigned short)1<<(i))>0);
-		
-		// only do shit if first frame, yo
-		if(firstFrame)
-		{
-				
-			// if it's in it's first frame, calculate the distance from us to it:
-			short d = dist(Crate_x[index], Crate_y[index], Explosion_x[i], Explosion_y[i]);
-			
-			// if we're withing the blast radius, take full damage:
-			if(d<Explosion_size[i])
-			{
-				Crate_health[index] -= Explosion_power[i];
-				continue;
-			}// end if within exp radius
-			
-			// calculate the extranius radius, with a power-fall off
-			short largerRadius = (short)(1.5f * Explosion_size[i]);
-			if(d<largerRadius)
-			{
-				// subract the minimum radius from both:
-				short minD = d - Explosion_size[i];
-				short minL = largerRadius - Explosion_size[i];
-				
-				// calculate how far away we are:
-				float distFallOffRatio = (1.0f - ((float)minD/(float)minL));
-				
-				// apply only this much damage:
-				Crate_health[index] -= (Explosion_power[i] * distFallOffRatio);
-				
-				continue;
-			}// end if within larger radius
-		}// end if first frame
-	}// next i
-}
-
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 
@@ -428,8 +381,9 @@ void Crates_update()
 		if((Crate_active & (unsigned short)1<<(i)))
 		{
 			// check all explosions if they are near-by and damaging this crate
-			checkExplosions(i);
-
+			short damage = Physics_checkExplosions(&Crate_physObj[i]);
+			Crate_health[i] -= damage;
+			
 			// if ded
 			if(Crate_health[i]<=0)
 			{

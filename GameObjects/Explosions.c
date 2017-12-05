@@ -17,18 +17,18 @@
 */
 
 // x/y positions of our Explosions
-short Explosion_x[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-short Explosion_y[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+short Explosion_x[MAX_EXPLOSIONS] = {0, 0, 0, 0, 0, 0, 0, 0};
+short Explosion_y[MAX_EXPLOSIONS] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 // current time of our explosion
 // note that we will consider <=0 time an inactive explosion
-char Explosion_time[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+char Explosion_time[MAX_EXPLOSIONS] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 // the size of the explosion
-char Explosion_size[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+char Explosion_size[MAX_EXPLOSIONS] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 // the damage power of the explosion
-char Explosion_power[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+char Explosion_power[MAX_EXPLOSIONS] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 // if any explosion is active
 unsigned short Explosion_active = 0;
@@ -59,21 +59,15 @@ unsigned short Explosion_firstFrame = 0;
 */
 void updateExplosion(short index)
 {
+	// if our time and size are the same, this is the first frame of this explosion
+	if(Explosion_time[index]==Explosion_size[index])
+		Explosion_firstFrame |= (unsigned short)1<<(index);
+	else
+		Explosion_firstFrame &= ~((unsigned short)1<<(index));
+	
 	// decrease it's time
 	Explosion_time[index]--;
-	
-	// no matter what, it's not a first-frame any more
-	Explosion_firstFrame &= ~((unsigned short)1<<(index));
-	
-	// calculate it's current radius
-	short radius = Explosion_size[index] - Explosion_time[index];
-	
-	// draw the explosion on our MapBuffers to erase map
-	// TO-DO: implement explosion drawing
-	
-	// prevent warnings for now
-	radius = radius;
-	
+
 	// if the explosions time is up, set it inactive
 	if(Explosion_time[index]<0)
 		Explosion_active &= ~((unsigned short)1<<(index));
@@ -104,7 +98,7 @@ void Explosion_spawn(short x, short y, char size, char power, char hasFire)
 	short expIndex = -1;
 	short lowestTimeIndex = -1;
 	short i=0;
-	for(i=0; i<8; i++)
+	for(i=0; i<MAX_EXPLOSIONS; i++)
 	{
 		// if it's active, we can just used that!
 		if(Explosion_time[i]<=0)
@@ -147,8 +141,8 @@ void Explosion_spawn(short x, short y, char size, char power, char hasFire)
 	Explosion_time[expIndex] = size;
 	Explosion_power[expIndex] = power;
 	
-	// set first-frame bit for this explosion to 1 (TRUE)
-	Explosion_firstFrame |= (unsigned short)1<<(expIndex);
+	// explosions wont have their "first frame" until next frame
+	Explosion_firstFrame &= ~((unsigned short)1<<(expIndex));
 	
 	// set this explosion active
 	Explosion_active |= (unsigned short)1<<(expIndex);
@@ -164,7 +158,7 @@ void Explosion_update()
 {
 	// update all our explosions, (if active)
 	short i=0;
-	for(i=0; i<8; i++)
+	for(i=0; i<MAX_EXPLOSIONS; i++)
 		if(Explosion_active & (unsigned short)1<<i)
 			updateExplosion(i);
 }

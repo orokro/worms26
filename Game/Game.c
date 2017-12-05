@@ -388,7 +388,13 @@ void gameUpdates()
 	// if any crates or mines are unsettled we need to update the map tiles
 	if(((Crate_active & ~Crate_settled) | (Mine_active & ~Mine_settled))>0)
 		Map_updateTiles();
-		
+	
+	// update explosions
+	// NOTE: this comes first because after an explosion has had its first frame
+	// it disables that bit... gotta make sure everyone else on this frame has a
+	// chance to see it
+	Explosion_update();
+	
 	// gravity and physics for worms!
 	Worm_update();
 	
@@ -396,20 +402,15 @@ void gameUpdates()
 	if(OilDrum_active)
 		OilDrums_update();
 
-	if(Crate_active>0)
+	if(Crate_active)
 		Crates_update();
 	
-	if(Mine_active>0)
+	if(Mine_active)
 		Mines_update();
 		
-	if(Weapon_active>0)
+	if(Weapon_active)
 		Weapons_update();
 
-	// update explosions
-	// NOTE: this comes last because after an explosion has had its first frame
-	// it disables that bit... gotta make sure everyone else on this frame has a
-	// chance to see it
-	Explosion_update();
 }
 
 // returns TRUE or FALSE if all game objects (crates, mines, worms, etc) are settled and not doing anything
