@@ -81,7 +81,8 @@ extern char Match_toolCratesEnabled;
 extern char Match_healthCratesEnabled;
 extern char Match_weaponCratesEnabled;
 extern short Match_defaultWeapons[5][14];
-
+extern const char *Match_teamNames[2];
+extern const char *Match_wormNames[16];
 
 
 /* ======================================================================================================================================
@@ -207,6 +208,8 @@ extern void Camera_clearFocus();
 
 // Draw globals
 extern unsigned long windSprites[3][3];
+extern unsigned long healthSprites[16][5];
+extern unsigned long healthMasks[16][5];
 
 // draw function prototypes
 
@@ -253,6 +256,31 @@ extern void Draw_renderPauseMenu(char);
  * @param wy a char that contatins the y-position of the current weapon selected in the matrix of weapons
 */
 extern void Draw_renderWeaponsMenu(char, char);
+
+/**
+ * renders our tiny text font to a serrirs of unsigned longs
+ *
+ * @param *buffer a pointer to at least 3 unsigned longs to render the text to
+ * @param size the number of unsigned longs this buffer is wide. There should be 3*size unsigned longs in the buffer.
+ * @param txt the test to write
+ * @param color TRUE for white on black, FALSE for black on white
+ * @return the length of the text in pixels
+*/
+extern short Draw_renderText(unsigned long *buffer, char size, char *txt, char color);
+
+/**
+ * renders all the worms name sprites once at the beginning of the game
+*/
+extern void Draw_renderWormNameSprites();
+
+/**
+ * So we don't have to render text every time, this routine will generate a the sprites to use for a worms health.
+ *
+ * This way, we can redraw the sprite, only when the health changes.
+ *
+ * @param index the index of the worm to draw the health sprite for
+*/
+void Draw_healthSprite(short index);
 
 /**
  * Expirimental, now depricated method, to set a local pointer to the maps memory.
@@ -536,7 +564,6 @@ extern char Worm_mode[MAX_WORMS];
 extern char Worm_currentWorm;
 extern unsigned short Worm_settled;
 extern unsigned short Worm_onGround;
-extern unsigned short Worm_HealthSprite[MAX_WORMS][7];
 
 // worm function prototypes
 

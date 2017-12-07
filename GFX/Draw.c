@@ -19,6 +19,11 @@
 // these sprites will be generated at the begining of the each turn to match the current wind conditions
 unsigned long windSprites[3][3];
 
+unsigned long nameSprites[16][10];
+unsigned long nameMasks[16][10];
+unsigned long healthSprites[16][5];
+unsigned long healthMasks[16][5];
+
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 
@@ -79,25 +84,69 @@ void drawWorms()
 				short y = screenY-8;
 				char facing = (Worm_dir & (unsigned short)1<<(i))>0;
 
-				// use the worms fill to erase the background on it's opposite color plane, acting as a mask
-				ClipSprite16_AND_R(x, y, 15, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), ((i>=8) ? lightPlane : darkPlane));
+				// use the worms fill to erase the background
+				ClipSprite16_AND_R(x, y, 15, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), darkPlane);
 				
 				// draw the worms fill and outline
-				if(i<8)
-				{
-					ClipSprite16_AND_R(x, y, 15, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), lightPlane);
-					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), darkPlane);
-					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), lightPlane);
-				}	
-				else
-				{
-					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Fill : spr_WormRight_Fill), darkPlane);
-					ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), lightPlane);
-				}
-				
+				ClipSprite16_AND_R(x, y, 15, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), lightPlane);
+				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), darkPlane);
+				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), lightPlane);
+
 				// draw health above worm
-				ClipSprite16_OR_R(x, y-8, 7, Worm_HealthSprite[i], lightPlane);
-				ClipSprite16_OR_R(x, y-8, 7, Worm_HealthSprite[i], darkPlane);
+				//ClipSprite16_OR_R(x, y-8, 7, Worm_HealthSprite[i], lightPlane);
+				//ClipSprite16_OR_R(x, y-8, 7, Worm_HealthSprite[i], darkPlane);
+				
+				if(i>8)
+				{
+					ClipSprite32_XOR_R(x-8, y-6, 5, healthMasks[i], lightPlane);
+					ClipSprite32_OR_R(x-8, y-6, 5, healthMasks[i], darkPlane);
+					ClipSprite32_XOR_R(x-8, y-6, 5, healthMasks[i], darkPlane);
+				}else
+				{
+					ClipSprite32_OR_R(x-8, y-6, 5, healthMasks[i], lightPlane);
+					ClipSprite32_OR_R(x-8, y-6, 5, healthMasks[i], darkPlane);
+					ClipSprite32_XOR_R(x-8, y-6, 5, healthMasks[i], lightPlane);
+					ClipSprite32_XOR_R(x-8, y-6, 5, healthMasks[i], darkPlane);
+				}
+				ClipSprite32_OR_R(x-8, y-6, 5, healthSprites[i], lightPlane);
+				ClipSprite32_OR_R(x-8, y-6, 5, healthSprites[i], darkPlane);
+					
+				// draw name above worm
+				short n;
+				for(n=0; n<2; n++)
+				{
+					/*
+						for team 1, the sprite is dark bg with white text
+						
+						we want to OR the mask on both planes (to make them solid black),
+						but leave outside pixels unaffected.
+						
+						then we can XOR the mask onto both planes, to erase them, and
+						leave the 0 mask pixels on the map unaffected (since XOR with a 0 will
+						not change a pixel)
+						
+						and then OR the sprite on both planes to make the light pixels white
+					*/
+					
+					// for light worms, we want to OR the mask onto the light plane, so its light gray
+					// and 
+					if(i>8)
+					{
+						ClipSprite32_XOR_R(x-24+n*32, y-10, 5, nameMasks[i]+(n*5), lightPlane);
+						ClipSprite32_OR_R(x-24+n*32, y-10, 5, nameMasks[i]+(n*5), darkPlane);
+						ClipSprite32_XOR_R(x-24+n*32, y-10, 5, nameMasks[i]+(n*5), darkPlane);
+					}else
+					{
+						ClipSprite32_OR_R(x-24+n*32, y-10, 5, nameMasks[i]+(n*5), lightPlane);
+						ClipSprite32_OR_R(x-24+n*32, y-10, 5, nameMasks[i]+(n*5), darkPlane);
+						ClipSprite32_XOR_R(x-24+n*32, y-10, 5, nameMasks[i]+(n*5), lightPlane);
+						ClipSprite32_XOR_R(x-24+n*32, y-10, 5, nameMasks[i]+(n*5), darkPlane);
+					}
+
+					// finally if we OR the sprite it to both buffers, it will draw the name
+					ClipSprite32_OR_R(x-24+n*32, y-10, 5, nameSprites[i]+(n*5), lightPlane);
+					ClipSprite32_OR_R(x-24+n*32, y-10, 5, nameSprites[i]+(n*5), darkPlane);
+				}
 				
 				//char foo = (char)((Worm_settled & ((unsigned short)1<<(i)))>0);
 				//DrawChar(x, y-15, (foo ? (char)20 : 'X'), A_NORMAL);
@@ -794,5 +843,279 @@ void Draw_renderWeaponsMenu(char wx, char wy)
 	}
 }
 
+// render a text message to the buffers
+short Draw_renderText(unsigned long *buffer, char size, char *txt, char color)
+{
+	/*
+		The characters are stored in a serries of unsigned longs, with 8 characters every 3 rows
+		the characters are arranged as so:
+		ABCD EFGH
+		IJKL MNOP
+		QRST UVWX
+		YZ01 2345
+		6789 -.?
+		
+		Thus:
+			- letters are 0-25
+			- numbers are 26-35
+			- . is 36
+			- - is 37
+			- ? is 38
+			- space is 39
+			
+		// not all characters are 4 bits wide, for proper spacing we need to save all the char widths
+	*/
+	
+	static char widths[] = {	
+														3, 2, 2, 3,  3, 3, 4, 3,
+														1, 2, 3, 2,  3, 4, 3, 2,
+														4, 3, 3, 3,  3, 3, 3, 3,
+														3, 3, 3, 1,  3, 3, 3, 3,
+														2, 3, 2, 2,  1, 2, 2, 2
+													};
 
+	int i;
+	
+	// save the length of the text
+	short len = strlen(txt);
+
+	// as we copy bits to each pixel of the buffers, we will move from 0 left, to right
+	// keep track of the pixel we're on
+	short pixColumn=0;
+
+	// loop to copy all chars
+	for(i=0; i<len; i++)
+	{
+		// get the char at this index
+		char chr = txt[i];
+		
+		// we need to convert the character to our mapped sprite, space will default for space or unknown chars
+		if(chr>=65 && chr<=90)
+			chr -= 65;
+		else if(chr>=48 && chr<=57)
+			chr -= 22;
+		else if(chr==45 || chr==47)
+			chr -= 9;
+		else if(chr==63)
+			chr = 38;
+		else
+			chr = 39;
+		
+		// get width of this char, so we know how many bits to copy
+		char chrWidth = widths[(short)chr];
+		
+		// get the bit index this char lives at horizontally in the sprites
+		char charStartBit = 3+((7-chr%8)*4);
+		
+		// make a mask starting at this bit:
+		unsigned long charBitMask = 1;
+		charBitMask = charBitMask<<charStartBit;
+
+		/*
+			get the unsigned long in which the top row of the char lives.
+			
+			Note: every 8 chars take 3 rows of unsigned longs.
+		*/
+		unsigned long *charStartUL = spr_tinyFont + (((chr-(chr%8))/8)*3);
+	
+		// add leading space
+		pixColumn++;
+		
+		// now we loop to copy the chars pixels from its row, to our row and location
+		int chrPix, row;
+		for(chrPix=0; chrPix<chrWidth; chrPix++)
+		{
+			// increment the our buffers colum
+			pixColumn++;
+			
+			// make a mask for our current pixel colum
+			unsigned long pixBitMask = 1;
+			pixBitMask = pixBitMask<<(31-(pixColumn%32));
+			
+			// calculate the current long we're on width wise, and get reference to it
+			short ulIndex = ((pixColumn-(pixColumn%32))/32)*5+1;
+			unsigned long *currentUL = buffer+ulIndex;
+			
+			// copy the current char row pixels to each buffer row pixels
+			for(row=0; row<3; row++)
+			{
+					// get status of char bit:
+					unsigned long chrBit = *(charStartUL+row) & charBitMask;
+					
+					// set bit in our buffer, based on black or white mode
+					if(!color)
+						chrBit ? (*(currentUL) |= pixBitMask) : (*(currentUL) &= ~pixBitMask);
+					else
+						chrBit ? (*(currentUL) &= ~pixBitMask) : (*(currentUL) |= pixBitMask);
+						
+					currentUL++;
+			}// next row			
+			
+			// move the char mask
+			charBitMask = charBitMask>>1;
+			
+		}// next chrPix
+			
+	}// next i
+
+	/*
+	 	now we need to center the text.
+	 	
+	 	note: we couldn't have done this earlier, becauwe we needed to convert the chars to our
+	 	sizes, and total the length in the main loop above...
+	*/
+	
+	// get total width of our buffer in pixels
+	short bufferWidth = size * 32;
+	
+	// pixColumn should make a fine text width...
+	// so lets get the difference and half it. that should be the left position of the text
+	short txtLeft = (bufferWidth-pixColumn)/2;
+	
+	// shift everything over that many pixels
+	for(i=0; i<(txtLeft-2); i++)
+	{
+		int col;
+		for(col=size; col>=0; col--)
+		{
+			// shift all rows int he column
+			int row;
+			for(row=0; row<3; row++)
+			{
+				// get pointer to our unsigned long
+				unsigned long *current = (buffer + (((col)*5)+(row+1)));
+				
+				// unsigned long on this row in previous colum, or 0 if left-most
+				unsigned long leftUL=1;
+				leftUL = leftUL<<31;
+				if(col-1>=0)
+					leftUL = *(current-5);
+				
+				// get upper bit of previous col on this row
+				unsigned long upperBit = leftUL<<31;
+	
+				// shift our value and move the previous unsigned longs value over
+				*current = ((*current)>>1) | upperBit;
+					
+			}// next row
+		}// next col
+	}// next i
+	
+	// return the length of the text
+	return (short)pixColumn;
+}
+
+// renders all the sprites for the worms once at the beginning of the game
+void Draw_renderWormNameSprites()
+{
+	int i;
+	for(i=0; i<MAX_WORMS; i++)
+	{
+		// clear all rows in our buffer, and mask buffer before we draw the text
+		int ul;
+		for(ul=0; ul<10; ul++)
+		{
+			nameSprites[i][ul] = (i<9) ? 0b11111111111111111111111111111111 : 0;
+			nameMasks[i][ul] = 0b11111111111111111111111111111111;
+		}
+		
+		// draw text to our buffer
+		short txtLen = Draw_renderText(nameSprites[i], 2, (char*)Match_wormNames[i], (i<9));
+		
+		// loop to create masks we can AND to clip the sprites wasted space on either side...
+		short txtLeft = ((64-txtLen)/2)-2;
+		txtLen+=2;
+		
+		short px;
+		unsigned long eraseMask=1;
+		eraseMask = eraseMask<<31;
+		for(px=0; px<64; px++)
+		{
+			// everytime we loop over a long, reset the erase mask
+			if(px%32==0)
+			{
+				eraseMask = 1;
+				eraseMask = eraseMask<<31;
+			}
+			
+			// only erase the row, if its outside the text:
+			if(px<=txtLeft || px>=(txtLeft+txtLen))
+			{
+				// convert px to our column
+				short col = (px<32) ? 0 : 5;
+
+				// erase this pixel from all rows on our current colum...
+				int row;
+				for(row=0; row<5; row++)
+				{
+					// only erase rows 0 and 4 from our edges
+					if(!((px==txtLeft || px==(txtLeft+txtLen)) && (row>0 && row<4)))
+					{
+						*(nameSprites[i]+col+row) &= ~eraseMask;
+						*(nameMasks[i]+col+row) &= ~eraseMask;
+					}
+					
+				}// next row				
+			
+			}// end if erasable
+			
+			// shift our erase mask right (when it hits the edge, px%32 will be 0 and reset the mask)
+			eraseMask = eraseMask>>1;
+			
+		}// next px
+			
+	}// next i
+	//nameMasks
+}
+
+// draw health sprite for a worm
+void Draw_healthSprite(short index)
+{
+	
+	// clear all rows in our buffer, and mask buffer before we draw the text
+	int ul;
+	for(ul=0; ul<5; ul++)
+	{
+		healthSprites[index][ul] = (index<9) ? 0b11111111111111111111111111111111 : 0;
+		healthMasks[index][ul] = 0b11111111111111111111111111111111;
+	}
+	
+	// make text to draw
+	char health[4];
+	sprintf(health, "%d", Worm_health[index]);
+	
+	// draw text to our buffer
+	short txtLen = Draw_renderText(healthSprites[index], 1, (char*)health, (index<9));
+	
+	// loop to create masks we can AND to clip the sprites wasted space on either side...
+	short txtLeft = ((32-txtLen)/2)-2;
+	txtLen+=2;
+	
+	short px;
+	unsigned long eraseMask=1;
+	eraseMask = eraseMask<<31;
+	for(px=0; px<32; px++)
+	{
+		// only erase the row, if its outside the text:
+		if(px<=txtLeft || px>=(txtLeft+txtLen))
+		{
+			// erase this pixel from all rows on our current colum...
+			int row;
+			for(row=0; row<5; row++)
+			{
+				// only erase rows 0 and 4 from our edges
+				if(!((px==txtLeft || px==(txtLeft+txtLen)) && (row>0 && row<4)))
+				{
+					*(healthSprites[index]+row) &= ~eraseMask;
+					*(healthMasks[index]+row) &= ~eraseMask;
+				}
+				
+			}// next row				
+		}// end if erasable
+		
+		// shift our erase mask right
+		eraseMask = eraseMask>>1;
+		
+	}// next px
+}
 

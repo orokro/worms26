@@ -175,7 +175,8 @@ void Map_traceEdges()
 			lastValues = current;
 		}// next x
 	}// next y
-}\
+}
+
 // builds a random map for the worms to play on
 void Map_makeMap()
 {

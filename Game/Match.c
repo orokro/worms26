@@ -56,6 +56,12 @@ short Match_defaultWeapons[5][14] = {
 																			{0,0,0,2,9,0,0,0,0,0,0,0,0,1}
 																		};
 																		
+// the names of each team
+const char *Match_teamNames[2] = {"GMILLER", "LDEBROUX"};
+
+// the names of each worm
+const char *Match_wormNames[MAX_WORMS] = {"MCGUYVER", "SLINKYFISH", "BUB", "STUMPY", "MISTER CHEF", "GERTIE", "KOWALSKI", "MURPHY", "ZULU", "JEAN STAINS", "TITCHY", "MUSCLES", "THE VERT", "DARKNET", "SMOKESTACK", "ROPESY"};
+
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
