@@ -93,25 +93,28 @@ void drawWorms()
 				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), darkPlane);
 				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), lightPlane);
 				
-				// draw name/healh above worm
-				short n;
-				for(n=0; n<2; n++)
+				// draw name/healh above worm, unless current worm in turn
+				if(!(i==Worm_currentWorm && Game_mode==gameMode_Turn))
 				{
-					short hX = x-24+n*32;
-					short hY = y-10;
-				
-					// mask out both planes for the name/healh sprites
-					ClipSprite32_AND_R(hX, hY, 9, healthMasks[i]+(n*9), lightPlane);
-					ClipSprite32_AND_R(hX, hY, 9, healthMasks[i]+(n*9), darkPlane);
+					short n;
+					for(n=0; n<2; n++)
+					{
+						short hX = x-24+n*32;
+						short hY = y-10;
 					
-					// if its a light worm, make the light plane gray
-					if(i>7)
-						ClipSprite32_OR_R(hX, hY, 9, healthLightGray[i]+(n*9), lightPlane);
+						// mask out both planes for the name/healh sprites
+						ClipSprite32_AND_R(hX, hY, 9, healthMasks[i]+(n*9), lightPlane);
+						ClipSprite32_AND_R(hX, hY, 9, healthMasks[i]+(n*9), darkPlane);
 						
-					// finally if we OR the sprite it to both buffers
-					ClipSprite32_OR_R(hX, hY, 9, healthSprites[i]+(n*9), lightPlane);
-					ClipSprite32_OR_R(hX, hY, 9, healthSprites[i]+(n*9), darkPlane);
-				}
+						// if its a light worm, make the light plane gray
+						if(i>7)
+							ClipSprite32_OR_R(hX, hY, 9, healthLightGray[i]+(n*9), lightPlane);
+							
+						// finally if we OR the sprite it to both buffers
+						ClipSprite32_OR_R(hX, hY, 9, healthSprites[i]+(n*9), lightPlane);
+						ClipSprite32_OR_R(hX, hY, 9, healthSprites[i]+(n*9), darkPlane);
+					}
+				}// end if current worm in turn
 				
 				//char foo = (char)((Worm_settled & ((unsigned short)1<<(i)))>0);
 				//DrawChar(x, y-15, (foo ? (char)20 : 'X'), A_NORMAL);
@@ -266,38 +269,41 @@ void drawLeavesAndClouds()
 	short wind = Game_wind/4;
 	
 	// no need for external data, only on leaf at a time so we can keep it static
-	static short Leaf_x = 0;
-	static short Leaf_y = 0;
+	static short Leaf_x[5] = {10, 30, 60, 90, 120};
+	static short Leaf_y[5] = {10, 30, 60, 90, 120};
 	
 	// only 3 clouds at a time, keep it static:
 	static short Cloud_x[] = {0, 53, 106};
 	static short Cloud_y[] = {-50, -70, -90};
 	
-	// leaves always move down at a constant rate, and sideways by the wind rate
-	Leaf_y++;
-	Leaf_x+=wind;
-	
-	// get leafs onscreen pos
-	short xPos = Leaf_x;
-	short yPos = Leaf_y;
-	
-	// draw if if on screen
-	if(worldToScreen(&xPos, &yPos))
-		ClipSprite16_OR_R(xPos, yPos, 8, spr_Leaf, lightPlane);
-		
-	// or respawn if off screen and far enoug bloe
-	else if(yPos>80)
+	for(i=0; i<5; i++)
 	{
-		if(abs(Game_wind)<5)
+		// leaves always move down at a constant rate, and sideways by the wind rate
+		Leaf_y[i]++;
+		Leaf_x[i]+=wind;
+		
+		// get leafs onscreen pos
+		short xPos = Leaf_x[i];
+		short yPos = Leaf_y[i];
+		
+		// draw if if on screen
+		if(worldToScreen(&xPos, &yPos))
+			ClipSprite16_OR_R(xPos, yPos, 8, spr_Leaf, lightPlane);
+			
+		// or respawn if off screen and far enoug bloe
+		else if(yPos>80)
 		{
-			Leaf_x = camX+random(160)-80;
-			Leaf_y = camY-58;
-		}else
-		{
-			Leaf_x = camX + ((Game_wind<0) ? 90 : -90);
-			Leaf_y = camY-61 + random(70);
-		}
-	}
+			if(abs(Game_wind)<5 || random(2)==0)
+			{
+				Leaf_x[i] = camX+random(160)-80;
+				Leaf_y[i] = camY-58;
+			}else
+			{
+				Leaf_x[i] = camX + ((Game_wind<0) ? 90 : -90);
+				Leaf_y[i] = camY-61 + random(70);
+			}
+		}		
+	} // next l
 	
 	// loop thru clouds and draw or respawn
 	for(i=0; i<3; i++)
@@ -506,7 +512,7 @@ void drawSelectArrow()
 		frame=0;
 	
 	short x=Worm_x[(short)Worm_currentWorm]-9;
-	short y=Worm_y[(short)Worm_currentWorm]-32;
+	short y=Worm_y[(short)Worm_currentWorm]-35;
 	
 	if(worldToScreen(&x, &y))
 	{
