@@ -208,8 +208,8 @@ extern void Camera_clearFocus();
 
 // Draw globals
 extern unsigned long windSprites[3][3];
-extern unsigned long healthSprites[16][5];
-extern unsigned long healthMasks[16][5];
+extern unsigned long healthSprites[16][18];
+extern unsigned long healthMasks[16][18];
 
 // draw function prototypes
 
@@ -270,17 +270,10 @@ extern short Draw_renderText(unsigned long *buffer, char size, char *txt, char c
 
 /**
  * renders all the worms name sprites once at the beginning of the game
-*/
-extern void Draw_renderWormNameSprites();
-
-/**
- * So we don't have to render text every time, this routine will generate a the sprites to use for a worms health.
  *
- * This way, we can redraw the sprite, only when the health changes.
- *
- * @param index the index of the worm to draw the health sprite for
+ * @param the index of the worm to draw the health sprite for
 */
-void Draw_healthSprite(short index);
+extern void Draw_healthSprite(short index);
 
 /**
  * Expirimental, now depricated method, to set a local pointer to the maps memory.

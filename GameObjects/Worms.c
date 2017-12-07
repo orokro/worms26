@@ -183,7 +183,8 @@ void Worm_update()
 			
 			// check all explosions if they are near-by and damaging this worm
 			short damage = Physics_checkExplosions(&Worm_physObj[i]);
-			Worm_setHealth(i, -damage, TRUE);
+			if(damage!=0)
+				Worm_setHealth(i, -damage, TRUE);
 				
 			// if the worm is considered "settled" no need for physics
 			if(!(Worm_settled & wormMask))

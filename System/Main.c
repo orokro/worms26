@@ -78,13 +78,7 @@ void _main(void)
 	
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	Game_changeMode(gameMode_WormSelect);
-	
-	// show the cake loading screen
-	Draw_cake(99, 100);
-	
-	// render worm name sprites
-	Draw_renderWormNameSprites();
-	
+
 	// done loading
 	Draw_cake(1,1);
 	
