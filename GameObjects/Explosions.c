@@ -88,10 +88,6 @@ void eraseMap(short index)
 	short lCol = (l-(l%32))/32;
 	short rCol = (r-(r%32))/32;
 	
-	// determine how many columns wide the explosion is.
-	// +1, bcause if both L and R are in the same colum, it would be 0
-	short colWidth = (rCol-lCol)+1;
-
 	// make virtual screen the size of our explosion
 	void *virtual=malloc(LCD_SIZE);
 	
@@ -140,9 +136,8 @@ void eraseMap(short index)
 			unsigned long ulLight = light[(col*200)+row];
 			unsigned long ulDark = dark[(col*200)+row];
 			
-			unsigned short *expShort = (unsigned short*)virtual;
-			
 			// move to the offset in the virtual:
+			unsigned short *expShort = (unsigned short*)virtual;
 			unsigned long *expLong = (unsigned long*)(expShort+((15*(row-t))+((col-lCol)*2)));
 			
 			// read the corresponding unsinged long from the explosion buffer,
@@ -155,7 +150,41 @@ void eraseMap(short index)
 			
 		}// next col
 	}// next row
+	
+	// loop to draw extra eclipses to make a burned edge of the map
+	for(e=s; e<s+2; e++)
+	{
+		DrawClipEllipse(x, y, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
+		DrawClipEllipse(x, y-1, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
+	}
+	
+	// now we do another pass to add the burned edge
+	for(row=t; row<=b; row++)
+	{
+		// loop over the columns in this row:
+		for(col=lCol; col<=rCol; col++)
+		{
+			// read the unsigned long from both our light and dark buffers,
+			// and combine them into one that represents the map at that lixe
+			unsigned long ulLight = light[(col*200)+row];
+			unsigned long ulDark = dark[(col*200)+row];
+			unsigned long ulMap = ulLight | ulDark;
 
+			// move to the offset in the virtual:
+			unsigned short *expShort = (unsigned short*)virtual;
+			unsigned long *expLong = (unsigned long*)(expShort+((15*(row-t))+((col-lCol)*2)));
+			
+			// read the corresponding unsinged long from the explosion buffer
+			unsigned long ulExp = (*expLong);
+			
+			// if we AND the exposlion bits, the map should add 1s to both layers where
+			// it overlays, but it will erase the map elsewhere so we can OR the layer back on
+			light[(col*200)+row] = (ulMap & ulExp) | ulLight;
+			dark[(col*200)+row] = (ulMap & ulExp) | ulDark;
+			
+		}// next col
+	}// next row
+	
 	// clean up time
 	PortRestore();
 	free(virtual);
