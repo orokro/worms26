@@ -82,16 +82,16 @@ void drawWorms()
 			{
 				// get the postion and direction the worm is facing..
 				short x = screenX-8;
-				short y = screenY-8;
+				short y = screenY-6;
 				char facing = (Worm_dir & (unsigned short)1<<(i))>0;
 
 				// use the worms fill to erase the background
-				ClipSprite16_AND_R(x, y, 15, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), darkPlane);
+				ClipSprite16_AND_R(x, y, 13, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), darkPlane);
 				
 				// draw the worms fill and outline
-				ClipSprite16_AND_R(x, y, 15, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), lightPlane);
-				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), darkPlane);
-				ClipSprite16_OR_R(x, y, 15, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), lightPlane);
+				ClipSprite16_AND_R(x, y, 13, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), lightPlane);
+				ClipSprite16_OR_R(x, y, 13, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), darkPlane);
+				ClipSprite16_OR_R(x, y, 13, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), lightPlane);
 				
 				// draw name/healh above worm, unless current worm in turn
 				if(!(i==Worm_currentWorm && Game_mode==gameMode_Turn))
@@ -512,7 +512,7 @@ void drawSelectArrow()
 		frame=0;
 	
 	short x=Worm_x[(short)Worm_currentWorm]-9;
-	short y=Worm_y[(short)Worm_currentWorm]-35;
+	short y=Worm_y[(short)Worm_currentWorm]-32;
 	
 	if(worldToScreen(&x, &y))
 	{
