@@ -405,7 +405,7 @@ void gameUpdates()
 	if(Crate_active)
 		Crates_update();
 	
-	if(Mine_active)
+	//if(Mine_active)
 		Mines_update();
 		
 	if(Weapon_active)

@@ -833,10 +833,9 @@ short Draw_renderText(unsigned long *buffer, char size, char *txt, char color)
 			- - is 37
 			- ? is 38
 			- space is 39
-			
-		// not all characters are 4 bits wide, for proper spacing we need to save all the char widths
 	*/
 	
+	// not all characters are 4 bits wide, for proper spacing we need to save all the char widths
 	static char widths[] = {	
 														3, 2, 2, 3,  3, 3, 4, 3,
 														1, 2, 3, 2,  3, 4, 3, 2,

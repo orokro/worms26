@@ -53,6 +53,117 @@ unsigned short Explosion_firstFrame = 0;
 
 
 /**
+ * Erases the map for a given explosion
+ *
+ * @param index the index of the explosion to erase from the map
+*/
+void eraseMap(short index)
+{
+	/*
+		To erase from the map, we will set up a virtual screen and use tigcc's eclispe
+		methods to draw the explosions circle.
+		
+		Then we will do a pass over the virtual screen and map buffers and use bitwise
+		operations to remove the circle area from our map buffers (light and dark)
+		
+		NOTE: we cannot use the DrawClipEllipse method on our map buffers because their
+		byte order is different than a screen buffer, for fast drawing routines.
+		
+		Finally we will draw a couple more outer layers of circles and loop over the
+		buffers again to add a burned edge to the map.
+	*/
+	
+	// get explosion details
+	short x = Explosion_x[index];
+	short y = Explosion_y[index];
+	short s = Explosion_size[index];
+
+	// determine the pixel edges of our explosion:
+	short t = y-s;
+	short b = y+s;
+	short l = x-s;
+	short r = x+s;
+	
+	// determine the columns the left and right are in
+	short lCol = (l-(l%32))/32;
+	short rCol = (r-(r%32))/32;
+	
+	// determine how many columns wide the explosion is.
+	// +1, bcause if both L and R are in the same colum, it would be 0
+	short colWidth = (rCol-lCol)+1;
+
+	// make virtual screen the size of our explosion
+	void *virtual=malloc(LCD_SIZE);
+	
+	// set it to be our virtual screen
+	PortSet(virtual, 239, 127);
+	
+	// clear our virtual screen
+	ClrScr();
+	
+	// convert the x and y position of the explosion to be relative to our mini buffer
+	x -= (lCol*32);
+	y -= t;
+	
+	// loop to draw a bunch of eclipses
+	short e;
+	for(e=1; e<s; e++)
+	{
+		DrawClipEllipse(x, y, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
+		DrawClipEllipse(x, y-1, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
+	}
+	
+	/*
+		now, our map buffers are arranged such that every 200 unsigned longs are a
+		vertical column, with 10 columns for a 320 wide map.
+		
+		The buffer will be arranged such that every colWidth unsinged longs will
+		be a row.
+		
+		Thus we will loop over the proper unsigned longs in both the map and our
+		explosion buffer and copy remove pixels from our map buffer.
+	
+	*/
+	
+	// referencs to our map buffers, and explosion buffer
+	unsigned long *light = (unsigned long*)mapLight;
+	unsigned long *dark = (unsigned long*)mapDark;
+	
+	// loop over our rows
+	short row, col;
+	for(row=t; row<=b; row++)
+	{
+		// loop over the columns in this row:
+		for(col=lCol; col<=rCol; col++)
+		{
+			// read the unsigned long from both our light and dark buffers
+			unsigned long ulLight = light[(col*200)+row];
+			unsigned long ulDark = dark[(col*200)+row];
+			
+			unsigned short *expShort = (unsigned short*)virtual;
+			
+			// move to the offset in the virtual:
+			unsigned long *expLong = (unsigned long*)(expShort+((15*(row-t))+((col-lCol)*2)));
+			
+			// read the corresponding unsinged long from the explosion buffer,
+			// and flip its bits, so that the exposion is 0 and everything else is 1
+			unsigned long ulExp = ~(*expLong);
+			
+			// if we AND the inverted exposlion bits, the map should be erased:
+			light[(col*200)+row] = ulLight & ulExp;
+			dark[(col*200)+row] = ulDark & ulExp;
+			
+		}// next col
+	}// next row
+
+	// clean up time
+	PortRestore();
+	free(virtual);
+}
+
+
+
+/**
  * Updates an individual explosion at the given index.
  *
  * @param index the explosion to update.
@@ -68,9 +179,13 @@ void updateExplosion(short index)
 	// decrease it's time
 	Explosion_time[index]--;
 
-	// if the explosions time is up, set it inactive
+	// if the explosions time is up, destory the map and set it inactive
 	if(Explosion_time[index]<0)
+	{
+		eraseMap(index);
 		Explosion_active &= ~((unsigned short)1<<(index));
+	}
+		
 }
 
 
