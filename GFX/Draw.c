@@ -625,7 +625,7 @@ void drawMountains()
 void drawTimer()
 {
 	// only draw the timer if the game is in select or turn mode!
-	if(Game_timer>0 && (Game_mode==gameMode_WormSelect || Game_mode==gameMode_Turn || Game_mode==gameMode_Cursor || Game_mode==gameMode_WeaponSelect))
+	if(Game_timer>0 && (Game_mode==gameMode_WormSelect || Game_mode==gameMode_Turn || Game_mode==gameMode_Cursor || Game_mode==gameMode_WeaponSelect ||  Game_mode==gameMode_Pause))
 	{
 		// exrase space for timer
 		ClipSprite16_AND_R(2, 87, 11, spr_timerMask, lightPlane);
@@ -866,20 +866,73 @@ void Draw_renderGame()
 // main drawing routine for the pause menu
 void Draw_renderPauseMenu(char menuItem)
 {
-	GrayDBufSetHiddenAMSPlane(DARK_PLANE);
-	ClrScr();
-	GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
-	ClrScr();
+	// draw the game as normal..
+	Draw_renderGame();
 	
-	short z=0;
-	for(z=0; z<2; z++)
+	// make it darker
+	FastFillRect(darkPlane, 0, 0, 159, 99, A_NORMAL);
+	
+	// draw hud normally
+	drawHUD();
+
+	// menu item text
+	char continueStr[] = " Continue ";
+	char exitStr[] = " Exit ";
+	
+	// if selected, add markers
+	if(menuItem==0)
 	{
-		GrayDBufSetHiddenAMSPlane((z%2==0) ? DARK_PLANE : LIGHT_PLANE);
-		
-		// draw the pause menu, and which menu item is currently selected
-		DrawStr(0,0,"pause menu", A_XOR);
-		DrawStr(0,10,(!menuItem ? "Continue" : "Quit Game"), A_NORMAL);
+		continueStr[0] = 26;
+		continueStr[9] = 25;
+	}else
+	{
+		exitStr[0] = 26;
+		exitStr[5] = 25;
 	}
+	
+	// draw menu options
+	GrayDrawStr2B(50, 20, continueStr, A_NORMAL, lightPlane, darkPlane);
+	GrayDrawStr2B(50, 20, continueStr, A_XOR, lightPlane, darkPlane);
+	GrayDrawStr2B(62, 30, exitStr, A_NORMAL, lightPlane, darkPlane);
+	GrayDrawStr2B(62, 30, exitStr, A_XOR, lightPlane, darkPlane);
+	
+	// draw title
+	FontSetSys(2);
+	
+	// dark plane is solid, so we can XOR the shadow area to make it WHITE on the dark plane
+	GrayDrawStr2B(57, 2, "Paused", A_XOR, darkPlane, darkPlane);
+	
+	// draw shadow JUST on light plane
+	GrayDrawStr2B(57, 2, "Paused", A_NORMAL, lightPlane, lightPlane);
+	
+	// draw it to both planes in black, then XOR it to make it WHITE
+	GrayDrawStr2B(56, 1, "Paused", A_NORMAL, lightPlane, darkPlane);
+	GrayDrawStr2B(56, 1, "Paused", A_XOR, lightPlane, darkPlane);
+	
+	FontSetSys(1);
+	
+	/*
+		NOTE:
+		
+		I was gonna draw control info below the options, but it runs too slow.
+		
+		Perhaps I'll use sprites one day if there's space.
+	*/
+	
+	/*
+	// controls text:
+	char controlsStr[] = "[2nd] confirm / use weapon\n[?] jump\n[a] back flip\n[?]+[?]/[?]/[?]/[?] move camera\n[F1]/[CAT] weapons menu\n[APPS] select worm (if enabled)\n[ESC] pause\n[1]/[2]/[3]/[4]/[5] fuse lengh / opts";
+	
+	// use tiny font to draw controls
+	FontSetSys(0);
+
+	// draw dark on light plane, then xor to erase
+	GrayDrawStr2B(10, 30, controlsStr, A_NORMAL, lightPlane, darkPlane);
+	GrayDrawStr2B(10, 30, controlsStr, A_XOR, lightPlane, darkPlane);
+	
+	FontSetSys(1);
+	*/
+	
 }
 
 
