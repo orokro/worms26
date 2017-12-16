@@ -150,24 +150,27 @@ void Mines_update()
 	// for debugging, we'll allow the user to switch between mines, and add velocity to
 	// test physics
 	static short testMine = 0;
-	if(Keys_keyDown(key1))
+	if(!Keys_keyState(keyCameraControl))
 	{
-		testMine++;
-		if(testMine>5)
-			testMine=0;
-		Camera_focusOn(&Mine_x[(short)testMine], &Mine_y[(short)testMine]);
-	}
-	if(Keys_keyDown(key2))
-	{
-		Physics_setVelocity(&Mine_physObj[testMine], -4, -7, FALSE);
-	}
-	if(Keys_keyDown(key3))
-	{
-		Physics_setVelocity(&Mine_physObj[testMine], 4, -7, FALSE);
-	}
-	if(Keys_keyDown(key5))
-	{
-		Mines_trigger(testMine);
+		if(Keys_keyDown(key1))
+		{
+			testMine++;
+			if(testMine>5)
+				testMine=0;
+			Camera_focusOn(&Mine_x[(short)testMine], &Mine_y[(short)testMine]);
+		}
+		if(Keys_keyDown(key2))
+		{
+			Physics_setVelocity(&Mine_physObj[testMine], -4, -7, FALSE);
+		}
+		if(Keys_keyDown(key3))
+		{
+			Physics_setVelocity(&Mine_physObj[testMine], 4, -7, FALSE);
+		}
+		if(Keys_keyDown(key5))
+		{
+			Mines_trigger(testMine);
+		}
 	}
 	
 	// if any of the active Crates have less than 0 health, create an explosion

@@ -46,8 +46,7 @@ static void Pause_update()
 				GameRunning=FALSE;
 				return;
 			}
-		}
-	
+		}	
 	}// end if moving camera
 	
 	// note: there are no physics, worms, time updates, etc during pause!

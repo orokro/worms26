@@ -150,6 +150,9 @@ char Game_xMarkPlaced = FALSE;
 char Game_xMarkAllowedOverLand = TRUE;
 char Game_cursorEndTurn = FALSE;
 
+// for debug, we can stop the time
+char Debug_stopTime = TRUE;
+
 /*
 	the current set of weapons for the current team, in stacked order.
 	
@@ -374,7 +377,7 @@ static void gameTimers()
 	// decrease whichever timer is active
 	if(Game_graceTimer>0)
 		Game_graceTimer--;
-	else
+	else if(!Debug_stopTime)
 		Game_timer--;
 		
 	// if we hit zero, end the turn!
@@ -393,6 +396,14 @@ static void gameTimers()
 */
 void gameUpdates()
 {
+	// for debug we will have hotkeys to control time
+	if(Keys_keyState(keyCameraControl) && Keys_keyDown(key1))
+		Debug_stopTime = !Debug_stopTime;
+	if(Keys_keyState(keyCameraControl) && Keys_keyDown(key2))
+		Game_timer=1;
+	if(Keys_keyState(keyCameraControl) && Keys_keyDown(key3))
+		Camera_focusOn(&Worm_x[(short)Worm_currentWorm], &Worm_y[(short)Worm_currentWorm]);
+		
 	// decrease game timers
 	gameTimers();
 	//return;
