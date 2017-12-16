@@ -19,30 +19,36 @@ static void Pause_enter()
 */
 static void Pause_update()
 {
-	/*
-	  if either up or down are pressed, we should toggle the pause menu item
-	  since there are only two menu items, there is no "direction", if the top item is selected
-	  pressing up would loop it to the bottom item, and pressing down would move down to the bottom item
-	  thus, we can test for either key at once by masking them together: keyUp | keyDown and then just
-	  toggle the state of the variable
-	*/
-	if(Keys_keyDown(keyUp | keyDown))
-		pauseMenuItem = ((pauseMenuItem==0) ? 1 : 0);
-		
-	// if the user presses the action key, we should either quit the game, or exit the pause menu
-	if(Keys_keyDown(keyAction))
+	// if shift is pressed, camera is being moved, ignore input
+	if(!Keys_keyState(keyCameraControl))
 	{
-		if(pauseMenuItem==0)
+		
+		/*
+		  if either up or down are pressed, we should toggle the pause menu item
+		  since there are only two menu items, there is no "direction", if the top item is selected
+		  pressing up would loop it to the bottom item, and pressing down would move down to the bottom item
+		  thus, we can test for either key at once by masking them together: keyUp | keyDown and then just
+		  toggle the state of the variable
+		*/
+		if(Keys_keyDown(keyUp | keyDown))
+			pauseMenuItem = ((pauseMenuItem==0) ? 1 : 0);
+			
+		// if the user presses the action key, we should either quit the game, or exit the pause menu
+		if(Keys_keyDown(keyAction))
 		{
-			Game_changeMode(Game_previousMode);
-			return;
-		}else
-		{
-			// setting this will exit the next tick of our main loop
-			GameRunning=FALSE;
-			return;
+			if(pauseMenuItem==0)
+			{
+				Game_changeMode(Game_previousMode);
+				return;
+			}else
+			{
+				// setting this will exit the next tick of our main loop
+				GameRunning=FALSE;
+				return;
+			}
 		}
-	}
+	
+	}// end if moving camera
 	
 	// note: there are no physics, worms, time updates, etc during pause!
 	
