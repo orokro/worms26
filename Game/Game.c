@@ -150,6 +150,18 @@ char Game_xMarkPlaced = FALSE;
 char Game_xMarkAllowedOverLand = TRUE;
 char Game_cursorEndTurn = FALSE;
 
+/*
+	the current set of weapons for the current team, in stacked order.
+	
+	Note: the weapons all have fixed places in the matrix for selecting weapons.
+	
+	However, if a worm is out of stock we shouldn't show that weapon. Further,
+	we should slide whatever weapons that are instock, below it, up. This is like
+	real worms. Thus, this array doesn't store weapon counts, but rather, the
+	ID's of the weapons for this current teams inventory.
+*/
+short Game_weapInventory[5][13];
+
 // current turn number the game is on
 char Game_turn = 0;
 

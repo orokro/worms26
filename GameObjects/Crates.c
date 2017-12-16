@@ -317,7 +317,9 @@ static char spawnCrate()
 		type = random(7);
 		
 	Crate_type[index] = enabledCrateTypes[(short)type];
-
+	
+	Crate_type[index] = Game_turn%3;
+	
 	// reset health:
 	Crate_health[index] = 30;
 
@@ -349,7 +351,7 @@ char Crates_spawnCrate()
 		return FALSE;
 	
 	// for debug, always spawn crates
-	//return spawnCrate();
+	return spawnCrate();
 	
 	// decide to spawn a crate... later in the game, crates will spawn more frequently
 	short r = random(10);

@@ -23,6 +23,87 @@ unsigned long healthSprites[16][18];
 unsigned long healthMasks[16][18];
 unsigned long healthLightGray[16][18];
 
+// static weapon names delcaration since we only really need the names in this draw method
+// using flat ID space
+static const char weaponNames[65][16] = {
+	// row 1
+	"Jetpack",
+	"Bazooka",
+	"Grenade",
+	"Shotgun",
+	"Fire Punch",
+	"Dynamite",
+	"Air Strike",
+	"Blow Torch",
+	"Ninja Rope",
+	"Sup. Banana Bomb",
+	"Petrol Bomb",
+	"Mad Cows",
+	"Skip Go",
+	
+	// row 2
+	"Low Gravity",
+	"Homing Missile",
+	"Cluster Bomb",
+	"Handgun",
+	"Dragon Ball",
+	"Mine",
+	"Napalm Strike",
+	"Pneumatic Drill",
+	"Bungee",
+	"Holy Hand G'nade",
+	"Skunk",
+	"Old Woman",
+	"Surrender",
+	
+	// row 3
+	"Fast Walk",
+	"Mortar",
+	"Banana Bomb",
+	"Uzi",
+	"Kamikaze",
+	"Sheep",
+	"Mail Strike",
+	"Girder",
+	"Parachute",
+	"Flame Thrower",
+	"Ming Vase",
+	"Concrete Donkey",
+	"Select Worm",
+	
+	// row 4
+	"Laser Sight",
+	"Homing Pigeon",
+	"Battle Axe",
+	"Minigun",
+	"Suicide Bomber",
+	"Super Sheep",
+	"Mine Strike",
+	"Baseball Bat",
+	"Teleport",
+	"Salvation Army",
+	"Sheep Strike",
+	"Nuclear Test",
+	"Freeze",
+	
+	// row 5
+	"Invisibility",
+	"Sheep Launcher",
+	"Earthquake",
+	"Longbow",
+	"Prod",
+	"Mole Bomb",
+	"Mole Squadron",
+	"Girder Pack",
+	"ScalesOfJustice",
+	"MB Bomb",
+	"Carpet Bomb",
+	"Armageddon",
+	"Magic Bullet"	
+};
+
+// buffers for our weapons screen
+void *weaponsLight, *weaponsDark;
 
 
 
@@ -54,7 +135,7 @@ char worldToScreen(short *x, short *y)
 {
 	// casting over kill because of mysterious crash
 	*x = (short)((short)80 + (short)((short)(*x)-(short)camX));
-	*y = (short)((short)50 + (short)(((short)*y)-(short)camY));
+	*y = (short)((short)50 + (short)((short)(*y)-(short)camY));
 	
 	// if anything is out of bounds, return false:
 	if((*x)<-32 || (*x)>160+32 || (*y)<-16 || (*y)>116)
@@ -539,27 +620,12 @@ void drawMountains()
 
 
 /**
- * Draws the games HUD (i.e. timer, wind, etc)
+ * Draws the games timer
 */
-void drawHUD()
-{		
-
-	// copy the wind bar to both buffers:
-	ClipSprite32_AND_R(126, 93, 5, spr_WindMeter_Mask, lightPlane);
-	ClipSprite32_AND_R(126, 93, 5, spr_WindMeter_Mask, darkPlane);
-	ClipSprite32_OR_R(126, 93, 5, spr_WindMeter, lightPlane);
-	ClipSprite32_OR_R(126, 93, 5, spr_WindMeter, darkPlane);
-	
-	// current frame of annimation:
-	static char frame=0;
-	if(++frame>33)
-		frame=0;
-	
-	// draw current frame of animated bar
-	ClipSprite32_OR_R(127, 94, 3, windSprites[(short)((frame/3)%3)], darkPlane);
-	
+void drawTimer()
+{
 	// only draw the timer if the game is in select or turn mode!
-	if(Game_timer>0 && (Game_mode==gameMode_WormSelect || Game_mode==gameMode_Turn || Game_mode==gameMode_Cursor))
+	if(Game_timer>0 && (Game_mode==gameMode_WormSelect || Game_mode==gameMode_Turn || Game_mode==gameMode_Cursor || Game_mode==gameMode_WeaponSelect))
 	{
 		// exrase space for timer
 		ClipSprite16_AND_R(2, 87, 11, spr_timerMask, lightPlane);
@@ -590,7 +656,31 @@ void drawHUD()
 			ClipSprite16_XOR_R(2, 87, 11, spr_timerBlink, darkPlane);
 		
 	}// end if draw timer	
+}
+
+
+/**
+ * Draws the games HUD (i.e. timer, wind, etc)
+*/
+void drawHUD()
+{		
+
+	// copy the wind bar to both buffers:
+	ClipSprite32_AND_R(126, 93, 5, spr_WindMeter_Mask, lightPlane);
+	ClipSprite32_AND_R(126, 93, 5, spr_WindMeter_Mask, darkPlane);
+	ClipSprite32_OR_R(126, 93, 5, spr_WindMeter, lightPlane);
+	ClipSprite32_OR_R(126, 93, 5, spr_WindMeter, darkPlane);
 	
+	// current frame of annimation:
+	static char frame=0;
+	if(++frame>33)
+		frame=0;
+	
+	// draw current frame of animated bar
+	ClipSprite32_OR_R(127, 94, 3, windSprites[(short)((frame/3)%3)], darkPlane);
+	
+	// draw the timer
+	drawTimer();	
 }
 
 
@@ -796,22 +886,85 @@ void Draw_renderPauseMenu(char menuItem)
 // main drawing routine for the weapons menu
 void Draw_renderWeaponsMenu(char wx, char wy)
 {
+	short x, y;
+	
+	// clear both our buffers
 	GrayDBufSetHiddenAMSPlane(DARK_PLANE);
 	ClrScr();
 	GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
 	ClrScr();
 	
-	short z=0;
-	for(z=0; z<2; z++)
+	// draw title with shadow
+	FontSetSys(2);
+	GrayDrawStr2B(54, 2, "Weapons", A_NORMAL, lightPlane, lightPlane);
+	GrayDrawStr2B(53, 1, "Weapons", A_NORMAL, lightPlane, darkPlane);
+	FontSetSys(1);
+	
+	// draw light and dark grid lines
+	for(x=1; x<14; x++)
+			GrayFastDrawLine2B(0+(x*12), 13, 0+(x*12), 73, 1, lightPlane, darkPlane);
+	for(y=1; y<6; y++)
+			GrayFastDrawHLine2B(1, 156, 12+(y*12), 1, lightPlane, darkPlane);
+	
+	// drawk black grid lies
+	for(x=0; x<14; x++)
+		GrayFastDrawLine2B(1+(x*12), 13, 1+(x*12), 73, 3, lightPlane, darkPlane);
+	for(y=0; y<6; y++)
+		GrayFastDrawHLine2B(1, 156, 13+(y*12), 3, lightPlane, darkPlane);
+	
+	// draw drop shadow for weapons box (also to make it "centered" perfectly
+	GrayFastDrawHLine2B(2, 157, 74, 1, lightPlane, darkPlane);
+	GrayFastDrawLine2B(158, 14, 158, 74, 1, lightPlane, darkPlane);
+	
+	// get the weapon ID at this POS
+	short weapID = Game_weapInventory[(short)wy][(short)wx];
+	
+	// if we have the weapon in our inventory...
+	if(weapID!=-1)
 	{
-		GrayDBufSetHiddenAMSPlane((z%2==0) ? DARK_PLANE : LIGHT_PLANE);
-
-		// draw the weapons menu and the X/Y position of the selected weapon in the menu
-		DrawStr(0,0,"Weapons Menu", A_NORMAL);
-		char weapStr[32];  
-		sprintf(weapStr, "Selected: %d, %d", (short)wx, (short)wy);
-		DrawStr(0,10,weapStr, A_NORMAL);	
+		// copy name to buffer with extra bit for null termination
+		char nameBuffer[32] = "";
+		memcpy(nameBuffer, weaponNames[weapID], 15);
+		nameBuffer[16] = 0;
+		
+		// the amount of the weapon
+		char countStr[8];
+		sprintf(countStr, " (x%d)", Match_teamWeapons[(short)Game_currentTeam][weapID]);
+		strcat(nameBuffer, countStr);
+		
+		// draw the name of the currently selected weapon and its stock count
+		GrayDrawStr2B(1, 78, nameBuffer, A_NORMAL, lightPlane, darkPlane);
 	}
+	
+	// loop over our available weapons and draw their sprites, only on dark plane
+	for(x=0; x<13; x++)
+	{
+		for(y=0; y<5; y++)
+		{
+			// weapon index in this visual slot
+			short weapID = Game_weapInventory[y][x];
+			
+			// if its a valid weapon, draw it's sprite
+			if(weapID!=-1)
+			{
+				ClipSprite16_OR_R(2+(x*12), 14+(y*12), 11, spr_weapons[weapID], lightPlane);
+				ClipSprite16_OR_R(2+(x*12), 14+(y*12), 11, spr_weapons[weapID], darkPlane);
+			}
+			else
+				ClipSprite16_OR_R(2+(x*12), 14+(y*12), 11, spr_weaponSelect, lightPlane);
+
+		}// next y
+	}// next x
+			
+	// draw the current cursor location
+	ClipSprite16_XOR_R(2+(wx*12), 14+(wy*12), 11, spr_weaponSelect, lightPlane);
+	ClipSprite16_XOR_R(2+(wx*12), 14+(wy*12), 11, spr_weaponSelect, darkPlane);
+	
+	// draw instructions
+	GrayDrawStr2B(19, 89, "[2nd] Select [ESC] Exit", A_NORMAL, lightPlane, lightPlane);
+	
+	// draw the current timer so the user can see time while picking a weapon
+	drawTimer();
 }
 
 // render a text message to the buffers
@@ -1090,7 +1243,6 @@ void Draw_healthSprite(short index)
 			healthLightGray[index][(col*9)+row] = ~(snm[(col*5)+row]);
 		}
 	}// next col
-	
-	
 }
+
 

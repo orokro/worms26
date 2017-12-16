@@ -47,13 +47,22 @@ char Match_toolCratesEnabled = TRUE;
 char Match_healthCratesEnabled = TRUE;
 char Match_weaponCratesEnabled = TRUE;
 
-// define the weapons each team should start with
-short Match_defaultWeapons[5][14] = { 
-																			{0,9,9,9,9,1,1,3,5,0,2,0,9,1},
-																			{0,1,3,9,9,2,1,3,2,0,1,0,9,1},
-																			{0,5,0,9,1,1,0,3,2,0,0,0,3,1},
-																			{0,0,2,0,0,0,0,1,2,0,0,0,0,1},
-																			{0,0,0,2,9,0,0,0,0,0,0,0,0,1}
+// the current stock of weapons for each team								
+short Match_teamWeapons[2][65] = {
+																			{
+																				1,9,9,9,9,1,1,3,5,1,2,1,9,
+																				1,1,3,9,9,2,1,3,2,1,1,1,9,
+																				1,5,1,9,1,1,1,3,2,1,1,1,3,
+																				1,1,2,1,9,1,1,1,2,1,1,1,1,
+																				1,1,1,2,9,1,1,1,2,1,1,1,1
+																			},
+																			{
+																				1,9,9,9,9,1,1,3,5,0,2,0,9,
+																				0,1,3,9,9,2,1,3,2,0,1,0,9,
+																				0,5,0,9,1,1,0,3,2,0,0,0,3,
+																				0,0,2,0,9,0,0,1,2,0,0,0,0,
+																				1,0,0,2,9,0,0,0,2,0,0,0,0
+																			}
 																		};
 																		
 // the names of each team

@@ -80,7 +80,7 @@ extern char Match_oilDrumsEnabled;
 extern char Match_toolCratesEnabled;
 extern char Match_healthCratesEnabled;
 extern char Match_weaponCratesEnabled;
-extern short Match_defaultWeapons[5][14];
+extern short Match_teamWeapons[2][65];
 extern const char *Match_teamNames[2];
 extern const char *Match_wormNames[16];
 
@@ -845,6 +845,7 @@ extern char Game_xMarkPlaced;
 extern char Game_xMarkAllowedOverLand;
 extern char Game_cursorEndTurn;
 extern char Game_turn;
+extern short Game_weapInventory[5][13];
 
 // game function prototypes
 
