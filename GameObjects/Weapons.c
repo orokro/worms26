@@ -203,7 +203,18 @@ short Weapon_targetY = 0;
 			- isAnimal:				the sheep, cows, old lady, etc. will use similar routines
 			- isCluster:			should it spawn clusters weapons upon detonation?	
 			- isParticle:			no collision or typical physics, but should float up and cause damamge
-
+	
+	Below some of the properties are set to '0'
+	This doesn't mean that the weapon doesn't do anything, but it will default to the
+	weapon specific instructions.
+	
+	Originally I had a flag for usesCustom, for weapons that sometimes need extra logic per frame
+	or during the character controller. Many weapons used this feature.
+	
+	I decided it was easier to assume most weapons will use this, and check all weapons against
+	custom logic per frame. This freed a slot in the 16 bits for usesDetonteOnImpact, which is
+	more specifically and reusable between weapon types.
+	
 	NOTE:
 	
 	Right now the array definition below uses a lot of bitwise OPs to set the flags for the various
