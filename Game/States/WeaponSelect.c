@@ -109,8 +109,8 @@ static void WeaponSelect_update()
 	else if(weaponSelectY>4)
 		weaponSelectY=0;
 	
-	// if the user pressed ESCAPE we should just exit the weapons menu
-	if(Keys_keyDown(keyEscape))
+	// if the user pressed ESCAPE or the weapons menu key again we should just exit the weapons menu
+	if(Keys_keyDown(keyEscape) || Keys_keyDown(keyWeaponsSelect))
 	{
 		Game_changeMode(Game_previousMode);
 		return;

@@ -19,10 +19,16 @@ static void Pause_enter()
 */
 static void Pause_update()
 {
+	// if escape is pressed again, just exit the Pause Menu
+	if(Keys_keyDown(keyEscape))
+	{
+		Game_changeMode(Game_previousMode);
+		return;
+	}
+		
 	// if shift is pressed, camera is being moved, ignore input
 	if(!Keys_keyState(keyCameraControl))
-	{
-		
+	{		
 		/*
 		  if either up or down are pressed, we should toggle the pause menu item
 		  since there are only two menu items, there is no "direction", if the top item is selected
