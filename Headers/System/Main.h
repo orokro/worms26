@@ -708,12 +708,22 @@ extern void Crates_pickUp(short, short);
 
 // Define bitmask flags for the types of properties a weapon can have:
 // when spawning a weapon, these can be ORed together to create it's logic
-#define usesVelocity 		1 	// 00000001
-#define usesGravity	 		2 	// 00000010
-#define usesTimer	   		4 	// 00000100
-#define usesHoming 	 		8		// 00001000
-#define usesMovement 		16 	// 00010000
-#define usesController 	32 	// 00100000
+#define usesAim 							0b0000000000000001
+#define usesCharge 						0b0000000000000010
+#define usesCursor 						0b0000000000000100
+#define usesPhysics 					0b0000000000001000
+#define usesWind 							0b0000000000010000
+#define usesHoming 						0b0000000000100000
+#define usesFuse 							0b0000000001000000
+#define usesDetonation 				0b0000000010000000
+#define usesController 				0b0000000100000000
+#define usesDetonateOnImpact 	0b0000001000000000
+#define isAnimal 							0b0000010000000000
+#define isCluster 						0b0000100000000000
+#define isParticle 						0b0001000000000000				
+#define isMele 								0b0010000000000000
+#define spawnsSelf 						0b0100000000000000
+#define multiUse 							0b1000000000000000
 
 /*
   enumerate our list of weapons, with matching index positions as described in the array above
@@ -752,10 +762,26 @@ extern short Weapon_y[MAX_WEAPONS];
 extern char Weapon_xVelo[MAX_WEAPONS];
 extern char Weapon_yVelo[MAX_WEAPONS];
 extern char Weapon_time[MAX_WEAPONS];
-extern char Weapon_uses[MAX_WEAPONS];
 extern unsigned short Weapon_active;
 extern short Weapon_targetX;
 extern short Weapon_targetY;
+
+/*
+	there are currently 69 different types of weapon objects that can be on screen
+	and behave differently.
+	
+	The game has 65 weapons / tools the user can choose from in the menu
+	
+	And there are four extra weapons that can spawn as a result of another weapon:
+		- fragments (from cluster bombs, mortars, etc)
+		- Fire / Napalm
+		- Skunk Gas / Poison Gas
+		- Coment (from Armegeddon)
+	
+	Below is an array of 16 bit shorts we will use to bitwise store the properties of
+	each weapon type, so we can optimize the weapon routines to reuse code
+*/
+extern unsigned short Weapon_props[69];
 
 // weapons function prototypes
 
@@ -780,7 +806,7 @@ extern short Weapon_targetY;
  * @param time weapons use time for different purposes, (e.g. fuse length)
  * @param properties a char that is used as a bitmasked variable for the types of properties this weapon requires
 */
-extern void Weapons_spawn(char, short, short, char, char, char, char);
+extern void Weapons_spawn(char, short, short, char, char, char, short);
 
 /**
  * Updates all the currently active weapons, should be called once per frame.
