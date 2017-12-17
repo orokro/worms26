@@ -87,6 +87,11 @@ static void WormSelect_enter()
 	// toggle teams
 	Game_currentTeam = (Game_currentTeam==1 ? 0 : 1);
 	
+	// when the team changes, temporarily (maybe perminantly) we will reset the weapon
+	// for debug / sanity check
+	Game_currentWeaponSelected = -1;
+	Game_currentWeaponProperties = 0;
+	
 	// pick a new wind speed:
 	Game_wind = -16+random(32);
 	
@@ -102,6 +107,7 @@ static void WormSelect_enter()
 	// the game is done, to get frames-to-seconds more accurate
 	Game_graceTimer = 5 * TIME_MULTIPLIER;
 	Game_timer = Match_turnTime * TIME_MULTIPLIER;
+	
 }
 
 /**

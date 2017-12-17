@@ -59,6 +59,8 @@ static void WeaponSelect_enter()
 	
 	// we need to build a matrix of the AVAILABLE weapons this user has access to...
 	calcWeapInventory();
+	
+	// start out in the top-left corner if our current weapon is -1
 }
 	
 
@@ -116,11 +118,17 @@ static void WeaponSelect_update()
 		return;
 	}
 	
-	// if the user pressed the action key, make sure they have stock of that weapon,
-	// and if so, select it and exit:
-	if(Keys_keyDown(keyAction))
+	// get the weapon ID at the current cursor position
+	short weapID = Game_weapInventory[(short)weaponSelectY][(short)weaponSelectX];
+		
+	// if the user pressed the action key over a valid weapon, select that weapon and GTFO
+	if(weapID!=-1 && Keys_keyDown(keyAction))
 	{
-		// TO-DO: implement
+		// set current weapon and properties
+		Game_currentWeaponSelected = weapID;
+		Game_currentWeaponProperties = Weapon_props[weapID];
+		Game_changeMode(Game_previousMode);
+		return;
 	}
 	
 	// All regular game-updates during this mode

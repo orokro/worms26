@@ -664,7 +664,21 @@ void drawTimer()
 */
 void drawHUD()
 {		
-
+	
+	// if the user has a weapon selected and the current mode is TURN, draw it's icon in the top right:
+	if(Game_currentWeaponSelected!=-1 && Game_mode==gameMode_Turn)
+	{
+		// draw the box sprite for the selected weapon
+		ClipSprite16_AND_R(2, 2, 13, spr_selectedWeaponBoxMask, lightPlane);
+		ClipSprite16_AND_R(2, 2, 13, spr_selectedWeaponBoxMask, darkPlane);
+		ClipSprite16_OR_R(2, 2, 13, spr_selectedWeaponBox, lightPlane);
+		ClipSprite16_OR_R(2, 2, 13, spr_selectedWeaponBox, darkPlane);
+		
+		// draw the icon for the selected weapon
+		ClipSprite16_OR_R(3, 3, 11, spr_weapons[(short)Game_currentWeaponSelected], lightPlane);
+		ClipSprite16_OR_R(3, 3, 11, spr_weapons[(short)Game_currentWeaponSelected], darkPlane);
+	}
+	
 	// copy the wind bar to both buffers:
 	ClipSprite32_AND_R(126, 93, 5, spr_WindMeter_Mask, lightPlane);
 	ClipSprite32_AND_R(126, 93, 5, spr_WindMeter_Mask, darkPlane);

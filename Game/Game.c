@@ -168,6 +168,13 @@ short Game_weapInventory[5][13];
 // current turn number the game is on
 char Game_turn = 0;
 
+// the weapon ID of the currently selected weapon for this worms turn
+char Game_currentWeaponSelected = -1;
+
+// the bit masked list of properties this weapon has
+unsigned short Game_currentWeaponProperties = 0;
+
+
 /* 
 	For reference, Game modes:
 	

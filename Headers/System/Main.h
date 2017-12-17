@@ -863,6 +863,8 @@ extern char Game_xMarkAllowedOverLand;
 extern char Game_cursorEndTurn;
 extern char Game_turn;
 extern short Game_weapInventory[5][13];
+extern char Game_currentWeaponSelected;
+extern unsigned short Game_currentWeaponProperties;
 
 // game function prototypes
 
