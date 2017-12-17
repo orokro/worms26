@@ -740,20 +740,13 @@ extern void Crates_pickUp(short, short);
   velocity
 */
 enum Weapons {
-	WJetPack, 		WLowG, 				WFastWalk, 		WLaser,				WInvis,
-	WBazooka,			WHoming,			WMorter,			WHomingP,			WSheepLaunch,
-	WGrenade,			WCluster,			WBanana,			WAxe, 				WQuake,
-	WShotG, 			WHandG, 			WUzi, 				WMiniG, 			WBow, 
-	WPunch, 			WDragonBall, 	WDeath, 			WSBomb, 			WProd,
-	WDyna, 				WMine, 				WSheep, 			WSSheep, 			WMole,
-	WAirStrike, 	WNapStrike, 	WMailStrike,	WMineStrike, 	WMoleStrike,
-	WBlow, 				WDrill, 			WGirder, 			WBaseball, 		WGirderPak,
-	WNinja, 			WBungee, 			WParachute, 	WTeleport, 		WScales,
-	WSBanana, 		WHolyGrenade, WFlame, 			WSalArmy, 		WMB,
-	WMolotov, 		WSkunk, 			WMingVase, 		WSheepStrike, WCarpet,
-	WCows, 				WOldLady, 		WDonkey, 			WNuke, 				WGeddon,
-	WSkip, 				WSurrender, 	WSwitch, 			WIce, 				WMagicB,
-	WClusterFrag, WBananaFrag, 	WComet,				WSuperSheep };
+	WJetPack,				WBazooka, 				WGrenade, 	WShotGun,		WFirePunch, 	WDynamite, 		WAirStrike, 		WBlowTorch, 	WNinjaRope, 			WSuperBanana, 		WPetrolBomb, 	WMadCows, 				WSkipGo,
+	WLowGravity, 		WHomingMissle, 		WCluster,		WHandGUn,		WDragonBall,	WMine, 				WNapalmStrike, 	WDrill, 			WBungeeCord,			WHolyHandGrenade,	WSkunk, 			WOldLady, 				WSurrender,
+	WFastWalk,			WMortar, 					WBanana, 		WUzi,				WKakamaze, 		WSheep, 			WMailStrike, 		WGirder, 			WParachute,				WFlameThrower, 		WMingVase, 		WConcreteDonkey, 	WSelectWorm,
+	WLaserSight, 		WHomingPigeon, 		WAxe,				WMiniGun,		WSuicideBomb, WSuperSheep, 	WMineStrike, 		WBaseballBat, WTeleport, 				WSalvationArmy, 	WSheepStrike, WNuclearTest, 		WFreeze,
+	WInvisibility,	WSheepLauncher,		WQuake, 		WLongbow,  	WProd, 				WMole, 				WMoleSquadron, 	WGirderPack, 	WScalesOfJustice,	WMBBomb, 					WCarpetBomb, 	WArmageddon, 			WMagicBullet,
+	WFragment, 			WFire,						WSkunkGas,	WComet
+ };
 
 // weapons globals
 extern char Weapon_type[MAX_WEAPONS];
