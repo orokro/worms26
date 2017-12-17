@@ -733,11 +733,9 @@ extern void Crates_pickUp(short, short);
   necessarily have an in-game object, or might be different.
   
   For isntance, a bow looks like a bow in the hand of the worm, but bow game objet is drawn as an arrow
-  Where as a cluster bomb is drawn as a grenade in game, but spawns WClusters, which aren't a selectable
-  weapon, only a weapon that exists as a side effect of a cluster or mortar exploding.
+  Where as a cluster bomb is drawn as a grenade in game, but spawns WFragments, which aren't a selectable
+  weapon, only a weapon that exists as a side effect of a cluster or mortar, or etc. exploding.
   
-  Mean while, sheep launcher doesnt have an in-game equivalent, but rather, spawns a sheep with initial
-  velocity
 */
 enum Weapons {
 	WJetPack,				WBazooka, 				WGrenade, 	WShotGun,		WFirePunch, 	WDynamite, 		WAirStrike, 		WBlowTorch, 	WNinjaRope, 			WSuperBanana, 		WPetrolBomb, 	WMadCows, 				WSkipGo,
@@ -746,7 +744,7 @@ enum Weapons {
 	WLaserSight, 		WHomingPigeon, 		WAxe,				WMiniGun,		WSuicideBomb, WSuperSheep, 	WMineStrike, 		WBaseballBat, WTeleport, 				WSalvationArmy, 	WSheepStrike, WNuclearTest, 		WFreeze,
 	WInvisibility,	WSheepLauncher,		WQuake, 		WLongbow,  	WProd, 				WMole, 				WMoleSquadron, 	WGirderPack, 	WScalesOfJustice,	WMBBomb, 					WCarpetBomb, 	WArmageddon, 			WMagicBullet,
 	WFragment, 			WFire,						WSkunkGas,	WComet
- };
+};
 
 // weapons globals
 extern char Weapon_type[MAX_WEAPONS];
