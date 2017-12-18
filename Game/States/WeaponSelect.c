@@ -122,7 +122,9 @@ static void WeaponSelect_update()
 	short weapID = Game_weapInventory[(short)weaponSelectY][(short)weaponSelectX];
 		
 	// if the user pressed the action key over a valid weapon, select that weapon and GTFO
-	if(weapID!=-1 && Keys_keyDown(keyAction))
+	// note that we wait for key UP because we don't want the 2ND press to accidentally fire
+	// the weapon when we return to the previous state...
+	if(weapID!=-1 && Keys_keyUp(keyAction))
 	{
 		// set current weapon and properties
 		Game_currentWeaponSelected = weapID;

@@ -175,7 +175,7 @@ char Game_currentWeaponSelected = -1;
 unsigned short Game_currentWeaponProperties = 0;
 
 // the charge of the current weapon (if it has charge)
-unsigned char Game_currentWeaponCharge = 0;
+unsigned short Game_currentWeaponCharge = 0;
 
 // the angle the current worm is aiming at
 char Game_aimAngle=10;

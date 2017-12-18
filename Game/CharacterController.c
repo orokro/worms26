@@ -111,34 +111,30 @@ void wormWeapon()
 				Game_currentWeaponCharge=0;
 				return;
 				
-			// if the key is down, we should add to the charge:
+			// if the key is pressed, we should add to the charge:
 			}else if(Keys_keyState(keyAction))
 			{
-				Game_currentWeaponCharge+=10;
-				if(Game_currentWeaponCharge>254)
-					Game_currentWeaponCharge=254;
+				Game_currentWeaponCharge+=18;
+				if(Game_currentWeaponCharge>=255)
+					Game_currentWeaponCharge=255;
 			}
 		}// weapon has charge
+	}
 	
-	// other wise, check other weapon state logic
-	}else{
+	// if uses aim we should let them press up and down
+	if(Game_currentWeaponProperties & usesAim)
+	{
+		if(Keys_keyState(keyUp))
+			Game_aimAngle++;
+		else if(Keys_keyState(keyDown))
+			Game_aimAngle--;
 		
-		// if uses aim we should let them press up and down
-		if(Game_currentWeaponProperties & usesAim)
-		{
-			if(Keys_keyState(keyUp))
-				Game_aimAngle++;
-			else if(Keys_keyState(keyDown))
-				Game_aimAngle--;
-			
-			// bound check
-			if(Game_aimAngle<=0)
-				Game_aimAngle=0;
-			else if(Game_aimAngle>18)
-				Game_aimAngle=18;
-		}
-
-	}// end if action is pressed
+		// bound check
+		if(Game_aimAngle<=0)
+			Game_aimAngle=0;
+		else if(Game_aimAngle>18)
+			Game_aimAngle=18;
+	}
 	
 	
 }

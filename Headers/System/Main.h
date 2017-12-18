@@ -870,7 +870,7 @@ extern char Game_turn;
 extern short Game_weapInventory[5][13];
 extern char Game_currentWeaponSelected;
 extern unsigned short Game_currentWeaponProperties;
-extern unsigned char Game_currentWeaponCharge;
+extern unsigned short Game_currentWeaponCharge;
 extern char Game_aimAngle;
 
 // game function prototypes

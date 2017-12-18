@@ -779,14 +779,18 @@ void drawWeaponDetails()
 {
 	
 	short i, x, y;
-	
+
 	// get the direction our current worm is facing
-	char facingRight = (Worm_dir & (unsigned short)1<<(Worm_currentWorm))>0;
+	char facingLeft = (Worm_dir & (unsigned short)1<<(Worm_currentWorm))>0;
 	
 	// get the x/y position of the current worm
 	short wormX = Worm_x[(short)Worm_currentWorm];
 	short wormY = Worm_y[(short)Worm_currentWorm];
 	
+	// the center is slightly off center
+	if(facingLeft)
+			wormX-=4;
+			
 	// if the weapon requires aiming or charge
 	if(
 			(Game_currentWeaponProperties & usesAim)
@@ -814,25 +818,84 @@ void drawWeaponDetails()
 		
 		if(Game_aimAngle>=10)
 			yComponent *= -1;
-		if(facingRight)
+		if(facingLeft)
 			xComponent *= -1;
 		
-		// draw the xhairs, if they're on screen
+		// get screen pos
 		x=wormX+xComponent;
-		y=wormY+yComponent;
-		if(worldToScreen(&x, &y))
-		{
-			ClipSprite8_OR_R(x-4, y-4, 8, spr_CrossHair, lightPlane);
-			ClipSprite8_OR_R(x-4, y-4, 8, spr_CrossHair, darkPlane);
-		}
-		
+		y=wormY+yComponent+4;
+		worldToScreen(&x, &y);
+
 		// if the weapon is being charged, draw the charge circles
 		if(Game_currentWeaponCharge>0)
 		{
-			//ClipSprite32_MASK_R(waterX, waterY, 9, &spr_Water_Dark[0+(f*9)], &spr_Water_Mask[0+(f*9)], darkPlane);
-			//ClipSprite32_AND_R(waterX, waterY, 9, &spr_Water_Mask[0+(f*9)], lightPlane);
-			//ClipSprite32_OR_R(waterX, waterY, 23, &spr_Water_Light[0+(f*23)], lightPlane);
-		}
+			/*
+				Drawing the charge:
+				
+				We want to draw in reverse order, from closer to the cross hairs
+				to the worm, so the sprites overlap nicely.
+				
+				Every other sprite will will alternate white and black.
+				
+				We have 9 total positions:
+					- 3 large
+					- 3 med
+					- 3 small
+					
+				The charge total goes between 0 and 255, so if we integer devide by 31,
+				we should get a value between 0-8
+				
+				we need to interpolate the sprites positions from the center of the worm
+				to the target on the steps 0-8
+				
+				Note that x and y are already converted to screen coords, so for this
+				we'll just convert the worms coords to screen and work just in screen
+			*/
+			
+			// get worms screen pos (worldToScreen mutates)
+			short wx = wormX;
+			short wy = wormY+4;
+			worldToScreen(&wx, &wy);
+			
+			// list of sprites based on size from 0-2
+			char *spritePtrs[] = {spr_chargeSmall, spr_chargeMed, spr_chargeLarge};
+			
+			// calc the charge amount in our scale
+			char chargeAmt = (Game_currentWeaponCharge/31);
+	
+			// loop from furtherst to nearest
+			for(i=chargeAmt; i>=0; i--)
+			{
+				// calc the scale index we're in
+				char scaleIdex = (i/3);
+				
+				// calculate the size of the sprite for this step
+				char spriteHeight = 4 + (2*scaleIdex);
+				
+				// interpolate sprite position and offset:
+				short sx = wx + (x-wx)*(float)((float)i/8.0f) - (spriteHeight/2);
+				short sy = wy + (y-wy)*(float)((float)i/8.0f) - (spriteHeight/2);
+				
+				// on even frames we draw dark gray
+				if(i%2==0)
+				{
+					ClipSprite8_AND_R(sx, sy, spriteHeight, spritePtrs[(short)scaleIdex]+spriteHeight, lightPlane);
+					ClipSprite8_OR_R(sx, sy, spriteHeight, spritePtrs[(short)scaleIdex], darkPlane);
+				}else
+				{
+					ClipSprite8_OR_R(sx, sy, spriteHeight, spritePtrs[(short)scaleIdex], lightPlane);
+					ClipSprite8_AND_R(sx, sy, spriteHeight, spritePtrs[(short)scaleIdex]+spriteHeight, darkPlane);
+				}
+				
+			
+				// draw sprite based on size
+			}// next i
+		
+		}// end if has charge
+		
+		// draw the crosshairs last so they're always on top of the charge
+		ClipSprite8_OR_R(x-4, y-4, 8, spr_CrossHair, lightPlane);
+		ClipSprite8_OR_R(x-4, y-4, 8, spr_CrossHair, darkPlane);
 		
 	}// end if uses aim or charge
 	
