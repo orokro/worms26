@@ -327,7 +327,7 @@ static char spawnCrate()
 	Crate_active |= (unsigned short)1<<(index);
 	Crate_settled &= ~((unsigned short)1<<(index));
 	
-	// make a new collider and physics object for this oil drum
+	// make a new collider and physics object for this crate
 	Collider coll = new_Collider(COL_DOWN, 0, 5, 0, 0);
 	Crate_physObj[index] = new_PhysObj(&Crate_x[index], &Crate_y[index], &Crate_xVelo[index], &Crate_yVelo[index], 0.55f, 1.0f, (char)index, &Crate_settled, coll);
 	Crate_physObj[index].bouncinessX=-1.0f;
@@ -390,7 +390,7 @@ void Crates_update()
 			if(Crate_health[i]<=0)
 			{
 				// boom
-				Explosion_spawn(OilDrum_x[i], OilDrum_y[i], 10, 10, TRUE);
+				Explosion_spawn(Crate_x[i], Crate_y[i], 10, 10, TRUE);
 
 				// no longer active
 				Crate_active &= ~((unsigned short)1<<(i));

@@ -116,7 +116,7 @@ void updateMine(short index)
 		// add gravity to mine
 		Mine_yVelo[index]++;
 		
-		// do physics and collision for OilDrum
+		// do physics and collision for mine
 		Physics_apply(&Mine_physObj[index]);
 	}
 }
