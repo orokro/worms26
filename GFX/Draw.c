@@ -306,16 +306,12 @@ void drawOilDrums()
 
 /**
 	Draws all the in-game, on-screen Crates.
-	
-	#define crateHealth 0
-	#define crateWeapon 1
-	#define crateTool 2
 */
 void drawCrates()
 {
 	short screenX, screenY;
 	
-	// loop over all mines and draw them if active:
+	// loop over all crates and draw them if active:
 	short i;
 	for(i=0; i<MAX_CRATES; i++)
 	{
@@ -338,6 +334,32 @@ void drawCrates()
 				ClipSprite16_MASK_R(screenX-6, screenY-6, 12, sprite+24, sprite, darkPlane);
 
 			}// end if on screen
+		}// end if active
+	}// next i
+}
+
+/**
+	Draws all the in-game, on-screen Weapon objects.
+*/
+void drawWeapons()
+{
+	short screenX, screenY;
+	
+	// loop over all weapons and draw them if active:
+	short i;
+	for(i=0; i<MAX_WEAPONS; i++)
+	{
+		if(Weapon_active & ((unsigned short)1<<(i)))
+		{
+			screenX=Weapon_x[i];
+			screenY=Weapon_y[i];
+			if(worldToScreen(&screenX, &screenY))
+			{				
+				// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon
+				ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, lightPlane);
+				ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, darkPlane);
+			}// end if on screen
+			
 		}// end if active
 	}// next i
 }
@@ -963,6 +985,9 @@ void Draw_renderGame()
 	
 	// draw explosions over everthing except HUD, since they reverse the pixels
 	drawExplosions();
+	
+	// draw weapon objects in the game...
+	drawWeapons();
 	
 	// HUD stuff is drawn last since it needs to go on top of all game elements
 	drawHUD();

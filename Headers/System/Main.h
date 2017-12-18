@@ -750,10 +750,12 @@ enum Weapons {
 extern char Weapon_type[MAX_WEAPONS];
 extern short Weapon_x[MAX_WEAPONS];
 extern short Weapon_y[MAX_WEAPONS];
+extern PhysObj Weapon_physObj[MAX_WEAPONS];
 extern char Weapon_xVelo[MAX_WEAPONS];
 extern char Weapon_yVelo[MAX_WEAPONS];
-extern char Weapon_time[MAX_WEAPONS];
+extern unsigned short Weapon_time[MAX_WEAPONS];
 extern unsigned short Weapon_active;
+extern unsigned short Weapon_settled;
 extern short Weapon_targetX;
 extern short Weapon_targetY;
 extern char Weapon_aimPosList[10][2];
@@ -798,19 +800,12 @@ extern unsigned short Weapon_props[69];
  * @param time weapons use time for different purposes, (e.g. fuse length)
  * @param properties a char that is used as a bitmasked variable for the types of properties this weapon requires
 */
-extern void Weapons_spawn(char, short, short, char, char, char, short);
+extern void Weapons_spawn(char, short, short, char, char, unsigned short);
 
 /**
  * Updates all the currently active weapons, should be called once per frame.
 */
 extern void Weapons_update();
-
-/**
- * Returns TRUE or FALSE if a any weapon at all is active.
- *
- * @return a char boolean if any weapon at all is active.
-*/
-extern char Weapons_weaponsActive();
 
 /**
  * When a weapon is a targeted weapon, such as Air Strike or Homing Missle, this sets the current X/Y target.

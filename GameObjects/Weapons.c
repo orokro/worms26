@@ -77,15 +77,19 @@ char Weapon_type[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 short Weapon_x[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 short Weapon_y[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-// velocities of weapons
+// physics objects and velocities of weapons
+PhysObj Weapon_physObj[MAX_WEAPONS];
 char Weapon_xVelo[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 char Weapon_yVelo[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // timer: various weapons can make use of a fuse timer, or timers for other reasons
-char Weapon_time[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+unsigned short Weapon_time[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // bit mask if the weapon is active in this slot
 unsigned short Weapon_active = 0;
+
+// is the weapon settled on land?
+unsigned short Weapon_settled=0;
 
 // because Weapons are defined BEFORE the Game header file, we cant access the cursor target
 // thus, whever a target is set, it will have to update our weapon target
@@ -397,8 +401,7 @@ short findFreeWeaponSlot()
 	short i=0;
 	for(i=0; i<MAX_WEAPONS; i++)
 	{
-		char freeSlot = (char)((Weapon_active & (unsigned short)((unsigned short)1<<(i))) <= 0);
-		if(freeSlot)
+		if((Weapon_active & (unsigned short)((unsigned short)1<<(i))) <= 0)
 			return i;
 	}
 	
@@ -406,114 +409,70 @@ short findFreeWeaponSlot()
 	return -1;
 }
 
-	
-// if a weapon has velocity enabled, use its velocity and move it appropriately
-void updateVelocity(short index)
+/**
+ * detonates the weapon of index
+ *
+ * @param index the index of the weapon to detonate
+*/
+void detonateWeapon(short index)
 {
-	// move based on velocity
-	Weapon_x[index] += Weapon_xVelo[index];
-	Weapon_y[index] += Weapon_yVelo[index];
+	// no longer active
+	Weapon_active &= ~((unsigned short)1<<(index));
 	
-	// we will handle collisions later, which includes bounds-checks
-}
-
-// if a weapon has gravity enabled, gravity as necessary
-void updateGravity(short index)
-{
-	Weapon_yVelo[index]--;
+	// for debug: always create an explosion for now
+	Explosion_spawn(Weapon_x[index], Weapon_y[index], 10, 10, TRUE);
 	
-	// we will handle collisions later, which includes bounds-checks
-}
-
-// if a weapon has a timer, this will decrement it, and call it's detonation method if time reaches 0
-void updateTimer(short index)
-{
-	Weapon_time[index]--;
-	if(Weapon_time[index]<=0)
+	// if this is a cluster weapon, spawn some cluster items
+	if(Weapon_props[(short)Weapon_type[index]] & isCluster)
 	{
-		// weapon is no longer active:
-		Weapon_active &= ~((unsigned short)1<<(index));
-		
-		// here we will call custom methods for when time expires
-		// TO-DO: implement detonation
+		int i;
+		for(i=0; i<5; i++)
+			Weapons_spawn(WFragment, Weapon_x[index], Weapon_y[index], -2+i, -3, 5*TIME_MULTIPLIER);
 	}
-}
-
-// if a weapon has homing, this will take move its position appropriately
-void updateHoming(short index)
-{
-	// adjust the weapons velocity towards it's target, less agressively as it gets closer
-	short deltaX = (short)((Weapon_targetX - Weapon_x[index])*0.25f);
-	short deltaY = (short)((Weapon_targetY - Weapon_y[index])*0.25f);
 	
-	Weapon_xVelo[index] += deltaX;
-	Weapon_yVelo[index] += deltaY;
+	// focus back on current worm
+	Camera_focusOn(&Worm_x[(short)Worm_currentWorm], &Worm_y[(short)Worm_currentWorm]);
 }
-
-
-// if a weapon has movement (e.g. cows, sheep, old lady, etc) this will update its custom movement logic
-void updateMovement(short index)
-{
-	// here we need to provide custom logic for moving weapon objects,
-	// for instance, sheep should move whatever direction their facing
-	// and sheep should jump occasionally
-	
-	// TO-DO: implement
-	index = index;
-}
-
-
-// if a weapon requires user input (such as super-sheep, or machine gun) this will take input from the user
-void updateController(short index)
-{
-	// some weapons, like super sheep require user input to steer
-	// other weapons, such as sheep or super banana bomb can be detonated before their time
-	// this method will check for the key press, and call the detonation function
-	// for the corresponding weapon
-	
-	// TO-DO: implement
-	index = index;
-}
-
-// if a weapon colides with the ground or a worm, it may either deconate, bounce, etc
-void updateCollision(short index)
-{
-	// we dont have our collisions system set up yet..
-	
-	// TO-DO: implement
-	index = index;
-}
-
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 
+
 // spawns a weapon... simple enough
-void Weapons_spawn(char type, short x, short y, char xVelocity, char yVelocity, char time, short properties)
+void Weapons_spawn(char type, short x, short y, char xVelocity, char yVelocity, unsigned short time)
 {
 	// find a free slot, if none are available, we are unable to spawn this weapon (should never happen)
 	short slot = findFreeWeaponSlot();
 	if(slot==-1)
 		return;
-		
-	// set the weapon active:
-	Weapon_active |= (unsigned short)1<<(slot);
-	
+
 	// set it's varius properties
 	Weapon_type[slot] = type;
 	Weapon_x[slot] = x;
 	Weapon_y[slot] = y;
-	Weapon_xVelo[slot] = xVelocity;
-	Weapon_yVelo[slot] = yVelocity;
 	Weapon_time[slot] = time;
-	Weapon_props[slot] = properties;
-}
-
-// returns TRUE/FALSE if any weapon is active:
-char Weapons_weaponsActive()
-{
-	return (char)(Weapon_active>0);
+	
+	// set the weapon active, and unsettled:
+	Weapon_active |= (unsigned short)1<<(slot);
+	Weapon_settled &= ~((unsigned short)1<<(slot));
+	
+	// if this weapon DOESN'T use physics, we don't have to instantiate a physObj,
+	// and since this weapon doesn't use physics it will never call physics updates on its null physObj anyway
+	if(Weapon_props[(short)type] & usesPhysics)
+	{
+		// make a new collider and physics object for this weapon
+		Collider coll = new_Collider(COL_UDLR, 2, 2, 2, 2);
+		Weapon_physObj[slot] = new_PhysObj(&Weapon_x[slot], &Weapon_y[slot], &Weapon_xVelo[slot], &Weapon_yVelo[slot], 0.55f, 1.0f, (char)slot, &Weapon_settled, coll);
+		
+		// set initial velocity
+		Physics_setVelocity(&Weapon_physObj[slot], xVelocity, yVelocity, FALSE);
+		
+		// focus the camera on this weapon (hack for now until better camera logic is made)
+		Camera_focusOn(&Weapon_x[(short)slot], &Weapon_y[(short)slot]);
+	
+	}
+	
 }
 
 // sets the target for our weapon
@@ -531,35 +490,65 @@ void Weapons_update()
 	for(i=0; i<MAX_WEAPONS; i++)
 	{
 		// check if it's active
-		char activeWeapon = (char)((Weapon_active & (unsigned short)((unsigned short)1<<(i))) > 0);
-		if(activeWeapon)
+		if(Weapon_active & (unsigned short)((unsigned short)1<<(i)))
 		{
-			
-			// based on the properties it has, call each subroutine with it's index
+			// if the weapon uses a timer, decrement and possibly detonate
 			/*
-			if(Weapon_uses[i] & usesVelocity)
-				updateVelocity(i);
-				
-			if(Weapon_uses[i] & usesGravity)
-				updateGravity(i);
-				
-			if(Weapon_uses[i] & usesTimer)
-				updateTimer(i);
-				
-			if(Weapon_uses[i] & usesHoming)
-				updateHoming(i);
-				
-			if(Weapon_uses[i] & usesMovement)
-				updateMovement(i);
-				
-			if(Weapon_uses[i] & usesController)
-				updateController(i);
+			  note: since all weapons can technically "timeout"
+			  I should just make all weapons use a default timer...
+			  I can free up a flag later for more important biz
+			  So for now, we'll add "TRUE ||" so all weapons default timeout
 			*/
+			if(TRUE || Weapon_props[(short)Weapon_type[i]] & usesFuse)
+			{
+				Weapon_time[i]--;
+				if(Weapon_time[i]<=0)
+				{
+					detonateWeapon(i);
+					continue;		
+				}
+			}// end if uses fuse/timer
 			
-			// all weapons will need to update their collision.
-			// some weapons will detonate on impact, others will bounce or something else
-			updateCollision(i);
+			// if a weapon uses homing, adjust it's velocity appropriately
+			if(Weapon_props[(short)Weapon_type[i]] & usesHoming)
+			{
+				// adjust the weapons velocity towards it's target, less agressively as it gets closer
+				short deltaX = (short)((Weapon_targetX - Weapon_x[i])*0.25f);
+				short deltaY = (short)((Weapon_targetY - Weapon_y[i])*0.25f);
+				
+				Weapon_xVelo[i] += deltaX;
+				Weapon_yVelo[i] += deltaY;
+			}//end if uses homing
 			
+			// if a weapon needs user input to controll it, read that now:
+			if(Weapon_props[(short)Weapon_type[i]] & usesController)
+			{
+				// TO-DO: implement controller logic	
+			}
+				
+			// if this weapon uses physics, lets update that shit
+			if(Weapon_props[(short)Weapon_type[i]] & usesPhysics)
+			{
+				// if the Weapon is considered "settled" no need for physics
+				if(!(Weapon_settled & (unsigned short)1<<(i)))
+				{
+					// add gravity to Weapon
+					Weapon_yVelo[i]++;
+					
+					// if it uses wind, lets add it now:
+					if(Weapon_props[(short)Weapon_type[i]] & usesWind)
+						Weapon_xVelo[i] += (Game_wind/5);
+					
+					// do physics and collision for Weapon
+					Physics_apply(&Weapon_physObj[i]);
+					
+					// if the weapon has detonate on impact, we should denoate if it hit something..
+					if((Weapon_props[(short)Weapon_type[i]] & usesDetonateOnImpact) && (Weapon_physObj[i].col.collisions>0))
+						detonateWeapon(i);
+						
+				}// end if uses physics
+						
+			}// end if unsettled (needs Physics)			
 		}// endif active
 	}// next i
 }
@@ -568,6 +557,63 @@ void Weapons_update()
 // when user fires a weapon
 void Weapons_fire(short charge)
 {
+	// before we spawn the weapon we need to make sure we have all the params ready to go...
+	
+	// get the direction our current worm is facing
+	char facingLeft = (Worm_dir & (unsigned short)1<<(Worm_currentWorm))>0;
+	
+	// spawn weapon at center of worm
+	short spawnX = Worm_x[(short)Worm_currentWorm];
+	short spawnY = Worm_y[(short)Worm_currentWorm];
+	
+	// default spawn direction unless weapon uses aim or charge (charge is implied with aim)
+	short dirX=0;
+	short dirY=0;
+	if(Game_currentWeaponProperties & usesAim)
+	{
+		dirX = Weapon_aimPosList[(Game_aimAngle<9) ? Game_aimAngle : 9-(Game_aimAngle-9)][0];
+		dirY = Weapon_aimPosList[(Game_aimAngle<9) ? Game_aimAngle : 9-(Game_aimAngle-9)][1];
+		
+		if(Game_aimAngle>=10)
+			dirY *= -1;
+		if(facingLeft)
+			dirX *= -1;
+	}
+	
+	// default no velocity unless weapon uses charge
+	short veloX=0;
+	short veloY=0;
+	if(Game_currentWeaponProperties & usesCharge)
+	{
+		veloX = dirX * (float)((float)charge/254.0f);
+		veloY = dirY * (float)((float)charge/254.0f);
+	}
+	
+	// for now, we'll always default to a 3 second timer
+	short fuseLength = (3 * TIME_MULTIPLIER);
+	
+	// finally spawn the weapon with it's params!
+	Weapons_spawn(Game_currentWeaponSelected, spawnX, spawnY, veloX, veloY, fuseLength);
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -96,30 +96,6 @@ void wormWalk()
 */
 void wormWeapon()
 {
-	/*
-		Before we do ANYTHING else, we need to check if the Action key is down (which is fire).
-	*/
-	if(Keys_keyState(keyAction))
-	{
-		// if this weapon uses charge
-		if(Game_currentWeaponProperties & usesCharge)
-		{
-			// if the action key was let go we should fire the weapon at it's current charge, reset charge and exit
-			if(Keys_keyUp(keyAction))
-			{
-				Weapons_fire(Game_currentWeaponCharge);
-				Game_currentWeaponCharge=0;
-				return;
-				
-			// if the key is pressed, we should add to the charge:
-			}else if(Keys_keyState(keyAction))
-			{
-				Game_currentWeaponCharge+=18;
-				if(Game_currentWeaponCharge>=255)
-					Game_currentWeaponCharge=255;
-			}
-		}// weapon has charge
-	}
 	
 	// if uses aim we should let them press up and down
 	if(Game_currentWeaponProperties & usesAim)
@@ -136,7 +112,35 @@ void wormWeapon()
 			Game_aimAngle=18;
 	}
 	
+	// if this weapon uses charge
+	if(Game_currentWeaponProperties & usesCharge)
+	{
+		// if the action key was let go we should fire the weapon at it's current charge, reset charge and exit
+		if(Keys_keyUp(keyAction))
+		{
+			Weapons_fire(Game_currentWeaponCharge);
+			Game_currentWeaponCharge=0;
+			return;
+			
+		// if the key is pressed, we should add to the charge:
+		}else if(Keys_keyState(keyAction))
+		{
+			Game_currentWeaponCharge+=18;
+			if(Game_currentWeaponCharge>=255)
+				Game_currentWeaponCharge=255;
+		}
 	
+	// otherwise, proceed since this weapon isn't chargeable
+	}else{
+		
+		// if 2nd was pressed, activate weapon
+		if(Keys_keyUp(keyAction))
+		{
+			Weapons_fire(Game_currentWeaponCharge);
+			Game_currentWeaponCharge=0;
+			return;
+		}// end if action was pressed
+	}// end if uses charge
 }
 
 
