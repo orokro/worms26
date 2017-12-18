@@ -756,6 +756,7 @@ extern char Weapon_time[MAX_WEAPONS];
 extern unsigned short Weapon_active;
 extern short Weapon_targetX;
 extern short Weapon_targetY;
+extern char Weapon_aimPosList[10][2];
 
 /*
 	there are currently 69 different types of weapon objects that can be on screen
@@ -819,6 +820,10 @@ extern char Weapons_weaponsActive();
 */
 extern void Weapons_setTarget(short, short);
 
+/**
+ * When the user fires a weapon
+*/
+extern void Weapons_fire(short charge);
 
 
 /* ======================================================================================================================================
@@ -865,6 +870,8 @@ extern char Game_turn;
 extern short Game_weapInventory[5][13];
 extern char Game_currentWeaponSelected;
 extern unsigned short Game_currentWeaponProperties;
+extern unsigned char Game_currentWeaponCharge;
+extern char Game_aimAngle;
 
 // game function prototypes
 

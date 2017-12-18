@@ -16,9 +16,12 @@
 		- Weapons Menu
 */
 
+short foo[5][10];
+
 // these sprites will be generated at the begining of the each turn to match the current wind conditions
 unsigned long windSprites[3][3];
 
+// these sprites will be genreated at the beginning and when health changes.
 unsigned long healthSprites[16][18];
 unsigned long healthMasks[16][18];
 unsigned long healthLightGray[16][18];
@@ -143,6 +146,7 @@ char worldToScreen(short *x, short *y)
 	else
 		return TRUE;
 }
+
 
 /**
 	Draws all the in-game, on-screen Worms.
@@ -768,6 +772,74 @@ void drawExplosions()
 }
 
 
+/**
+ * Draw's the cross hair and/or charge bar for the selected weapon
+*/
+void drawWeaponDetails()
+{
+	
+	short i, x, y;
+	
+	// get the direction our current worm is facing
+	char facingRight = (Worm_dir & (unsigned short)1<<(Worm_currentWorm))>0;
+	
+	// get the x/y position of the current worm
+	short wormX = Worm_x[(short)Worm_currentWorm];
+	short wormY = Worm_y[(short)Worm_currentWorm];
+	
+	// if the weapon requires aiming or charge
+	if(
+			(Game_currentWeaponProperties & usesAim)
+			||
+			(Game_currentWeaponProperties & usesCharge)
+		)
+	{
+	
+		/*
+			get the x/y components to use for the crosshair or the charge
+			
+			Charge is stored as a value between 0 and 18 (19 positions, using center twice)
+			but our array only has 10 values... so we gotta pick values from this.
+			
+			The first value represents position 18, so the first 10 are:
+				19-(Game_aimAngle-9), which would be 0-9 in the array
+				
+			Therefore, if the Game_aimAngle is less than 9, we want to use:
+				Game_aimAngle, but flip the y component.
+				
+			The x component will be flipped if facing left
+		*/
+		char xComponent = Weapon_aimPosList[(Game_aimAngle<9) ? Game_aimAngle : 9-(Game_aimAngle-9)][0];
+		char yComponent = Weapon_aimPosList[(Game_aimAngle<9) ? Game_aimAngle : 9-(Game_aimAngle-9)][1];
+		
+		if(Game_aimAngle>=10)
+			yComponent *= -1;
+		if(facingRight)
+			xComponent *= -1;
+		
+		// draw the xhairs, if they're on screen
+		x=wormX+xComponent;
+		y=wormY+yComponent;
+		if(worldToScreen(&x, &y))
+		{
+			ClipSprite8_OR_R(x-4, y-4, 8, spr_CrossHair, lightPlane);
+			ClipSprite8_OR_R(x-4, y-4, 8, spr_CrossHair, darkPlane);
+		}
+		
+		// if the weapon is being charged, draw the charge circles
+		if(Game_currentWeaponCharge>0)
+		{
+			//ClipSprite32_MASK_R(waterX, waterY, 9, &spr_Water_Dark[0+(f*9)], &spr_Water_Mask[0+(f*9)], darkPlane);
+			//ClipSprite32_AND_R(waterX, waterY, 9, &spr_Water_Mask[0+(f*9)], lightPlane);
+			//ClipSprite32_OR_R(waterX, waterY, 23, &spr_Water_Light[0+(f*23)], lightPlane);
+		}
+		
+	}// end if uses aim or charge
+	
+}
+
+
+
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -835,6 +907,10 @@ void Draw_renderGame()
 	// if the game mode is worm select, draw the selection arrow
 	if(Game_mode==gameMode_WormSelect)
 		drawSelectArrow();
+	
+	// extra stuff to draw if the worm has certain wepaons selected
+	if(Game_currentWeaponSelected!=-1)
+		drawWeaponDetails();
 		
 	// for now, we will output a bunch of debug info on the screen
 	

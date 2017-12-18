@@ -30,7 +30,7 @@
 	A note about how Weapons are indexed:
 	
 	For the weapons menu, and inventory, the weapons are stored in a 5x14 array, like so:
-	[5][14] = [5][14] = { 
+	[5][13] = [5][13] = { 
 												{0,9,9,9,9,1,1,3,5,0,2,0,9,1},
 												{0,1,3,9,9,2,1,3,2,0,1,0,9,1},
 												{0,5,0,9,1,1,0,3,2,0,0,0,3,1},
@@ -41,28 +41,25 @@
 	This pattern reflects the same position they are in the WWP menu on the PC.
 	However, it can also be indexed directly, such that [0][0]=0 and [0][1]=1,
 	where as [1][0] would actually be weapon 15.
-	
-	Regarding the total number of weapons on screen at once:
-	Fire particles, either for napalm or fire, will be handled with a fire system separately,
-	since fire doesn't need to take up weapon slots, and lots of weapons may need to spawn fire
-	
-	Thus, if a cluster bomb clusters into 5 small cluser fragments, there needs to be a total of 6 weapon
-	slots availalbe:
-	1 for the initial bomb, room to spawn 5 clusters on the same frame the bomb is deactivated
-	
-	For the uzi and gattling gun, there may need to be more than 6 bullets on screen tho, which would
-	by far be the most in-game weapons at once.
-	
-	Let's say for now, 10 weapons, but we will only loop to 6 unless the "bullets" flag is set																		
 
 	For Reference:
 	
-	usesVelocity 		1 	// 00000001
-	usesGravity	 		2 	// 00000010
-	usesTimer	   		4 	// 00000100
-	usesHoming 	 		8		// 00001000
-	usesMovement 		16 	// 00010000
-	usesController 	32 	// 00100000
+	usesAim
+	usesCharge
+	usesCursor
+	usesPhysics
+	usesWind
+	usesHoming
+	usesFuse
+	usesDetonation
+	usesController
+	usesDetonateOnImpact
+	isAnimal
+	isCluster
+	isParticle
+	isMele
+	spawnsSelf
+	multiUse
 
 	WJetPack,				WBazooka, 				WGrenade, 	WShotGun,		WFirePunch, 	WDynamite, 		WAirStrike, 		WBlowTorch, 	WNinjaRope, 			WSuperBanana, 		WPetrolBomb, 	WMadCows, 				WSkipGo,
 	WLowGravity, 		WHomingMissle, 		WCluster,		WHandGUn,		WDragonBall,	WMine, 				WNapalmStrike, 	WDrill, 			WBungeeCord,			WHolyHandGrenade,	WSkunk, 			WOldLady, 				WSurrender,
@@ -94,6 +91,23 @@ unsigned short Weapon_active = 0;
 // thus, whever a target is set, it will have to update our weapon target
 short Weapon_targetX = 0;
 short Weapon_targetY = 0;
+
+/*
+	Below is a list of relative points to a worm to use for rotating the target
+	crosshairs around the worm, when aiming a weapon.
+*/
+char Weapon_aimPosList[10][2] = {
+	{0,  13},
+	{2,  13},
+	{4,  12},
+	{6,  11},
+	{8,  10},
+	{10, 8},
+	{11, 6},
+	{12, 4},
+	{13, 2},
+	{13, 0}
+};
 
 /*
 	So below is seems straight forward:
@@ -550,4 +564,10 @@ void Weapons_update()
 	}// next i
 }
 
+
+// when user fires a weapon
+void Weapons_fire(short charge)
+{
+	
+}
 

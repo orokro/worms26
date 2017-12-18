@@ -87,9 +87,68 @@ void wormWalk()
 		 // unsettle worm
 		 Worm_physObj[(short)Worm_currentWorm].staticFrames=0;
 		 Worm_settled &= ~wormMask;
-		 
 	}
 }
+
+
+/**
+ * This method handles weapon-specific logic if a weapon is currently selected
+*/
+void wormWeapon()
+{
+	/*
+		Before we do ANYTHING else, we need to check if the Action key is down (which is fire).
+	*/
+	if(Keys_keyState(keyAction))
+	{
+		// if this weapon uses charge
+		if(Game_currentWeaponProperties & usesCharge)
+		{
+			// if the action key was let go we should fire the weapon at it's current charge, reset charge and exit
+			if(Keys_keyUp(keyAction))
+			{
+				Weapons_fire(Game_currentWeaponCharge);
+				Game_currentWeaponCharge=0;
+				return;
+				
+			// if the key is down, we should add to the charge:
+			}else if(Keys_keyState(keyAction))
+			{
+				Game_currentWeaponCharge+=10;
+				if(Game_currentWeaponCharge>254)
+					Game_currentWeaponCharge=254;
+			}
+		}// weapon has charge
+	
+	// other wise, check other weapon state logic
+	}else{
+		
+		// if uses aim we should let them press up and down
+		if(Game_currentWeaponProperties & usesAim)
+		{
+			if(Keys_keyState(keyUp))
+				Game_aimAngle++;
+			else if(Keys_keyState(keyDown))
+				Game_aimAngle--;
+			
+			// bound check
+			if(Game_aimAngle<=0)
+				Game_aimAngle=0;
+			else if(Game_aimAngle>18)
+				Game_aimAngle=18;
+		}
+
+	}// end if action is pressed
+	
+	
+}
+
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 // handles all update frames for controlling worms in the turn game mode
 void CharacterController_update()
@@ -109,6 +168,10 @@ void CharacterController_update()
 	// if the worm is grounded, we should test for walking:
 	if(Worm_onGround & wormMask)
 		wormWalk();
-		
-		// TO-DO: implement parachute, bunjee, and ninja rope
+
+	//if the user has a weapon selectedan check for first-frames of keyDown
+	if(Game_currentWeaponSelected!=-1)
+		wormWeapon();
+	
+	// TO-DO: implement parachute, bunjee, and ninja rope
 }
