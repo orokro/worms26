@@ -249,7 +249,7 @@ unsigned short Weapon_props[69] = {
         // firepunch
         isMele,
         // dynamite
-        spawnsSelf,
+        spawnsSelf | usesPhysics,
         // air strike
         usesCursor,
         // blow torch
@@ -315,7 +315,7 @@ unsigned short Weapon_props[69] = {
         // flame thrower
         usesAim,
         // priceless ming vase
-        spawnsSelf | usesFuse | isCluster,
+        spawnsSelf | usesFuse | isCluster | usesPhysics,
         // concrete donkey
         usesCursor | usesPhysics | usesDetonateOnImpact,
         // select worm
