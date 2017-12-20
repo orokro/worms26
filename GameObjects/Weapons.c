@@ -463,7 +463,7 @@ void Weapons_spawn(char type, short x, short y, char xVelocity, char yVelocity, 
 	{
 		// make a new collider and physics object for this weapon
 		Collider coll = new_Collider(COL_UDLR, 2, 2, 2, 2);
-		Weapon_physObj[slot] = new_PhysObj(&Weapon_x[slot], &Weapon_y[slot], &Weapon_xVelo[slot], &Weapon_yVelo[slot], 0.55f, 1.0f, (char)slot, &Weapon_settled, coll);
+		Weapon_physObj[slot] = new_PhysObj(&Weapon_x[slot], &Weapon_y[slot], &Weapon_xVelo[slot], &Weapon_yVelo[slot], 0.7f, 1.0f, (char)slot, &Weapon_settled, coll);
 		
 		// set initial velocity
 		Physics_setVelocity(&Weapon_physObj[slot], xVelocity, yVelocity, FALSE);
@@ -537,7 +537,7 @@ void Weapons_update()
 					
 					// if it uses wind, lets add it now:
 					if(Weapon_props[(short)Weapon_type[i]] & usesWind)
-						Weapon_xVelo[i] += (Game_wind/5);
+						Weapon_xVelo[i] += (Game_wind/10);
 					
 					// do physics and collision for Weapon
 					Physics_apply(&Weapon_physObj[i]);
