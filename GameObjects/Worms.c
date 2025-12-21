@@ -174,6 +174,7 @@ void Worm_update()
 	// loop over worms, and any active worms should have their gravity and physics applied..
 	short i;
 	long wormMask;
+	unsigned short Worm_wasOnGround = Worm_onGround;
 	for(i=0; i<MAX_WORMS; i++)
 	{
 		// caculate the bitmask for this worm once, since we'll use it alot
@@ -202,6 +203,7 @@ void Worm_update()
 				// do physics and collision for worm
 				Physics_apply(&Worm_physObj[i]);
 				
+				
 				// if we collided with the ground on the last frame, assume the worm is grounded.
 				// (it should collide with the ground ever frame its grounded, due to gravity.
 				// if the worm was settled on this frame, we won't get here on the next frame
@@ -210,6 +212,10 @@ void Worm_update()
 					Worm_onGround |= wormMask;
 				else
 					Worm_onGround &= ~wormMask;
+
+				// reset jump animation if any
+				if(!(Worm_wasOnGround & wormMask) && (Worm_onGround & wormMask))
+					Game_wormAnimState = ANIM_NONE;
 			}
 			
 			// calculate the worms tile, and if it changed, we need to check for mine and crate updates

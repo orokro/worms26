@@ -150,6 +150,11 @@ char Game_xMarkPlaced = FALSE;
 char Game_xMarkAllowedOverLand = TRUE;
 char Game_cursorEndTurn = FALSE;
 
+// for animating jumps
+char Game_wormAnimState = ANIM_NONE;
+int Game_wormAnimTimer = 0;
+char Game_wormFlipStartDir = 0; // 0 = right, 1 = left (matching wormMask)
+
 // for debug, we can stop the time
 char Debug_stopTime = FALSE;
 

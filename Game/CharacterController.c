@@ -45,12 +45,26 @@ void wormWalk()
 	if(Keys_keyDown(keyJump))
 	{
 		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], ((Worm_dir & wormMask) ? -2 : 2), -5, FALSE);
+		
+		// set jump animation
+		Game_wormAnimState = ANIM_JUMP;
+    Game_wormAnimTimer = 0;
+    
 		return;
 		
 	// backflip
 	}else if(Keys_keyDown(keyBackflip))
 	{
-		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], ((Worm_dir & wormMask) ? -1 : 1), -6, FALSE);
+		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], ((Worm_dir & wormMask) ? 1 : -1), -6, FALSE);
+		
+		// Set Animation State
+    Game_wormAnimState = ANIM_BACKFLIP;
+    Game_wormAnimTimer = 0;
+    
+    // Store the direction we were facing when we started the flip
+    // (We need this because the worm might spin, but the sequence depends on start dir)
+    
+    Game_wormFlipStartDir = (Worm_dir & wormMask);
 		return;
 		
 	// test for directions left/right
@@ -122,7 +136,7 @@ void wormWeapon()
 			Game_currentWeaponCharge=0;
 
 			// end turn because we fired a weapon
-			Game_changeMode(gameMode_TurnEnd);
+		  //	Game_changeMode(gameMode_TurnEnd);
 
 			return;
 			
@@ -144,7 +158,7 @@ void wormWeapon()
 			Game_currentWeaponCharge=0;
 
 			// end turn because we fired a weapon
-			Game_changeMode(gameMode_TurnEnd);
+			//Game_changeMode(gameMode_TurnEnd);
 			return;
 		}// end if action was pressed
 	}// end if uses charge

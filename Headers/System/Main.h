@@ -31,34 +31,36 @@
 	so latter items cannot reference things defined after them.
 */
 
+
+
 /* ======================================================================================================================================
    MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++
    ====================================================================================================================================== */
   
-  // main defines
+// main defines
   
-	// how many frames consist of one second?
-	#define TIME_MULTIPLIER 15
+// how many frames consist of one second?
+#define TIME_MULTIPLIER 15
 	       
-	// main globals
-	extern void *GblDBuffer;
-	extern char GameRunning;
-	extern void *mapBuffer;
-	extern void *lightPlane;
-	extern void *darkPlane;
+// main globals
+extern void *GblDBuffer;
+extern char GameRunning;
+extern void *mapBuffer;
+extern void *lightPlane;
+extern void *darkPlane;
 	
-	// main prototypes
+// main prototypes
 
-	/**
-	 * Calculates the distance between two 2D points.
-  	 * 
-  	 * @param x1 the x value of the first coordinate
-  	 * @param y1 the y value of the first coordinate
-  	 * @param x2 the x value of the second coordinate
-  	 * @param y2 the y value of the second coordinate
-  	 * @return the distance between 2 points, via Pythags thereom
-	*/
-	short dist(short, short, short, short);
+/**
+ * Calculates the distance between two 2D points.
+ 	 * 
+ 	 * @param x1 the x value of the first coordinate
+ 	 * @param y1 the y value of the first coordinate
+ 	 * @param x2 the x value of the second coordinate
+ 	 * @param y2 the y value of the second coordinate
+ 	 * @return the distance between 2 points, via Pythags thereom
+*/
+short dist(short, short, short, short);
 	
 	
    
@@ -533,8 +535,18 @@ extern void Explosion_update();
    WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORM
    ====================================================================================================================================== */
 
+// Animation States
+#define ANIM_NONE     0
+#define ANIM_JUMP     1
+#define ANIM_BACKFLIP 2
+
 // worm defines
 #define MAX_WORMS 16
+
+// Global tracking
+extern char Game_wormAnimState;
+extern int  Game_wormAnimTimer;
+extern char Game_wormFlipStartDir; // To know if we started right or left
 
 // worm enums
 enum WormModes {wormMode_idle, wormMode_walking, wormMode_jumping, wormMode_backFliping, wormMode_falling, wormMode_knockBack, wormMode_parachute, wormMode_rope, wormMode_bungie};

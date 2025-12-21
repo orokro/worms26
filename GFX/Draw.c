@@ -16,6 +16,11 @@
 		- Weapons Menu
 */
 
+// Global Variables (Defined in Game.c)
+extern char Game_wormAnimState;    // Current animation state (0=None, 1=Jump, 2=Backflip)
+extern int  Game_wormAnimTimer;    // Timer to track animation progress
+extern char Game_wormFlipStartDir; // Direction worm was facing when flip started (0=Right, Mask=Left)
+
 short foo[5][10];
 
 // these sprites will be generated at the begining of the each turn to match the current wind conditions
@@ -153,71 +158,164 @@ char worldToScreen(short *x, short *y)
 */
 void drawWorms()
 {
-	short screenX, screenY;
-	
-	// loop over all worms and draw them if active:
-	short i;
-	for(i=0; i<MAX_WORMS; i++)
-	{
-		if(Worm_active & (unsigned short)1<<(i))
-		{
-			screenX=Worm_x[i];
-			screenY=Worm_y[i];
-			if(worldToScreen(&screenX, &screenY))
-			{
-				// get the postion and direction the worm is facing..
-				short x = screenX-8;
-				short y = screenY-6;
-				char facing = (Worm_dir & (unsigned short)1<<(i))>0;
+    short screenX, screenY;
+    short i;
 
-				// use the worms fill to erase the background
-				ClipSprite16_AND_R(x, y, 13, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), darkPlane);
-				
-				// draw the worms fill and outline
-				ClipSprite16_AND_R(x, y, 13, (facing ? spr_WormLeft_Mask : spr_WormRight_Mask), lightPlane);
-				ClipSprite16_OR_R(x, y, 13, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), darkPlane);
-				ClipSprite16_OR_R(x, y, 13, (facing ? spr_WormLeft_Outline : spr_WormRight_Outline), lightPlane);
-				
-				// draw name/healh above worm, unless current worm in turn
-				if(!(i==Worm_currentWorm && Game_mode==gameMode_Turn))
-				{
-					short n;
-					for(n=0; n<2; n++)
-					{
-						short hX = x-24+n*32;
-						short hY = y-10;
-					
-						// mask out both planes for the name/healh sprites
-						ClipSprite32_AND_R(hX, hY, 9, healthMasks[i]+(n*9), lightPlane);
-						ClipSprite32_AND_R(hX, hY, 9, healthMasks[i]+(n*9), darkPlane);
-						
-						// if its a light worm, make the light plane gray
-						if(i>7)
-							ClipSprite32_OR_R(hX, hY, 9, healthLightGray[i]+(n*9), lightPlane);
-							
-						// finally if we OR the sprite it to both buffers
-						ClipSprite32_OR_R(hX, hY, 9, healthSprites[i]+(n*9), lightPlane);
-						ClipSprite32_OR_R(hX, hY, 9, healthSprites[i]+(n*9), darkPlane);
-					}
-				}// end if current worm in turn
-				
-				//char foo = (char)((Worm_settled & ((unsigned short)1<<(i)))>0);
-				//DrawChar(x, y-15, (foo ? (char)20 : 'X'), A_NORMAL);
-				
-			}// end if on screen
-		}// end if active
-	}// next i
-	
-	// for debug: draw collider for current worm:
-	/*
-	short x=Worm_x[(short)Worm_currentWorm];
-	short y=Worm_y[(short)Worm_currentWorm];
-	if(worldToScreen(&x, &y)==TRUE)
-	{
-		DrawLine(x-2, y, x+2, y, A_NORMAL);
-		DrawLine(x, y-4, x, y+6, A_NORMAL);
-	}
-	*/
+    // Pointers for the sprite data to draw this frame
+    unsigned short* sprOutline;
+    unsigned short* sprMask;
+    short sprHeight; // New: sprites have different heights now!
+
+    // Loop over all worms
+    for(i=0; i<MAX_WORMS; i++)
+    {
+        // Check active bitmask
+        if(Worm_active & (unsigned short)1<<(i))
+        {
+            screenX = Worm_x[i];
+            screenY = Worm_y[i];
+
+            // Only draw if on screen
+            if(worldToScreen(&screenX, &screenY))
+            {
+                // Align sprite (centered x, feet y adjustment)
+                short x = screenX - 8;
+                short y = screenY - 6;
+
+                // Default to standard height
+                sprHeight = 13; 
+
+                // ============================================================
+                // SPRITE SELECTION LOGIC
+                // ============================================================
+                
+                // Is this the Active Worm doing an Animation?
+                if(i == Worm_currentWorm && Game_wormAnimState != ANIM_NONE)
+                {
+                    // --- BACKFLIP ---
+                    if(Game_wormAnimState == ANIM_BACKFLIP)
+                    {
+                        Game_wormAnimTimer++; // Advance frame
+                        
+                        // Determine Stage
+                        int stage = 1;
+                        if(Game_wormAnimTimer < 6)       stage = 1; 
+                        else if(Game_wormAnimTimer < 8) stage = 2; 
+                        else if(Game_wormAnimTimer < 9) stage = 3; 
+                        else if(Game_wormAnimTimer < 12) stage = 4; 
+                        else                             stage = 1; 
+
+                        // Handle Directions (Start Dir 0=Right, >0=Left)
+                        if(Game_wormFlipStartDir == 0) 
+                        {
+                            // Started facing RIGHT
+                            if(stage==1) { sprOutline=spr_WormFlip1_Right_Outline; sprMask=spr_WormFlip1_Right_Mask; sprHeight=17; }
+                            else if(stage==2) { sprOutline=spr_WormFlip2_Right_Outline; sprMask=spr_WormFlip2_Right_Mask; sprHeight=13; }
+                            else if(stage==3) { sprOutline=spr_WormFlip3_Left_Outline;  sprMask=spr_WormFlip3_Left_Mask; sprHeight=15; }
+                            else if(stage==4) { sprOutline=spr_WormFlip4_Left_Outline;  sprMask=spr_WormFlip4_Left_Mask; sprHeight=13; }
+                            else { sprOutline=spr_WormFlip1_Right_Outline; sprMask=spr_WormFlip1_Right_Mask; sprHeight=17; }
+                        }
+                        else 
+                        {
+                            // Started facing LEFT
+                            if(stage==1) { sprOutline=spr_WormFlip1_Left_Outline; sprMask=spr_WormFlip1_Left_Mask; sprHeight=17; }
+                            else if(stage==2) { sprOutline=spr_WormFlip2_Left_Outline; sprMask=spr_WormFlip2_Left_Mask; sprHeight=13; }
+                            else if(stage==3) { sprOutline=spr_WormFlip3_Right_Outline; sprMask=spr_WormFlip3_Right_Mask; sprHeight=15; }
+                            else if(stage==4) { sprOutline=spr_WormFlip4_Right_Outline; sprMask=spr_WormFlip4_Right_Mask; sprHeight=13; }
+                            else { sprOutline=spr_WormFlip1_Left_Outline; sprMask=spr_WormFlip1_Left_Mask; sprHeight=17; }
+                        }
+                        
+                        // Adjust Y for tall sprites so feet stay aligned
+                        // (17px tall needs to be drawn 4px higher than 13px tall)
+                        if(sprHeight == 17) y -= 4; 
+                        if(sprHeight == 15) y -= 2;
+                    }
+                    // --- JUMPING ---
+                    else if(Game_wormAnimState == ANIM_JUMP)
+                    {
+                        sprHeight = 17; // Jump sprites are tall
+                        y -= 4;         // Align feet
+                        
+                        // Check Direction
+                        if(Worm_dir & (unsigned short)1<<(i)) {
+                            sprOutline = spr_WormJump_Left_Outline;
+                            sprMask = spr_WormJump_Left_Mask;
+                        } else {
+                            sprOutline = spr_WormJump_Right_Outline;
+                            sprMask = spr_WormJump_Right_Mask;
+                        }
+                    }
+                    // Safety Fallback
+                    else {
+                        sprOutline = spr_WormRight_Outline;
+                        sprMask = spr_WormRight_Mask;
+                    }
+                }
+                // ============================================================
+                // STANDARD WALKING / STANDING
+                // ============================================================
+                else
+                {
+                    char facing = (Worm_dir & (unsigned short)1<<(i))>0;
+                    if(facing) {
+                        sprOutline = spr_WormLeft_Outline; // Make sure these match SpriteData.c names!
+                        sprMask = spr_WormLeft_Mask;
+                    } else {
+                        sprOutline = spr_WormRight_Outline;
+                        sprMask = spr_WormRight_Mask;
+                    }
+                }
+
+                // ============================================================
+                // DRAWING
+                // ============================================================
+
+                // 1. Calculate the final Bottom-Right coordinate
+                short finalY = y + sprHeight;
+
+                // 2. SAFETY CHECK:
+                // Ensure we do not draw to negative memory addresses (Fatal Crash)
+                // AND ensure we don't draw off the bottom (Visual Glitch)
+                if(y > -sprHeight && y < 100) 
+                {
+                     // Draw Mask (AND logic)
+                     ClipSprite16_AND_R(x, y, sprHeight, sprMask, darkPlane);
+                     ClipSprite16_AND_R(x, y, sprHeight, sprMask, lightPlane);
+                    
+                     // Draw Outline (OR logic)
+                     ClipSprite16_OR_R(x, y, sprHeight, sprOutline, darkPlane);
+                     ClipSprite16_OR_R(x, y, sprHeight, sprOutline, lightPlane);
+                }
+                
+                // ============================================================
+                // HUD (Name / Health)
+                // ============================================================
+                // Only draw if NOT the current worm during a turn
+                if(!(i==Worm_currentWorm && Game_mode==gameMode_Turn))
+                {
+                    short n;
+                    for(n=0; n<2; n++)
+                    {
+                        short hX = x-24+n*32;
+                        short hY = y-10; // Might need adjustment if sprite is tall (jumping)
+                    
+                        // mask out both planes
+                        ClipSprite32_AND_R(hX, hY, 9, healthMasks[i]+(n*9), lightPlane);
+                        ClipSprite32_AND_R(hX, hY, 9, healthMasks[i]+(n*9), darkPlane);
+                        
+                        // if its a light worm (Team 2?), make the light plane gray
+                        if(i>7)
+                            ClipSprite32_OR_R(hX, hY, 9, healthLightGray[i]+(n*9), lightPlane);
+                            
+                        // OR the sprite to both buffers
+                        ClipSprite32_OR_R(hX, hY, 9, healthSprites[i]+(n*9), lightPlane);
+                        ClipSprite32_OR_R(hX, hY, 9, healthSprites[i]+(n*9), darkPlane);
+                    }
+                } // end HUD
+                
+            } // end if on screen
+        } // end if active
+    } // next i
 }
 
 /**
@@ -941,7 +1039,7 @@ void Draw_cake(short amount, short total)
 	ClipSprite32_OR_R(64, 38, 23, spi_CandleCake_Light, lightPlane);	
 	
 	char progStr[40];
-	sprintf(progStr, "Zoading... %d%%", (short)((float)((float)amount/(float)total)*100));
+	sprintf(progStr, "Loading... %d%%", (short)((float)((float)amount/(float)total)*100));
 	DrawStr(40,70,progStr, A_NORMAL);	
 
 	// now flip the planes
