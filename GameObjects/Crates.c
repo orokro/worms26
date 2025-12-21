@@ -432,8 +432,5 @@ void Crates_pickUp(short index, short worm)
 	// based on the type, upgrade the worm
 	if(Crate_type[index]==crateHealth)
 		Worm_setHealth(worm, 50, TRUE);
-		
-	// update the map tiles..
-	Map_updateTiles();
 }
 

@@ -332,10 +332,6 @@ extern void Map_getSpawnPoint();
 */
 extern void Map_makeMap();
 
-/**
- * Updates our tile map with the positions of objects
-*/
-extern void Map_updateTiles();
 
 
 /* ======================================================================================================================================

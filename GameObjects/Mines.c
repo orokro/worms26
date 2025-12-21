@@ -96,10 +96,7 @@ void updateMine(short index)
 			// disable the mine
 			Mine_active &= ~((unsigned short)1<<(index));
 			Mine_triggered &= ~((unsigned short)1<<(index));
-			
-			// update the map..
-			Map_updateTiles();
-			
+
 			// boom
 			Explosion_spawn(Mine_x[index], Mine_y[index], 14, 14, TRUE);
 				

@@ -120,6 +120,10 @@ void wormWeapon()
 		{
 			Weapons_fire(Game_currentWeaponCharge);
 			Game_currentWeaponCharge=0;
+
+			// end turn because we fired a weapon
+			Game_changeMode(gameMode_TurnEnd);
+
 			return;
 			
 		// if the key is pressed, we should add to the charge:
@@ -138,6 +142,9 @@ void wormWeapon()
 		{
 			Weapons_fire(Game_currentWeaponCharge);
 			Game_currentWeaponCharge=0;
+
+			// end turn because we fired a weapon
+			Game_changeMode(gameMode_TurnEnd);
 			return;
 		}// end if action was pressed
 	}// end if uses charge

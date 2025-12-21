@@ -122,33 +122,36 @@ void spawnWorm(short index)
  */
 void checkCratesAndMines(short index)
 {
-	// get the tile data at the worms tile
-	unsigned char tileData = mapTiles[Worm_tile[index]];
-	
-	// if there are no items in this tile, no checks to make
-	if(tileData==0)
-		return;
-	
-	// get the high and low word, high word being crates
-	short mine = tileData & 0b00001111;
-	short crate = (tileData & 0b11110000)>>4;
-	
-	// if there is a crate on this tile..
-	if(crate)
-	{
-		// check if we are close enough to pick it up
-		if(abs(Crate_x[crate]-Worm_x[index])<5 && abs(Crate_y[crate]-Worm_y[index])<5)
-			Crates_pickUp(crate, index);
-	}
-	
-	// if there is a mine on this tile..
-	if(mine)
-	{
-		// check if we are close enough to trigger it
-		if(abs(Mine_x[mine]-Worm_x[index])<10 && abs(Mine_y[mine]-Worm_y[index])<10)
-			Mines_trigger(mine);
-	}
+		short i, c;
+    
+    // Check Mines
+    for(i=0; i<MAX_MINES; i++)
+    {
+        // Check if active, not triggered, and close enough
+        if((Mine_active & (1<<i)) && !(Mine_triggered & (1<<i)))
+        {
+             if(abs(Mine_x[i] - Worm_x[index]) < 15 && abs(Mine_y[i] - Worm_y[index]) < 15)
+             {
+                 Mines_trigger(i);
+             }
+        }
+    }
+
+    // Check Crates
+    for(c=0; c<MAX_CRATES; c++)
+    {
+        // Check if active, not triggered, and close enough
+        if((Crate_active & (1<<c)))
+        {
+             if(abs(Crate_x[c] - Worm_x[index]) < 15 && abs(Crate_y[c] - Worm_y[index]) < 15)
+             {
+				Crates_pickUp(c, index);
+             }
+        }
+    }
 }
+
+
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 
