@@ -257,7 +257,7 @@ unsigned short Weapon_props[69] = {
         // ninja rope
         0,
         // super banana bomb
-        usesAim | usesCharge | usesPhysics | usesController | isCluster,
+        usesAim | usesCharge | usesPhysics | usesController | isCluster | spawnsSelf,
         // petrol bomb
         usesAim | usesCharge | usesPhysics | usesDetonateOnImpact,
         // mad cows
@@ -271,13 +271,13 @@ unsigned short Weapon_props[69] = {
         // homing missle
         usesAim | usesCharge | usesPhysics | usesHoming | usesDetonateOnImpact,
         // cluster bomb
-        usesAim | usesCharge | usesPhysics | usesWind | usesCursor | isCluster,
+        usesAim | usesCharge | usesPhysics | usesWind | isCluster,
         // hand gun
-        usesAim | multiUse,
+        usesAim,
         // dragonball
         isMele,
         // mine
-        0,
+        usesFuse | spawnsSelf,
         // napalm strike
         usesCursor,
         // pneumatic drill
@@ -299,7 +299,7 @@ unsigned short Weapon_props[69] = {
         // mortar
         usesAim | usesPhysics | isCluster | usesDetonateOnImpact,
         // banana bomb
-        usesAim | usesCharge | usesPhysics | usesFuse,
+        usesAim | usesCharge | usesPhysics | usesFuse | spawnsSelf,
         // uzi
         usesAim,
         // kamakaze
@@ -307,7 +307,7 @@ unsigned short Weapon_props[69] = {
         // sheep
         spawnsSelf | usesPhysics | isAnimal,
         // mail strike
-        usesCursor | usesPhysics,
+        usesCursor | usesPhysics | spawnsSelf,
         // girder
         0,
         // parachute
@@ -325,7 +325,7 @@ unsigned short Weapon_props[69] = {
         // laser sight
         0,
         // homing pigeon
-        usesAim | usesHoming | usesCursor | usesDetonateOnImpact,
+        usesAim | usesHoming | usesCursor | usesDetonateOnImpact | spawnsSelf,
         // battle axe
         isMele,
         // minigun
@@ -333,11 +333,11 @@ unsigned short Weapon_props[69] = {
         // suicide bomber
         0,
         // supersheep
-        usesController | usesDetonateOnImpact,
+        isAnimal | usesController | usesDetonateOnImpact,
         // mine strike
-        usesCursor,
-        // baseball battle
-        isMele,
+        usesCursor | spawnsSelf,
+        // baseball bat
+        isMele | usesAim,
         // teleport
         usesCursor,
         // salvation army lady
@@ -361,9 +361,9 @@ unsigned short Weapon_props[69] = {
         // prod
         isMele,
         // mole
-        spawnsSelf | usesPhysics | isAnimal | usesDetonateOnImpact,
+        spawnsSelf | usesPhysics | isAnimal | usesDetonateOnImpact | usesFuse,
         // mole squadron
-        usesCursor,
+        usesCursor | spawnsSelf,
         // girder pack
         usesCursor | multiUse,
         // scales of justice
@@ -371,13 +371,14 @@ unsigned short Weapon_props[69] = {
         // MB bomb
         usesCursor | usesDetonateOnImpact,
         // carpet bomb
-        usesCursor | usesPhysics | usesDetonateOnImpact,
+        usesCursor | usesPhysics | usesDetonateOnImpact | spawnsSelf,
         // armageddon
         0,
         // magic bullet
         usesAim | usesHoming | usesDetonateOnImpact,
     
     // sub weapons (ones you cannot directly use, but can spawn as a result of other weapons)
+    
         // cluster/mortar/salvation army/ming vase fragment
         usesPhysics | usesDetonateOnImpact | usesFuse,
         // napalm / fire
@@ -385,7 +386,13 @@ unsigned short Weapon_props[69] = {
         // skunk gas
         isParticle | usesFuse,
         // comet from armageddon
-        usesPhysics | usesDetonateOnImpact
+        usesPhysics | usesDetonateOnImpact,
+        // mail from mail strike
+        usesPhysics | usesDetonateOnImpact,
+        // carpet from carpet bomb
+        usesPhysics | usesDetonateOnImpact,
+        // fake mine
+        usesPhysics | usesFuse
 };
     
     

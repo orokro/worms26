@@ -271,7 +271,7 @@ void drawWorms()
                 // ============================================================
 
                 // 1. Calculate the final Bottom-Right coordinate
-                short finalY = y + sprHeight;
+                // short finalY = y + sprHeight;
 
                 // 2. SAFETY CHECK:
                 // Ensure we do not draw to negative memory addresses (Fatal Crash)
@@ -345,7 +345,7 @@ void drawMines()
 				if(Mine_fuse[i]>0)
 				{
 					sprintf(fuseStr, "%d", (Mine_fuse[i]/TIME_MULTIPLIER));
-					DrawStr(screenX-4, screenY-16, fuseStr, A_NORMAL);
+					GrayDrawStr2B(screenX-4, screenY-16, fuseStr, A_NORMAL, lightPlane, darkPlane);
 				}// end if fuse
 				
 				// if the oil drum is "settled" draw an arrow above it, for debug
@@ -452,13 +452,26 @@ void drawWeapons()
 			screenX=Weapon_x[i];
 			screenY=Weapon_y[i];
 			if(worldToScreen(&screenX, &screenY))
-			{				
-				// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon
-				ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, lightPlane);
-				ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, darkPlane);
+			{	
+				// if weapon uses spawnSelf, we can use it's same sprite as from the menu
+				if(Weapon_props[(short)Weapon_type[i]] & spawnsSelf)
+				{
+
+					// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon
+					ClipSprite16_OR_R(screenX-2, screenY-2, 11, spr_weapons[Weapon_type[i]], lightPlane);
+					ClipSprite16_OR_R(screenX-2, screenY-2, 11, spr_weapons[Weapon_type[i]], darkPlane);
+
+				}else{	
+					// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon
+					ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, lightPlane);
+					ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, darkPlane);
+				}
+
+
 			}// end if on screen
 			
 		}// end if active
+
 	}// next i
 }
 
