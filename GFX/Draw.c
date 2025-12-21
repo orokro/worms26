@@ -141,8 +141,8 @@ char worldToScreen(short *x, short *y)
 	*y = (short)((short)50 + (short)((short)(*y)-(short)camY));
 	
 	// if anything is out of bounds, return false:
-	if((*x)<-32 || (*x)>160+32 || (*y)<-16 || (*y)>116)
-		return FALSE;
+	if((*x)<-32 || (*x)>192 || (*y)<-5 || (*y)>105)
+    return FALSE;
 	else
 		return TRUE;
 }
@@ -494,8 +494,8 @@ void drawMap()
 	short camRight = camX+80;
 	
 	// we shouldn't continue if either is out of bounds
-	if(!(camBottom<0) && !(camTop>199) && !(camLeft>319) && !(camRight<0))
-	{
+	if((camBottom>0) && (camTop<200) && (camLeft<320) && (camRight>0))
+	{ 
 		
 		// the of the screen we should start copying the buffer to
 		short screenTop=0;
@@ -941,7 +941,7 @@ void Draw_cake(short amount, short total)
 	ClipSprite32_OR_R(64, 38, 23, spi_CandleCake_Light, lightPlane);	
 	
 	char progStr[40];
-	sprintf(progStr, "Loading... %d%%", (short)((float)((float)amount/(float)total)*100));
+	sprintf(progStr, "Zoading... %d%%", (short)((float)((float)amount/(float)total)*100));
 	DrawStr(40,70,progStr, A_NORMAL);	
 
 	// now flip the planes

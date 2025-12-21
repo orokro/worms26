@@ -151,7 +151,7 @@ char Game_xMarkAllowedOverLand = TRUE;
 char Game_cursorEndTurn = FALSE;
 
 // for debug, we can stop the time
-char Debug_stopTime = TRUE;
+char Debug_stopTime = FALSE;
 
 /*
 	the current set of weapons for the current team, in stacked order.

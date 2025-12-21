@@ -307,7 +307,7 @@ unsigned short Weapon_props[69] = {
         // sheep
         spawnsSelf | usesPhysics | isAnimal,
         // mail strike
-        usesCursor,
+        usesCursor | usesPhysics,
         // girder
         0,
         // parachute
@@ -339,7 +339,7 @@ unsigned short Weapon_props[69] = {
         // baseball battle
         isMele,
         // teleport
-        0,
+        usesCursor,
         // salvation army lady
         spawnsSelf | usesPhysics | isAnimal | isCluster | usesController,
         // sheep strike
