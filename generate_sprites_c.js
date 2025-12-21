@@ -109,7 +109,8 @@ try {
             }
 
             // Generate C Code
-            cOutput += `static ${arrayType} ${name}[][${blocks[0].length}] = {\n`;
+            // UPDATED LINE: Added comment // X tall
+            cOutput += `static ${arrayType} ${name}[][${blocks[0].length}] = { // ${blocks[0].length} tall\n`;
             
             blocks.forEach((pixels, idx) => {
                 cOutput += `\t{\n`;
@@ -135,6 +136,7 @@ try {
                 cType = "unsigned long"; // fallback
             }
 
+            // UPDATED LINE: Matches existing logic
             cOutput += `static ${cType} ${name}[] = { // ${data.height} tall\n`;
             data.pixels.forEach((row, idx) => {
                 let binStr = row.toString(2).padStart(data.width, '0');
