@@ -200,8 +200,8 @@ void drawWorms()
                         // Determine Stage
                         int stage = 1;
                         if(Game_wormAnimTimer < 6)       stage = 1; 
-                        else if(Game_wormAnimTimer < 8) stage = 2; 
-                        else if(Game_wormAnimTimer < 9) stage = 3; 
+                        else if(Game_wormAnimTimer < 8)  stage = 2; 
+                        else if(Game_wormAnimTimer < 9)  stage = 3; 
                         else if(Game_wormAnimTimer < 12) stage = 4; 
                         else                             stage = 1; 
 
@@ -210,18 +210,18 @@ void drawWorms()
                         {
                             // Started facing RIGHT
                             if(stage==1) { sprOutline=spr_WormFlip1_Right_Outline; sprMask=spr_WormFlip1_Right_Mask; sprHeight=17; }
-                            else if(stage==2) { sprOutline=spr_WormFlip2_Right_Outline; sprMask=spr_WormFlip2_Right_Mask; sprHeight=13; }
-                            else if(stage==3) { sprOutline=spr_WormFlip3_Left_Outline;  sprMask=spr_WormFlip3_Left_Mask; sprHeight=15; }
-                            else if(stage==4) { sprOutline=spr_WormFlip4_Left_Outline;  sprMask=spr_WormFlip4_Left_Mask; sprHeight=13; }
+                            else if(stage==2) { sprOutline=spr_WormFlip2_Right_Outline; sprMask=spr_WormFlip2_Right_Mask; sprHeight=10; }
+                            else if(stage==3) { sprOutline=spr_WormFlip3_Left_Outline;  sprMask=spr_WormFlip3_Left_Mask; sprHeight=13; }
+                            else if(stage==4) { sprOutline=spr_WormFlip4_Left_Outline;  sprMask=spr_WormFlip4_Left_Mask; sprHeight=10; }
                             else { sprOutline=spr_WormFlip1_Right_Outline; sprMask=spr_WormFlip1_Right_Mask; sprHeight=17; }
                         }
                         else 
                         {
                             // Started facing LEFT
                             if(stage==1) { sprOutline=spr_WormFlip1_Left_Outline; sprMask=spr_WormFlip1_Left_Mask; sprHeight=17; }
-                            else if(stage==2) { sprOutline=spr_WormFlip2_Left_Outline; sprMask=spr_WormFlip2_Left_Mask; sprHeight=13; }
-                            else if(stage==3) { sprOutline=spr_WormFlip3_Right_Outline; sprMask=spr_WormFlip3_Right_Mask; sprHeight=15; }
-                            else if(stage==4) { sprOutline=spr_WormFlip4_Right_Outline; sprMask=spr_WormFlip4_Right_Mask; sprHeight=13; }
+                            else if(stage==2) { sprOutline=spr_WormFlip2_Left_Outline; sprMask=spr_WormFlip2_Left_Mask; sprHeight=10; }
+                            else if(stage==3) { sprOutline=spr_WormFlip3_Right_Outline; sprMask=spr_WormFlip3_Right_Mask; sprHeight=13; }
+                            else if(stage==4) { sprOutline=spr_WormFlip4_Right_Outline; sprMask=spr_WormFlip4_Right_Mask; sprHeight=10; }
                             else { sprOutline=spr_WormFlip1_Left_Outline; sprMask=spr_WormFlip1_Left_Mask; sprHeight=17; }
                         }
                         
@@ -233,7 +233,7 @@ void drawWorms()
                     // --- JUMPING ---
                     else if(Game_wormAnimState == ANIM_JUMP)
                     {
-                        sprHeight = 17; // Jump sprites are tall
+                        sprHeight = 15; // Jump sprites are tall
                         y -= 4;         // Align feet
                         
                         // Check Direction
