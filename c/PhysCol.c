@@ -187,7 +187,10 @@ unsigned char Collider_apply(Collider *col, short *x, short *y)
 }
 
 
-// does physics for an in game object
+/**
+ * does physics for an in game object
+ * @param *obj - the object to compute physics for
+ */
 char Physics_apply(PhysObj *obj)
 {
 	// before we apply physics, save the inital state of the X/Y
@@ -324,7 +327,13 @@ char Physics_apply(PhysObj *obj)
 }
 
 
-// sets or adds velocity to an object
+/**
+ * sets or adds velocity to an object
+ * @param *obj - phsysics object we're applying velocity to
+ * @param x - x velocity to add
+ * @param y - y veleocity to add
+ * @param additives - adds to existing velocity isntead of setting it
+ */
 void Physics_setVelocity(PhysObj *obj, char x, char y, char additive)
 {
 
@@ -345,7 +354,12 @@ void Physics_setVelocity(PhysObj *obj, char x, char y, char additive)
 }
 
 
-// tests for a collision and moves the opposite direction until a free pixel is found, if it did collide
+/**
+ * tests for a collision and moves the opposite direction until a free pixel is found, if it did collide
+ * @param x - test x
+ * @param y - test y
+ * @param dir - direction to test from
+ */
 short Collide_test(short x, short y, char dir)
 {
 	// test for a collision, and if none, just return 0
@@ -402,17 +416,18 @@ short Collide_test(short x, short y, char dir)
 }
 
 
-// check if an object is hit by active explosions
+/**
+ * check if an object is hit by active explosions
+ */
 short Physics_checkExplosions(PhysObj *obj)
 {
 	// if no explosions are in their first frame, no need to check 'em
 	if(Explosion_firstFrame==0)
 		return 0;
-	
+		
 	// calculate total damge from all possible explosions
 	short totalDamage = 0;
-	
-	short i=0; 
+	short i=0;
 	for(i=0; i<MAX_EXPLOSIONS; i++)
 	{
 		// check if the explosion is in it's first-frame
@@ -421,8 +436,12 @@ short Physics_checkExplosions(PhysObj *obj)
 		// only do shit if first frame, yo
 		if(firstFrame)
 		{
-			// get the explosions distance from us
-			short d = dist(*obj->x, *obj->y, Explosion_x[i], Explosion_y[i]);
+			// FIX 1: Use longs for delta calculation to prevent overflow when squaring
+			long dx = (long)(*obj->x) - (long)Explosion_x[i];
+			long dy = (long)(*obj->y) - (long)Explosion_y[i];
+			
+			// Calculate distance using floats/longs to avoid 16-bit overflow
+			float d = sqrt((float)(dx*dx + dy*dy));
 			
 			// get the explosions size, and large size
 			short radius = Explosion_size[i];
@@ -437,35 +456,42 @@ short Physics_checkExplosions(PhysObj *obj)
 			else if(d<largerRadius)
 			{
 				// subract the minimum radius from both:
-				short minD = d - Explosion_size[i];
-				short minL = largerRadius - Explosion_size[i];
+				float minD = d - radius;
+				float minL = largerRadius - radius;
 				
 				// calculate how far away we are:
-				pendingDamageRatio = (1.0f - ((float)minD/(float)minL));
-			}// end if within larger radius		
+				pendingDamageRatio = (1.0f - (minD/minL));
+			}// end if within larger radius
 			
 			// if damage was done, we should add it to our total, and apply velocity
 			if(pendingDamageRatio>0.0f)
 			{
 				// total damage done so far
-				totalDamage += (pendingDamageRatio*Explosion_power[i]);
-				
-				// get the x and y differences from us to the explosion
-				short x = *obj->x - Explosion_x[i];
-				short y = *obj->y - Explosion_y[i];
+				totalDamage += (short)(pendingDamageRatio*Explosion_power[i]);
 				
 				// calcualte the power to add in this direction:
-				short power = (pendingDamageRatio*Explosion_size[i]);
+				// using size for "physical force" magnitude
+				float power = (pendingDamageRatio*Explosion_size[i]); 
 				
-				// use ratio of x/y to determine how much power to apply to each
-				short xPow = abs(((float)x/(float)y)*power*0.1f) * ((x>0) ? 1 : -1);
-				short yPow = abs(((float)y/(float)x)*power*0.1f) * ((y>0) ? 1 : -1);
+				// FIX 2: Correct Vector Projection
+				// Previously (x/y) would cause division by zero or infinite force 
+				// if the worm was aligned horizontally/vertically.
+				// We use (dx/d) to get the normalized direction vector.
 				
-				// apply velocity!
-				Physics_setVelocity(obj, xPow, yPow, TRUE);
+				// Multiplier to tune the "kick" strength. 
+				// 0.3f provides a similar feel to your original 0.1f without the infinite spikes.
+				float kickScale = 0.3f; 
+				
+				if(d > 0.1f) // Prevent div by zero
+				{
+					short xPow = (short)((dx / d) * power * kickScale);
+					short yPow = (short)((dy / d) * power * kickScale);
+					
+					// apply velocity!
+					Physics_setVelocity(obj, xPow, yPow, TRUE);
+				}
 			}
-				
-		}// end if first frame		
+		}// end if first frame
 	}// next i
 	
 	// return the total damage that was done
