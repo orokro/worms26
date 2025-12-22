@@ -1,5 +1,6 @@
 #include "Main.h"
 #include "Game.h"
+#include "Map.h"
 
 /*
 	Main

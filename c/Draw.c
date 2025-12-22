@@ -2,13 +2,15 @@
 // Created 11/11/2017; 11:34:12 PM
 
 #include "Main.h"
+#include "SpriteData.c"
 #include "Game.h"
 #include "Crates.h"
 #include "OilDrums.h"
 #include "Mines.h"
 #include "Worms.h"
-#include "SpriteData.c"
 #include "Weapons.h"
+#include "Explosions.h"
+#include "Map.h"
 
 /*
 	Draw

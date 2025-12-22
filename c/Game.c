@@ -8,7 +8,9 @@
 #include "Mines.h"
 #include "Worms.h"
 #include "Weapons.h"
+#include "Explosions.h"
 #include "CharacterController.h"
+#include "Map.h"
 
 /*
 	Game

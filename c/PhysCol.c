@@ -3,6 +3,8 @@
 
 #include "Main.h"
 #include "PhysCol.h"
+#include "Map.h"
+#include "Explosions.h"
 
 /*
 	PhysCol

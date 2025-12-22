@@ -3,6 +3,7 @@
 
 #include "Main.h"
 #include "Game.h"
+#include "Map.h"
 #include "CharacterController.h"
 #include "PhysCol.h"
 #include "Worms.h"

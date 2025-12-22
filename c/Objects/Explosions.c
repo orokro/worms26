@@ -2,6 +2,8 @@
 // Created 11/12/2017; 8:33:12 PM
 
 #include "Main.h"
+#include "Explosions.h"
+#include "Map.h"
 
 /*
 	Explosions

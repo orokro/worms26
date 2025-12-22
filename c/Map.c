@@ -2,6 +2,7 @@
 // Created 11/11/2017; 11:34:08 PM
 
 #include "Main.h"
+#include "Map.h"
 #include "Worms.h"
 #include "OilDrums.h"
 #include "Mines.h"

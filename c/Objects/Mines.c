@@ -1,6 +1,8 @@
 #include "Main.h"
 #include "Mines.h"
 #include "PhysCol.h"
+#include "Map.h"
+#include "Explosions.h"
 
 /*
 	Mines

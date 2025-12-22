@@ -7,6 +7,7 @@
 #include "Crates.h"
 #include "PhysCol.h"
 #include "Worms.h"
+#include "Map.h"
 
 /*
 	Worms

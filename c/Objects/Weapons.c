@@ -6,6 +6,7 @@
 #include "PhysCol.h"
 #include "Worms.h"
 #include "Weapons.h"
+#include "Explosions.h"
 
 /*
 	Weapons
