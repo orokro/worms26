@@ -1,9 +1,12 @@
+/*
+	Weapons.h
+	---------
+	
+	Main header file for the Weapons.c module
+*/
+
 #ifndef WEAPONS_H
 #define WEAPONS_H
-
-/* ======================================================================================================================================
-   WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WEAPONS +++ WE
-   ====================================================================================================================================== */
 
 // Weapons defines
 #define MAX_WEAPONS 10
@@ -42,12 +45,12 @@
   
 */
 enum Weapons {
-	WJetPack,				WBazooka, 				WGrenade, 	WShotGun,		WFirePunch, 	WDynamite, 		WAirStrike, 		WBlowTorch, 	WNinjaRope, 			WSuperBanana, 		WPetrolBomb, 	WMadCows, 				WSkipGo,
-	WLowGravity, 		WHomingMissle, 		WCluster,		WHandGun,		WDragonBall,	WMine, 				WNapalmStrike, 	WDrill, 			WBungeeCord,			WHolyHandGrenade,	WSkunk, 			WOldLady, 				WSurrender,
-	WFastWalk,			WMortar, 					WBanana, 		WUzi,				WKakamaze, 		WSheep, 			WMailStrike, 		WGirder, 			WParachute,				WFlameThrower, 		WMingVase, 		WConcreteDonkey, 	WSelectWorm,
-	WLaserSight, 		WHomingPigeon, 		WAxe,				WMiniGun,		WSuicideBomb, WSuperSheep, 	WMineStrike, 		WBaseballBat, WTeleport, 				WSalvationArmy, 	WSheepStrike, WNuclearTest, 		WFreeze,
-	WInvisibility,	WSheepLauncher,		WQuake, 		WLongbow,  	WProd, 				WMole, 				WMoleSquadron, 	WGirderPack, 	WScalesOfJustice,	WMBBomb, 					WCarpetBomb, 	WArmageddon, 			WMagicBullet,
-	WFragment, 			WFire,						WSkunkGas,	WComet, 		WMail, 				WCarpet, 			WFakeMine
+	WJetPack,			WBazooka, 			WGrenade, 	WShotGun,	WFirePunch, 	WDynamite, 		WAirStrike, 	WBlowTorch, 	WNinjaRope, 		WSuperBanana, 		WPetrolBomb, 	WMadCows, 			WSkipGo,
+	WLowGravity, 		WHomingMissle, 		WCluster,	WHandGun,	WDragonBall,	WMine, 			WNapalmStrike, 	WDrill, 		WBungeeCord,		WHolyHandGrenade,	WSkunk, 		WOldLady, 			WSurrender,
+	WFastWalk,			WMortar, 			WBanana, 	WUzi,		WKakamaze, 		WSheep, 		WMailStrike, 	WGirder, 		WParachute,			WFlameThrower, 		WMingVase, 		WConcreteDonkey, 	WSelectWorm,
+	WLaserSight, 		WHomingPigeon, 		WAxe,		WMiniGun,	WSuicideBomb, 	WSuperSheep, 	WMineStrike, 	WBaseballBat, 	WTeleport, 			WSalvationArmy, 	WSheepStrike,	WNuclearTest, 		WFreeze,
+	WInvisibility,		WSheepLauncher,		WQuake, 	WLongbow,  	WProd, 			WMole, 			WMoleSquadron, 	WGirderPack, 	WScalesOfJustice,	WMBBomb, 			WCarpetBomb, 	WArmageddon, 		WMagicBullet,
+	WFragment, 			WFire,				WSkunkGas,	WComet, 	WMail, 			WCarpet, 		WFakeMine
 };
 
 // weapons globals

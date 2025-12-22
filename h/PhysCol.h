@@ -1,11 +1,13 @@
-// PhysCol.h
+/*
+	PhysCol.h
+	---------
+	
+	Main header file for the PhysCol.c module
+*/
+
 #ifndef PHYSCOL_H
 #define PHYSCOL_H
 
-
-/* ======================================================================================================================================
-   PHYSICS/COLLISION +++ PHYSICS/COLLISION +++ PHYSICS/COLLISION +++ PHYSICS/COLLISION +++ PHYSICS/COLLISION +++ PHYSICS/COLLISION +++ PH
-   ====================================================================================================================================== */
 
 // collision defines
 #define COL_UP 0b00000001
@@ -16,6 +18,7 @@
 #define COL_LR 0b00001100
 #define COL_DLR 0b00001110
 #define COL_UDLR 0b00001111
+
 
 /*
 	This one is special
@@ -86,6 +89,7 @@ typedef struct{
 	
 }PhysObj;
 
+
 // collision function prototypes
 
 /**
@@ -102,6 +106,7 @@ typedef struct{
 */
 extern Collider new_Collider(unsigned char type, char up, char down, char left, char right);
 
+
 /**
  * to be used like a pseudo constructor for a new PhysObj
  * 
@@ -116,6 +121,7 @@ extern Collider new_Collider(unsigned char type, char up, char down, char left, 
 */
 extern PhysObj new_PhysObj(short *x, short *y, char *xVelo, char *yVelo, float bounciness, float smoothness, char objIndex, unsigned short *settled, Collider c);
 
+
 /**
  * updates a physics object, including map collision
  *
@@ -123,6 +129,7 @@ extern PhysObj new_PhysObj(short *x, short *y, char *xVelo, char *yVelo, float b
  * @return TRUE or FALSE weather or not the object moved on this frame
 */
 extern char Physics_apply(PhysObj*);
+
 
 /**
  * Sets a physics objects velocity
@@ -134,6 +141,7 @@ extern char Physics_apply(PhysObj*);
 */
 extern void Physics_setVelocity(PhysObj *obj, char x, char y, char additive);
 
+
 /**
  * Tests an object against nearby explosions, if any.
  *
@@ -143,6 +151,7 @@ extern void Physics_setVelocity(PhysObj *obj, char x, char y, char additive);
  * @return the total damage taken by the object, if hit by one or more explosions
 */
 extern short Physics_checkExplosions(PhysObj *obj);
+
 
 /**
  * This method takes a point in world space, and a direction and tests for collision.

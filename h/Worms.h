@@ -1,10 +1,14 @@
+/*
+	Worms.h
+	-------
+	
+	Main header file for the Worms.c module
+*/
+
 #ifndef WORMS_H
 #define WORMS_H
 
-/* ======================================================================================================================================
-   WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORM
-   ====================================================================================================================================== */
-
+// includes
 #include "PhysCol.h"
 
 // Animation States
@@ -38,6 +42,7 @@ extern char Worm_currentWorm;
 extern unsigned short Worm_settled;
 extern unsigned short Worm_onGround;
 
+
 // worm function prototypes
 
 /**
@@ -47,13 +52,16 @@ extern unsigned short Worm_onGround;
 */
 extern void Worm_spawnWorms();
 
+
 /**
  * This handles updates, (i.e. phsysics, gravity, and map collisions) for worms, as well as damage checking from explosions.
 */
 extern void Worm_update();
 
+
 /* updates worms health */
 extern void Worm_setHealth(short index, short health, char additive);
+
 
 /* draws all worms */
 extern void Worm_drawAll();

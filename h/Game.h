@@ -1,9 +1,12 @@
+/*
+	Game.h
+	------
+	
+	Main header file for the game.c module
+*/
 #ifndef GAME_H
 #define GAME_H
 
-/* ======================================================================================================================================
-   GAME +++ GAME +++ GAME +++ GAME +++ GAME +++ GAME +++ GAME +++ GAME +++ GAME +++ GAME +++ GAME +++ GAME +++ GAME +++ GAME +++ GAME +++
-   ====================================================================================================================================== */
 
 // game enums
 enum GameModes {gameMode_WormSelect, gameMode_Turn, gameMode_WeaponSelect, gameMode_Pause, gameMode_Cursor, gameMode_TurnEnd, gameMode_Death, gameMode_AfterTurn, gameMode_GameOver};
@@ -34,6 +37,7 @@ extern unsigned short Game_currentWeaponProperties;
 extern unsigned short Game_currentWeaponCharge;
 extern char Game_aimAngle;
 
+
 // game function prototypes
 
 /**
@@ -43,6 +47,7 @@ extern char Game_aimAngle;
 */
 extern void Game_changeMode(char);
 
+
 /**
  * The main update method for the entire game, should be called once per frame.
  *
@@ -51,6 +56,7 @@ extern void Game_changeMode(char);
  * This is called every frame in the main-loop.
 */
 extern void Game_update();
+
 
 /**
 	* Returns TRUE or FALSE if all he game items in the game are settled and not doing anything.

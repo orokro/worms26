@@ -1,9 +1,13 @@
+/*
+	CharacterController.h
+	---------------------
+	
+	Main header file for the CharacterController.c module
+*/
+
 #ifndef CHARCTRL_H
 #define CHARCTRL_H
 
-/* ======================================================================================================================================
-   CHARACTER CONTROLLER +++ CHARACTER CONTROLLER +++ CHARACTER CONTROLLER +++ CHARACTER CONTROLLER +++ CHARACTER CONTROLLER +++ CHARACTER
-   ====================================================================================================================================== */
 
 // character controller function prototypes
 

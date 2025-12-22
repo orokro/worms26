@@ -1,3 +1,10 @@
+/*
+	MainGeneral.h
+	-------------
+	
+	Header file with calculator specific paramters for TI-89 OS
+*/
+
 // C Source File
 // Created 11/11/2017; 11:30:42 PM
 

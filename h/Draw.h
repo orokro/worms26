@@ -1,20 +1,27 @@
+/*
+	Draw.h
+	------
+	
+	Main header file for the Draw.c module
+*/
+
 #ifndef DRAW_H
 #define DRAW_H
 
-/* ======================================================================================================================================
-   DRAW +++ DRAW +++ DRAW +++ DRAW +++ DRAW +++ DRAW +++ DRAW +++ DRAW +++ DRAW +++ DRAW +++ DRAW +++ DRAW +++ DRAW +++ DRAW +++ DRAW +++
-   ====================================================================================================================================== */
 
 // Draw defines
+
 
 // Draw globals
 extern unsigned long windSprites[3][3];
 extern unsigned long healthSprites[16][18];
 extern unsigned long healthMasks[16][18];
 
+
 // draw function prototypes
 
 extern char worldToScreen(short *x, short *y);
+
 
 /**
  * Draws the cake loading screen
@@ -23,6 +30,7 @@ extern char worldToScreen(short *x, short *y);
  * @param total amount of progress to be completed
 */
 extern void Draw_cake(short amount, short total);
+
 
 /**
  * Renders the map, items on it, and all game elements in general.
@@ -41,6 +49,7 @@ extern void Draw_cake(short amount, short total);
 */
 extern void Draw_renderGame();
 
+
 /**
  * Draws the pause menu, with current menu item selected.
  * 
@@ -52,6 +61,7 @@ extern void Draw_renderGame();
 */
 extern void Draw_renderPauseMenu(char);
 
+
 /**
  * Draws the weapons menu for when a player is selecting a weapon.
  * 
@@ -59,6 +69,7 @@ extern void Draw_renderPauseMenu(char);
  * @param wy a char that contatins the y-position of the current weapon selected in the matrix of weapons
 */
 extern void Draw_renderWeaponsMenu(char, char);
+
 
 /**
  * renders our tiny text font to a serrirs of unsigned longs
@@ -70,6 +81,7 @@ extern void Draw_renderWeaponsMenu(char, char);
  * @return the length of the text in pixels
 */
 extern short Draw_renderText(unsigned long *buffer, char size, char *txt, char color);
+
 
 /**
  * renders all the worms name sprites once at the beginning of the game

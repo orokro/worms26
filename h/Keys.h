@@ -1,9 +1,13 @@
+/*
+	Keys.h
+	------
+	
+	Main header file for the Keys.c module
+*/
+
 #ifndef KEYS_H
 #define KEYS_H
 
-/* ======================================================================================================================================
-   KEYS +++ KEYS +++ KEYS +++ KEYS +++ KEYS +++ KEYS +++ KEYS +++ KEYS +++ KEYS +++ KEYS +++ KEYS +++ KEYS +++ KEYS +++ KEYS +++ KEYS +++
-   ====================================================================================================================================== */
 
 // key defines
 
@@ -37,6 +41,7 @@
 // this works similar to keyAny, except just for the direction keys
 #define keyCursors (long)1920			//00000000000000000000011110000000
 
+
 // keys function prototypes
 
 /**
@@ -50,6 +55,7 @@
 */
 extern void Keys_update();
 
+
 /**
  * Checks if a key is FIRST down ON THIS FRAME using it's bitmask.
  *
@@ -58,6 +64,7 @@ extern void Keys_update();
 */
 extern char Keys_keyDown(long);
 
+
 /**
  * Checks if a key is pressed on this frame using it's bitmask.
  *
@@ -65,6 +72,7 @@ extern char Keys_keyDown(long);
  * @return a boolean char set to 0 or 1 if the key is pressed
 */
 extern char Keys_keyState(long);
+
 
 /**
  * Checks if a key is LET up ON THIS FRAME using it's bitmask.

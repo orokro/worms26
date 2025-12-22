@@ -1,3 +1,10 @@
+/*
+	SpriteData.h
+	------------
+	
+	Main header file for the SpriteData.c module
+*/
+
 #ifndef SPRITEDATA_H
 #define SPRITEDATA_H
 

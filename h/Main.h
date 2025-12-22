@@ -1,19 +1,23 @@
+/*
+	Main.h
+	------
+	
+	Main header file for the game / main.c
+*/
 
+
+// includes
 #include <tigcclib.h>
-
-// include all our headers in dependency order
 #include "Lib\extgraph.h"
 #include "MainGeneral.h"
 
 
-/* ======================================================================================================================================
-   MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++ MAIN +++
-   ====================================================================================================================================== */
-  
+
 // main defines
   
 // how many frames consist of one second?
 #define TIME_MULTIPLIER 15
+	       
 	       
 // main globals
 extern void *GblDBuffer;
@@ -21,6 +25,7 @@ extern char GameRunning;
 extern void *mapBuffer;
 extern void *lightPlane;
 extern void *darkPlane;
+	
 	
 // main prototypes
 

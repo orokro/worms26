@@ -1,9 +1,13 @@
+/*
+	Match.h
+	-------
+	
+	Main header file for the Match.c module
+*/
+
 #ifndef MATCH_H
 #define MATCH_H
 
-/* ======================================================================================================================================
-   MATCH +++ MATCH +++ MATCH +++ MATCH +++ MATCH +++ MATCH +++ MATCH +++ MATCH +++ MATCH +++ MATCH +++ MATCH +++ MATCH +++ MATCH +++ MATC
-   ====================================================================================================================================== */
 
 // match globals
 extern char Match_wormCount[2];

@@ -1,6 +1,14 @@
 
+/*
+	Crates.h
+	--------
+	
+	Main header file for the Crates.c module
+*/
+
 #ifndef CRATES_H
 #define CRATES_H
+
 
 // crate defines
 #define MAX_CRATES 8

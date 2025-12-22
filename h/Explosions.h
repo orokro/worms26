@@ -1,12 +1,17 @@
+/*
+	Explosions.h
+	------------
+	
+	Main header file for the Explosions.c module
+*/
+
 #ifndef EXPLOSIONS_H
 #define EXPLOSIONS_H
    
-/* ======================================================================================================================================
-   EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++ EXPLOSIONS +++
-   ====================================================================================================================================== */
-
+   
 // explosion defined
 #define MAX_EXPLOSIONS 8
+
 
 // explosion globals
 extern short Explosion_x[MAX_EXPLOSIONS];
@@ -31,10 +36,12 @@ extern unsigned short Explosion_firstFrame;
 */
 extern void Explosion_spawn(short, short, char, char, char);
 
+
 /**
  * Updates all the explisions currently active, should be called once per frame.
 */
 extern void Explosion_update();
+
 
 /**
  * Draws all explosions 

@@ -1,12 +1,18 @@
+/*
+	Map.h
+	-----
+	
+	Main header file for the Map.c module
+*/
+
 #ifndef MAP_H
 #define MAP_H
 
-/* ======================================================================================================================================
-   MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP ++
-   ====================================================================================================================================== */
 
+// Map defines
 #define MAP_WIDTH 320
 #define MAP_HEIGHT 200
+
 
 // map globals
 extern short Map_lastRequestedSpawnX;
@@ -21,6 +27,7 @@ extern unsigned char mapTiles[640];
 */
 extern void Map_traceEdges();
 
+
 /**
  * Checks if a point on the map is land or not.
  *
@@ -34,6 +41,7 @@ extern void Map_traceEdges();
 */
 extern char Map_testPoint(short, short);
 
+
 /**
  * Sets globals, Map_lastRequestedSpawnX and Map_lastRequestedSpawnY to a valid spawn point for an item on the map.
  *
@@ -44,6 +52,7 @@ extern char Map_testPoint(short, short);
  * This method will also nullify the spawn point from the pool so no other items can spawn there.
 */
 extern void Map_getSpawnPoint();
+
 
 /**
  * Renders a map playfield for the worms to play on, as well as spawns in game items.

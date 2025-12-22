@@ -1,8 +1,16 @@
+/*
+	Mines.h
+	-------
+	
+	Main header file for the Mines.c module
+*/
 #ifndef MINES_H
 #define MINES_H
 
+
 // includes
 #include "PhysCol.h"
+
 
 // mine defines
 #define mineTriggerDistance 10

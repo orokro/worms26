@@ -1,11 +1,17 @@
+/*
+	OilDrums.h
+	----------
+	
+	Main header file for the OilDrums.c module
+*/
+
 #ifndef OILDRUMS_H
 #define OILDRUMS_H
 
+
+// includes
 #include "PhysCol.h"
 
-/* ======================================================================================================================================
-   OIL DRUMS +++ OIL DRUMS +++ OIL DRUMS +++ OIL DRUMS +++ OIL DRUMS +++ OIL DRUMS +++ OIL DRUMS +++ OIL DRUMS +++ OIL DRUMS +++ OIL DRUM
-   ====================================================================================================================================== */
 
 // OilDrum defines
 #define MAX_OILDRUMS 6
