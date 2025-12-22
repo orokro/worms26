@@ -5,6 +5,9 @@
    MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP +++ MAP ++
    ====================================================================================================================================== */
 
+#define MAP_WIDTH 320
+#define MAP_HEIGHT 200
+
 // map globals
 extern short Map_lastRequestedSpawnX;
 extern short Map_lastRequestedSpawnY;
