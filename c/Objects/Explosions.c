@@ -208,7 +208,7 @@ void updateExplosion(short index)
 		Explosion_firstFrame &= ~((unsigned short)1<<(index));
 	
 	// decrease it's time
-	Explosion_time[index]--;
+	Explosion_time[index]-=3;
 
 	// if the explosions time is up, destory the map and set it inactive
 	if(Explosion_time[index]<0)

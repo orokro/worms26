@@ -25,7 +25,7 @@ Collider new_Collider(unsigned char type, char up, char down, char left, char ri
 	new.l = left;
 	new.r = right;
 	new.collisions = 0;
-	return new;
+	return new; 
 }
 
 // makes a new PhysObj
