@@ -2,6 +2,8 @@
 // Created 11/11/2017; 11:34:05 PM
 
 #include "Main.h"
+#include "Draw.h"
+#include "Match.h"
 #include "Game.h"
 #include "Mines.h"
 #include "Crates.h"

@@ -1,4 +1,7 @@
 #include "Main.h"
+#include "Camera.h"
+#include "Keys.h"
+#include "Match.h"
 #include "Mines.h"
 #include "PhysCol.h"
 #include "Map.h"

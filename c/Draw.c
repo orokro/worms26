@@ -2,6 +2,9 @@
 // Created 11/11/2017; 11:34:12 PM
 
 #include "Main.h"
+#include "Draw.h"
+#include "Camera.h"
+#include "Keys.h"
 #include "SpriteData.c"
 #include "Game.h"
 #include "Crates.h"
@@ -11,6 +14,7 @@
 #include "Weapons.h"
 #include "Explosions.h"
 #include "Map.h"
+#include "Match.h"
 
 /*
 	Draw

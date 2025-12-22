@@ -1,4 +1,7 @@
 #include "Main.h"
+#include "Camera.h"
+#include "Keys.h"
+#include "Match.h"
 #include "Game.h"
 #include "Game.h"
 #include "Crates.h"

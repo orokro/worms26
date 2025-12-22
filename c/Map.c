@@ -3,6 +3,7 @@
 
 #include "Main.h"
 #include "Map.h"
+#include "Draw.h"
 #include "Worms.h"
 #include "OilDrums.h"
 #include "Mines.h"

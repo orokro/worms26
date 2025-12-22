@@ -3,6 +3,10 @@
 
 #include "Main.h"
 #include "Game.h"
+#include "Match.h"
+#include "Draw.h"
+#include "Camera.h"
+#include "Keys.h"
 #include "Crates.h"
 #include "OilDrums.h"
 #include "Mines.h"

@@ -1,6 +1,8 @@
 #include "Main.h"
 #include "Game.h"
 #include "Map.h"
+#include "Keys.h"
+#include "Draw.h"
 
 /*
 	Main
