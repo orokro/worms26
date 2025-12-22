@@ -8,6 +8,8 @@
 #include "Worms.h"
 #include "Weapons.h"
 #include "Explosions.h"
+#include "SpriteData.h"
+#include "Draw.h"
 
 /*
 	Weapons
@@ -611,22 +613,41 @@ void Weapons_fire(short charge)
 }
 
 
+/**
+	Draws all the in-game, on-screen Weapon objects.
+*/
+void Weapons_drawAll()
+{
+	short screenX, screenY;
+	
+	// loop over all weapons and draw them if active:
+	short i;
+	for(i=0; i<MAX_WEAPONS; i++)
+	{
+		if(Weapon_active & ((unsigned short)1<<(i)))
+		{
+			screenX=Weapon_x[i];
+			screenY=Weapon_y[i];
+			if(worldToScreen(&screenX, &screenY))
+			{	
+				// if weapon uses spawnSelf, we can use it's same sprite as from the menu
+				if(Weapon_props[(short)Weapon_type[i]] & spawnsSelf)
+				{
+
+					// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon
+					ClipSprite16_OR_R(screenX-2, screenY-2, 11, spr_weapons[(short)Weapon_type[i]], lightPlane);
+					ClipSprite16_OR_R(screenX-2, screenY-2, 11, spr_weapons[(short)Weapon_type[i]], darkPlane);
+
+				}else{	
+					// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon
+					ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, lightPlane);
+					ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, darkPlane);
+				}
 
 
+			}// end if on screen
+			
+		}// end if active
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	}// next i
+}

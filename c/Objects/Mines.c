@@ -6,6 +6,8 @@
 #include "PhysCol.h"
 #include "Map.h"
 #include "Explosions.h"
+#include "SpriteData.h"
+#include "Draw.h"
 
 /*
 	Mines
@@ -204,3 +206,51 @@ void Mines_trigger(short index)
 	// set fuse
 	Mine_fuse[index] = ((Match_mineFuseLength<6) ? (Match_mineFuseLength*TIME_MULTIPLIER) : (random(5)*TIME_MULTIPLIER));
 }
+
+
+/**
+	Draws all the in-game, on-screen Mines.
+*/
+void Mines_drawAll()
+{
+	short screenX, screenY;
+	
+	char fuseStr[8];
+	
+	// loop over all mines and draw them if active:
+	short i;
+	for(i=0; i<MAX_MINES; i++)
+	{
+		if(Mine_active & (unsigned short)1<<(i))
+		{
+			screenX=Mine_x[i];
+			screenY=Mine_y[i];
+			if(worldToScreen(&screenX, &screenY))
+			{				
+				// draw the mines fill and outline
+				ClipSprite8_OR_R(screenX-3, screenY-1, 4, spr_Mine_Dark, darkPlane);
+				ClipSprite8_OR_R(screenX-3, screenY-1, 4, spr_Mine_Light, lightPlane);
+				
+				// if the mine has an active fuse, draw that too
+				if(Mine_fuse[i]>0)
+				{
+					sprintf(fuseStr, "%d", (Mine_fuse[i]/TIME_MULTIPLIER));
+					GrayDrawStr2B(screenX-4, screenY-16, fuseStr, A_NORMAL, lightPlane, darkPlane);
+				}// end if fuse
+				
+				// if the oil drum is "settled" draw an arrow above it, for debug
+				//char foo = (Mine_settled & (unsigned short)1<<(i));
+				//DrawChar(screenX, screenY-8, (foo ? (char)20 : 'X'), A_NORMAL);
+				
+				/*
+				char txt[4];
+				sprintf(txt, "%d", (short)Mine_yVelo[i]);
+				DrawStr(screenX-3, screenY-8, txt, A_NORMAL);
+				*/
+				
+			}// end if on screen
+		}// end if active
+	}// next i
+}
+
+

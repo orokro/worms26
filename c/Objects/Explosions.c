@@ -4,6 +4,8 @@
 #include "Main.h"
 #include "Explosions.h"
 #include "Map.h"
+#include "Draw.h"
+
 
 /*
 	Explosions
@@ -309,4 +311,39 @@ void Explosion_update()
 			updateExplosion(i);
 }
 
+
+/**
+ * Draws active explosions, if there are any
+*/
+void Explosion_drawAll()
+{
+	// if no explosion is active, just gtfo
+	if(Explosion_active==0)
+		return;
+		
+	// loop over explosions..
+	short i;
+	for(i=0; i<MAX_EXPLOSIONS; i++)
+	{
+		if(Explosion_active & (unsigned short)1<<i)
+		{
+			short x=Explosion_x[i];
+			short y=Explosion_y[i];
+			short r=Explosion_size[i]-Explosion_time[i];
+			
+			if(worldToScreen(&x, &y))
+			{
+				short e;
+				for(e=1; e<r; e++)
+				{
+					GrayDBufSetHiddenAMSPlane(DARK_PLANE);
+					DrawClipEllipse(x, y, e, e, &(SCR_RECT){{0, 0, 159, 99}}, A_XOR);
+					GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
+					DrawClipEllipse(x, y, e, e, &(SCR_RECT){{0, 0, 159, 99}}, A_XOR);
+				}
+			}
+		}// end if active
+	}// next i
+	
+}
 

@@ -9,6 +9,9 @@
 #include "Worms.h"
 #include "Map.h"
 #include "Explosions.h"
+#include "SpriteData.h"
+#include "Draw.h"
+
 
 /*
 	Crates
@@ -444,3 +447,37 @@ void Crates_pickUp(short index, short worm)
 		Worm_setHealth(worm, 50, TRUE);
 }
 
+
+/**
+	Draws all the in-game, on-screen Crates.
+*/
+void Crates_drawAll()
+{
+	short screenX, screenY;
+	
+	// loop over all crates and draw them if active:
+	short i;
+	for(i=0; i<MAX_CRATES; i++)
+	{
+		if(Crate_active & ((unsigned short)1<<(i)))
+		{
+			screenX=Crate_x[i];
+			screenY=Crate_y[i];
+			if(worldToScreen(&screenX, &screenY))
+			{
+				// if crate has parachute
+				if(i==parachuteCrate)
+				{
+					ClipSprite16_MASK_R(screenX-6, screenY-16, 12, spr_Parachute+12, spr_Parachute, lightPlane);
+					ClipSprite16_MASK_R(screenX-6, screenY-16, 12, spr_Parachute+24, spr_Parachute, darkPlane);
+				}
+				
+				// draw crate (this comes after parachut so it can slightly overlap)
+				unsigned short *sprite = ((Crate_type[i]==crateHealth) ? (unsigned short*)&spr_CrateHealth[0] : ((Crate_type[i]==crateWeapon) ? (unsigned short*)&spr_CrateWeapon[0] : (unsigned short*)&spr_CrateTool[0]));					
+				ClipSprite16_MASK_R(screenX-6, screenY-6, 12, sprite+12, sprite, lightPlane);
+				ClipSprite16_MASK_R(screenX-6, screenY-6, 12, sprite+24, sprite, darkPlane);
+
+			}// end if on screen
+		}// end if active
+	}// next i
+}

@@ -36,4 +36,9 @@ extern void Explosion_spawn(short, short, char, char, char);
 */
 extern void Explosion_update();
 
+/**
+ * Draws all explosions 
+ */
+extern void Explosion_drawAll();
+
 #endif

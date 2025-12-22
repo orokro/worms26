@@ -1,15 +1,13 @@
 #ifndef MINES_H
 #define MINES_H
 
+// includes
 #include "PhysCol.h"
-
-/* ======================================================================================================================================
-   MINES +++ MINES +++ MINES +++ MINES +++ MINES +++ MINES +++ MINES +++ MINES +++ MINES +++ MINES +++ MINES +++ MINES +++ MINES +++ MINE
-   ====================================================================================================================================== */
 
 // mine defines
 #define mineTriggerDistance 10
 #define MAX_MINES 10
+
 
 // mine globals
 extern short Mine_x[MAX_MINES];
@@ -32,10 +30,12 @@ extern unsigned short Mine_settled;
 */
 extern void Mines_spawnMines();
 
+
 /**
  * Updates the Mines currently active, should be called once per frame.
 */
 extern void Mines_update();
+
 
 /**
  * Allows a worm to trigger a mine
@@ -43,6 +43,7 @@ extern void Mines_update();
  * @param index the mine index to trigger
 */
 extern void Mines_trigger(short);
+
 
 /**
  * Changes the heath of a worm. Updates worms health sprite.
@@ -52,5 +53,12 @@ extern void Mines_trigger(short);
  * @param additive TRUE or FALSE if using additive mode
 */
 extern void Worm_setHealth(short, short, char);
+
+
+/**
+ * @brief Draws all the mines
+ * 
+ */
+extern void Mines_drawAll();
 
 #endif /* MINES_H */

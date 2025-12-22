@@ -1,15 +1,13 @@
+
 #ifndef CRATES_H
 #define CRATES_H
-
-/* ======================================================================================================================================
-   CRATES +++ CRATES +++ CRATES +++ CRATES +++ CRATES +++ CRATES +++ CRATES +++ CRATES +++ CRATES +++ CRATES +++ CRATES +++ CRATES +++ CR
-   ====================================================================================================================================== */
 
 // crate defines
 #define MAX_CRATES 8
 #define crateHealth 0
 #define crateWeapon 1
 #define crateTool 2
+
 
 // crate globals
 extern short Crate_x[MAX_CRATES];
@@ -20,6 +18,7 @@ extern unsigned short Crate_active;
 extern unsigned short Crate_settled;
 extern char parachuteCrate;
 
+
 // crate function prototypes
 
 /**
@@ -29,6 +28,7 @@ extern char parachuteCrate;
  * @return TRUE or FALSE if a crate was successfully spawned
 */
 extern char Crates_spawnCrate();
+
 
 /**
  * Updates the Crates currently active, should be called once per frame.
@@ -42,5 +42,12 @@ extern void Crates_update();
  * @param worm the index of the worm who picked up the crate
 */
 extern void Crates_pickUp(short, short);
+
+
+/**
+ * @brief Draws all the crates
+ * 
+ */
+extern void Crates_drawAll();
 
 #endif

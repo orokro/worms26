@@ -5,7 +5,7 @@
 #include "Draw.h"
 #include "Camera.h"
 #include "Keys.h"
-#include "SpriteData.c"
+#include "SpriteData.h"
 #include "Game.h"
 #include "Crates.h"
 #include "OilDrums.h"
@@ -31,15 +31,10 @@ extern char Game_wormAnimState;    // Current animation state (0=None, 1=Jump, 2
 extern int  Game_wormAnimTimer;    // Timer to track animation progress
 extern char Game_wormFlipStartDir; // Direction worm was facing when flip started (0=Right, Mask=Left)
 
-short foo[5][10];
-
 // these sprites will be generated at the begining of the each turn to match the current wind conditions
 unsigned long windSprites[3][3];
 
-// these sprites will be genreated at the beginning and when health changes.
-unsigned long healthSprites[16][18];
-unsigned long healthMasks[16][18];
-unsigned long healthLightGray[16][18];
+
 
 // static weapon names delcaration since we only really need the names in this draw method
 // using flat ID space
@@ -160,329 +155,6 @@ char worldToScreen(short *x, short *y)
     return FALSE;
 	else
 		return TRUE;
-}
-
-
-/**
-	Draws all the in-game, on-screen Worms.
-*/
-void drawWorms()
-{
-    short screenX, screenY;
-    short i;
-
-    // Pointers for the sprite data to draw this frame
-    unsigned short* sprOutline;
-    unsigned short* sprMask;
-    short sprHeight; // New: sprites have different heights now!
-
-    // Loop over all worms
-    for(i=0; i<MAX_WORMS; i++)
-    {
-        // Check active bitmask
-        if(Worm_active & (unsigned short)1<<(i))
-        {
-            screenX = Worm_x[i];
-            screenY = Worm_y[i];
-
-            // Only draw if on screen
-            if(worldToScreen(&screenX, &screenY))
-            {
-                // Align sprite (centered x, feet y adjustment)
-                short x = screenX - 8;
-                short y = screenY - 6;
-
-                // Default to standard height
-                sprHeight = 13; 
-
-                // ============================================================
-                // SPRITE SELECTION LOGIC
-                // ============================================================
-                
-                // Is this the Active Worm doing an Animation?
-                if(i == Worm_currentWorm && Game_wormAnimState != ANIM_NONE)
-                {
-                    // --- BACKFLIP ---
-                    if(Game_wormAnimState == ANIM_BACKFLIP)
-                    {
-                        Game_wormAnimTimer++; // Advance frame
-                        
-                        // Determine Stage
-                        int stage = 1;
-                        if(Game_wormAnimTimer < 6)       stage = 1; 
-                        else if(Game_wormAnimTimer < 8)  stage = 2; 
-                        else if(Game_wormAnimTimer < 9)  stage = 3; 
-                        else if(Game_wormAnimTimer < 12) stage = 4; 
-                        else                             stage = 1; 
-
-                        // Handle Directions (Start Dir 0=Right, >0=Left)
-                        if(Game_wormFlipStartDir == 0) 
-                        {
-                            // Started facing RIGHT
-                            if(stage==1) { sprOutline=spr_WormFlip1_Right_Outline; sprMask=spr_WormFlip1_Right_Mask; sprHeight=17; }
-                            else if(stage==2) { sprOutline=spr_WormFlip2_Right_Outline; sprMask=spr_WormFlip2_Right_Mask; sprHeight=10; }
-                            else if(stage==3) { sprOutline=spr_WormFlip3_Left_Outline;  sprMask=spr_WormFlip3_Left_Mask; sprHeight=13; }
-                            else if(stage==4) { sprOutline=spr_WormFlip4_Left_Outline;  sprMask=spr_WormFlip4_Left_Mask; sprHeight=10; }
-                            else { sprOutline=spr_WormFlip1_Right_Outline; sprMask=spr_WormFlip1_Right_Mask; sprHeight=17; }
-                        }
-                        else 
-                        {
-                            // Started facing LEFT
-                            if(stage==1) { sprOutline=spr_WormFlip1_Left_Outline; sprMask=spr_WormFlip1_Left_Mask; sprHeight=17; }
-                            else if(stage==2) { sprOutline=spr_WormFlip2_Left_Outline; sprMask=spr_WormFlip2_Left_Mask; sprHeight=10; }
-                            else if(stage==3) { sprOutline=spr_WormFlip3_Right_Outline; sprMask=spr_WormFlip3_Right_Mask; sprHeight=13; }
-                            else if(stage==4) { sprOutline=spr_WormFlip4_Right_Outline; sprMask=spr_WormFlip4_Right_Mask; sprHeight=10; }
-                            else { sprOutline=spr_WormFlip1_Left_Outline; sprMask=spr_WormFlip1_Left_Mask; sprHeight=17; }
-                        }
-                        
-                        // Adjust Y for tall sprites so feet stay aligned
-                        // (17px tall needs to be drawn 4px higher than 13px tall)
-                        if(sprHeight == 17) y -= 4; 
-                        if(sprHeight == 15) y -= 2;
-                    }
-                    // --- JUMPING ---
-                    else if(Game_wormAnimState == ANIM_JUMP)
-                    {
-                        sprHeight = 15; // Jump sprites are tall
-                        y -= 4;         // Align feet
-                        
-                        // Check Direction
-                        if(Worm_dir & (unsigned short)1<<(i)) {
-                            sprOutline = spr_WormJump_Left_Outline;
-                            sprMask = spr_WormJump_Left_Mask;
-                        } else {
-                            sprOutline = spr_WormJump_Right_Outline;
-                            sprMask = spr_WormJump_Right_Mask;
-                        }
-                    }
-                    // Safety Fallback
-                    else {
-                        sprOutline = spr_WormRight_Outline;
-                        sprMask = spr_WormRight_Mask;
-                    }
-                }
-                // ============================================================
-                // STANDARD WALKING / STANDING
-                // ============================================================
-                else
-                {
-                    char facing = (Worm_dir & (unsigned short)1<<(i))>0;
-                    if(facing) {
-                        sprOutline = spr_WormLeft_Outline; // Make sure these match SpriteData.c names!
-                        sprMask = spr_WormLeft_Mask;
-                    } else {
-                        sprOutline = spr_WormRight_Outline;
-                        sprMask = spr_WormRight_Mask;
-                    }
-                }
-
-                // ============================================================
-                // DRAWING
-                // ============================================================
-
-                // 1. Calculate the final Bottom-Right coordinate
-                // short finalY = y + sprHeight;
-
-                // 2. SAFETY CHECK:
-                // Ensure we do not draw to negative memory addresses (Fatal Crash)
-                // AND ensure we don't draw off the bottom (Visual Glitch)
-                if(y > -sprHeight && y < 100) 
-                {
-                     // Draw Mask (AND logic)
-                     ClipSprite16_AND_R(x, y, sprHeight, sprMask, darkPlane);
-                     ClipSprite16_AND_R(x, y, sprHeight, sprMask, lightPlane);
-                    
-                     // Draw Outline (OR logic)
-                     ClipSprite16_OR_R(x, y, sprHeight, sprOutline, darkPlane);
-                     ClipSprite16_OR_R(x, y, sprHeight, sprOutline, lightPlane);
-                }
-                
-                // ============================================================
-                // HUD (Name / Health)
-                // ============================================================
-                // Only draw if NOT the current worm during a turn
-                if(!(i==Worm_currentWorm && Game_mode==gameMode_Turn))
-                {
-                    short n;
-                    for(n=0; n<2; n++)
-                    {
-                        short hX = x-24+n*32;
-                        short hY = y-10; // Might need adjustment if sprite is tall (jumping)
-                    
-                        // mask out both planes
-                        ClipSprite32_AND_R(hX, hY, 9, healthMasks[i]+(n*9), lightPlane);
-                        ClipSprite32_AND_R(hX, hY, 9, healthMasks[i]+(n*9), darkPlane);
-                        
-                        // if its a light worm (Team 2?), make the light plane gray
-                        if(i>7)
-                            ClipSprite32_OR_R(hX, hY, 9, healthLightGray[i]+(n*9), lightPlane);
-                            
-                        // OR the sprite to both buffers
-                        ClipSprite32_OR_R(hX, hY, 9, healthSprites[i]+(n*9), lightPlane);
-                        ClipSprite32_OR_R(hX, hY, 9, healthSprites[i]+(n*9), darkPlane);
-                    }
-                } // end HUD
-                
-            } // end if on screen
-        } // end if active
-    } // next i
-}
-
-/**
-	Draws all the in-game, on-screen Mines.
-*/
-void drawMines()
-{
-	short screenX, screenY;
-	
-	char fuseStr[8];
-	
-	// loop over all mines and draw them if active:
-	short i;
-	for(i=0; i<MAX_MINES; i++)
-	{
-		if(Mine_active & (unsigned short)1<<(i))
-		{
-			screenX=Mine_x[i];
-			screenY=Mine_y[i];
-			if(worldToScreen(&screenX, &screenY))
-			{				
-				// draw the mines fill and outline
-				ClipSprite8_OR_R(screenX-3, screenY-1, 4, spr_Mine_Dark, darkPlane);
-				ClipSprite8_OR_R(screenX-3, screenY-1, 4, spr_Mine_Light, lightPlane);
-				
-				// if the mine has an active fuse, draw that too
-				if(Mine_fuse[i]>0)
-				{
-					sprintf(fuseStr, "%d", (Mine_fuse[i]/TIME_MULTIPLIER));
-					GrayDrawStr2B(screenX-4, screenY-16, fuseStr, A_NORMAL, lightPlane, darkPlane);
-				}// end if fuse
-				
-				// if the oil drum is "settled" draw an arrow above it, for debug
-				//char foo = (Mine_settled & (unsigned short)1<<(i));
-				//DrawChar(screenX, screenY-8, (foo ? (char)20 : 'X'), A_NORMAL);
-				
-				/*
-				char txt[4];
-				sprintf(txt, "%d", (short)Mine_yVelo[i]);
-				DrawStr(screenX-3, screenY-8, txt, A_NORMAL);
-				*/
-				
-			}// end if on screen
-		}// end if active
-	}// next i
-}
-
-/**
-	Draws all the in-game, on-screen Oil Drums.
-*/
-void drawOilDrums()
-{
-	short screenX, screenY;
-
-	// loop over all mines and draw them if active:
-	short i;
-	for(i=0; i<MAX_OILDRUMS; i++)
-	{
-		if(OilDrum_active & (unsigned short)1<<(i))
-		{
-			screenX=OilDrum_x[i];
-			screenY=OilDrum_y[i];
-			if(worldToScreen(&screenX, &screenY))
-			{
-				// draw the oil drums fill and outline
-				ClipSprite16_OR_R(screenX-4, screenY-5, 11, spr_Oil_Dark, darkPlane);
-				ClipSprite16_OR_R(screenX-4, screenY-5, 11, spr_Oil_Light, lightPlane);
-				
-				
-				// if the oil drum is "settled" draw an arrow above it, for debug
-				//if(OilDrum_settled & (unsigned short)1<<(i))
-				//	DrawChar(screenX, screenY-10, (char)20, A_NORMAL);
-				
-				/*
-				char txt[4];
-				sprintf(txt, "%d", (short)OilDrum_yVelo[i]);
-				DrawStr(screenX-4, screenY-20, txt, A_NORMAL);
-				*/
-				
-			}// end if on screen
-		}// end if active
-	}// next i
-	
-}
-
-
-/**
-	Draws all the in-game, on-screen Crates.
-*/
-void drawCrates()
-{
-	short screenX, screenY;
-	
-	// loop over all crates and draw them if active:
-	short i;
-	for(i=0; i<MAX_CRATES; i++)
-	{
-		if(Crate_active & ((unsigned short)1<<(i)))
-		{
-			screenX=Crate_x[i];
-			screenY=Crate_y[i];
-			if(worldToScreen(&screenX, &screenY))
-			{
-				// if crate has parachute
-				if(i==parachuteCrate)
-				{
-					ClipSprite16_MASK_R(screenX-6, screenY-16, 12, spr_Parachute+12, spr_Parachute, lightPlane);
-					ClipSprite16_MASK_R(screenX-6, screenY-16, 12, spr_Parachute+24, spr_Parachute, darkPlane);
-				}
-				
-				// draw crate (this comes after parachut so it can slightly overlap)
-				unsigned short *sprite = ((Crate_type[i]==crateHealth) ? (unsigned short*)&spr_CrateHealth[0] : ((Crate_type[i]==crateWeapon) ? (unsigned short*)&spr_CrateWeapon[0] : (unsigned short*)&spr_CrateTool[0]));					
-				ClipSprite16_MASK_R(screenX-6, screenY-6, 12, sprite+12, sprite, lightPlane);
-				ClipSprite16_MASK_R(screenX-6, screenY-6, 12, sprite+24, sprite, darkPlane);
-
-			}// end if on screen
-		}// end if active
-	}// next i
-}
-
-/**
-	Draws all the in-game, on-screen Weapon objects.
-*/
-void drawWeapons()
-{
-	short screenX, screenY;
-	
-	// loop over all weapons and draw them if active:
-	short i;
-	for(i=0; i<MAX_WEAPONS; i++)
-	{
-		if(Weapon_active & ((unsigned short)1<<(i)))
-		{
-			screenX=Weapon_x[i];
-			screenY=Weapon_y[i];
-			if(worldToScreen(&screenX, &screenY))
-			{	
-				// if weapon uses spawnSelf, we can use it's same sprite as from the menu
-				if(Weapon_props[(short)Weapon_type[i]] & spawnsSelf)
-				{
-
-					// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon
-					ClipSprite16_OR_R(screenX-2, screenY-2, 11, spr_weapons[(short)Weapon_type[i]], lightPlane);
-					ClipSprite16_OR_R(screenX-2, screenY-2, 11, spr_weapons[(short)Weapon_type[i]], darkPlane);
-
-				}else{	
-					// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon
-					ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, lightPlane);
-					ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, darkPlane);
-				}
-
-
-			}// end if on screen
-			
-		}// end if active
-
-	}// next i
 }
 
 
@@ -880,42 +552,6 @@ void drawWater()
 
 
 /**
- * Draws active explosions, if there are any
-*/
-void drawExplosions()
-{
-	// if no explosion is active, just gtfo
-	if(Explosion_active==0)
-		return;
-		
-	// loop over explosions..
-	short i;
-	for(i=0; i<MAX_EXPLOSIONS; i++)
-	{
-		if(Explosion_active & (unsigned short)1<<i)
-		{
-			short x=Explosion_x[i];
-			short y=Explosion_y[i];
-			short r=Explosion_size[i]-Explosion_time[i];
-			
-			if(worldToScreen(&x, &y))
-			{
-				short e;
-				for(e=1; e<r; e++)
-				{
-					GrayDBufSetHiddenAMSPlane(DARK_PLANE);
-					DrawClipEllipse(x, y, e, e, &(SCR_RECT){{0, 0, 159, 99}}, A_XOR);
-					GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
-					DrawClipEllipse(x, y, e, e, &(SCR_RECT){{0, 0, 159, 99}}, A_XOR);
-				}
-			}
-		}// end if active
-	}// next i
-	
-}
-
-
-/**
  * Draw's the cross hair and/or charge bar for the selected weapon
 */
 void drawWeaponDetails()
@@ -1001,7 +637,7 @@ void drawWeaponDetails()
 			worldToScreen(&wx, &wy);
 			
 			// list of sprites based on size from 0-2
-			char *spritePtrs[] = {spr_chargeSmall, spr_chargeMed, spr_chargeLarge};
+			const char *spritePtrs[] = {spr_chargeSmall, spr_chargeMed, spr_chargeLarge};
 			
 			// calc the charge amount in our scale
 			char chargeAmt = (Game_currentWeaponCharge/31);
@@ -1090,25 +726,25 @@ void Draw_renderGame()
 	drawMap();	
 	
 	// draw oil drums first, as everything else should overlap them
-	drawOilDrums();
+	OilDrums_drawAll();
 	
-	// draw crates ontop of oil drums...
-	drawCrates();
+	// draw crates on top of oil drums...
+	Crates_drawAll();
 	
 	// draw our wormy bros
-	drawWorms();
+	Worm_drawAll();
 	
 	// mines are important, so draw them on top of everything else
-	drawMines();
+	Mines_drawAll();
 	
 	// draw water that's infront of everything but the HUD
 	drawWater(FALSE);
 	
-	// draw explosions over everthing except HUD, since they reverse the pixels
-	drawExplosions();
+	// draw explosions over everything except HUD, since they reverse the pixels
+	Explosion_drawAll();
 	
 	// draw weapon objects in the game...
-	drawWeapons();
+	Weapons_drawAll();
 	
 	// HUD stuff is drawn last since it needs to go on top of all game elements
 	drawHUD();
@@ -1117,7 +753,7 @@ void Draw_renderGame()
 	if(Game_mode==gameMode_WormSelect)
 		drawSelectArrow();
 	
-	// extra stuff to draw if the worm has certain wepaons selected
+	// extra stuff to draw if the worm has certain weapons selected
 	if(Game_currentWeaponSelected!=-1)
 		drawWeaponDetails();
 		
@@ -1126,7 +762,7 @@ void Draw_renderGame()
 	// game modes by name	{"Select", "Turn", "WeaponSel", "Pause", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
 	static const char modes[9][16] = {"", "", "", "", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
 	
-	// draw the current and previous game mode on the scren
+	// draw the current and previous game mode on the screen
 	DrawStr(60,1,modes[(short)Game_mode], A_XOR);
 
 	// draw the current grace time, turn time, and retreat time on the screen
@@ -1391,7 +1027,7 @@ short Draw_renderText(unsigned long *buffer, char size, char *txt, char color)
 			
 			Note: every 8 chars take 3 rows of unsigned longs.
 		*/
-		unsigned long *charStartUL = spr_tinyFont + (((chr-(chr%8))/8)*3);
+		const unsigned long *charStartUL = spr_tinyFont + (((chr-(chr%8))/8)*3);
 	
 		// add leading space
 		pixColumn++;
@@ -1481,120 +1117,5 @@ short Draw_renderText(unsigned long *buffer, char size, char *txt, char color)
 }
 
 
-/**
- * draws text to a 5 row high, 2 column wide unsigned long buffer
- *
- * for usage when rendering name and health sprites, which are 64 bits wide and 7 bits tall
- * @param buffer the buffer to render the text to
- * @param mask the mask buffer to render the mask to
- * @param txt the text to write
- * @param color the white on black or black on white mode
-*/
-void txtToBuffer(unsigned long *buffer, unsigned long *mask, char *txt, char color)
-{
-	// draw text to our buffer
-	short txtLen = Draw_renderText(buffer, 2, (char*)txt, color);
-	
-	// loop to create masks we can AND to clip the sprites wasted space on either side...
-	short txtLeft = ((64-txtLen)/2)-2;
-	txtLen+=2;
-	
-	short px;
-	unsigned long eraseMask=1;
-	eraseMask = eraseMask<<31;
-	for(px=0; px<64; px++)
-	{
-		// everytime we loop over a long, reset the erase mask
-		if(px%32==0)
-		{
-			eraseMask = 1;
-			eraseMask = eraseMask<<31;
-		}
-			
-		// only erase the row, if its outside the text:
-		if(px<=txtLeft || px>=(txtLeft+txtLen))
-		{
-			// convert px to our column
-			short col = (px<32) ? 0 : 5;
-
-			// erase this pixel from all rows on our current colum...
-			int row;
-			for(row=0; row<5; row++)
-			{
-				// only erase rows 0 and 4 from our edges
-				if(!((px==txtLeft || px==(txtLeft+txtLen)) && (row>0 && row<4)))
-				{
-					*(buffer+col+row) &= ~eraseMask;
-					*(mask+col+row) |= eraseMask;
-				}				
-			}// next row				
-		}// end if erasable
-		
-		// shift our erase mask right (when it hits the edge, px%32 will be 0 and reset the mask)
-		eraseMask = eraseMask>>1;
-	}// next px
-}
-
-
-// draw health sprite for a worm
-void Draw_healthSprite(short index)
-{
-	/*
-		make four buffers total:
-			- two sprite buffers for the name and health
-			- two mask buffers for the name and health
-	*/
-	unsigned long sn[10];
-	unsigned long snm[10];
-	unsigned long sh[10];
-	unsigned long shm[10];
-	
-	// clear all rows in our buffer, and mask buffer before we draw the text
-	int ul;
-	for(ul=0; ul<18; ul++)
-	{
-		healthSprites[index][ul] = (index<8) ? 0b11111111111111111111111111111111 : 0;
-		healthMasks[index][ul] = 0;// 0b11111111111111111111111111111111;
-		healthLightGray[index][ul] = 0;
-		
-		if(ul<10)
-		{
-			sn[ul] = (index<8) ? 0b11111111111111111111111111111111 : 0;
-			snm[ul] = 0;
-			sh[ul] = (index<8) ? 0b11111111111111111111111111111111 : 0;
-			shm[ul] = 0;
-		}
-	}
-	
-	// make health text to draw
-	char txtHealth[20];
-	sprintf(txtHealth, "%d", Worm_health[index]);
-	
-	// draw the name and mask to each set of buffers
-	txtToBuffer(sn, snm, (char*)Match_wormNames[index], (index<8));
-	txtToBuffer(sh, shm, (char*)txtHealth, (index<8));
-	
-	// now we need to combine the name and health into our single sprite,
-	// for faster drawing
-	int row, col;
-	for(col=0; col<2; col++)
-	{
-		// copy the health rows...
-		for(row=0; row<5; row++)
-		{
-			healthSprites[index][(col*9)+row+4] = sh[(col*5)+row];
-			healthMasks[index][(col*9)+row+4] = shm[(col*5)+row];
-			healthLightGray[index][(col*9)+row+4] = ~(shm[(col*5)+row]);
-		}
-		
-		// add the rows for the sprite:
-		for(row=0; row<5; row++)
-		{
-			healthSprites[index][(col*9)+row] = sn[(col*5)+row];
-			healthMasks[index][(col*9)+row] = snm[(col*5)+row];
-			healthLightGray[index][(col*9)+row] = ~(snm[(col*5)+row]);
-		}
-	}// next col
-}
 
 

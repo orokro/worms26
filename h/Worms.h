@@ -55,4 +55,7 @@ extern void Worm_update();
 /* updates worms health */
 extern void Worm_setHealth(short index, short health, char additive);
 
+/* draws all worms */
+extern void Worm_drawAll();
+
 #endif

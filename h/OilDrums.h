@@ -10,6 +10,7 @@
 // OilDrum defines
 #define MAX_OILDRUMS 6
 
+
 // OilDrum globals
 extern short OilDrum_x[MAX_OILDRUMS];
 extern short OilDrum_y[MAX_OILDRUMS];
@@ -18,6 +19,7 @@ extern unsigned short OilDrum_active;
 extern unsigned short OilDrum_settled;
 extern char OilDrum_xVelo[MAX_OILDRUMS];
 extern char OilDrum_yVelo[MAX_OILDRUMS];
+
 
 // OilDrum function prototypes
 
@@ -29,9 +31,16 @@ extern char OilDrum_yVelo[MAX_OILDRUMS];
 */
 extern void OilDrums_spawnDrums();
 
+
 /**
  * Updates the Oil Drums currently active, should be called once per frame.
 */
 extern void OilDrums_update();
+
+
+/**
+	Draws all the in-game, on-screen Oil Drums.
+*/
+extern void OilDrums_drawAll();
 
 #endif

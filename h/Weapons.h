@@ -8,6 +8,7 @@
 // Weapons defines
 #define MAX_WEAPONS 10
 
+
 // Define bitmask flags for the types of properties a weapon can have:
 // when spawning a weapon, these can be ORed together to create it's logic
 #define usesAim 							0b0000000000000001
@@ -26,6 +27,7 @@
 #define isMele 								0b0010000000000000
 #define spawnsSelf 						0b0100000000000000
 #define multiUse 							0b1000000000000000
+
 
 /*
   enumerate our list of weapons, with matching index positions as described in the array above
@@ -62,6 +64,7 @@ extern short Weapon_targetX;
 extern short Weapon_targetY;
 extern char Weapon_aimPosList[10][2];
 
+
 /*
 	there are currently 69 different types of weapon objects that can be on screen
 	and behave differently.
@@ -78,6 +81,7 @@ extern char Weapon_aimPosList[10][2];
 	each weapon type, so we can optimize the weapon routines to reuse code
 */
 extern unsigned short Weapon_props[72];
+
 
 // weapons function prototypes
 
@@ -104,10 +108,12 @@ extern unsigned short Weapon_props[72];
 */
 extern void Weapons_spawn(char, short, short, char, char, unsigned short);
 
+
 /**
  * Updates all the currently active weapons, should be called once per frame.
 */
 extern void Weapons_update();
+
 
 /**
  * When a weapon is a targeted weapon, such as Air Strike or Homing Missle, this sets the current X/Y target.
@@ -117,9 +123,16 @@ extern void Weapons_update();
 */
 extern void Weapons_setTarget(short, short);
 
+
 /**
  * When the user fires a weapon
 */
 extern void Weapons_fire(short charge);
+
+
+/**
+	Draws all the in-game, on-screen Weapon objects.
+*/
+extern void Weapons_drawAll();
 
 #endif

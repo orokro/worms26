@@ -7,6 +7,8 @@
 #include "PhysCol.h"
 #include "Map.h"
 #include "Explosions.h"
+#include "SpriteData.h"
+#include "Draw.h"
 
 /*
 	OilDrums
@@ -134,3 +136,40 @@ void OilDrums_update()
 }
 
 
+/**
+	Draws all the in-game, on-screen Oil Drums.
+*/
+void OilDrums_drawAll()
+{
+	short screenX, screenY;
+
+	// loop over all mines and draw them if active:
+	short i;
+	for(i=0; i<MAX_OILDRUMS; i++)
+	{
+		if(OilDrum_active & (unsigned short)1<<(i))
+		{
+			screenX=OilDrum_x[i];
+			screenY=OilDrum_y[i];
+			if(worldToScreen(&screenX, &screenY))
+			{
+				// draw the oil drums fill and outline
+				ClipSprite16_OR_R(screenX-4, screenY-5, 11, spr_Oil_Dark, darkPlane);
+				ClipSprite16_OR_R(screenX-4, screenY-5, 11, spr_Oil_Light, lightPlane);
+				
+				
+				// if the oil drum is "settled" draw an arrow above it, for debug
+				//if(OilDrum_settled & (unsigned short)1<<(i))
+				//	DrawChar(screenX, screenY-10, (char)20, A_NORMAL);
+				
+				/*
+				char txt[4];
+				sprintf(txt, "%d", (short)OilDrum_yVelo[i]);
+				DrawStr(screenX-4, screenY-20, txt, A_NORMAL);
+				*/
+				
+			}// end if on screen
+		}// end if active
+	}// next i
+	
+}

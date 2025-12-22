@@ -3,6 +3,7 @@
 
 #include "Main.h"
 #include "Draw.h"
+#include "SpriteData.h"
 #include "Match.h"
 #include "Game.h"
 #include "Mines.h"
@@ -68,23 +69,18 @@ unsigned short Worm_onGround = 0;
 // the current worms 10x10 tile. we don't need to store both X and Y, just the tile index
 short Worm_tile[MAX_WORMS] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
+// these sprites will be genreated at the beginning and when health changes.
+unsigned long healthSprites[16][18];
+unsigned long healthMasks[16][18];
+unsigned long healthLightGray[16][18];
+
+void renderHealthSprite(short index);
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-/**
- * So we don't have to render text every time, this routine will generate a the sprites to use for a worms health.
- *
- * This way, we can redraw the sprite, only when the health changes.
- *
- * @param index the index of the worm to draw the health sprite for
-*/
-void renderHealthSprite(short index)
-{
-	Draw_healthSprite(index);
-}
 
 
 /**
@@ -251,6 +247,290 @@ void Worm_setHealth(short index, short health, char additive)
 	// update it's sprite
 	renderHealthSprite(index);
 }
+
+
+/**
+ * draws text to a 5 row high, 2 column wide unsigned long buffer
+ *
+ * for usage when rendering name and health sprites, which are 64 bits wide and 7 bits tall
+ * @param buffer the buffer to render the text to
+ * @param mask the mask buffer to render the mask to
+ * @param txt the text to write
+ * @param color the white on black or black on white mode
+*/
+void txtToBuffer(unsigned long *buffer, unsigned long *mask, char *txt, char color)
+{
+	// draw text to our buffer
+	short txtLen = Draw_renderText(buffer, 2, (char*)txt, color);
+	
+	// loop to create masks we can AND to clip the sprites wasted space on either side...
+	short txtLeft = ((64-txtLen)/2)-2;
+	txtLen+=2;
+	
+	short px;
+	unsigned long eraseMask=1;
+	eraseMask = eraseMask<<31;
+	for(px=0; px<64; px++)
+	{
+		// everytime we loop over a long, reset the erase mask
+		if(px%32==0)
+		{
+			eraseMask = 1;
+			eraseMask = eraseMask<<31;
+		}
+			
+		// only erase the row, if its outside the text:
+		if(px<=txtLeft || px>=(txtLeft+txtLen))
+		{
+			// convert px to our column
+			short col = (px<32) ? 0 : 5;
+
+			// erase this pixel from all rows on our current colum...
+			int row;
+			for(row=0; row<5; row++)
+			{
+				// only erase rows 0 and 4 from our edges
+				if(!((px==txtLeft || px==(txtLeft+txtLen)) && (row>0 && row<4)))
+				{
+					*(buffer+col+row) &= ~eraseMask;
+					*(mask+col+row) |= eraseMask;
+				}				
+			}// next row				
+		}// end if erasable
+		
+		// shift our erase mask right (when it hits the edge, px%32 will be 0 and reset the mask)
+		eraseMask = eraseMask>>1;
+	}// next px
+}
+
+
+// draw health sprite for a worm
+void renderHealthSprite(short index)
+{
+	/*
+		make four buffers total:
+			- two sprite buffers for the name and health
+			- two mask buffers for the name and health
+	*/
+	unsigned long sn[10];
+	unsigned long snm[10];
+	unsigned long sh[10];
+	unsigned long shm[10];
+	
+	// clear all rows in our buffer, and mask buffer before we draw the text
+	int ul;
+	for(ul=0; ul<18; ul++)
+	{
+		healthSprites[index][ul] = (index<8) ? 0b11111111111111111111111111111111 : 0;
+		healthMasks[index][ul] = 0;// 0b11111111111111111111111111111111;
+		healthLightGray[index][ul] = 0;
+		
+		if(ul<10)
+		{
+			sn[ul] = (index<8) ? 0b11111111111111111111111111111111 : 0;
+			snm[ul] = 0;
+			sh[ul] = (index<8) ? 0b11111111111111111111111111111111 : 0;
+			shm[ul] = 0;
+		}
+	}
+	
+	// make health text to draw
+	char txtHealth[20];
+	sprintf(txtHealth, "%d", Worm_health[index]);
+	
+	// draw the name and mask to each set of buffers
+	txtToBuffer(sn, snm, (char*)Match_wormNames[index], (index<8));
+	txtToBuffer(sh, shm, (char*)txtHealth, (index<8));
+	
+	// now we need to combine the name and health into our single sprite,
+	// for faster drawing
+	int row, col;
+	for(col=0; col<2; col++)
+	{
+		// copy the health rows...
+		for(row=0; row<5; row++)
+		{
+			healthSprites[index][(col*9)+row+4] = sh[(col*5)+row];
+			healthMasks[index][(col*9)+row+4] = shm[(col*5)+row];
+			healthLightGray[index][(col*9)+row+4] = ~(shm[(col*5)+row]);
+		}
+		
+		// add the rows for the sprite:
+		for(row=0; row<5; row++)
+		{
+			healthSprites[index][(col*9)+row] = sn[(col*5)+row];
+			healthMasks[index][(col*9)+row] = snm[(col*5)+row];
+			healthLightGray[index][(col*9)+row] = ~(snm[(col*5)+row]);
+		}
+	}// next col
+}
+
+
+/**
+	Draws all the in-game, on-screen Worms.
+*/
+void Worm_drawAll()
+{
+    short screenX, screenY;
+    short i;
+
+    // Pointers for the sprite data to draw this frame
+    const unsigned short* sprOutline;
+    const unsigned short* sprMask;
+    short sprHeight; // New: sprites have different heights now!
+
+    // Loop over all worms
+    for(i=0; i<MAX_WORMS; i++)
+    {
+        // Check active bitmask
+        if(Worm_active & (unsigned short)1<<(i))
+        {
+            screenX = Worm_x[i];
+            screenY = Worm_y[i];
+
+            // Only draw if on screen
+            if(worldToScreen(&screenX, &screenY))
+            {
+                // Align sprite (centered x, feet y adjustment)
+                short x = screenX - 8;
+                short y = screenY - 6;
+
+                // Default to standard height
+                sprHeight = 13; 
+
+                // ============================================================
+                // SPRITE SELECTION LOGIC
+                // ============================================================
+                
+                // Is this the Active Worm doing an Animation?
+                if(i == Worm_currentWorm && Game_wormAnimState != ANIM_NONE)
+                {
+                    // --- BACKFLIP ---
+                    if(Game_wormAnimState == ANIM_BACKFLIP)
+                    {
+                        Game_wormAnimTimer++; // Advance frame
+                        
+                        // Determine Stage
+                        int stage = 1;
+                        if(Game_wormAnimTimer < 6)       stage = 1; 
+                        else if(Game_wormAnimTimer < 8)  stage = 2; 
+                        else if(Game_wormAnimTimer < 9)  stage = 3; 
+                        else if(Game_wormAnimTimer < 12) stage = 4; 
+                        else                             stage = 1; 
+
+                        // Handle Directions (Start Dir 0=Right, >0=Left)
+                        if(Game_wormFlipStartDir == 0) 
+                        {
+                            // Started facing RIGHT
+                            if(stage==1) { sprOutline=spr_WormFlip1_Right_Outline; sprMask=spr_WormFlip1_Right_Mask; sprHeight=17; }
+                            else if(stage==2) { sprOutline=spr_WormFlip2_Right_Outline; sprMask=spr_WormFlip2_Right_Mask; sprHeight=10; }
+                            else if(stage==3) { sprOutline=spr_WormFlip3_Left_Outline;  sprMask=spr_WormFlip3_Left_Mask; sprHeight=13; }
+                            else if(stage==4) { sprOutline=spr_WormFlip4_Left_Outline;  sprMask=spr_WormFlip4_Left_Mask; sprHeight=10; }
+                            else { sprOutline=spr_WormFlip1_Right_Outline; sprMask=spr_WormFlip1_Right_Mask; sprHeight=17; }
+                        }
+                        else 
+                        {
+                            // Started facing LEFT
+                            if(stage==1) { sprOutline=spr_WormFlip1_Left_Outline; sprMask=spr_WormFlip1_Left_Mask; sprHeight=17; }
+                            else if(stage==2) { sprOutline=spr_WormFlip2_Left_Outline; sprMask=spr_WormFlip2_Left_Mask; sprHeight=10; }
+                            else if(stage==3) { sprOutline=spr_WormFlip3_Right_Outline; sprMask=spr_WormFlip3_Right_Mask; sprHeight=13; }
+                            else if(stage==4) { sprOutline=spr_WormFlip4_Right_Outline; sprMask=spr_WormFlip4_Right_Mask; sprHeight=10; }
+                            else { sprOutline=spr_WormFlip1_Left_Outline; sprMask=spr_WormFlip1_Left_Mask; sprHeight=17; }
+                        }
+                        
+                        // Adjust Y for tall sprites so feet stay aligned
+                        // (17px tall needs to be drawn 4px higher than 13px tall)
+                        if(sprHeight == 17) y -= 4; 
+                        if(sprHeight == 15) y -= 2;
+                    }
+                    // --- JUMPING ---
+                    else if(Game_wormAnimState == ANIM_JUMP)
+                    {
+                        sprHeight = 15; // Jump sprites are tall
+                        y -= 4;         // Align feet
+                        
+                        // Check Direction
+                        if(Worm_dir & (unsigned short)1<<(i)) {
+                            sprOutline = spr_WormJump_Left_Outline;
+                            sprMask = spr_WormJump_Left_Mask;
+                        } else {
+                            sprOutline = spr_WormJump_Right_Outline;
+                            sprMask = spr_WormJump_Right_Mask;
+                        }
+                    }
+                    // Safety Fallback
+                    else {
+                        sprOutline = spr_WormRight_Outline;
+                        sprMask = spr_WormRight_Mask;
+                    }
+                }
+                // ============================================================
+                // STANDARD WALKING / STANDING
+                // ============================================================
+                else
+                {
+                    char facing = (Worm_dir & (unsigned short)1<<(i))>0;
+                    if(facing) {
+                        sprOutline = spr_WormLeft_Outline; // Make sure these match SpriteData.c names!
+                        sprMask = spr_WormLeft_Mask;
+                    } else {
+                        sprOutline = spr_WormRight_Outline;
+                        sprMask = spr_WormRight_Mask;
+                    }
+                }
+
+                // ============================================================
+                // DRAWING
+                // ============================================================
+
+                // 1. Calculate the final Bottom-Right coordinate
+                // short finalY = y + sprHeight;
+
+                // 2. SAFETY CHECK:
+                // Ensure we do not draw to negative memory addresses (Fatal Crash)
+                // AND ensure we don't draw off the bottom (Visual Glitch)
+                if(y > -sprHeight && y < 100) 
+                {
+                     // Draw Mask (AND logic)
+                     ClipSprite16_AND_R(x, y, sprHeight, sprMask, darkPlane);
+                     ClipSprite16_AND_R(x, y, sprHeight, sprMask, lightPlane);
+                    
+                     // Draw Outline (OR logic)
+                     ClipSprite16_OR_R(x, y, sprHeight, sprOutline, darkPlane);
+                     ClipSprite16_OR_R(x, y, sprHeight, sprOutline, lightPlane);
+                }
+                
+                // ============================================================
+                // HUD (Name / Health)
+                // ============================================================
+                // Only draw if NOT the current worm during a turn
+                if(!(i==Worm_currentWorm && Game_mode==gameMode_Turn))
+                {
+                    short n;
+                    for(n=0; n<2; n++)
+                    {
+                        short hX = x-24+n*32;
+                        short hY = y-10; // Might need adjustment if sprite is tall (jumping)
+                    
+                        // mask out both planes
+                        ClipSprite32_AND_R(hX, hY, 9, healthMasks[i]+(n*9), lightPlane);
+                        ClipSprite32_AND_R(hX, hY, 9, healthMasks[i]+(n*9), darkPlane);
+                        
+                        // if its a light worm (Team 2?), make the light plane gray
+                        if(i>7)
+                            ClipSprite32_OR_R(hX, hY, 9, healthLightGray[i]+(n*9), lightPlane);
+                            
+                        // OR the sprite to both buffers
+                        ClipSprite32_OR_R(hX, hY, 9, healthSprites[i]+(n*9), lightPlane);
+                        ClipSprite32_OR_R(hX, hY, 9, healthSprites[i]+(n*9), darkPlane);
+                    }
+                } // end HUD
+                
+            } // end if on screen
+        } // end if active
+    } // next i
+}
+
 
 
 

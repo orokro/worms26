@@ -50,7 +50,7 @@ Use Return Value=0
 Enable Error Return=0
 Save Screen=1
 [File Editing]
-Open File=C:\Users\geem4\Desktop\worms17\c\PhysCol.c
+Open File=C:\Users\geem4\Desktop\worms17\c\Objects\OilDrums.c
 [Included Files]
 C File 1=c\PhysCol.c
 C File 2=c\Match.c
@@ -67,6 +67,7 @@ C File 12=c\Objects\OilDrums.c
 C File 13=c\Objects\Mines.c
 C File 14=c\Objects\Explosions.c
 C File 15=c\Objects\Crates.c
+C File 16=c\SpriteData.c
 Archive File 1=lib\tilemap.a
 Archive File 2=lib\extgraph.a
 Header File 1=h\Worms.h
@@ -85,7 +86,7 @@ Header File 13=h\Draw.h
 Header File 14=h\Crates.h
 Header File 15=h\CharacterController.h
 Header File 16=h\Camera.h
-Header File 17=c\SpriteData.c
+Header File 17=h\SpriteData.h
 Header File 18=lib\extgraph.h
 Header File 18 Folder=Lib
 Header File 19=lib\tilemap.h

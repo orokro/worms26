@@ -14,6 +14,8 @@ extern unsigned long healthMasks[16][18];
 
 // draw function prototypes
 
+extern char worldToScreen(short *x, short *y);
+
 /**
  * Draws the cake loading screen
  *
