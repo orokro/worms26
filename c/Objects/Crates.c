@@ -1,4 +1,6 @@
 #include "Main.h"
+#include "PhysCol.h"
+#include "Worms.h"
 
 /*
 	Crates

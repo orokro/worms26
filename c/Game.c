@@ -2,6 +2,7 @@
 // Created 11/12/2017; 4:26:32 PM
 
 #include "Main.h"
+#include "Worms.h"
 
 /*
 	Game
@@ -214,15 +215,15 @@ void gameUpdates();
 	
 	Each state has a State_enter, State_update, and State_exit method. Yay, state-machines!
 */
-#include "WormSelect.c"
-#include "Turn.c"
-#include "WeaponSelect.c"
-#include "Pause.c"
-#include "Cursor.c"
-#include "TurnEnd.c"
-#include "Death.c"
-#include "AfterTurn.c"
-#include "GameOver.c"
+#include "States/WormSelect.c"
+#include "States/Turn.c"
+#include "States/WeaponSelect.c"
+#include "States/Pause.c"
+#include "States/Cursor.c"
+#include "States/TurnEnd.c"
+#include "States/Death.c"
+#include "States/AfterTurn.c"
+#include "States/GameOver.c"
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------

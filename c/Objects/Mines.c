@@ -1,4 +1,5 @@
 #include "Main.h"
+#include "PhysCol.h"
 
 /*
 	Mines

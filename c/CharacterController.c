@@ -2,6 +2,8 @@
 // Created 11/22/2017; 2:56:22 AM
 
 #include "Main.h"
+#include "PhysCol.h"
+#include "Worms.h"
 
 /*
 	CharacterController
