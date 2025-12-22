@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 // Configuration
-const INPUT_FILE = 'Game/SpriteData.c';
+// UPDATED: Points to the new C directory
+const INPUT_FILE = 'c/SpriteData.c';
 const OUTPUT_DIR = 'SpriteBitmaps';
 
 // Ensure output directory exists
@@ -12,38 +13,46 @@ if (!fs.existsSync(OUTPUT_DIR)) {
 
 // Helper: Create a BMP buffer
 function createBMP(width, height, data) {
+    // BMP rows must be padded to multiples of 4 bytes
     const rowSize = Math.ceil((width * 3) / 4) * 4;
     const fileSize = 54 + rowSize * height;
     const buffer = Buffer.alloc(fileSize);
 
+    // BMP Header
     buffer.write('BM', 0);
     buffer.writeUInt32LE(fileSize, 2);
-    buffer.writeUInt32LE(54, 10);
-    buffer.writeUInt32LE(40, 14);
+    buffer.writeUInt32LE(54, 10); // Data offset
+    buffer.writeUInt32LE(40, 14); // Header size
     buffer.writeInt32LE(width, 18);
-    buffer.writeInt32LE(-height, 22);
-    buffer.writeUInt16LE(1, 26);
-    buffer.writeUInt16LE(24, 28);
+    buffer.writeInt32LE(-height, 22); // Negative height = Top-down
+    buffer.writeUInt16LE(1, 26); // Planes
+    buffer.writeUInt16LE(24, 28); // Bits per pixel
     
     let offset = 54;
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
+            // Logic: 1 = Black, 0 = White (Inverse of typical brightness)
+            // This matches the logic in generate_sprites_c.js
             const isBlack = data[y][x] === 1;
             const color = isBlack ? 0x00 : 0xFF;
+            
+            // BGR format
             buffer.writeUInt8(color, offset + x * 3 + 0);
             buffer.writeUInt8(color, offset + x * 3 + 1);
             buffer.writeUInt8(color, offset + x * 3 + 2);
         }
-        offset += rowSize;
-        offset -= rowSize;
+        
+        // Handle Row Padding
         offset += (width * 3);
         const padding = rowSize - (width * 3);
-        for(let p=0; p<padding; p++) buffer.writeUInt8(0, offset++);
+        for(let p=0; p<padding; p++) {
+            buffer.writeUInt8(0, offset++);
+        }
     }
     return buffer;
 }
 
-// Helper: Get width based on type
+// Helper: Get width based on C type
 function getWidthFromType(type) {
     if (type.includes('char')) return 8;
     if (type.includes('short')) return 16;
@@ -54,7 +63,7 @@ function getWidthFromType(type) {
 // Helper: Extract data from binary strings
 function parseBinaryBlock(text, width) {
     const pixels = [];
-    // Remove comments
+    // Remove comments (// ...)
     const cleanText = text.replace(/\/\/.*$/gm, '');
     // Match 0b followed by 0s and 1s
     const matches = cleanText.match(/0b[01]+/g);
@@ -63,7 +72,7 @@ function parseBinaryBlock(text, width) {
         matches.forEach(binStr => {
             // Remove '0b' prefix
             let bits = binStr.substring(2);
-            // Pad or Trim to width
+            // Pad or Trim to width to be safe
             bits = bits.padStart(width, '0').slice(-width);
             pixels.push(bits.split('').map(Number));
         });
@@ -72,6 +81,10 @@ function parseBinaryBlock(text, width) {
 }
 
 try {
+    if (!fs.existsSync(INPUT_FILE)) {
+        throw new Error(`Input file not found: ${INPUT_FILE}`);
+    }
+
     console.log(`Reading ${INPUT_FILE}...`);
     let content = fs.readFileSync(INPUT_FILE, 'utf8');
 
@@ -79,7 +92,7 @@ try {
     content = content.replace(/\u00A0/g, ' ').replace(/[^\x00-\x7F]/g, ' ');
 
     // 2. Regex to find the START of a declaration
-    // UPDATED: Made "static" optional using (?:static\s+)?
+    // UPDATED: Handles 'const', optional 'static', and various array sizes like [][11] or []
     const startRegex = /(?:static\s+)?(?:const\s+)?(unsigned\s+(?:char|short|long))\s+([a-zA-Z0-9_]+)[^=]*=\s*\{/g;
 
     let match;
@@ -114,10 +127,10 @@ try {
         if (bodyStartIndex !== -1 && bodyEndIndex !== -1) {
             const fullBody = content.substring(bodyStartIndex, bodyEndIndex);
             
-            // Check for 2D array
+            // Check for 2D array (contains nested braces)
             const innerContent = fullBody.substring(1, fullBody.length - 1);
             if (innerContent.includes('{')) {
-                // 2D Array Logic
+                // --- 2D Array Logic (Animations) ---
                 let subSpriteIndex = 0;
                 let subOpen = 0;
                 let subStart = -1;
@@ -142,7 +155,7 @@ try {
                     }
                 }
             } else {
-                // 1D Array Logic
+                // --- 1D Array Logic (Single Image) ---
                 const pixels = parseBinaryBlock(fullBody, width);
                 if (pixels.length > 0) {
                     const filename = `${name}.bmp`;
