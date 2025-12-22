@@ -538,8 +538,13 @@ void Worm_drawAll()
                     }
                 } // end HUD
                 
+                
+                
             } // end if on screen
         } // end if active
+        
+        // check if we're the current worm and we need to draw weapons or anything
+        
     } // next i
 }
 

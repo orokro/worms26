@@ -222,7 +222,7 @@ char Game_turn = 0;
 char Game_currentWeaponSelected = -1;
 
 // the bit masked list of properties this weapon has
-unsigned int Game_currentWeaponProperties = 0;
+unsigned long Game_currentWeaponProperties = 0;
 
 // the charge of the current weapon (if it has charge)
 unsigned short Game_currentWeaponCharge = 0;

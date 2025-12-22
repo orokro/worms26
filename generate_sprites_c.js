@@ -154,6 +154,10 @@ try {
             }
 
             const innerLen = blocks[0].length;
+            const count = blocks.length;
+
+            // Generate Define Name: spr_weapons -> NUM_WEAPONS
+            const defineName = "NUM_" + name.replace(/^spr_/i, '').toUpperCase();
 
             // --- C Output ---
             cOutput += `const ${arrayType} ${name}[][${innerLen}] = { // ${innerLen} tall\n`;
@@ -168,9 +172,10 @@ try {
             cOutput += `};\n\n`;
 
             // --- H Output ---
-            hOutput += `extern const ${arrayType} ${name}[][${innerLen}];\n`;
+            hOutput += `#define ${defineName} ${count}\n`;
+            hOutput += `extern const ${arrayType} ${name}[][${innerLen}];\n\n`;
 
-            console.log(`Generated 2D array: ${name}`);
+            console.log(`Generated 2D array: ${name} (Count: ${count})`);
 
         } else {
             // Handle Single Array
@@ -194,7 +199,7 @@ try {
             cOutput += `};\n\n`;
 
             // --- H Output ---
-            hOutput += `extern const ${cType} ${name}[];\n`;
+            hOutput += `extern const ${cType} ${name}[];\n\n`;
 
             console.log(`Generated array: ${name}`);
         }

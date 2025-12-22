@@ -33,8 +33,11 @@
 #define usesRaycast				0b00000000000000010000000000000000	// true if the requires firing uses raycasting instead of spawning objects
 #define holdsSelf				0b00000000000000100000000000000000	// true if the weapon should use it's menu sprite in the worms hand
 #define holdsLauncher			0b00000000000001000000000000000000	// true if the weapon should use the generic rocket launcher when equiped
-#define holdsCustom				0b00000000000100000000000000000000  // true if there needs to be custom switch logic for what the worm should hold
-
+#define holdsCustom				0b00000000000010000000000000000000  // true if there needs to be custom switch logic for what the worm should hold
+#define usesAirStrike			0b00000000000100000000000000000000  // weapons that spawn groups of things in the sky
+#define usesRoutine 			0b00000000001000000000000000000000  // true if the weapon needs custom per-frame logic	
+#define isMeta 					0b00000000010000000000000000000000  // true if the weapon needs custom per-frame logic	
+#define isDroppable 			0b00000000100000000000000000000000  // true if the weapon needs custom per-frame logic	
 
 /*
   enumerate our list of weapons, with matching index positions as described in the array above
@@ -88,7 +91,7 @@ extern char Weapon_aimPosList[10][2];
 	Below is an array of 16 bit shorts we will use to bitwise store the properties of
 	each weapon type, so we can optimize the weapon routines to reuse code
 */
-extern unsigned int Weapon_props[72];
+extern unsigned long Weapon_props[72];
 
 
 // weapons function prototypes

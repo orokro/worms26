@@ -247,162 +247,231 @@ char Weapon_aimPosList[10][2] = {
 	
 	This way, I can avoid the OPs and save space. For debug, it will remain.
 */
-unsigned int Weapon_props[72] = {
+unsigned long Weapon_props[72] = {
     // row 1
         // jetpack
         0,
+
         // bazooka
-        usesAim | usesCharge | usesPhysics | usesWind | usesDetonateOnImpact,
-        // grenade
-        usesAim | usesCharge | usesPhysics | usesWind | usesFuse,
-        // shotgun
-        usesAim | multiUse,
-        // firepunch
+        usesAim | usesCharge | usesPhysics | usesWind | usesDetonateOnImpact | holdsLauncher,
+        
+		// grenade
+        usesAim | usesCharge | usesPhysics | usesWind | usesFuse | holdsSelf | spawnsSelf,
+        
+		// shotgun
+        usesAim | multiUse | holdsSelf | usesRaycast,
+        
+		// firepunch
         isMele,
-        // dynamite
-        spawnsSelf | usesPhysics,
-        // air strike
-        usesCursor,
-        // blow torch
+        
+		// dynamite
+        spawnsSelf | usesPhysics | holdsSelf | isDroppable,
+        
+		// air strike
+        usesCursor | usesAirStrike,
+        
+		// blow torch
         0,
-        // ninja rope
+        
+		// ninja rope
         0,
-        // super banana bomb
-        usesAim | usesCharge | usesPhysics | usesController | isCluster | spawnsSelf,
-        // petrol bomb
-        usesAim | usesCharge | usesPhysics | usesDetonateOnImpact,
-        // mad cows
-        spawnsSelf | usesFuse | usesController | isAnimal | usesPhysics,
-        // skip turn
-        0,
+        
+		// super banana bomb
+        usesAim | usesCharge | usesPhysics | usesController | isCluster | spawnsSelf | holdsSelf,
+        
+		// petrol bomb
+        usesAim | usesCharge | usesPhysics | usesDetonateOnImpact | holdsSelf | spawnsSelf,
+        
+		// mad cows
+        spawnsSelf | usesFuse | usesController | isAnimal | usesPhysics | holdsSelf,
+        
+		// skip turn
+        isMeta,
     
     // row 2
         // low gravity
-        0,
-        // homing missle
-        usesAim | usesCharge | usesPhysics | usesHoming | usesDetonateOnImpact,
-        // cluster bomb
-        usesAim | usesCharge | usesPhysics | usesWind | isCluster,
-        // hand gun
-        usesAim,
-        // dragonball
+        isMeta,
+        
+		// homing missile
+        usesAim | usesCharge | usesPhysics | usesHoming | usesDetonateOnImpact | holdsLauncher,
+        
+		// cluster bomb
+        usesAim | usesCharge | usesPhysics | usesWind | isCluster | holdsSelf | spawnsSelf,
+        
+		// hand gun
+        usesAim | holdsSelf | usesRaycast | usesRoutine,
+        
+		// dragon ball
         isMele,
-        // mine
-        usesFuse | spawnsSelf,
-        // napalm strike
-        usesCursor,
-        // pneumatic drill
+        
+		// mine
+        usesFuse | spawnsSelf | holdsSelf | isDroppable,
+        
+		// napalm strike
+        usesCursor | usesAirStrike,
+        
+		// pneumatic drill
         0,
-        // bunjee
-        0,
-        // holy hand grenade
-        usesAim | usesCharge | usesPhysics,
-        // skunk
-        spawnsSelf | isAnimal | usesPhysics,
-        // old lady
-        spawnsSelf | isAnimal | usesPhysics | usesFuse,
-        // surrender
-        0,
+        
+		// bungee
+        isMeta,
+        
+		// holy hand grenade
+        usesAim | usesCharge | usesPhysics | holdsSelf | spawnsSelf,
+        
+		// skunk
+        spawnsSelf | isAnimal | usesPhysics | holdsSelf,
+        
+		// old lady
+        spawnsSelf | isAnimal | usesPhysics | usesFuse | holdsSelf,
+        
+		// surrender
+        isMeta,
     
     // row 3
-        // fast walk
-        0,
-        // mortar
-        usesAim | usesPhysics | isCluster | usesDetonateOnImpact,
-        // banana bomb
-        usesAim | usesCharge | usesPhysics | usesFuse | spawnsSelf,
-        // uzi
-        usesAim,
-        // kamakaze
+        
+		// fast walk
+        isMeta,
+        
+		// mortar
+        usesAim | usesPhysics | isCluster | usesDetonateOnImpact | holdsLauncher,
+        
+		// banana bomb
+        usesAim | usesCharge | usesPhysics | usesFuse | spawnsSelf | holdsSelf,
+        
+		// uzi
+        usesAim | holdsSelf | usesRaycast | usesRoutine,
+        
+		// kamikaze
         isMele,
-        // sheep
-        spawnsSelf | usesPhysics | isAnimal,
-        // mail strike
-        usesCursor | usesPhysics | spawnsSelf,
-        // girder
+        
+		// sheep
+        spawnsSelf | usesPhysics | isAnimal | holdsSelf,
+        
+		// mail strike
+        usesCursor | usesPhysics | spawnsSelf | usesAirStrike,
+        
+		// girder
         0,
-        // parachute
-        0,
-        // flame thrower
-        usesAim,
-        // priceless ming vase
-        spawnsSelf | usesFuse | isCluster | usesPhysics,
-        // concrete donkey
-        usesCursor | usesPhysics | usesDetonateOnImpact,
-        // select worm
-        0,
+        
+		// parachute
+        isMeta,
+        
+		// flame thrower
+        usesAim | usesRoutine | holdsSelf,
+        
+		// priceless ming vase
+        spawnsSelf | usesFuse | isCluster | usesPhysics | holdsSelf | isDroppable,
+        
+		// concrete donkey
+        usesCursor | usesPhysics | usesDetonateOnImpact | usesAirStrike,
+        
+		// select worm
+        isMeta,
     
     // row 4
-        // laser sight
+        
+		// laser sight
+        isMeta | usesRaycast,
+        
+		// homing pigeon
+        usesAim | usesHoming | usesCursor | usesDetonateOnImpact | spawnsSelf | holdsSelf,
+        
+		// battle axe
+        isMele | holdsSelf,
+        
+		// minigun
+        usesAim | holdsSelf | usesRaycast | usesRoutine,
+        
+		// suicide bomber
         0,
-        // homing pigeon
-        usesAim | usesHoming | usesCursor | usesDetonateOnImpact | spawnsSelf,
-        // battle axe
-        isMele,
-        // minigun
-        usesAim,
-        // suicide bomber
-        0,
-        // supersheep
-        isAnimal | usesController | usesDetonateOnImpact,
-        // mine strike
-        usesCursor | spawnsSelf,
-        // baseball bat
-        isMele | usesAim,
-        // teleport
-        usesCursor,
-        // salvation army lady
-        spawnsSelf | usesPhysics | isAnimal | isCluster | usesController,
-        // sheep strike
-        usesCursor,
-        // indian nuclear nuclear test
-        0,
-        // freeze
-        0,
+        
+		// super sheep
+        isAnimal | usesController | usesDetonateOnImpact | holdsSelf | spawnsSelf,
+        
+		// mine strike
+        usesCursor | spawnsSelf | usesAirStrike,
+        
+		// baseball bat
+        isMele | usesAim | holdsSelf,
+        
+		// teleport
+        usesCursor | holdsSelf,
+        
+		// salvation army lady
+        spawnsSelf | usesPhysics | isAnimal | isCluster | usesController | holdsSelf,
+        
+		// sheep strike
+        usesCursor | usesAirStrike,
+        
+		// indian nuclear nuclear test
+        usesRoutine,
+        
+		// freeze
+        isMeta,
     
     // row 5
-        // invisibility
-        0,
-        // sheep launcher
-        usesAim | usesPhysics | usesController | usesDetonateOnImpact,
-        // earth quake
-        0,
-        // long bow
-        usesAim | usesPhysics | multiUse | usesDetonateOnImpact,
-        // prod
-        isMele,
-        // mole
+        
+		// invisibility
+        isMeta,
+        
+		// sheep launcher
+        usesAim | usesPhysics | usesController | usesDetonateOnImpact | holdsLauncher,
+        
+		// earth quake
+        usesRoutine,
+        
+		// long bow
+        usesAim | usesPhysics | multiUse | usesDetonateOnImpact | holdsSelf,
+        
+		// prod
+        isMele | holdsSelf,
+        
+		// mole
         spawnsSelf | usesPhysics | isAnimal | usesDetonateOnImpact | usesFuse,
-        // mole squadron
-        usesCursor | spawnsSelf,
-        // girder pack
+        
+		// mole squadron
+        usesCursor | spawnsSelf | usesAirStrike,
+        
+		// girder pack
         usesCursor | multiUse,
-        // scales of justice
-        0,
-        // MB bomb
-        usesCursor | usesDetonateOnImpact,
-        // carpet bomb
-        usesCursor | usesPhysics | usesDetonateOnImpact | spawnsSelf,
-        // armageddon
-        0,
-        // magic bullet
-        usesAim | usesHoming | usesDetonateOnImpact,
+        
+		// scales of justice
+        usesRoutine,
+        
+		// MB bomb
+        usesCursor | usesDetonateOnImpact | usesAirStrike,
+        
+		// carpet bomb
+        usesCursor | usesPhysics | usesDetonateOnImpact | spawnsSelf | usesAirStrike,
+        
+		// armageddon
+        usesRoutine,
+        
+		// magic bullet
+        usesCursor | usesAim | usesHoming | usesDetonateOnImpact | holdsLauncher,
     
     // sub weapons (ones you cannot directly use, but can spawn as a result of other weapons)
     
         // cluster/mortar/salvation army/ming vase fragment
         usesPhysics | usesDetonateOnImpact | usesFuse,
-        // napalm / fire
+        
+		// napalm / fire
         usesPhysics | usesDetonateOnImpact | usesFuse,
-        // skunk gas
+        
+		// skunk gas
         isParticle | usesFuse,
-        // comet from armageddon
+        
+		// comet from armageddon
         usesPhysics | usesDetonateOnImpact,
-        // mail from mail strike
+        
+		// mail from mail strike
         usesPhysics | usesDetonateOnImpact,
-        // carpet from carpet bomb
+        
+		// carpet from carpet bomb
         usesPhysics | usesDetonateOnImpact,
-        // fake mine
+        
+		// fake mine
         usesPhysics | usesFuse
 };
     

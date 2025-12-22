@@ -141,7 +141,7 @@ void Map_traceEdges()
 		// update loading screen
 		Draw_cake(320+(x*20), 620);
 		
-		// at the top of every colum, this is 0 since it's "outside" the top of the buffer
+		// at the top of every Colum, this is 0 since it's "outside" the top of the buffer
 		unsigned long lastValues = 0;
 		
 		// now we need to loop over the map and calculate dark-pixels for the maps edges

@@ -35,6 +35,28 @@ char GameRunning = TRUE;
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 
+// Efficient 16-bit bit reversal algorithm
+unsigned short reverseBits16(unsigned short n)
+{
+    n = ((n >> 1) & 0x5555) | ((n & 0x5555) << 1);
+    n = ((n >> 2) & 0x3333) | ((n & 0x3333) << 2);
+    n = ((n >> 4) & 0x0F0F) | ((n & 0x0F0F) << 4);
+    return (n >> 8) | (n << 8);
+}
+
+
+// Call this ONCE in _main()
+void GenerateFlippedSprites() {
+    int w, r;
+    for(w = 0; w < NUM_WEAPONS; w++) {
+        for(r = 0; r < 11; r++) {
+            // Read ROM, flip bits, write to RAM
+            spr_weapons_flipped[w][r] = reverseBits16(spr_weapons[w][r]);
+        }
+    }
+}
+
+
 
 // global method to calculate distance between two points
 // maybe I'll move this into a math file one day
@@ -85,6 +107,8 @@ void _main(void)
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	Game_changeMode(gameMode_WormSelect);
 
+	GenerateFlippedSprites();
+	
 	// done loading
 	Draw_cake(1,1);
 	

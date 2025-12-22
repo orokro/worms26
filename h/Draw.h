@@ -9,6 +9,8 @@
 #define DRAW_H
 
 
+#include "SpriteData.h"
+
 // Draw defines
 
 
@@ -17,6 +19,8 @@ extern unsigned long windSprites[3][3];
 extern unsigned long healthSprites[16][18];
 extern unsigned long healthMasks[16][18];
 
+// This is the new RAM buffer (takes 0 bytes of ROM space)
+extern unsigned short spr_weapons_flipped[NUM_WEAPONS][11];
 
 // draw function prototypes
 

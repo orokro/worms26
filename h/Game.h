@@ -43,7 +43,7 @@ extern char Game_cursorEndTurn;
 extern char Game_turn;
 extern short Game_weapInventory[5][13];
 extern char Game_currentWeaponSelected;
-extern unsigned int Game_currentWeaponProperties;
+extern unsigned long Game_currentWeaponProperties;
 extern unsigned short Game_currentWeaponCharge;
 extern char Game_aimAngle;
 

@@ -37,6 +37,8 @@ extern char Game_wormFlipStartDir; // Direction worm was facing when flip starte
 // these sprites will be generated at the begining of the each turn to match the current wind conditions
 unsigned long windSprites[3][3];
 
+// flipped weapon sprites
+unsigned short spr_weapons_flipped[NUM_WEAPONS][11];
 
 // static weapon names delcaration since we only really need the names in this draw method
 // using flat ID space
@@ -407,9 +409,9 @@ void drawWeaponDetails()
 			
 	// if the weapon requires aiming or charge
 	if(
-			(Game_currentWeaponProperties & usesAim)
-			||
-			(Game_currentWeaponProperties & usesCharge)
+		(Game_currentWeaponProperties & usesAim)
+		||
+		(Game_currentWeaponProperties & usesCharge)
 		)
 	{
 	
@@ -513,6 +515,18 @@ void drawWeaponDetails()
 		
 	}// end if uses aim or charge
 	
+	// if the weapon needs to draw itself being held, do that now
+	if(Game_currentWeaponProperties & holdsSelf){
+
+		const unsigned short* heldSprite = facingLeft ? spr_weapons_flipped[(short)Game_currentWeaponSelected] : spr_weapons[(short)Game_currentWeaponSelected];
+		short wx = facingLeft ? wormX-14 : wormX+2;
+		short wy = wormY-5;
+		worldToScreen(&wx, &wy);
+		
+		ClipSprite16_OR_R(wx, wy, 11, heldSprite, lightPlane);
+		ClipSprite16_OR_R(wx, wy, 11, heldSprite, darkPlane);
+					
+	}
 }
 
 
