@@ -815,10 +815,10 @@ void Draw_renderWeaponsMenu(char wx, char wy)
 	FontSetSys(1);
 	
 	// draw light and dark grid lines
-	for(x=1; x<14; x++)
-			GrayFastDrawLine2B(0+(x*12), 13, 0+(x*12), 73, 1, lightPlane, darkPlane);
-	for(y=1; y<6; y++)
-			GrayFastDrawHLine2B(1, 156, 12+(y*12), 1, lightPlane, darkPlane);
+	// for(x=1; x<14; x++)
+	//		GrayFastDrawLine2B(0+(x*12), 13, 0+(x*12), 73, 1, lightPlane, darkPlane);
+	//for(y=1; y<6; y++)
+	//		GrayFastDrawHLine2B(1, 156, 12+(y*12), 1, lightPlane, darkPlane);
 	
 	// draw black grid lies
 	// for(x=0; x<14; x++)
@@ -827,8 +827,8 @@ void Draw_renderWeaponsMenu(char wx, char wy)
 	// 	GrayFastDrawHLine2B(1, 156, 13+(y*12), 3, lightPlane, darkPlane);
 	
 	// draw drop shadow for weapons box (also to make it "centered" perfectly
-	GrayFastDrawHLine2B(2, 157, 74, 1, lightPlane, darkPlane);
-	GrayFastDrawLine2B(158, 14, 158, 74, 1, lightPlane, darkPlane);
+	// GrayFastDrawHLine2B(2, 157, 74, 1, lightPlane, darkPlane);
+	// GrayFastDrawLine2B(158, 14, 158, 74, 1, lightPlane, darkPlane);
 	
 	// get the weapon ID at this POS
 	short weapID = Game_weapInventory[(short)wy][(short)wx];

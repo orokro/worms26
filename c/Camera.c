@@ -4,7 +4,7 @@
 	
 	This is the file for the Camera system.
 	
-	In the previus version of Worms, the Camera system was rather rigid.
+	In the previous version of Worms, the Camera system was rather rigid.
 	
 	The Camera was either:
 		- locked on 1:1 with the worm in control
@@ -30,6 +30,10 @@
 #include "Main.h"
 #include "Camera.h"
 #include "Keys.h"
+#include "Explosions.h"
+#include "Weapons.h"
+#include "Worms.h"
+
 
 // the current position of the camera in game-world units
 short camX = 0;
@@ -37,6 +41,10 @@ short camY = 0;
 
 // boolean if Camera is focused on something
 char cameraIsFocused = FALSE;
+
+// true if camera is in auto-focus mode
+char cameraAutoFocus = TRUE;
+
 
 /* 
 	Pointers to shorts that the Camera should focus on.
@@ -65,6 +73,8 @@ short userY=0;
 // this is the main update function for the logic of the Camera.
 void Camera_update()
 {
+	short i;
+
 	// if this is the first frame that shift was pressed,
 	// we should reset the user offsets to whatever the camera's current
 	// position is..
@@ -100,7 +110,7 @@ void Camera_update()
 		// if the deltas aren't zero (camera perfectly focused) but our moves
 		// just make them 1 pixel in the correct direction. The camera always
 		// gets within 4 pixels of it's target (due to the 0.2f) so we will
-		// allways move one pixel at a time towards the target within 4 pixels
+		// always move one pixel at a time towards the target within 4 pixels
 		if(deltaX!=0 && moveX==0)
 			moveX = deltaX / abs(deltaX);
 		if(deltaY!=0 && moveY==0)
@@ -109,6 +119,35 @@ void Camera_update()
 		// move the camera pos:
 		camX += moveX;
 		camY += moveY;
+
+	}
+	
+	if(cameraAutoFocus==TRUE)
+	{
+		// if there's an active explosion, focus on that
+		if(Explosion_active)
+		{
+			// focus on the first active explosion
+			i = Explosion_getFirstActive();
+			cameraTargetX = &Explosion_x[i];
+			cameraTargetY = &Explosion_y[i];
+		}
+
+		// if there's an active weapon, focus on that
+		else if(Weapon_active)
+		{
+			// focus on the first active weapon
+			i = Weapons_getFirstActive();
+			cameraTargetX = &Weapon_x[i];
+			cameraTargetY = &Weapon_y[i];
+		}
+		// otherwise, focus on the current worm
+		else
+		{
+			cameraTargetX = &Worm_x[(short)Worm_currentWorm];
+			cameraTargetY = &Worm_y[(short)Worm_currentWorm];
+		}
+		cameraIsFocused = TRUE;
 	}
 	
 	//  make sure the camera is always within bounds
@@ -122,7 +161,13 @@ void Camera_update()
 		camX=320+100;
 }
 
-// tell the Camera to focus on a pair of X/Y coordinates
+
+/**
+ * Focuses the camera on the given target pointers, so it will follow them.
+ * 
+ * @param *targetX pointer to the x value to focus on
+ * @param *targetY pointer to the y value to focus on
+ */
 void Camera_focusOn(short *targetX, short *targetY)
 {
 	// save our target pointers
@@ -133,7 +178,26 @@ void Camera_focusOn(short *targetX, short *targetY)
 	cameraIsFocused=TRUE;
 }
 
-// stop the camera from focusing on anything in particular
+
+/**
+ * @brief Clears the camera focus if it's currently focused on the given target
+ * 
+ * @param targetX The target X pointer to check
+ * @param targetY The target Y pointer to check
+ */
+void Camera_clearIf(short *targetX, short *targetY)
+{
+	// only clear if the current target matches the given target
+	if(cameraIsFocused==TRUE && cameraTargetX==targetX && cameraTargetY==targetY)
+	{
+		Camera_clearFocus();
+	}
+}
+
+
+/**
+ * @brief stops the camera from focusing on anything in particular
+ */
 void Camera_clearFocus()
 {
 	// just disable the focus mode, no need to clear pointers

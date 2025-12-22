@@ -11,6 +11,8 @@
 // Weapons defines
 #define MAX_WEAPONS 10
 
+#import "PhysCol.h"
+
 
 // Define bitmask flags for the types of properties a weapon can have:
 // when spawning a weapon, these can be ORed together to create it's logic
@@ -116,8 +118,9 @@ extern unsigned long Weapon_props[72];
  * @param yVelocity the staarting y velocity of the weapon
  * @param time weapons use time for different purposes, (e.g. fuse length)
  * @param properties a char that is used as a bitmasked variable for the types of properties this weapon requires
+ * @returns a char that is the index of the weapon slot this weapon was spawned into, or -1 if no slot was available.
 */
-extern void Weapons_spawn(char, short, short, char, char, unsigned short);
+extern char Weapons_spawn(char, short, short, char, char, unsigned short);
 
 
 /**
@@ -145,5 +148,13 @@ extern void Weapons_fire(short charge);
 	Draws all the in-game, on-screen Weapon objects.
 */
 extern void Weapons_drawAll();
+
+
+/**
+ * @brief Returns the index of the first active weapon, or -1 if none are active
+ * 
+ * @return char index of first active weapon
+ */
+extern char Weapons_getFirstActive();
 
 #endif

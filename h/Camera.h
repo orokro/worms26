@@ -15,6 +15,8 @@
 extern short camX;
 extern short camY;
 
+// true if camera is in auto focus mode
+extern char cameraAutoFocus;
 
 // camera function prototypes
 
@@ -35,6 +37,15 @@ extern void Camera_update();
  * @param targetY a pointer to a short y variable for the Camera to track
 */
 extern void Camera_focusOn(short*, short*);
+
+
+/**
+ * @brief Clears the camera focus if it's currently focused on the given target
+ * 
+ * @param targetX The target X pointer to check
+ * @param targetY The target Y pointer to check
+ */
+extern void Camera_clearIf(short *targetX, short *targetY);
 
 
 /**

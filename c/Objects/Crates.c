@@ -435,7 +435,7 @@ void Crates_update()
 				// for the parachute crate, fall at a constant velocity,
 				// and half speed
 				if(i==parachuteCrate){
-					Physics_setVelocity(&Crate_physObj[i], 0, ((Game_timer%2==0) ? 1 : 0), FALSE);
+					Physics_setVelocity(&Crate_physObj[i], 0, ((Game_timer%2==0) ? 1 : 0), FALSE, TRUE);
 				}
 				
 				// do physics and collision for Crate

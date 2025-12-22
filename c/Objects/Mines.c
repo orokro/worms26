@@ -147,7 +147,7 @@ void Mines_spawnMines()
 		char i=0;
 		
 		// only spawn 6 mines, leaving 4 free slots for user placeable mines
-		for(i=0; i<6; i++)
+		for(i=0; i<3; i++)
 			spawnMine(i);
 	}
 }
@@ -172,11 +172,11 @@ void Mines_update()
 		}
 		if(Keys_keyDown(key2))
 		{
-			Physics_setVelocity(&Mine_physObj[testMine], -4, -7, FALSE);
+			Physics_setVelocity(&Mine_physObj[testMine], -4, -7, FALSE, TRUE);
 		}
 		if(Keys_keyDown(key3))
 		{
-			Physics_setVelocity(&Mine_physObj[testMine], 4, -7, FALSE);
+			Physics_setVelocity(&Mine_physObj[testMine], 4, -7, FALSE, TRUE);
 		}
 		if(Keys_keyDown(key5))
 		{

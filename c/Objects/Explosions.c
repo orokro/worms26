@@ -15,11 +15,12 @@
 */
 
 
-// incldues
+// includes
 #include "Main.h"
 #include "Explosions.h"
 #include "Map.h"
 #include "Draw.h"
+#include "Camera.h"
 
 
 // x/y positions of our Explosions
@@ -208,6 +209,7 @@ void updateExplosion(short index)
 	{
 		eraseMap(index);
 		Explosion_active &= ~((unsigned short)1<<(index));
+		Camera_clearIf(&Explosion_x[index], &Explosion_y[index]);
 	}
 		
 }
@@ -286,6 +288,9 @@ void Explosion_spawn(short x, short y, char size, char power, char hasFire)
 	Explosion_time[expIndex] = size;
 	Explosion_power[expIndex] = power;
 	
+	// focus on explosion
+	Camera_focusOn(&Explosion_x[expIndex], &Explosion_y[expIndex]);
+
 	// explosions wont have their "first frame" until next frame
 	Explosion_firstFrame &= ~((unsigned short)1<<(expIndex));
 	
@@ -307,7 +312,10 @@ void Explosion_update()
 	short i=0;
 	for(i=0; i<MAX_EXPLOSIONS; i++)
 		if(Explosion_active & (unsigned short)1<<i)
+		{
+			Camera_focusOn(&Explosion_x[i], &Explosion_y[i]);
 			updateExplosion(i);
+		}			
 }
 
 
@@ -346,3 +354,19 @@ void Explosion_drawAll()
 	
 }
 
+
+/**
+ * returns the index of the first active explosion, or -1 if none are active
+ * @return char index of first active explosion
+ */
+char Explosion_getFirstActive()
+{
+	short i;
+	for(i=0; i<MAX_EXPLOSIONS; i++)
+	{
+		if(Explosion_active & (unsigned short)1<<i)
+			return (char)i;
+	}
+	
+	return -1;
+}

@@ -119,6 +119,16 @@ static unsigned long spr_LandTexture[] = { // 32 tall
 
 
 
+char Map_isOOB(short x, short y)
+{
+	// out of bounds check
+	if(x<0 || x>=320 || y<-500 || y>=200)
+		return TRUE;
+		
+	return FALSE;
+}
+
+
 /**
  * trace the edges of the map with a black line
  */
@@ -569,6 +579,18 @@ void Map_draw()
 			// we want to draw lower on the screen... by how far the camera is beyond
 			screenTop = (camTop*-1);
 			
+			// [FIX] SAFETY CHECK: 
+            // If screenTop is > 99, the map starts below the screen.
+            // We must abort, otherwise (screenBottom - screenTop) will underflow 
+            // and crash the calculator with a massive height value.
+            if(screenTop > 99)
+                return;
+                
+            // [FIX] Abort if the map is completely below the screen (Height <= 0)
+	        // This handles camY <= -49 where screenTop >= 99
+	        if(screenTop >= screenBottom) 
+	            return;
+            
 			// we want to only copy pixels for the rest of the screen
 			screenBottom = 99;
 

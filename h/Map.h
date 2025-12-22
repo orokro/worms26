@@ -22,6 +22,9 @@ extern unsigned char mapTiles[640];
 
 // map function prototypes
 
+
+extern char Map_isOOB(short x, short y);
+
 /**
  * Outlines the edges of land in the light and dark map buffers
 */

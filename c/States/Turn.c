@@ -13,7 +13,7 @@
 */
 static void Turn_enter()
 {
-	
+	cameraAutoFocus = TRUE;
 }
 
 
@@ -57,4 +57,5 @@ static void Turn_exit()
 {
 	// note, this doesn't imply that the turn is over.
 	// just that we are switching to it
+	cameraAutoFocus = FALSE;
 }

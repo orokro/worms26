@@ -138,8 +138,9 @@ extern char Physics_apply(PhysObj*);
  * @param x the new x velocity
  * @param y the new y velocity
  * @param additive if set to TRUE the X/Y are added to the current velocity instead of replacing it.
+ * @param impact if set to TRUE, the velocity will be applied immediately, if not, it might skip frames to simulate smoother movement.
 */
-extern void Physics_setVelocity(PhysObj *obj, char x, char y, char additive);
+extern void Physics_setVelocity(PhysObj *obj, char x, char y, char additive, char impact);
 
 
 /**

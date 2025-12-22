@@ -27,7 +27,7 @@
  * @param down - how far down to test
  * @param left - how far left to test
  * @param right - how far right to test
- * @returns - the new Collider obejct
+ * @returns - the new Collider object
  */
 Collider new_Collider(unsigned char type, char up, char down, char left, char right)
 {
@@ -48,8 +48,8 @@ Collider new_Collider(unsigned char type, char up, char down, char left, char ri
  * @param *x - the x position
  * @param *y - the y position
  * @param *xVelo - the initial x velocity
- * @param *yVelo - the initial y valocity
- * @param bounciness - bouuncincess factory
+ * @param *yVelo - the initial y velocity
+ * @param bounciness - bounciness factory
  * @param smoothness - smoothness
  * @param objIndex
  * @param settled
@@ -118,12 +118,12 @@ unsigned char Collider_apply(Collider *col, short *x, short *y)
 		char movedRight = (col->type & COL_RIGHT) ? (Collide_test((*x)+col->r, *y, COL_RIGHT)) : 0;
 		
 		/*
-			unlike up and down colliders, neither can take prescendence.
+			unlike up and down colliders, neither can take precedence.
 			we don't want to push the object off the edges of the map, which can happen with a feedback
-			loop of collisions. If the left colider and right collider both hit something, instead
+			loop of collisions. If the left collider and right collider both hit something, instead
 			we want to push the item UP since both it's edges are "on ground"
 			
-			This might end up in some unrealistic behavoir, but its better than pushing the object to the
+			This might end up in some unrealistic behavior, but its better than pushing the object to the
 			far edges of the map.
 			
 			in this case, we will push the object up, and test again, until neither collider hits.
@@ -138,13 +138,13 @@ unsigned char Collider_apply(Collider *col, short *x, short *y)
 		{
 			// move until neither is colliding any more
 			// note that, the worst case scenario is that the worm is moved to the top of the map,
-			// in which case both colliders will definately return false, so this won't be an endless while
+			// in which case both colliders will definitely return false, so this won't be an endless while
 			while(movedLeft && movedRight)
 			{
 				// move the object up:
 				*y = *y - 1;
 				
-				// test again. No need for ternarys since the only way to get to this loop is if both are tested
+				// test again. No need for ternary since the only way to get to this loop is if both are tested
 				movedLeft = Collide_test(*x-col->l, *y, COL_LEFT);
 				movedRight = Collide_test(*x+col->r, *y, COL_RIGHT);
 			}
@@ -165,7 +165,7 @@ unsigned char Collider_apply(Collider *col, short *x, short *y)
 					
 				thus, no matter how you look at it, one will always be 0.
 				
-				if we add movedLeft and movedRight it will return the ammount to move the x
+				if we add movedLeft and movedRight it will return the amount to move the x
 				value left or right.
 				
 				if both movedLeft and movedRight were non zero, then the above while loop would have happened
@@ -197,7 +197,7 @@ char Physics_apply(PhysObj *obj)
 	short initX = *obj->x;
 	short initY = *obj->y;
 	
-	// if an object is too far below the water, it is perminently settled, and we dont
+	// if an object is too far below the water, it is permanently settled, and we dont
 	// need to do anything with it.
 	if(initY>250)
 	{
@@ -282,7 +282,7 @@ char Physics_apply(PhysObj *obj)
 	
 	/*
 		So, when objects move, sometimes their colliders can put them in a state
-		where they move every frame no matter once, thus never becomming settled.
+		where they move every frame no matter once, thus never becoming settled.
 		
 		Because they aren't really in-motion at this point, their velocities should
 		be very low, or 0.
@@ -294,7 +294,7 @@ char Physics_apply(PhysObj *obj)
 		sometimes move on every frame).
 		
 		If the velocity is small for 6 frames in a row, we will consider the object
-		to be settled. If the object truely was in motion, it's velocity would
+		to be settled. If the object truly was in motion, it's velocity would
 		never stay less than 2 for more than 6 frames, just due to gravity alone.
 	*/
 	if((abs(*obj->xVelo)>2 || abs(*obj->yVelo)>2) && moved)
@@ -329,13 +329,24 @@ char Physics_apply(PhysObj *obj)
 
 /**
  * sets or adds velocity to an object
- * @param *obj - phsysics object we're applying velocity to
+ * @param *obj - physics object we're applying velocity to
  * @param x - x velocity to add
- * @param y - y veleocity to add
- * @param additives - adds to existing velocity isntead of setting it
+ * @param y - y velocity to add
+ * @param additives - adds to existing velocity instead of setting it
+ * @param impact - if TRUE, applies the velocity immediately, if FALSE, may skip frames for smoother movement
  */
-void Physics_setVelocity(PhysObj *obj, char x, char y, char additive)
+void Physics_setVelocity(PhysObj *obj, char x, char y, char additive, char impact)
 {
+
+	static char skipFrame = 0;
+
+	// if not impact, we may skip frames for smoother movement
+	if(!impact)
+	{
+		skipFrame = (skipFrame+1)%2;
+		if(skipFrame%2==0)
+			return;
+	}
 
 	// add or set the velocity
 	if(additive)
@@ -348,7 +359,7 @@ void Physics_setVelocity(PhysObj *obj, char x, char y, char additive)
 		*obj->yVelo = y;
 	}
 	
-	// any object that had velocity added is definately "not" settled
+	// any object that had velocity added is definitely "not" settled
 	obj->staticFrames = 0;
 	*obj->settled &= ~((unsigned short)1<<(obj->index));
 }
@@ -396,7 +407,7 @@ short Collide_test(short x, short y, char dir)
 	
 	/*
 		move until a free pixel.
-	  worst case scenario is that the worm is put in an invalide state on the map
+	  worst case scenario is that the worm is put in an invalid state on the map
 	  and this function moves them all the way to the edge of the map.
 	  
 	  Map_testPoint WILL return false once OOB of the map.. so the worm
@@ -425,7 +436,7 @@ short Physics_checkExplosions(PhysObj *obj)
 	if(Explosion_firstFrame==0)
 		return 0;
 		
-	// calculate total damge from all possible explosions
+	// calculate total damage from all possible explosions
 	short totalDamage = 0;
 	short i=0;
 	for(i=0; i<MAX_EXPLOSIONS; i++)
@@ -455,7 +466,7 @@ short Physics_checkExplosions(PhysObj *obj)
 				pendingDamageRatio = 1.0f;
 			else if(d<largerRadius)
 			{
-				// subract the minimum radius from both:
+				// subtract the minimum radius from both:
 				float minD = d - radius;
 				float minL = largerRadius - radius;
 				
@@ -469,9 +480,9 @@ short Physics_checkExplosions(PhysObj *obj)
 				// total damage done so far
 				totalDamage += (short)(pendingDamageRatio*Explosion_power[i]);
 				
-				// calcualte the power to add in this direction:
+				// calculate the power to add in this direction:
 				// using size for "physical force" magnitude
-				float power = (pendingDamageRatio*Explosion_size[i]); 
+				float power = (pendingDamageRatio*Explosion_size[i])*2; 
 				
 				// FIX 2: Correct Vector Projection
 				// Previously (x/y) would cause division by zero or infinite force 
@@ -488,7 +499,7 @@ short Physics_checkExplosions(PhysObj *obj)
 					short yPow = (short)((dy / d) * power * kickScale);
 					
 					// apply velocity!
-					Physics_setVelocity(obj, xPow, yPow, TRUE);
+					Physics_setVelocity(obj, xPow, yPow, TRUE, TRUE);
 				}
 			}
 		}// end if first frame
@@ -497,5 +508,3 @@ short Physics_checkExplosions(PhysObj *obj)
 	// return the total damage that was done
 	return totalDamage;
 }
-
-

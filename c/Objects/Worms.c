@@ -195,6 +195,11 @@ void Worm_update()
 		if(Worm_active & wormMask)
 		{
 			
+			//if(i == Worm_currentWorm){
+			//	Camera_focusOn(&Worm_x[i], &Worm_y[i]);
+				
+			//}
+			
 			// check all explosions if they are near-by and damaging this worm
 			short damage = Physics_checkExplosions(&Worm_physObj[i]);
 			if(damage!=0)

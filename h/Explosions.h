@@ -48,4 +48,12 @@ extern void Explosion_update();
  */
 extern void Explosion_drawAll();
 
+
+/**
+ * @brief Returns the index of the first active explosion, or -1 if none are active
+ * 
+ * @return char index of first active explosion
+ */
+extern char Explosion_getFirstActive();
+
 #endif

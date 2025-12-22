@@ -15,9 +15,9 @@
 	- gravity
 	- .. and more
 	
-	Each weapon has it's on unique behavoir, however, some behavoirs can be
-	shared between many weapons. For example, hand grenands and cluster bombs
-	both are fired and have physics. When the cluser explodes it will create
+	Each weapon has it's on unique behavior, however, some behaviors can be
+	shared between many weapons. For example, hand grenades and cluster bombs
+	both are fired and have physics. When the cluster explodes it will create
 	more bomb particles, where as the grenade just explodes.
 	
 	Physics for grenades, therefore, is shared between the two.
@@ -78,6 +78,7 @@
 #include "Explosions.h"
 #include "SpriteData.h"
 #include "Draw.h"
+#include "Map.h"
 
 
 // the type of the weapon!
@@ -102,13 +103,13 @@ unsigned short Weapon_active = 0;
 unsigned short Weapon_settled=0;
 
 // because Weapons are defined BEFORE the Game header file, we cant access the cursor target
-// thus, whever a target is set, it will have to update our weapon target
+// thus, wherever a target is set, it will have to update our weapon target
 short Weapon_targetX = 0;
 short Weapon_targetY = 0;
 
 /*
 	Below is a list of relative points to a worm to use for rotating the target
-	crosshairs around the worm, when aiming a weapon.
+	crosshair around the worm, when aiming a weapon.
 */
 char Weapon_aimPosList[10][2] = {
 	{0,  13},
@@ -133,7 +134,7 @@ char Weapon_aimPosList[10][2] = {
 	But there's a catch:
 	
 	These weapon properties serve two purposes, but are all stored in the same place
-	to conserve memory, and reduce redundency.
+	to conserve memory, and reduce redundancy.
 	
 	However, it's important to note that these properties apply in two different
 	situations, so you can read them easily.
@@ -142,16 +143,16 @@ char Weapon_aimPosList[10][2] = {
 			use that weapon in a way that is appropriate.
 			
 			For instance, if they choose a weapon that is aimable it must show the cross
-			hairs and read Up/Down input to aim the crosshairs.
+			hairs and read Up/Down input to aim the crosshair.
 			
-			Not all aimable weapons are charable and fire at a fixed rate of speed, but
+			Not all aimable weapons are chargable and fire at a fixed rate of speed, but
 			some aimable weapons do require charging.
 			
-			These types of paramters apply to the worms character controller for activating
+			These types of parameters apply to the worms character controller for activating
 			the weapon.
 			
 	2)	In game / "on screen" weapons are slightly different. They are instances in our
-			arrays above. That is, they have physics objects (sometimes), colliders (somtimes),
+			arrays above. That is, they have physics objects (sometimes), colliders (sometimes),
 			the draw sprites, and etc.
 			
 			Weapons as OBJECTS in Game, also reference these properties.
@@ -167,12 +168,12 @@ char Weapon_aimPosList[10][2] = {
 	(aka an in game object), will have: usesPhysics, usesWind, usesDetonateOnImpact.
 	
 	Okay, so now you understand that these weapon properties apply both to their
-	method of activation, as well as their ingame presence once they are spawned
+	method of activation, as well as their in game presence once they are spawned
 	as a weapon object.
 	
 	But There's two things that might be a tad bit confusing:
 	
-		1) 	Some weapons NEVER have an ingame presence
+		1) 	Some weapons NEVER have an in game presence
 				
 				For instance, the Sheep Strike usesCursor to pick a place to spawn,
 				and this part of the Character Controller.
@@ -192,7 +193,7 @@ char Weapon_aimPosList[10][2] = {
 				In this case, they are a weapon that is an in-game object ONLY.
 				
 	Other things to keep in mind:
-		- properties 0-64 are the ingame usable weapons by the user
+		- properties 0-64 are the in game usable weapons by the user
 		- properties 65-68 are the sub-weapons that can only be spawned by other weapons.
 		
 	To recap:
@@ -201,9 +202,9 @@ char Weapon_aimPosList[10][2] = {
 		- some weapon properties/IDs are never directly used by the character controller
 		- properties for both character controlling and in game objects are stored in the same unsigned short
 	
-	For refrence, the following flags show which apply to character controlling and which to game objects
+	For reference, the following flags show which apply to character controlling and which to game objects
 		
-		Charactar Controller:
+		Character Controller:
 			- usesAim: 				the user needs to aim this weapon
 			- usesCharge: 		the user needs to charge this weapon
 			- usesCursor: 		the user must use the cursor to pick a target
@@ -223,7 +224,7 @@ char Weapon_aimPosList[10][2] = {
 			- usesController: the weapon can change based on user input, even after it's spawned (e.g. super sheep)
 			- isAnimal:				the sheep, cows, old lady, etc. will use similar routines
 			- isCluster:			should it spawn clusters weapons upon detonation?	
-			- isParticle:			no collision or typical physics, but should float up and cause damamge
+			- isParticle:			no collision or typical physics, but should float up and cause damage
 	
 	Below some of the properties are set to '0'
 	This doesn't mean that the weapon doesn't do anything, but it will default to the
@@ -233,7 +234,7 @@ char Weapon_aimPosList[10][2] = {
 	or during the character controller. Many weapons used this feature.
 	
 	I decided it was easier to assume most weapons will use this, and check all weapons against
-	custom logic per frame. This freed a slot in the 16 bits for usesDetonteOnImpact, which is
+	custom logic per frame. This freed a slot in the 16 bits for usesDetonateOnImpact, which is
 	more specifically and reusable between weapon types.
 	
 	NOTE:
@@ -249,7 +250,7 @@ char Weapon_aimPosList[10][2] = {
 */
 unsigned long Weapon_props[72] = {
     // row 1
-        // jetpack
+        // jet pack
         0,
 
         // bazooka
@@ -261,7 +262,7 @@ unsigned long Weapon_props[72] = {
 		// shotgun
         usesAim | multiUse | holdsSelf | usesRaycast,
         
-		// firepunch
+		// fire punch
         isMele,
         
 		// dynamite
@@ -529,15 +530,36 @@ void detonateWeapon(short index)
 
 
 
-// spawns a weapon... simple enough
-void Weapons_spawn(char type, short x, short y, char xVelocity, char yVelocity, unsigned short time)
+/**
+ * This spawns a Weapon item in the game.
+ *
+ * Weapons have a type, position, initial x/y velocity, time and various properties.
+ * The properties are bitmasked onto a char.
+ * Valid Properties:
+   - usesVelocity
+ * - usesGravity
+ * - usesTimer
+ * - usesHoming
+ * - usesMovement
+ * - usesController
+ *
+ * @param type a char storing the type of weapon item this is, as defined by the enumeration Weapons.
+ * @param x the starting x position of the weapon
+ * @param y the starting y position of the weapon
+ * @param xVelocity the starting x velocity of the weapon
+ * @param yVelocity the starting y velocity of the weapon
+ * @param time weapons use time for different purposes, (e.g. fuse length)
+ * @param properties a char that is used as a bitmarked variable for the types of properties this weapon requires
+ * @returns a char that is the index of the weapon slot this weapon was spawned into, or -1 if no slot was available.
+*/
+char Weapons_spawn(char type, short x, short y, char xVelocity, char yVelocity, unsigned short time)
 {
 	// find a free slot, if none are available, we are unable to spawn this weapon (should never happen)
 	short slot = findFreeWeaponSlot();
 	if(slot==-1)
-		return;
+		return slot;
 
-	// set it's varius properties
+	// set it's various properties
 	Weapon_type[slot] = type;
 	Weapon_x[slot] = x;
 	Weapon_y[slot] = y;
@@ -556,13 +578,13 @@ void Weapons_spawn(char type, short x, short y, char xVelocity, char yVelocity, 
 		Weapon_physObj[slot] = new_PhysObj(&Weapon_x[slot], &Weapon_y[slot], &Weapon_xVelo[slot], &Weapon_yVelo[slot], 0.7f, 1.0f, (char)slot, &Weapon_settled, coll);
 		
 		// set initial velocity
-		Physics_setVelocity(&Weapon_physObj[slot], xVelocity, yVelocity, FALSE);
+		Physics_setVelocity(&Weapon_physObj[slot], xVelocity, yVelocity, FALSE, TRUE);
 		
 		// focus the camera on this weapon (hack for now until better camera logic is made)
 		Camera_focusOn(&Weapon_x[(short)slot], &Weapon_y[(short)slot]);
-	
 	}
-	
+
+	return slot;	
 }
 
 
@@ -653,6 +675,14 @@ void Weapons_update()
 		// check if it's active
 		if(Weapon_active & (unsigned short)((unsigned short)1<<(i)))
 		{
+
+			// if weapon is out of bounds deactivate it
+			if(Map_isOOB(Weapon_x[(short)i], Weapon_y[(short)i]))
+			{
+				Weapon_active &= ~(unsigned short)((unsigned short)1<<(i));
+				continue;				
+			}
+			
 			// if the weapon uses a timer, decrement and possibly detonate
 			/*
 			  note: since all weapons can technically "timeout"
@@ -673,7 +703,7 @@ void Weapons_update()
 			// if a weapon uses homing, adjust it's velocity appropriately
 			if(Weapon_props[(short)Weapon_type[i]] & usesHoming)
 			{
-				// adjust the weapons velocity towards it's target, less agressively as it gets closer
+				// adjust the weapons velocity towards it's target, less aggressively as it gets closer
 				short deltaX = (short)((Weapon_targetX - Weapon_x[i])*0.25f);
 				short deltaY = (short)((Weapon_targetY - Weapon_y[i])*0.25f);
 				
@@ -681,7 +711,7 @@ void Weapons_update()
 				Weapon_yVelo[i] += deltaY;
 			}//end if uses homing
 			
-			// if a weapon needs user input to controll it, read that now:
+			// if a weapon needs user input to control it, read that now:
 			if(Weapon_props[(short)Weapon_type[i]] & usesController)
 			{
 				// TO-DO: implement controller logic	
@@ -693,24 +723,22 @@ void Weapons_update()
 				// if the Weapon is considered "settled" no need for physics
 				if(!(Weapon_settled & (unsigned short)1<<(i)))
 				{
-					// add gravity to Weapon
-					Weapon_yVelo[i]++;
-					
-					// if it uses wind, lets add it now:
-					if(Weapon_props[(short)Weapon_type[i]] & usesWind)
-						Weapon_xVelo[i] += (Game_wind/10);
+					// apply wind and gravity
+					Physics_setVelocity(&Weapon_physObj[i], (Game_wind/10), 1, TRUE, FALSE);
 					
 					// do physics and collision for Weapon
 					Physics_apply(&Weapon_physObj[i]);
 					
-					// if the weapon has detonate on impact, we should denoate if it hit something..
+					// if the weapon has detonate on impact, we should detonate if it hit something..
 					if((Weapon_props[(short)Weapon_type[i]] & usesDetonateOnImpact) && (Weapon_physObj[i].col.collisions>0))
 						detonateWeapon(i);
 						
 				}// end if uses physics
 						
-			}// end if unsettled (needs Physics)			
+			}// end if unsettled (needs Physics)
+
 		}// endif active
+
 	}// next i
 }
 
@@ -765,7 +793,6 @@ void Weapons_fire(short charge)
 	
 	// finally spawn the weapon with it's params!
 	Weapons_spawn(Game_currentWeaponSelected, spawnX, spawnY, veloX, veloY, fuseLength);
-	
 }
 
 
@@ -805,4 +832,22 @@ void Weapons_drawAll()
 		}// end if active
 
 	}// next i
+}
+
+
+/**
+ * returns the index of the first active explosion, or -1 if none are active
+ * 
+ * @return char index of first active explosion
+ */
+char Weapons_getFirstActive()
+{
+	short i;
+	for(i=0; i<MAX_WEAPONS; i++)
+	{
+		if(Weapon_active & (unsigned short)((unsigned short)1<<(i)))
+			return i;
+	}
+	
+	return -1;
 }
