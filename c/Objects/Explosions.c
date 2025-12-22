@@ -7,7 +7,7 @@
 	About Explosions:
 	
 	They will have a max-radius size
-	They will have a damage amount, more powerful explosions will propell worms further
+	They will have a damage amount, more powerful explosions will propel worms further
 	They can optionally spawn fire-particles
 	
 	C Source File
@@ -65,17 +65,7 @@ unsigned short Explosion_firstFrame = 0;
 void eraseMap(short index)
 {
 	/*
-		To erase from the map, we will set up a virtual screen and use tigcc's eclispe
-		methods to draw the explosions circle.
-		
-		Then we will do a pass over the virtual screen and map buffers and use bitwise
-		operations to remove the circle area from our map buffers (light and dark)
-		
-		NOTE: we cannot use the DrawClipEllipse method on our map buffers because their
-		byte order is different than a screen buffer, for fast drawing routines.
-		
-		Finally we will draw a couple more outer layers of circles and loop over the
-		buffers again to add a burned edge to the map.
+		Fixed version with bounds checking and memory safety.
 	*/
 	
 	// get explosion details
@@ -96,6 +86,10 @@ void eraseMap(short index)
 	// make virtual screen the size of our explosion
 	void *virtual=malloc(LCD_SIZE);
 	
+	// SAFETY CHECK: If malloc fails (out of memory), abort to prevent crash
+	if(virtual == NULL)
+		return;
+	
 	// set it to be our virtual screen
 	PortSet(virtual, 239, 127);
 	
@@ -103,53 +97,50 @@ void eraseMap(short index)
 	ClrScr();
 	
 	// convert the x and y position of the explosion to be relative to our mini buffer
-	x -= (lCol*32);
-	y -= t;
+	// We save these to separate vars so we can reuse them for the second pass
+	short drawX = x - (lCol*32);
+	short drawY = y - t;
 	
 	// loop to draw a bunch of eclipses
 	short e;
 	for(e=1; e<s; e++)
 	{
-		DrawClipEllipse(x, y, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
-		DrawClipEllipse(x, y-1, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
+		DrawClipEllipse(drawX, drawY, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
+		DrawClipEllipse(drawX, drawY-1, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
 	}
 	
-	/*
-		now, our map buffers are arranged such that every 200 unsigned longs are a
-		vertical column, with 10 columns for a 320 wide map.
-		
-		The buffer will be arranged such that every colWidth unsinged longs will
-		be a row.
-		
-		Thus we will loop over the proper unsigned longs in both the map and our
-		explosion buffer and copy remove pixels from our map buffer.
-	
-	*/
-	
-	// referencs to our map buffers, and explosion buffer
+	// references to our map buffers, and explosion buffer
 	unsigned long *light = (unsigned long*)mapLight;
 	unsigned long *dark = (unsigned long*)mapDark;
 	
+	// CLAMPING: Ensure we only loop over valid map bounds
+	short startRow = (t < 0) ? 0 : t;
+	short endRow = (b > 199) ? 199 : b;
+	short startCol = (lCol < 0) ? 0 : lCol;
+	short endCol = (rCol > 9) ? 9 : rCol;
+
 	// loop over our rows
 	short row, col;
-	for(row=t; row<=b; row++)
+	for(row=startRow; row<=endRow; row++)
 	{
 		// loop over the columns in this row:
-		for(col=lCol; col<=rCol; col++)
+		for(col=startCol; col<=endCol; col++)
 		{
 			// read the unsigned long from both our light and dark buffers
 			unsigned long ulLight = light[(col*200)+row];
 			unsigned long ulDark = dark[(col*200)+row];
 			
 			// move to the offset in the virtual:
+			// Note: We use the original 't' and 'lCol' for the virtual buffer math
+			// to ensure we align with the drawn ellipse, even if we are skipping map rows/cols
 			unsigned short *expShort = (unsigned short*)virtual;
 			unsigned long *expLong = (unsigned long*)(expShort+((15*(row-t))+((col-lCol)*2)));
 			
-			// read the corresponding unsinged long from the explosion buffer,
-			// and flip its bits, so that the exposion is 0 and everything else is 1
+			// read the corresponding unsigned long from the explosion buffer,
+			// and flip its bits, so that the explosion is 0 and everything else is 1
 			unsigned long ulExp = ~(*expLong);
-			
-			// if we AND the inverted exposlion bits, the map should be erased:
+
+			// if we AND the inverted explosion bits, the map should be erased:
 			light[(col*200)+row] = ulLight & ulExp;
 			dark[(col*200)+row] = ulDark & ulExp;
 			
@@ -159,18 +150,18 @@ void eraseMap(short index)
 	// loop to draw extra eclipses to make a burned edge of the map
 	for(e=s; e<s+2; e++)
 	{
-		DrawClipEllipse(x, y, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
-		DrawClipEllipse(x, y-1, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
+		DrawClipEllipse(drawX, drawY, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
+		DrawClipEllipse(drawX, drawY-1, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
 	}
 	
 	// now we do another pass to add the burned edge
-	for(row=t; row<=b; row++)
+	for(row=startRow; row<=endRow; row++)
 	{
 		// loop over the columns in this row:
-		for(col=lCol; col<=rCol; col++)
+		for(col=startCol; col<=endCol; col++)
 		{
 			// read the unsigned long from both our light and dark buffers,
-			// and combine them into one that represents the map at that lixe
+			// and combine them into one that represents the map at that line
 			unsigned long ulLight = light[(col*200)+row];
 			unsigned long ulDark = dark[(col*200)+row];
 			unsigned long ulMap = ulLight | ulDark;
@@ -179,10 +170,10 @@ void eraseMap(short index)
 			unsigned short *expShort = (unsigned short*)virtual;
 			unsigned long *expLong = (unsigned long*)(expShort+((15*(row-t))+((col-lCol)*2)));
 			
-			// read the corresponding unsinged long from the explosion buffer
+			// read the corresponding unsigned long from the explosion buffer
 			unsigned long ulExp = (*expLong);
 			
-			// if we AND the exposlion bits, the map should add 1s to both layers where
+			// if we AND the explosion bits, the map should add 1s to both layers where
 			// it overlays, but it will erase the map elsewhere so we can OR the layer back on
 			light[(col*200)+row] = (ulMap & ulExp) | ulLight;
 			dark[(col*200)+row] = (ulMap & ulExp) | ulDark;
@@ -212,7 +203,7 @@ void updateExplosion(short index)
 	// decrease it's time
 	Explosion_time[index]-=3;
 
-	// if the explosions time is up, destory the map and set it inactive
+	// if the explosions time is up, destroy the map and set it inactive
 	if(Explosion_time[index]<0)
 	{
 		eraseMap(index);
@@ -225,7 +216,7 @@ void updateExplosion(short index)
 /**
  * Spawns fire at an explosion point, for explosions that use fire.
  *
- * Explosions, such as those from OilDrums or Molotov Cocktains spawn fire particles
+ * Explosions, such as those from OilDrums or Molotov Cocktails spawn fire particles
 */
 void spawnFire()
 {
@@ -275,7 +266,7 @@ void Explosion_spawn(short x, short y, char size, char power, char hasFire)
 		further-more we will just set it's frame to 1 (last frame) and call it's update manually
 		this will have the affect of erasing the map the full-size and damaging worms or items
 	  
-	 	Essentially, we will be skipping it's inbetween animation frames, and skipping to the last
+	 	Essentially, we will be skipping it's in between animation frames, and skipping to the last
 	 	frame of our explosion before we replace it!
 	*/
 	if(expIndex==-1)
@@ -325,7 +316,7 @@ void Explosion_update()
 */
 void Explosion_drawAll()
 {
-	// if no explosion is active, just gtfo
+	// if no explosion is active, just GTFO
 	if(Explosion_active==0)
 		return;
 		
