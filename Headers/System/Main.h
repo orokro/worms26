@@ -783,7 +783,7 @@ extern char Weapon_aimPosList[10][2];
 	Below is an array of 16 bit shorts we will use to bitwise store the properties of
 	each weapon type, so we can optimize the weapon routines to reuse code
 */
-extern unsigned short Weapon_props[69];
+extern unsigned short Weapon_props[72];
 
 // weapons function prototypes
 

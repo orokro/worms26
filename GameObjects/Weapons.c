@@ -236,7 +236,7 @@ char Weapon_aimPosList[10][2] = {
 	
 	This way, I can avoid the OPs and save space. For debug, it will remain.
 */
-unsigned short Weapon_props[69] = {
+unsigned short Weapon_props[72] = {
     // row 1
         // jetpack
         0,
