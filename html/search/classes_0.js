@@ -1,6 +1,0 @@
-var searchData=
-[
-  ['ttarchive_5fentry',['TTARCHIVE_ENTRY',['../struct_t_t_a_r_c_h_i_v_e___e_n_t_r_y.html',1,'']]],
-  ['ttarchive_5fheader',['TTARCHIVE_HEADER',['../struct_t_t_a_r_c_h_i_v_e___h_e_a_d_e_r.html',1,'']]],
-  ['ttunpack_5fheader',['TTUNPACK_HEADER',['../struct_t_t_u_n_p_a_c_k___h_e_a_d_e_r.html',1,'']]]
-];
