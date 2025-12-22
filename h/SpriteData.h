@@ -40,6 +40,8 @@ extern const unsigned char spr_CursorFill[];
 
 extern const unsigned char spr_CursorOutline[];
 
+extern const unsigned char spr_launcher[];
+
 extern const unsigned short spr_Leaf[];
 
 extern const unsigned char spr_Mine_Dark[];
@@ -54,6 +56,10 @@ extern const unsigned short spr_Oil_Dark[];
 extern const unsigned short spr_Oil_Light[];
 
 extern const unsigned short spr_Parachute[];
+
+extern const unsigned char spr_remote[];
+
+extern const unsigned char spr_remoteMask[];
 
 extern const unsigned short spr_selectedWeaponBox[];
 
@@ -79,7 +85,7 @@ extern const unsigned long spr_Water_Mask[];
 
 extern const unsigned short spr_weaponSelect[];
 
-#define NUM_WEAPONS 65
+#define NUM_WEAPONS 72
 extern const unsigned short spr_weapons[][11];
 
 extern const unsigned long spr_WindMeter[];
@@ -133,6 +139,10 @@ extern const unsigned short spr_WormLeft_Outline[];
 extern const unsigned short spr_WormRight_Mask[];
 
 extern const unsigned short spr_WormRight_Outline[];
+
+extern const unsigned char spr_XSpot[];
+
+extern const unsigned char spr_XSpotMask[];
 
 
 #endif /* SPRITEDATA_H */

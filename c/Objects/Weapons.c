@@ -286,7 +286,7 @@ unsigned long Weapon_props[72] = {
         spawnsSelf | usesFuse | usesController | isAnimal | usesPhysics | holdsSelf,
         
 		// skip turn
-        isMeta,
+        isMeta | holdsSelf,
     
     // row 2
         // low gravity
@@ -311,7 +311,7 @@ unsigned long Weapon_props[72] = {
         usesCursor | usesAirStrike,
         
 		// pneumatic drill
-        0,
+        holdsCustom,
         
 		// bungee
         isMeta,
@@ -326,7 +326,7 @@ unsigned long Weapon_props[72] = {
         spawnsSelf | isAnimal | usesPhysics | usesFuse | holdsSelf,
         
 		// surrender
-        isMeta,
+        isMeta | holdsSelf,
     
     // row 3
         
@@ -367,7 +367,7 @@ unsigned long Weapon_props[72] = {
         usesCursor | usesPhysics | usesDetonateOnImpact | usesAirStrike,
         
 		// select worm
-        isMeta,
+        isMeta | holdsSelf,
     
     // row 4
         
@@ -405,10 +405,10 @@ unsigned long Weapon_props[72] = {
         usesCursor | usesAirStrike,
         
 		// indian nuclear nuclear test
-        usesRoutine,
+        usesRoutine | holdsCustom,
         
 		// freeze
-        isMeta,
+        isMeta | holdsSelf,
     
     // row 5
         
@@ -419,7 +419,7 @@ unsigned long Weapon_props[72] = {
         usesAim | usesPhysics | usesController | usesDetonateOnImpact | holdsLauncher,
         
 		// earth quake
-        usesRoutine,
+        usesRoutine | holdsCustom,
         
 		// long bow
         usesAim | usesPhysics | multiUse | usesDetonateOnImpact | holdsSelf,
@@ -437,7 +437,7 @@ unsigned long Weapon_props[72] = {
         usesCursor | multiUse,
         
 		// scales of justice
-        usesRoutine,
+        usesRoutine | holdsSelf,
         
 		// MB bomb
         usesCursor | usesDetonateOnImpact | usesAirStrike,
@@ -446,7 +446,7 @@ unsigned long Weapon_props[72] = {
         usesCursor | usesPhysics | usesDetonateOnImpact | spawnsSelf | usesAirStrike,
         
 		// armageddon
-        usesRoutine,
+        usesRoutine | holdsCustom,
         
 		// magic bullet
         usesCursor | usesAim | usesHoming | usesDetonateOnImpact | holdsLauncher,
@@ -454,25 +454,25 @@ unsigned long Weapon_props[72] = {
     // sub weapons (ones you cannot directly use, but can spawn as a result of other weapons)
     
         // cluster/mortar/salvation army/ming vase fragment
-        usesPhysics | usesDetonateOnImpact | usesFuse,
+        usesPhysics | usesDetonateOnImpact | usesFuse | spawnsSelf,
         
 		// napalm / fire
-        usesPhysics | usesDetonateOnImpact | usesFuse,
+        usesPhysics | usesDetonateOnImpact | usesFuse | spawnsSelf,
         
 		// skunk gas
-        isParticle | usesFuse,
+        isParticle | usesFuse | spawnsSelf,
         
 		// comet from armageddon
-        usesPhysics | usesDetonateOnImpact,
+        usesPhysics | usesDetonateOnImpact | spawnsSelf,
         
 		// mail from mail strike
-        usesPhysics | usesDetonateOnImpact,
+        usesPhysics | usesDetonateOnImpact | spawnsSelf,
         
 		// carpet from carpet bomb
-        usesPhysics | usesDetonateOnImpact,
+        usesPhysics | usesDetonateOnImpact | spawnsSelf,
         
 		// fake mine
-        usesPhysics | usesFuse
+        usesPhysics | usesFuse | spawnsSelf
 };
     
     
@@ -577,6 +577,7 @@ void Weapons_setTarget(short x, short y)
 	Weapon_targetY = y;
 }
 
+
 /**
  * update all weapons in game every frame
  */
@@ -665,6 +666,13 @@ void Weapons_fire(short charge)
 	// spawn weapon at center of worm
 	short spawnX = Worm_x[(short)Worm_currentWorm];
 	short spawnY = Worm_y[(short)Worm_currentWorm];
+	
+	// adjust spawn point if it's a droppable
+	if(Game_currentWeaponProperties & isDroppable)
+	{
+		spawnY += 5;
+		spawnX += (facingLeft) ? -14 : 2;
+	}
 	
 	// default spawn direction unless weapon uses aim or charge (charge is implied with aim)
 	short dirX=0;

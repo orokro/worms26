@@ -516,7 +516,8 @@ void drawWeaponDetails()
 	}// end if uses aim or charge
 	
 	// if the weapon needs to draw itself being held, do that now
-	if(Game_currentWeaponProperties & holdsSelf){
+	if(Game_currentWeaponProperties & holdsSelf)
+	{
 
 		const unsigned short* heldSprite = facingLeft ? spr_weapons_flipped[(short)Game_currentWeaponSelected] : spr_weapons[(short)Game_currentWeaponSelected];
 		short wx = facingLeft ? wormX-14 : wormX+2;
@@ -525,6 +526,27 @@ void drawWeaponDetails()
 		
 		ClipSprite16_OR_R(wx, wy, 11, heldSprite, lightPlane);
 		ClipSprite16_OR_R(wx, wy, 11, heldSprite, darkPlane);
+					
+	}else if(Game_currentWeaponProperties & holdsLauncher)
+	{
+
+		short wx = facingLeft ? wormX-2 : wormX-2;
+		short wy = wormY-1;
+		worldToScreen(&wx, &wy);
+		
+		GrayClipSprite8_AND_R(wx, wy, 5, spr_launcher, spr_launcher, lightPlane, darkPlane);
+		GrayClipSprite8_OR_R(wx, wy, 5, spr_launcher, spr_launcher, lightPlane, darkPlane);
+					
+	}else if((Game_currentWeaponProperties & usesCursor) && (Game_currentWeaponState & targetPicked)==0)
+	{
+
+		short wx = facingLeft ? wormX-2 : wormX-2;
+		short wy = wormY-2;
+		worldToScreen(&wx, &wy);
+		
+		// CORRECT: 6 arguments
+		GrayClipSprite8_AND_R(wx, wy, 8, spr_remoteMask, spr_remoteMask, lightPlane, darkPlane);
+		GrayClipSprite8_OR_R(wx, wy, 8, spr_remote, spr_remote, lightPlane, darkPlane);
 					
 	}
 }

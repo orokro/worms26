@@ -21,6 +21,9 @@ enum GameModes {
 	gameMode_GameOver
 };
 
+// flags for current weapon state
+#define targetPicked 0b00000001
+
 // game globals
 extern char Game_mode;
 extern char Game_previousMode;
@@ -44,6 +47,7 @@ extern char Game_turn;
 extern short Game_weapInventory[5][13];
 extern char Game_currentWeaponSelected;
 extern unsigned long Game_currentWeaponProperties;
+extern unsigned short Game_currentWeaponState;
 extern unsigned short Game_currentWeaponCharge;
 extern char Game_aimAngle;
 

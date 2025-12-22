@@ -121,7 +121,30 @@ void wormWalk()
 */
 void wormWeapon()
 {
-	
+	// if the weapon has usesCursor and we haven't picked a spot yet, we should goto cursor mode
+	if((Game_currentWeaponProperties & usesCursor) && (Game_currentWeaponState & targetPicked)==0)
+	{
+		// if action was pressed, place the x-mark
+		if(Keys_keyUp(keyAction))
+		{
+			Game_changeMode(gameMode_Cursor);
+		}
+		
+		// no need to continue
+		return;
+
+	// otherwise, if a target WAS picked, use escape to cancel instead of pause
+	}else{
+		if(Keys_keyUp(keyEscape))
+		{
+			// un-set target picked
+			Game_currentWeaponState &= ~targetPicked;
+			
+			// no need to continue
+			return;
+		}
+	}
+
 	// if uses aim we should let them press up and down
 	if(Game_currentWeaponProperties & usesAim)
 	{
