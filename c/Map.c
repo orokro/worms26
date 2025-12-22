@@ -1,19 +1,9 @@
-// C Source File
-// Created 11/11/2017; 11:34:08 PM
-
-#include "Main.h"
-#include "Map.h"
-#include "Draw.h"
-#include "Worms.h"
-#include "OilDrums.h"
-#include "Mines.h"
-
 /*
-	Map
-	---
+	Map.c
+	-----
 	
-	This file defines our Map system.
-
+	Handles all the logic for the Map including drawing it
+	
 	The map will be made up of a large buffer, four times the screen size
 	(double vertical and double horizontal)
 
@@ -21,7 +11,20 @@
 	the land will be removed from this buffer.
 
 	Pixels in this buffer will be tested for collision.
+	
+	C Source File
+	Created 11/11/2017; 11:34:08 PM
 */
+
+// includes
+#include "Main.h"
+#include "Map.h"
+#include "Draw.h"
+#include "Worms.h"
+#include "OilDrums.h"
+#include "Mines.h"
+
+
 
 /*
 	Below, these array values will store eligible spawn points on the map.
@@ -57,6 +60,7 @@
 short spawnPoint_x[53];
 short spawnPoint_y[53];
 
+
 /*
 	the map will keep an array of 620 tiles, (32 x 20) which represent
 	10x10 tiles on the map. When mines or crates spawn or move, they
@@ -67,10 +71,12 @@ short spawnPoint_y[53];
 */
 unsigned char mapTiles[640];
 	
+	
 // when a spawn point is requested of the map, it will find one
 // and update these global map variables:
 short Map_lastRequestedSpawnX=0;
 short Map_lastRequestedSpawnY=0;
+
 
 // the texture pattern for the land
 static unsigned long spr_LandTexture[] = { // 32 tall
@@ -113,7 +119,9 @@ static unsigned long spr_LandTexture[] = { // 32 tall
 
 
 
-// trace the edges of the map with a black line
+/**
+ * trace the edges of the map with a black line
+ */
 void Map_traceEdges()
 {
 	// iteration vars
@@ -182,7 +190,10 @@ void Map_traceEdges()
 	}// next y
 }
 
-// builds a random map for the worms to play on
+
+/**
+ * builds a random map for the worms to play on
+ */
 void Map_makeMap()
 {
 	// gotta be random!
@@ -405,7 +416,12 @@ void Map_makeMap()
 	
 }
 
-// tests a point on the map
+
+/**
+ * tests a point on the map
+ * 
+ * @returns TRUE or FALSE if a point is on land
+ */
 char Map_testPoint(short x, short y)
 {
 	// our X/Y position will be passed in world space.
@@ -448,7 +464,9 @@ char Map_testPoint(short x, short y)
 
 
 
-// find a free point to spawn something, that doesn't overlap with something else existing
+/**
+ * find a free point to spawn something, that doesn't overlap with something else existing
+ */
 void Map_getSpawnPoint()
 {
 	// loop over our available spawn points till we find one:

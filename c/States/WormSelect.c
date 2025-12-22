@@ -1,7 +1,12 @@
+/*
+	WormSelect.c
+	------------
+	
+	This file is a snippet that is included raw in Game.c
+	
+	This handles the WormSelect statemachine specifc code.
+*/
 
-/* ----------------------------------------------------------------------------------------
-	 WORM SELECT +++ WORM SELECT +++ WORM SELECT +++ WORM SELECT +++ WORM SELECT +++ WORM SEL
-   ---------------------------------------------------------------------------------------- */
 
 /**
  * Renders the 3 sprites used to animate the window meter, for the current wind level.
@@ -76,6 +81,7 @@ static void nextWorm()
 	}// wend
 }
 
+
 /**
 	Called on the first-frame when the Games state machine is set to WormSelect mode.
 */
@@ -110,6 +116,7 @@ static void WormSelect_enter()
 	
 }
 
+
 /**
 	Called every frame that the Games state machine is in WormSelect mode.
 */
@@ -131,6 +138,7 @@ static void WormSelect_update()
 	// the game
 	Draw_renderGame();
 }
+
 
 /**
 	Called on the first-frame when the Games state machine leaves WormSelect mode.

@@ -1,21 +1,34 @@
-// C Source File
-// Created 11/22/2017; 2:28:07 AM
+/*
+	PhysCol.c
+	---------
+	
+	This is part of our new physics / collision system.
+	
+	At the time of writing, not all objects use this, but we have it available.
+	
+	This provides Physics Objects structs that have common physics properties
+	
+	C Source File
+	Created 11/22/2017; 2:28:07 AM
+*/
 
+// includes
 #include "Main.h"
 #include "PhysCol.h"
 #include "Map.h"
 #include "Explosions.h"
 
-/*
-	PhysCol
-	-------
-	
-	This file provides a bunch of generic physics and collision methods,
-	which many objects will be using
-	
-*/
 
-// makes a new collider
+/**
+ * Makes a new collider object
+ *
+ * @param type - the type of collider
+ * @param up - how far up to test
+ * @param down - how far down to test
+ * @param left - how far left to test
+ * @param right - how far right to test
+ * @returns - the new Collider obejct
+ */
 Collider new_Collider(unsigned char type, char up, char down, char left, char right)
 {
 	Collider new;
@@ -28,7 +41,21 @@ Collider new_Collider(unsigned char type, char up, char down, char left, char ri
 	return new; 
 }
 
-// makes a new PhysObj
+
+/**
+ * makes a new PhysObj
+ *
+ * @param *x - the x position
+ * @param *y - the y position
+ * @param *xVelo - the initial x velocity
+ * @param *yVelo - the initial y valocity
+ * @param bounciness - bouuncincess factory
+ * @param smoothness - smoothness
+ * @param objIndex
+ * @param settled
+ * @param c - the collider to test for
+ * @returns - the new PhysObj
+ */	
 PhysObj new_PhysObj(short *x, short *y, char *xVelo, char *yVelo, float bounciness, float smoothness, char objIndex, unsigned short *settled, Collider c)
 {
 	PhysObj new;
@@ -47,6 +74,7 @@ PhysObj new_PhysObj(short *x, short *y, char *xVelo, char *yVelo, float bouncine
 	new.staticFrames = 0;
 	return new;
 }
+
 
 /**
  * Applys an objects collider. This can mutate it's X/Y.
@@ -295,6 +323,7 @@ char Physics_apply(PhysObj *obj)
 	return moved;
 }
 
+
 // sets or adds velocity to an object
 void Physics_setVelocity(PhysObj *obj, char x, char y, char additive)
 {
@@ -314,6 +343,7 @@ void Physics_setVelocity(PhysObj *obj, char x, char y, char additive)
 	obj->staticFrames = 0;
 	*obj->settled &= ~((unsigned short)1<<(obj->index));
 }
+
 
 // tests for a collision and moves the opposite direction until a free pixel is found, if it did collide
 short Collide_test(short x, short y, char dir)

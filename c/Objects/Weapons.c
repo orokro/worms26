@@ -1,19 +1,6 @@
-// C Source File
-// Created 11/13/2017; 10:31:52 PM
-
-#include "Main.h"
-#include "Camera.h"
-#include "Game.h"
-#include "PhysCol.h"
-#include "Worms.h"
-#include "Weapons.h"
-#include "Explosions.h"
-#include "SpriteData.h"
-#include "Draw.h"
-
 /*
-	Weapons
-	-------
+	Weapons.c
+	---------
 	
 	This defines Weapons on the map.
 	
@@ -69,14 +56,29 @@
 	spawnsSelf
 	multiUse
 
-	WJetPack,				WBazooka, 				WGrenade, 	WShotGun,		WFirePunch, 	WDynamite, 		WAirStrike, 		WBlowTorch, 	WNinjaRope, 			WSuperBanana, 		WPetrolBomb, 	WMadCows, 				WSkipGo,
-	WLowGravity, 		WHomingMissle, 		WCluster,		WHandGUn,		WDragonBall,	WMine, 				WNapalmStrike, 	WDrill, 			WBungeeCord,			WHolyHandGrenade,	WSkunk, 			WOldLady, 				WSurrender,
-	WFastWalk,			WMortar, 					WBanana, 		WUzi,				WKakamaze, 		WSheep, 			WMailStrike, 		WGirder, 			WParachute,				WFlameThrower, 		WMingVase, 		WConcreteDonkey, 	WSelectWorm,
-	WLaserSight, 		WHomingPigeon, 		WAxe,				WMiniGun,		WSuicideBomb, WSuperSheep, 	WMineStrike, 		WBaseballBat, WTeleport, 				WSalvationArmy, 	WSheepStrike, WNuclearTest, 		WFreeze,
-	WInvisibility,	WSheepLauncher,		WQuake, 		WLongbow,  	WProd, 				WMole, 				WMoleSquadron, 	WGirderPack, 	WScalesOfJustice,	WMBBomb, 					WCarpetBomb, 	WArmageddon, 			WMagicBullet,
-	WFragment, 			WFire,						WSkunkGas,	WComet
+	WJetPack,			WBazooka, 			WGrenade, 	WShotGun,		WFirePunch, 	WDynamite, 		WAirStrike, 		WBlowTorch, 	WNinjaRope, 		WSuperBanana, 		WPetrolBomb, 	WMadCows, 			WSkipGo,
+	WLowGravity, 		WHomingMissle, 		WCluster,	WHandGUn,		WDragonBall,	WMine, 			WNapalmStrike, 		WDrill, 		WBungeeCord,		WHolyHandGrenade,	WSkunk, 		WOldLady, 			WSurrender,
+	WFastWalk,			WMortar, 			WBanana, 	WUzi,			WKakamaze, 		WSheep, 		WMailStrike, 		WGirder, 		WParachute,			WFlameThrower, 		WMingVase, 		WConcreteDonkey, 	WSelectWorm,
+	WLaserSight, 		WHomingPigeon, 		WAxe,		WMiniGun,		WSuicideBomb, 	WSuperSheep, 	WMineStrike, 		WBaseballBat, 	WTeleport, 			WSalvationArmy, 	WSheepStrike, 	WNuclearTest, 		WFreeze,
+	WInvisibility,		WSheepLauncher,		WQuake, 	WLongbow,  		WProd, 			WMole, 			WMoleSquadron, 		WGirderPack, 	WScalesOfJustice,	WMBBomb, 			WCarpetBomb, 	WArmageddon, 		WMagicBullet,
+	WFragment, 			WFire,				WSkunkGas,	WComet
 
+	C Source File
+	Created 11/13/2017; 10:31:52 PM
 */
+
+
+// includes
+#include "Main.h"
+#include "Camera.h"
+#include "Game.h"
+#include "PhysCol.h"
+#include "Worms.h"
+#include "Weapons.h"
+#include "Explosions.h"
+#include "SpriteData.h"
+#include "Draw.h"
+
 
 // the type of the weapon!
 char Weapon_type[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -120,6 +122,7 @@ char Weapon_aimPosList[10][2] = {
 	{13, 2},
 	{13, 0}
 };
+
 
 /*
 	So below is seems straight forward:
@@ -409,7 +412,9 @@ unsigned short Weapon_props[72] = {
 
 
 
-// finds a free weapon slot available
+/**
+ * finds a free weapon slot available
+ */
 short findFreeWeaponSlot()
 {
 	// loop till an active slot is found:
@@ -423,6 +428,7 @@ short findFreeWeaponSlot()
 	// nothing found, return error code
 	return -1;
 }
+
 
 /**
  * detonates the weapon of index
@@ -490,14 +496,21 @@ void Weapons_spawn(char type, short x, short y, char xVelocity, char yVelocity, 
 	
 }
 
-// sets the target for our weapon
+
+/**
+ * sets the target for our weapon
+ * @param x - the x target pos
+ * @param y - the y target pos
+ */
 void Weapons_setTarget(short x, short y)
 {
 	Weapon_targetX = x;
 	Weapon_targetY = y;
 }
 
-// update all weapons in game every frame
+/**
+ * update all weapons in game every frame
+ */
 void Weapons_update()
 {
 	// loop over all weapons, and update the active ones as necessary
@@ -569,7 +582,10 @@ void Weapons_update()
 }
 
 
-// when user fires a weapon
+/**
+ * when user fires a weapon
+ * @param charge - the charge amount fired with
+ */
 void Weapons_fire(short charge)
 {
 	// before we spawn the weapon we need to make sure we have all the params ready to go...

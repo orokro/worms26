@@ -1,6 +1,12 @@
-/* ----------------------------------------------------------------------------------------
-	 TURN +++ TURN +++ TURN +++ TURN +++ TURN +++ TURN +++ TURN +++ TURN +++ TURN +++ TURN ++
-   ---------------------------------------------------------------------------------------- */
+/*
+	Turn.c
+	------
+	
+	This file is a snippet that is included raw in Game.c
+	
+	This handles the Turn state machine specifc code.
+*/
+
 
 /**
 	Called on the first-frame when the Games state machine is set to Turn mode.
@@ -9,6 +15,7 @@ static void Turn_enter()
 {
 	
 }
+
 
 /**
 	Called every frame that the Games state machine is in Turn mode.
@@ -41,6 +48,7 @@ static void Turn_update()
 		return;
 	}
 }
+
 
 /**
 	Called on the first-frame when the Games state machine leaves Turn mode.

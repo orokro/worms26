@@ -1,18 +1,6 @@
-// C Source File
-// Created 11/12/2017; 8:33:19 PM
-
-#include "Main.h"
-#include "Match.h"
-#include "OilDrums.h"
-#include "PhysCol.h"
-#include "Map.h"
-#include "Explosions.h"
-#include "SpriteData.h"
-#include "Draw.h"
-
 /*
-	OilDrums
-	--------
+	OilDrums.c
+	----------
 	
 	This defines our OilDrums on the map.
 	
@@ -24,7 +12,22 @@
 	OilDrums have no velocity - they can fall down, but not moved otherwise.
 	
 	OilDrums have health, and will explode if drained of health.
+	
+	C Source File
+	Created 11/12/2017; 8:33:19 PM
 */
+
+
+// includes
+#include "Main.h"
+#include "Match.h"
+#include "OilDrums.h"
+#include "PhysCol.h"
+#include "Map.h"
+#include "Explosions.h"
+#include "SpriteData.h"
+#include "Draw.h"
+
 
 // x/y positions of our oil drums
 short OilDrum_x[MAX_OILDRUMS] = {0, 0, 0, 0, 0, 0};
@@ -45,8 +48,8 @@ char OilDrum_xVelo[MAX_OILDRUMS] = {0, 0, 0, 0, 0, 0};
 char OilDrum_yVelo[MAX_OILDRUMS] = {0, 0, 0, 0, 0, 0};
 
 
-// --------------------------------------------------------------------------------------------------------------------------------------
 
+// --------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -80,7 +83,9 @@ void spawnDrum(short index)
 
 
 
-// spawns OilDrums on the map, if they're enabled
+/**
+ * spawns OilDrums on the map, if they're enabled
+ */
 void OilDrums_spawnDrums()
 {
 	if(Match_oilDrumsEnabled)
@@ -92,7 +97,9 @@ void OilDrums_spawnDrums()
 }
 
 
-// main update for oil drums
+/**
+ * main update for oil drums
+ */
 void OilDrums_update()
 {
 	// if any of the active OilDrums have less than 0 health, create an explosion

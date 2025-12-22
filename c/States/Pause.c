@@ -1,9 +1,16 @@
-/* ----------------------------------------------------------------------------------------
-	 PAUSE +++ PAUSE +++ PAUSE +++ PAUSE +++ PAUSE +++ PAUSE +++ PAUSE +++ PAUSE +++ PAUSE ++
-   ---------------------------------------------------------------------------------------- */
+/*
+	Pause.c
+	-------
+	
+	This file is a snippet that is included raw in Game.c
+	
+	This handles the Pause state machine specifc code.
+*/
+
 
 // there will be TWO menu items for the pause menu: continue (0) and exit (1)
 char pauseMenuItem=0;
+
 
 /**
 	Called on the first-frame when the Games state machine is set to Pause mode.
@@ -13,6 +20,7 @@ static void Pause_enter()
 	// always make sure its on continue when we enter
 	pauseMenuItem=0;
 }
+
 
 /**
 	Called every frame that the Games state machine is in Pause mode.
@@ -61,6 +69,7 @@ static void Pause_update()
 	Draw_renderPauseMenu(pauseMenuItem);
 
 }
+
 
 /**
 	Called on the first-frame when the Games state machine leaves Pause mode.

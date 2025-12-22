@@ -1,6 +1,12 @@
-/* ----------------------------------------------------------------------------------------
-	 AFTER TURN +++ AFTER TURN +++ AFTER TURN +++ AFTER TURN +++ AFTER TURN +++ AFTER TURN ++
-   ---------------------------------------------------------------------------------------- */
+/*
+	AfterTurn.c
+	-----------
+	
+	This file is a snippet that is included raw in Game.c
+	
+	This handles the AfterTurn state machine specifc code.
+*/
+
 
 // after a crate is settled, wait a bit before moving the camera
 char afterCrateFrames;
@@ -8,6 +14,7 @@ char afterCrateFrames;
 // during the after turn in sudden death, the water will take 10 frames to advance 10 pixels...
 // this is that timer
 char waterLevelTimer=0;
+
 
 /**
 	Called on the first-frame when the Games state machine is set to AfterTurn mode.
@@ -23,6 +30,7 @@ static void AfterTurn_enter()
 		afterCrateFrames=10;
 	
 }
+
 
 /**
 	Called every frame that the Games state machine is in AfterTurn mode.
@@ -53,6 +61,7 @@ static void AfterTurn_update()
 	}
 		
 }
+
 
 /**
 	Called on the first-frame when the Games state machine leaves AfterTurn mode.

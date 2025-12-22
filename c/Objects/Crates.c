@@ -1,3 +1,22 @@
+/*
+	Crates.c
+	--------
+	
+	This defines Crates on the map.
+	
+	About Crates:
+	
+	There are 3 types of crates: weapon, health, tool.
+	Each type can either be enabled, or disabled for a match.
+	If disabled, they will not spawn.
+	
+	Crates have no velocity - they can fall down, but not moved otherwise.
+	
+	Crates have health, and will explode if drained of health.
+*/
+
+
+// includes
 #include "Main.h"
 #include "Camera.h"
 #include "Keys.h"
@@ -12,23 +31,6 @@
 #include "SpriteData.h"
 #include "Draw.h"
 
-
-/*
-	Crates
-	------
-	
-	This defines Crates on the map.
-	
-	About Crates:
-	
-	There are 3 types of crates: weapon, health, tool.
-	Each type can either be enabled, or disabled for a match.
-	If disabled, they will not spawn.
-	
-	Crates have no velocity - they can fall down, but not moved otherwise.
-	
-	Crates have health, and will explode if drained of health.
-*/
 
 // x/y positions of our Crates
 short Crate_x[MAX_CRATES] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -54,10 +56,16 @@ char Crate_yVelo[MAX_CRATES] = {0, 0, 0, 0, 0, 0, 0, 0};
 // if this is anything else, it's the index of the parachut crate
 char parachuteCrate=-1;
 
+
+
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 
-// pause the game with info on the screen until the user presses 2ND
+
+/**
+ * pause the game with info on the screen until the user presses 2ND
+ * @char text to show for the info
+ */
 void showInfo(const char *txt)
 {
 	Keys_update();
@@ -79,6 +87,7 @@ void showInfo(const char *txt)
 	
 	Keys_update();
 }
+
 
 /**
  * Spawns a single crate of the given type
@@ -356,7 +365,10 @@ static char spawnCrate()
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 
-// spawns a Crate on the map, if they're enabled and returns if one was spawned
+
+/**
+ * spawns a Crate on the map, if they're enabled and returns if one was spawned
+ */
 char Crates_spawnCrate()
 {
 	// if no crates are enabled in this game, just exit without spawning a crate
@@ -376,7 +388,9 @@ char Crates_spawnCrate()
 		
 }
 
-// main update for Crates
+/**
+ * main update for Crates
+ */
 void Crates_update()
 {
 	// for debug...
@@ -436,7 +450,12 @@ void Crates_update()
 	}// next i
 }
 
-// allows a worm to pick up a crate
+
+/**
+ * allows a worm to pick up a crate
+ * @param index - which crate to pick up
+ * @param worm - which worm is picking it up
+ */
 void Crates_pickUp(short index, short worm)
 {
 	// no longer active

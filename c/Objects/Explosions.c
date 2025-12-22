@@ -1,15 +1,6 @@
-// C Source File
-// Created 11/12/2017; 8:33:12 PM
-
-#include "Main.h"
-#include "Explosions.h"
-#include "Map.h"
-#include "Draw.h"
-
-
 /*
-	Explosions
-	----------
+	Explosions.c
+	------------
 	
 	This defines Explosions
 	
@@ -18,7 +9,18 @@
 	They will have a max-radius size
 	They will have a damage amount, more powerful explosions will propell worms further
 	They can optionally spawn fire-particles
+	
+	C Source File
+	Created 11/12/2017; 8:33:12 PM
 */
+
+
+// incldues
+#include "Main.h"
+#include "Explosions.h"
+#include "Map.h"
+#include "Draw.h"
+
 
 // x/y positions of our Explosions
 short Explosion_x[MAX_EXPLOSIONS] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -48,7 +50,6 @@ unsigned short Explosion_active = 0;
 	explosions will only cause damage on the first frame
 */
 unsigned short Explosion_firstFrame = 0;
-
 
 
 
@@ -195,7 +196,6 @@ void eraseMap(short index)
 }
 
 
-
 /**
  * Updates an individual explosion at the given index.
  *
@@ -238,7 +238,13 @@ void spawnFire()
 
 
 
-// spawns a new explosion
+/**
+ * spawns a new explosion
+ * @param x - x location to spawn at
+ * @param y - y location to spawn at
+ * @param size - size of explosion to spawn
+ * @param hasFire - true if has fire effects
+ */
 void Explosion_spawn(short x, short y, char size, char power, char hasFire)
 {
 	// first we gotta find a free explosion. if none is found,
@@ -301,7 +307,9 @@ void Explosion_spawn(short x, short y, char size, char power, char hasFire)
 }
 
 
-// updates active explosions
+/**
+ * updates active explosions
+ */
 void Explosion_update()
 {
 	// update all our explosions, (if active)

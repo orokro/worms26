@@ -1,6 +1,23 @@
-// C Source File
-// Created 11/11/2017; 11:34:05 PM
+/*
+	Worms.c
+	-------
+	
+	This file defines the worms. Note that, a separate file will handle controlling
+	the currently selected worm during a turn.
 
+	In the previous version of Worms, we had two separate sets of arrays:
+	one for the White team and one for the Black team.
+	
+	In this new implementation, we will have one set of arrays for ALL worms.
+	
+	This way, we can loop over all of them at once, and update all of them at once.
+	
+	C Source File
+	Created 11/11/2017; 11:34:05 PM
+*/
+
+
+// includes
 #include "Main.h"
 #include "Draw.h"
 #include "SpriteData.h"
@@ -12,20 +29,6 @@
 #include "Worms.h"
 #include "Map.h"
 
-/*
-	Worms
-	-----
-	
-	This file defines the worms. Note that, a separate file will handle controlling
-	the currently selected worm during a turn.
-
-	In the previous version of Worms, we had two separate sets of arrays:
-	one for the White team and one for the Black team.
-	
-	In this new implementation, we will have one set of arrays for ALL worms.
-	
-	This way, we can loop over all of them at once, and update all of them at once.
-*/
 
 // the X/Y position of all the worms
 short Worm_x[MAX_WORMS] = {15, 81, 120, 65, 90, 35, 150, 40, 175, 95, 250, 210, 25, 140, 150, 10};
@@ -120,7 +123,6 @@ void spawnWorm(short index)
 }
 
 
-
 /**
  * checks if a worm is close to a crate or a mine, based on the tile the worm is in
  */
@@ -160,7 +162,10 @@ void checkCratesAndMines(short index)
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 
-// spawns worms on the map
+
+/**
+ * spawns worms on the map
+ */
 void Worm_spawnWorms()
 {
 	short i=0;
@@ -171,7 +176,9 @@ void Worm_spawnWorms()
 }
 
 
-// main update method for all worms
+/**
+ * main update method for all worms
+ */
 void Worm_update()
 {
 	// loop over worms, and any active worms should have their gravity and physics applied..
@@ -236,7 +243,9 @@ void Worm_update()
 }
 
 
-// changes the worms health
+/**
+ * changes the worms health
+ */
 void Worm_setHealth(short index, short health, char additive)
 {
 	if(additive)
@@ -304,7 +313,10 @@ void txtToBuffer(unsigned long *buffer, unsigned long *mask, char *txt, char col
 }
 
 
-// draw health sprite for a worm
+/**
+ * draw health sprite for a worm
+ * @param index - worm health index to draw
+ */
 void renderHealthSprite(short index)
 {
 	/*

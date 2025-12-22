@@ -1,11 +1,18 @@
-/* ----------------------------------------------------------------------------------------
-	 WEAPON SELECT +++ WEAPON SELECT +++ WEAPON SELECT +++ WEAPON SELECT +++ WEAPON SELECT ++
-   ---------------------------------------------------------------------------------------- */
+/*
+	WeaponSelect.c
+	--------------
+	
+	This file is a snippet that is included raw in Game.c
+	
+	This handles the WeaponSelect state machine specifc code.
+*/
+
 
 // the x/y position of the weapon-select cursor:
 char weaponSelectX=0;
 char weaponSelectY=0;
 char weaponFastMove=0;
+
 
 /**
  * When a team brings up the weapons menu, we only want to show the items they have in stock.
@@ -140,6 +147,7 @@ static void WeaponSelect_update()
 	Draw_renderWeaponsMenu(weaponSelectX, weaponSelectY);	
 }
 
+
 /**
 	Called on the first-frame when the Games state machine leaves WeaponSelect mode.
 */
@@ -147,3 +155,4 @@ static void WeaponSelect_exit()
 {
 	
 }
+

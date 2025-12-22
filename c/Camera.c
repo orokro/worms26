@@ -1,13 +1,6 @@
-// C Source File
-// Created 11/11/2017; 11:34:14 PM
-
-#include "Main.h"
-#include "Camera.h"
-#include "Keys.h"
-
 /*
-	Camera
-	------
+	Camera.c
+	--------
 	
 	This is the file for the Camera system.
 	
@@ -27,7 +20,16 @@
 	take it's current position and gradually move towards it's target
 	every frame. This way, the camera will smoothly move between worms
 	/ objects in focus.
+	
+	C Source File
+	Created 11/11/2017; 11:34:14 PM
 */
+
+
+// includes
+#include "Main.h"
+#include "Camera.h"
+#include "Keys.h"
 
 // the current position of the camera in game-world units
 short camX = 0;

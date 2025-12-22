@@ -1,12 +1,6 @@
-#include "Main.h"
-#include "Game.h"
-#include "Map.h"
-#include "Keys.h"
-#include "Draw.h"
-
 /*
-	Main
-	----
+	Main.c
+	------
 
 	It all begins here... as any C program.
 
@@ -15,6 +9,15 @@
 
 	The main loop, though sparse, is also here.
 */
+
+
+// includes
+#include "Main.h"
+#include "Game.h"
+#include "Map.h"
+#include "Keys.h"
+#include "Draw.h"
+
 
 // the main buffer for the map
 void *mapBuffer, *mapLight, *mapDark;
@@ -47,7 +50,6 @@ short dist(short x1, short y1, short x2, short y2)
 }
 
 
-
 // Main Function
 void _main(void)
 {
@@ -77,7 +79,7 @@ void _main(void)
 	GrayDBufInit(dbuffer);
 	GblDBuffer=dbuffer;
   
-  lightPlane = GrayDBufGetHiddenPlane(LIGHT_PLANE);
+  	lightPlane = GrayDBufGetHiddenPlane(LIGHT_PLANE);
 	darkPlane = GrayDBufGetHiddenPlane(DARK_PLANE);
 	
 	// before we can do the main game update loop, we need to change the state machine into the first state
@@ -121,5 +123,4 @@ void _main(void)
 	//resets key stuff
 	SetIntVec(AUTO_INT_1, save_1); 
 	SetIntVec(AUTO_INT_5, save_5); 
-
 }

@@ -1,6 +1,18 @@
-// C Source File
-// Created 11/11/2017; 11:34:12 PM
+/*
+	Draw.c
+	------
+	
+	Here we define our global drawing routines, for drawing each kind of scene:
+		- Main game
+		- Pause Menu
+		- Weapons Menu
+		
+	C Source File
+	Created 11/11/2017; 11:34:12 PM
+*/
 
+
+// includes
 #include "Main.h"
 #include "Draw.h"
 #include "Camera.h"
@@ -16,15 +28,6 @@
 #include "Map.h"
 #include "Match.h"
 
-/*
-	Draw
-	----
-	
-	Here we define our global drawing routines, for drawing each kind of scene:
-		- Main game
-		- Pause Menu
-		- Weapons Menu
-*/
 
 // Global Variables (Defined in Game.c)
 extern char Game_wormAnimState;    // Current animation state (0=None, 1=Jump, 2=Backflip)
@@ -33,7 +36,6 @@ extern char Game_wormFlipStartDir; // Direction worm was facing when flip starte
 
 // these sprites will be generated at the begining of the each turn to match the current wind conditions
 unsigned long windSprites[3][3];
-
 
 
 // static weapon names delcaration since we only really need the names in this draw method
@@ -437,7 +439,6 @@ void drawMountains()
 }
 
 
-
 /**
  * Draws the games timer
 */
@@ -515,7 +516,6 @@ void drawHUD()
 	// draw the timer
 	drawTimer();	
 }
-
 
 
 /**
@@ -707,6 +707,7 @@ void Draw_cake(short amount, short total)
 	lightPlane = GrayDBufGetHiddenPlane(LIGHT_PLANE);
 	darkPlane = GrayDBufGetHiddenPlane(DARK_PLANE);
 }
+
 
 // main drawing routine for the game, e.g. map, worms, weapons, etc
 void Draw_renderGame()
@@ -955,6 +956,7 @@ void Draw_renderWeaponsMenu(char wx, char wy)
 	drawTimer();
 }
 
+
 // render a text message to the buffers
 short Draw_renderText(unsigned long *buffer, char size, char *txt, char color)
 {
@@ -978,12 +980,12 @@ short Draw_renderText(unsigned long *buffer, char size, char *txt, char color)
 	
 	// not all characters are 4 bits wide, for proper spacing we need to save all the char widths
 	static char widths[] = {	
-														3, 2, 2, 3,  3, 3, 4, 3,
-														1, 2, 3, 2,  3, 4, 3, 2,
-														4, 3, 3, 3,  3, 3, 3, 3,
-														3, 3, 3, 1,  3, 3, 3, 3,
-														2, 3, 2, 2,  1, 2, 2, 2
-													};
+		3, 2, 2, 3,  3, 3, 4, 3,
+		1, 2, 3, 2,  3, 4, 3, 2,
+		4, 3, 3, 3,  3, 3, 3, 3,
+		3, 3, 3, 1,  3, 3, 3, 3,
+		2, 3, 2, 2,  1, 2, 2, 2
+	};
 
 	int i;
 	

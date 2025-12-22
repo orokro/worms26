@@ -1,8 +1,11 @@
-
-/* ----------------------------------------------------------------------------------------
-	 CURSOR +++ CURSOR +++ CURSOR +++ CURSOR +++ CURSOR +++ CURSOR +++ CURSOR +++ CURSOR +++ 
-   ---------------------------------------------------------------------------------------- */
 /*
+	Cursor.c
+	--------
+	
+	This file is a snippet that is included raw in Game.c
+	
+	This handles the Cursor state machine specifc code.
+
 	For reference:
 	
 	Game_cursorX
@@ -14,6 +17,7 @@
 	Game_xMarkAllowedOverLand
 */
 char cursorFastMove=0;
+
 
 /**
 	Called on the first-frame when the Games state machine is set to Cursor mode.
@@ -33,6 +37,7 @@ static void Cursor_enter()
 	// we should set the camera to follow the cursor:
 	Camera_focusOn(&Game_cursorX, &Game_cursorY);	
 }
+
 
 /**
 	Called every frame that the Games state machine is in Cursor mode.
@@ -116,6 +121,7 @@ static void Cursor_update()
 	// the game
 	Draw_renderGame();
 }
+
 
 /**
 	Called on the first-frame when the Games state machine leaves Cursor mode.

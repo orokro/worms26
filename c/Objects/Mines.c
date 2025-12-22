@@ -1,17 +1,6 @@
-#include "Main.h"
-#include "Camera.h"
-#include "Keys.h"
-#include "Match.h"
-#include "Mines.h"
-#include "PhysCol.h"
-#include "Map.h"
-#include "Explosions.h"
-#include "SpriteData.h"
-#include "Draw.h"
-
 /*
-	Mines
-	-----
+	Mines.c
+	-------
 	
 	This defines Mines on the map.
 	
@@ -33,6 +22,20 @@
 	a random index.
 	
 */
+
+
+// includes
+#include "Main.h"
+#include "Camera.h"
+#include "Keys.h"
+#include "Match.h"
+#include "Mines.h"
+#include "PhysCol.h"
+#include "Map.h"
+#include "Explosions.h"
+#include "SpriteData.h"
+#include "Draw.h"
+
 
 // x/y positions of our Mines
 short Mine_x[MAX_MINES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -57,6 +60,7 @@ unsigned short Mine_settled=0;
 // local vars
 char proxmityCheckTimer = 0;
 PhysObj Mine_physObj[MAX_MINES];
+
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -84,7 +88,6 @@ void spawnMine(char index)
 	Collider col = new_Collider(COL_UDLR, 2, 2, 3, 3);
 	Mine_physObj[(short)index] = new_PhysObj(&Mine_x[(short)index], &Mine_y[(short)index], &Mine_xVelo[(short)index], &Mine_yVelo[(short)index], 0.65f, 1.0f, (char)index, &Mine_settled, col);
 }
-
 
 
 /**
@@ -129,13 +132,13 @@ void updateMine(short index)
 
 
 
-
-
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 
 
-// spawns Mines on the map, if they're enabled
+/**
+ * spawns Mines on the map, if they're enabled
+ */
 void Mines_spawnMines()
 {
 
@@ -150,7 +153,9 @@ void Mines_spawnMines()
 }
 
 
-// main update for Mines
+/**
+ * main update for Mines
+ */
 void Mines_update()
 {		
 	// for debugging, we'll allow the user to switch between mines, and add velocity to
@@ -193,7 +198,11 @@ void Mines_update()
 	}// next i
 }
 
-// triggers a mine
+
+/**
+ * triggers a mine
+ * @param index - the mine to trigger
+ */
 void Mines_trigger(short index)
 {
 	// if this mine is already triggered, just gtfo

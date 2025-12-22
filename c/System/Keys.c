@@ -1,12 +1,6 @@
-// C Source File
-// Created 11/11/2017; 11:34:17 PM
-
-#include "Main.h"
-#include "Keys.h"
-
 /*
-	Keys
-	----
+	Keys.c
+	------
 	
 	In the previous version of the Worms source code, keys were tested directly
 	and there were some ugly hacks associated with doing so.
@@ -101,7 +95,16 @@
 	key3
 	key4
 	key5
+	
+	C Source File
+	Created 11/11/2017; 11:34:17 PM
 */
+
+
+// includes
+#include "Main.h"
+#include "Keys.h"
+
 
 // longs to store our bit wise key states in. We don't need all 32 bits.
 long keysDown, keysState, keysUp;
@@ -154,12 +157,14 @@ void Keys_update()
 	keysUp = (long)(lastKeysState & changedKeys);
 }
 
+
 // test if a key is down for the first time this frame
 char Keys_keyDown(long keyCode)
 {
 	// return if the key is down on this frame:
 	return (char)((keysDown & keyCode)>0);
 }
+
 
 // test the current state of any key
 char Keys_keyState(long keyCode)
@@ -168,10 +173,10 @@ char Keys_keyState(long keyCode)
 	return (char)((keysState & keyCode)>0);
 }
 
+
 // test if a key was let-go on this frame
 char Keys_keyUp(long keyCode)
 {
 	// return if the key is let up on this frame:
 	return (char)((keysUp & keyCode)>0);
 }
-

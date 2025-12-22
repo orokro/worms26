@@ -1,18 +1,6 @@
-// C Source File
-// Created 11/22/2017; 2:56:22 AM
-
-#include "Main.h"
-#include "Game.h"
-#include "Keys.h"
-#include "Map.h"
-#include "CharacterController.h"
-#include "PhysCol.h"
-#include "Worms.h"
-#include "Weapons.h"
-
 /*
-	CharacterController
-	-------------------
+	CharacterController.c
+	---------------------
 	
 	During the turn mode, and only during the turn mode, the player
 	can move the worm around.
@@ -29,7 +17,22 @@
 		- Jetpack
 		
 	We will handle all of them in here... 
+	
+	C Source File
+	Created 11/22/2017; 2:56:22 AM
 */
+
+
+// includes
+#include "Main.h"
+#include "Game.h"
+#include "Keys.h"
+#include "Map.h"
+#include "CharacterController.h"
+#include "PhysCol.h"
+#include "Worms.h"
+#include "Weapons.h"
+
 
 // local defines: the max slope a worm can walk up:
 #define MAX_WORM_SLOPE 6
@@ -39,8 +42,9 @@
 short *wX, *wY;
 unsigned short wormMask=0;
 
+
 /**
-	* Handles moving the worm in the character controller, if its on the ground.
+ * Handles moving the worm in the character controller, if its on the ground.
 */
 void wormWalk()
 {
@@ -173,12 +177,13 @@ void wormWeapon()
 
 
 
-
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 
 
-// handles all update frames for controlling worms in the turn game mode
+/**
+ * handles all update frames for controlling worms in the turn game mode
+ */
 void CharacterController_update()
 {
 	// if the camera is being controled, no need to controll the character

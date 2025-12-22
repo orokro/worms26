@@ -1,25 +1,12 @@
-// C Source File
-// Created 11/12/2017; 4:26:32 PM
-
-#include "Main.h"
-#include "Game.h"
-#include "Match.h"
-#include "Draw.h"
-#include "Camera.h"
-#include "Keys.h"
-#include "Crates.h"
-#include "OilDrums.h"
-#include "Mines.h"
-#include "Worms.h"
-#include "Weapons.h"
-#include "Explosions.h"
-#include "CharacterController.h"
-#include "Map.h"
-
 /*
-	Game
-	----
+	Game.c
+	------
 	
+	This is the main state-machine file for the entire game.
+	
+	C Source File
+	Created 11/12/2017; 4:26:32 PM
+
 	This file defines the various modes and global settings for the Game.
 	
 	Including the Game_update() function which updates Game Logic for everything in the Main loop
@@ -125,6 +112,51 @@
 				After the user confirms the annoucement with any key, the game will exit.
 */
 
+
+// includes
+#include "Main.h"
+#include "Game.h"
+#include "Match.h"
+#include "Draw.h"
+#include "Camera.h"
+#include "Keys.h"
+#include "Crates.h"
+#include "OilDrums.h"
+#include "Mines.h"
+#include "Worms.h"
+#include "Weapons.h"
+#include "Explosions.h"
+#include "CharacterController.h"
+#include "Map.h"
+
+// this has to be defined before the next set of includes or else they'll try too reference it too early - they're .c includes
+void gameUpdates();
+
+// function prototypes for our local game-mode logic methods!
+/*
+	Due to TIGCC's weird path rules, these files are stored in the Game/States folder on DISK
+	but in TIGCC IDE they are under Header Files/States
+	
+	The only way I was able to include them was to move them under Headers...
+	
+	At least in Headers they wont compile on their own, since we just want them included in this file.
+	
+	Anyway, below, each of the states for the state machine is defined, and any methods or variables they need
+	will be defined in their file.
+	
+	Each state has a State_enter, State_update, and State_exit method. Yay, state-machines!
+*/
+#include "States/WormSelect.c"
+#include "States/Turn.c"
+#include "States/WeaponSelect.c"
+#include "States/Pause.c"
+#include "States/Cursor.c"
+#include "States/TurnEnd.c"
+#include "States/Death.c"
+#include "States/AfterTurn.c"
+#include "States/GameOver.c"
+
+
 // current game mode!
 char Game_mode = gameMode_WormSelect;
 
@@ -211,31 +243,6 @@ char Game_aimAngle=10;
 	gameMode_AfterTurn
 */
 
-void gameUpdates();
-
-// function prototypes for our local game-mode logic methods!
-/*
-	Due to TIGCC's weird path rules, these files are stored in the Game/States folder on DISK
-	but in TIGCC IDE they are under Header Files/States
-	
-	The only way I was able to include them was to move them under Headers...
-	
-	At least in Headers they wont compile on their own, since we just want them included in this file.
-	
-	Anyway, below, each of the states for the state machine is defined, and any methods or variables they need
-	will be defined in their file.
-	
-	Each state has a State_enter, State_update, and State_exit method. Yay, state-machines!
-*/
-#include "States/WormSelect.c"
-#include "States/Turn.c"
-#include "States/WeaponSelect.c"
-#include "States/Pause.c"
-#include "States/Cursor.c"
-#include "States/TurnEnd.c"
-#include "States/Death.c"
-#include "States/AfterTurn.c"
-#include "States/GameOver.c"
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
