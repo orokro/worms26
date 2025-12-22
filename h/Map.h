@@ -61,4 +61,10 @@ extern void Map_getSpawnPoint();
 */
 extern void Map_makeMap();
 
+
+/**
+ * Draws the map!
+ */
+extern void Map_draw();
+
 #endif

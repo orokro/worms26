@@ -23,7 +23,7 @@
 #include "Worms.h"
 #include "OilDrums.h"
 #include "Mines.h"
-
+#include "Camera.h"
 
 
 /*
@@ -487,4 +487,169 @@ void Map_getSpawnPoint()
 				return;
 			}
 	}	
+}
+
+
+// draw the map.. but I can't call this, crashes
+void Map_draw()
+{
+	/*
+		How this works:
+		
+		Our mapBuffer pointer points a buffer that's four times the normal LCD_SIZE.
+		
+		We only want to draw a sub-section of that buffer on the screen.
+		
+		For vertical:
+		
+		The calculators screen height is 100 pixels, so we should draw 50 pixels above and below
+		the camera's "center"
+		
+		So: CameraTop = CameraY-50, and CameraBottom = CameraY+50
+		
+		The rows we draw on the screen will always be between 0 and 99 inclusive.
+		
+		So we need to determine the following:
+			- The top most row on the screen to draw
+			- The bottom most row on the screen to draw
+			- The top row from the buffer we should start copying.
+			
+		If the camera goes out of bounds of the map buffer, we can still draw part of the map
+		In this case, there are a few conditions:
+			- If the Camera goes above the map (CameraTop is less than 0 in the map-buffer)
+				then we can still draw the map, but ScreenTop will be lower on the screen
+			- If the Camera goes below the map (CameraBottom is more than 200 in the map-buffer)
+				then we can still draw the map. ScreenTop will be 0, but we'll only draw till the end of the buffer
+			- If either the CameraBottom is less than 0 or CameraTop is greater than 200 then the map is compeltey
+				off screen, and we don't need to draw it at all.
+				
+		This way, the camera can still pan outside the map, into nothingness.
+		This is useful for following weapons or worms that fly far off the map, or projectiles that fly high
+		into the sky.
+	*/
+	
+	// camera top position, in world-space
+	short camTop = camY-50;
+	
+	// camera bottom position, in wrold-space
+	short camBottom = camY+50;
+	
+	// camera left position, in world-space
+	short camLeft = camX-80;
+	
+	// camera right position, in world-space
+	short camRight = camX+80;
+	
+	// we shouldn't continue if either is out of bounds
+	if((camBottom>0) && (camTop<200) && (camLeft<320) && (camRight>0))
+	{ 
+		
+		// the of the screen we should start copying the buffer to
+		short screenTop=0;
+		
+		// the bottom of the screen we should stop copying the buffer to
+		short screenBottom=99;
+		
+		// the top row from the buffer we should start copying from
+		// note: we don't need a buffer bottom, since the loop is controlled from screenTop to screenBottom
+		// so we only really need bufferTop in the loop
+		short bufferTop=camTop;
+
+		// if both the top and the bottom of the buffer points are inbounds
+		// we can simplly draw the whole screen worth!
+		// we don't need to change any variables
+		
+		// if, however, the top of the camera is is above the map
+		// we need to change our render bounds..
+		if(camTop<0)
+		{
+			// whatever we draw, will be from the top row of the buffer
+			bufferTop = 0;
+			
+			// we want to draw lower on the screen... by how far the camera is beyond
+			screenTop = (camTop*-1);
+			
+			// we want to only copy pixels for the rest of the screen
+			screenBottom = 99;
+
+		// also check if the bottom of the camera is beyond the map buffer
+		}else if(camBottom>199)
+		{
+			// always draw on the top of the screen:
+			screenTop = 0;
+			
+			// always draw from the camera-top in the buffer:
+			bufferTop = camTop;
+
+			// only draw that many rows:
+			screenBottom = (200-bufferTop);
+		}
+		
+		// the left side of the screen, we should start drawing to
+		short screenLeft = 0;
+		
+		// the right side of the screen, we should stop drawing at
+		short screenRight = 160;
+		
+		// the position in the buffer we should start copying left-to-right
+		short bufferLeft = camLeft;
+		
+		// if the screen's left is out of bounds of our map buffer
+		// then we should start drawing in the middle of the screen...
+		if(camLeft<0)
+		{
+			// the screen left should be the same as how far OB the camera is.
+			// if the camera is 10 pixels to the left of the map, the map
+			// should draw at 10px right on the screen...
+			screenLeft = (camLeft*-1);
+			
+			// since we're starting at the left of the map, we will draw
+			// all the way to the right edge of the screen:
+			screenRight = 160;
+			
+			// since we're starting at the left of the screen, we will
+			// start at the left of the buffer:
+			bufferLeft=0;
+			
+		// if the right of the camera is beyond the right edge of the buffer...
+		}else if(camRight>319)
+		{
+			// we will definately start drawing on the left side of the screen
+			screenLeft = 0;
+			
+			// we will start the buffer at the left-camera edge:
+			bufferLeft = camLeft;
+			
+			// we only need to draw until the buffer runs out..
+			screenRight = 160; //320-bufferLeft;
+		}
+		
+		// because we are going to be copying bits in blocks of 32 at a time below
+		// we need to convert our screenLeft, screenRight and bufferLeft into columns
+		short colLeft = (screenLeft-(screenLeft%32))/32;
+		short colRight = (screenRight-(screenRight%32))/32+1;
+		short colBuff = (bufferLeft-(bufferLeft%32))/32;
+
+		// loop to manually copy memory from a sub-section of our map, via ClipSprite32
+		unsigned long *light = (unsigned long*)mapLight;
+		unsigned long *dark = (unsigned long*)mapDark;
+		short x;
+		short bufferCol = 0;
+		
+		// loop over the visible columns of the map on screen, or till our buffer runs out
+		for(x=colLeft; (x<colRight && (colBuff+bufferCol)<10); x++)
+		{
+			short offset = screenLeft==0 ? camLeft%32 : 0;
+
+			// take advantage of extgrah's sprite method to handle bit shiting and mem copying in one swoop!
+			ClipSprite32_OR_R(screenLeft+(bufferCol*32)-offset, screenTop, screenBottom-screenTop, &light[((colBuff+bufferCol)*200)+bufferTop], lightPlane);
+			ClipSprite32_XOR_R(screenLeft+(bufferCol*32)-offset, screenTop, screenBottom-screenTop, &dark[((colBuff+bufferCol)*200)+bufferTop], lightPlane);
+			ClipSprite32_OR_R(screenLeft+(bufferCol*32)-offset, screenTop, screenBottom-screenTop, &dark[((colBuff+bufferCol)*200)+bufferTop], darkPlane);
+
+			// on the next iteration we will be on the next buffer 32 bit colum
+			bufferCol++;
+		
+		}// next x
+		
+	}// end if draw map
 }
