@@ -2,6 +2,7 @@
 // Created 11/11/2017; 11:34:12 PM
 
 #include "Main.h"
+#include "Game.h"
 #include "Crates.h"
 #include "Worms.h"
 #include "SpriteData.c"
@@ -459,8 +460,8 @@ void drawWeapons()
 				{
 
 					// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon
-					ClipSprite16_OR_R(screenX-2, screenY-2, 11, spr_weapons[Weapon_type[i]], lightPlane);
-					ClipSprite16_OR_R(screenX-2, screenY-2, 11, spr_weapons[Weapon_type[i]], darkPlane);
+					ClipSprite16_OR_R(screenX-2, screenY-2, 11, spr_weapons[(short)Weapon_type[i]], lightPlane);
+					ClipSprite16_OR_R(screenX-2, screenY-2, 11, spr_weapons[(short)Weapon_type[i]], darkPlane);
 
 				}else{	
 					// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon

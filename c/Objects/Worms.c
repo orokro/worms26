@@ -2,6 +2,7 @@
 // Created 11/11/2017; 11:34:05 PM
 
 #include "Main.h"
+#include "Game.h"
 #include "Crates.h"
 #include "PhysCol.h"
 #include "Worms.h"
@@ -157,7 +158,6 @@ void checkCratesAndMines(short index)
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
-
 
 
 // spawns worms on the map
