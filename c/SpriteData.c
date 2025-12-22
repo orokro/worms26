@@ -303,6 +303,21 @@ const unsigned char spr_CursorFill[] = { // 12 tall
 	0b00001100
 };
 
+const unsigned char spr_CursorFillFlipped[] = { // 12 tall
+	0b00000011,
+	0b00000111,
+	0b00001111,
+	0b00011111,
+	0b00111111,
+	0b01111111,
+	0b11111111,
+	0b11111111,
+	0b00111111,
+	0b01111011,
+	0b01111000,
+	0b00110000
+};
+
 const unsigned char spr_CursorOutline[] = { // 12 tall
 	0b11111111,
 	0b10111111,
@@ -315,6 +330,21 @@ const unsigned char spr_CursorOutline[] = { // 12 tall
 	0b10100111,
 	0b11110011,
 	0b11110011,
+	0b11111111
+};
+
+const unsigned char spr_CursorOutlineFlipped[] = { // 12 tall
+	0b11111111,
+	0b11111101,
+	0b11111001,
+	0b11110001,
+	0b11100001,
+	0b11000001,
+	0b10010001,
+	0b11100101,
+	0b11100101,
+	0b11001111,
+	0b11001111,
 	0b11111111
 };
 
@@ -2343,7 +2373,7 @@ const unsigned short spr_WormRight_Outline[] = { // 13 tall
 	0b0000111011000000
 };
 
-const unsigned char spr_XSpot[] = { // 8 tall
+const unsigned char spr_XSpot[] = { // 16 tall
 	0b01100110,
 	0b10011001,
 	0b10000001,
@@ -2351,17 +2381,25 @@ const unsigned char spr_XSpot[] = { // 8 tall
 	0b01000010,
 	0b10000001,
 	0b10011001,
+	0b01100110,
+	0b01100110,
+	0b11111111,
+	0b11111111,
+	0b01111110,
+	0b01111110,
+	0b11111111,
+	0b11111111,
 	0b01100110
 };
 
 const unsigned char spr_XSpotMask[] = { // 8 tall
-	0b01100110,
-	0b11111111,
-	0b11111111,
-	0b01111110,
-	0b01111110,
-	0b11111111,
-	0b11111111,
-	0b01100110
+	0b10011001,
+	0b00000000,
+	0b00000000,
+	0b10000001,
+	0b10000001,
+	0b00000000,
+	0b00000000,
+	0b10011001
 };
 

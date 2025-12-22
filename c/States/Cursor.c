@@ -50,14 +50,20 @@ static void Cursor_update()
 	
 	// for each cursor key, move the cursor position, when its pressed
 	if(Keys_keyDown(keyLeft))
-		Game_cursorX--;
+	{
+		Game_cursorX -= 3;
+		Game_currentWeaponState |= strikeLeft;
+	}
 	else if(Keys_keyDown(keyRight))
-		Game_cursorX++;
-		
+	{
+		Game_cursorX += 3;
+		Game_currentWeaponState &= ~strikeLeft;
+	}	
+	
 	if(Keys_keyDown(keyUp))
-		Game_cursorY--;
+		Game_cursorY -= 3;
 	else if(Keys_keyDown(keyDown))
-		Game_cursorY++;
+		Game_cursorY += 3;
 		
 	// as long as ANY of the arrow keys are down, increment our fast-move timer:
 	if(Keys_keyState(keyCursors))
@@ -66,17 +72,17 @@ static void Cursor_update()
 		cursorFastMove = 0;
 		
 	// if our weapons-fast move timer is over 30 frames, we will auto-move the cursor every 5 frames
-	if(cursorFastMove>=30 && cursorFastMove%5==0)
+	if(cursorFastMove>=5 && cursorFastMove%2==0)
 	{
 		if(Keys_keyState(keyLeft))
-			Game_cursorX--;
+			Game_cursorX -= 3;
 		else if(Keys_keyState(keyRight))
-			Game_cursorX++;
+			Game_cursorX += 3;
 			
 		if(Keys_keyState(keyUp))
-			Game_cursorY--;
+			Game_cursorY -= 3;
 		else if(Keys_keyState(keyDown))
-			Game_cursorY++;
+			Game_cursorY += 3;
 	}
 	
 	// finally we bound-check our cursor position:
@@ -85,13 +91,13 @@ static void Cursor_update()
 	else if(Game_cursorX>319)
 		Game_cursorX=319;
 		
-	if(Game_cursorY<0)
-		Game_cursorY=0;
+	if(Game_cursorY<-50)
+		Game_cursorY = -50;
 	else if(Game_cursorY>190)
-		Game_cursorY=190;
+		Game_cursorY = 190;
 	
 	// if the user pressed ESCAPE we should just exit cursor mode
-	if(Keys_keyDown(keyEscape))
+	if(Keys_keyUp(keyEscape))
 	{
 		Game_changeMode(Game_previousMode);
 		return;
@@ -99,13 +105,14 @@ static void Cursor_update()
 	
 	// if the user pressed the action key, we should test if it's a valid point,
 	// place the xMark spot and exit...
-	if(Keys_keyDown(keyAction))
+	if(Keys_keyUp(keyAction))
 	{
 		if(Game_xMarkAllowedOverLand || Map_testPoint(Game_cursorX, Game_cursorY) )
 		{
 			Game_xMarkSpotX = Game_cursorX;
 			Game_xMarkSpotY = Game_cursorY;
 			Game_xMarkPlaced = TRUE;
+			Game_currentWeaponState |= targetPicked;
 			
 			// at this point we should do whatever weapon spawning junk we need to do..
 			// TO-DO: implement

@@ -38,7 +38,11 @@ extern const unsigned char spr_CrossHair[];
 
 extern const unsigned char spr_CursorFill[];
 
+extern const unsigned char spr_CursorFillFlipped[];
+
 extern const unsigned char spr_CursorOutline[];
+
+extern const unsigned char spr_CursorOutlineFlipped[];
 
 extern const unsigned char spr_launcher[];
 

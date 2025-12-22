@@ -69,14 +69,14 @@ extern void Draw_renderPauseMenu(char);
 /**
  * Draws the weapons menu for when a player is selecting a weapon.
  * 
- * @param wx a char that contatins the x-position of the current weapon selected in the matrix of weapons
- * @param wy a char that contatins the y-position of the current weapon selected in the matrix of weapons
+ * @param wx a char that contains the x-position of the current weapon selected in the matrix of weapons
+ * @param wy a char that contains the y-position of the current weapon selected in the matrix of weapons
 */
 extern void Draw_renderWeaponsMenu(char, char);
 
 
 /**
- * renders our tiny text font to a serrirs of unsigned longs
+ * renders our tiny text font to a serries of unsigned longs
  *
  * @param *buffer a pointer to at least 3 unsigned longs to render the text to
  * @param size the number of unsigned longs this buffer is wide. There should be 3*size unsigned longs in the buffer.

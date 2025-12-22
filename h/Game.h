@@ -22,7 +22,9 @@ enum GameModes {
 };
 
 // flags for current weapon state
-#define targetPicked 0b00000001
+#define targetPicked 	0b00000001
+#define strikeLeft  	0b00000010
+#define firstShotTaken  0b00000100
 
 // game globals
 extern char Game_mode;

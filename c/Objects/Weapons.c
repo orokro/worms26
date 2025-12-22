@@ -575,6 +575,69 @@ void Weapons_setTarget(short x, short y)
 {
 	Weapon_targetX = x;
 	Weapon_targetY = y;
+	
+	// if the current weapon is a an airstrike type, go up and spawn some things
+	if(Game_currentWeaponProperties & usesAirStrike)
+	{
+
+		// air strikes are just bazookas in disguise
+		short spawnItem = WBazooka;
+		char spawnCount = 5;
+
+		switch(Game_currentWeaponSelected)
+		{
+			case WNapalmStrike:
+				spawnItem = WFire;
+				break;
+			case WMailStrike:
+				spawnItem = WMail;
+				break;
+			case WMineStrike:
+				spawnItem = WFakeMine;
+				break;
+			case WSheepStrike:
+				spawnItem = WSheep;
+				break;
+			case WCarpetBomb:
+				spawnItem = WCarpet;
+				break;
+			case WMoleSquadron:
+				spawnItem = WMole;
+				break;
+			case WMBBomb:
+				spawnItem = WMBBomb;
+				spawnCount = 1;
+				break;
+			case WConcreteDonkey:
+				spawnItem = WConcreteDonkey;
+				spawnCount = 1;
+				break;
+			default:
+				spawnItem = WBazooka;
+				break;
+		
+		}// swatch 
+		
+		const char spawnXVelo = (Game_currentWeaponState & strikeLeft) ? -1 : 1;
+		
+		// if only 1
+		if(spawnCount==1)
+		{
+			Weapons_spawn(spawnItem, x, -50, spawnXVelo, 0, 5*TIME_MULTIPLIER);
+			return;
+		}
+		
+		// for now, spawn 5 weapons in a line above the target
+		int i;
+		for(i=-2; i<=2; i++)
+		{
+			Weapons_spawn(spawnItem, x+(i*5), -50, spawnXVelo, 0, 5*TIME_MULTIPLIER);
+		}
+		
+		// un-set target picked
+		Game_currentWeaponState &= ~targetPicked;
+		Game_xMarkPlaced = FALSE;
+	}
 }
 
 
@@ -673,7 +736,7 @@ void Weapons_fire(short charge)
 		spawnY += 5;
 		spawnX += (facingLeft) ? -14 : 2;
 	}
-	
+
 	// default spawn direction unless weapon uses aim or charge (charge is implied with aim)
 	short dirX=0;
 	short dirY=0;
@@ -726,7 +789,6 @@ void Weapons_drawAll()
 				// if weapon uses spawnSelf, we can use it's same sprite as from the menu
 				if(Weapon_props[(short)Weapon_type[i]] & spawnsSelf)
 				{
-
 					// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon
 					ClipSprite16_OR_R(screenX-2, screenY-2, 11, spr_weapons[(short)Weapon_type[i]], lightPlane);
 					ClipSprite16_OR_R(screenX-2, screenY-2, 11, spr_weapons[(short)Weapon_type[i]], darkPlane);

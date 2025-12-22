@@ -59,7 +59,7 @@ void wormWalk()
 		
 		// set jump animation
 		Game_wormAnimState = ANIM_JUMP;
-    Game_wormAnimTimer = 0;
+    	Game_wormAnimTimer = 0;
     
 		return;
 		
@@ -69,13 +69,13 @@ void wormWalk()
 		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], ((Worm_dir & wormMask) ? 1 : -1), -6, FALSE);
 		
 		// Set Animation State
-    Game_wormAnimState = ANIM_BACKFLIP;
-    Game_wormAnimTimer = 0;
-    
-    // Store the direction we were facing when we started the flip
-    // (We need this because the worm might spin, but the sequence depends on start dir)
-    
-    Game_wormFlipStartDir = (Worm_dir & wormMask);
+	    Game_wormAnimState = ANIM_BACKFLIP;
+	    Game_wormAnimTimer = 0;
+	    
+	    // Store the direction we were facing when we started the flip
+	    // (We need this because the worm might spin, but the sequence depends on start dir)
+	    
+	    Game_wormFlipStartDir = (Worm_dir & wormMask);
 		return;
 		
 	// test for directions left/right
@@ -139,6 +139,7 @@ void wormWeapon()
 		{
 			// un-set target picked
 			Game_currentWeaponState &= ~targetPicked;
+			Game_xMarkPlaced = FALSE;
 			
 			// no need to continue
 			return;

@@ -136,6 +136,7 @@ static void WeaponSelect_update()
 		// set current weapon and properties
 		Game_currentWeaponSelected = weapID;
 		Game_currentWeaponProperties = Weapon_props[weapID];
+		Game_currentWeaponState = 0;
 		Game_changeMode(Game_previousMode);
 		return;
 	}

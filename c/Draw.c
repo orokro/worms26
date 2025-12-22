@@ -40,7 +40,7 @@ unsigned long windSprites[3][3];
 // flipped weapon sprites
 unsigned short spr_weapons_flipped[NUM_WEAPONS][11];
 
-// static weapon names delcaration since we only really need the names in this draw method
+// static weapon names declaration since we only really need the names in this draw method
 // using flat ID space
 static const char weaponNames[65][16] = {
 	// row 1
@@ -139,13 +139,13 @@ void *weaponsLight, *weaponsDark;
  * If the final X/Y screen position determined is out of bounds for the screen, the method will return FALSE.
  * Otherwise, TRUE.
  *
- * The current bounding for the screen is +/- 8 pixels horizzontal on each side of the screen, and
+ * The current bounding for the screen is +/- 8 pixels horizontal on each side of the screen, and
  * +/- 16 pixels vertically.
  *
  * This may need to be changed, as the final sprites are decided
  *
  * @param x a pointer reference to the x value to change to screen coordinates
- * @param y a poitner reference to the y value to change to screen coordinates
+ * @param y a pointer reference to the y value to change to screen coordinates
  * @return a char boolean either TRUE or FALSE if the coordinates are roughly on screen
 */
 char worldToScreen(short *x, short *y)
@@ -194,7 +194,7 @@ void drawLeavesAndClouds()
 		if(worldToScreen(&xPos, &yPos))
 			ClipSprite16_OR_R(xPos, yPos, 8, spr_Leaf, lightPlane);
 			
-		// or respawn if off screen and far enoug bloe
+		// or respawn if off screen and far enough below
 		else if(yPos>80)
 		{
 			if(abs(Game_wind)<5 || random(2)==0)
@@ -215,13 +215,13 @@ void drawLeavesAndClouds()
 		// clouds only move horizontally
 		Cloud_x[i] += wind;
 		
-		// get positions to muttate
+		// get positions to mutate
 		short xPosC = Cloud_x[i];
 		short yPosC = Cloud_y[i];
 		
 		char onScreen = worldToScreen(&xPosC, &yPosC);
 		
-		// check scren pos:
+		// check screen pos:
 		if(onScreen)
 		{
 			// draw the cloud:
@@ -241,6 +241,47 @@ void drawLeavesAndClouds()
 
 
 /**
+ * Draws the X picked in arrow mode
+ */
+void drawCursorAndXSpot()
+{	
+	// GTFO if our current weapon doesn't use cursors anyway
+	if((Game_currentWeaponProperties & usesCursor)==0)
+		return;
+	
+	short screenX = Game_cursorX;
+	short screenY = Game_cursorY;
+	
+	// if we're actually in cursor mode draw the cursor on screen
+	if(Game_mode==gameMode_Cursor)
+	{		
+		if(worldToScreen(&screenX, &screenY))
+		{							
+			const unsigned char* cursorOutlineSprite = (Game_currentWeaponState & strikeLeft) ? spr_CursorOutline : spr_CursorOutlineFlipped;
+			const unsigned char* cursorFillSprite = (Game_currentWeaponState & strikeLeft) ? spr_CursorFill : spr_CursorFillFlipped;
+			
+			GrayClipSprite8_AND_R(screenX, screenY, 12, cursorOutlineSprite, cursorOutlineSprite, lightPlane, darkPlane);
+			GrayClipSprite8_OR_R(screenX, screenY, 12, cursorFillSprite, cursorFillSprite, lightPlane, darkPlane);
+		}
+	}
+	
+	// GTFO if we don't have an x placed
+	if((Game_currentWeaponState & targetPicked)==0)
+		return;
+		
+	// convert to screen space & draw the sprites
+	screenX = Game_xMarkSpotX;
+	screenY = Game_xMarkSpotY;
+	if(worldToScreen(&screenX, &screenY))
+	{							
+		GrayClipSprite8_AND_R(screenX, screenY, 8, spr_XSpotMask, spr_XSpotMask, lightPlane, darkPlane);
+		GrayClipSprite8_OR_R(screenX, screenY, 8, spr_XSpot, spr_XSpot+8, lightPlane, darkPlane);
+
+	}// end if on scree
+}
+
+
+/**
  * Draws either the selection arrow, or current worm arrow in Worm Select mode.
 */
 void drawSelectArrow()
@@ -255,7 +296,7 @@ void drawSelectArrow()
 	
 	if(worldToScreen(&x, &y))
 	{
-		// take advantage of extgrah's sprite method to handle bit shiting and mem copying in one swoop!
+		// take advantage of extgrah's sprite method to handle bit shifting and mem copying in one swoop!
 		ClipSprite16_XOR_R(x, y, 16, ((frame<4) ? spr_SelectionArrowFrame1 : spr_SelectionArrowFrame2), darkPlane);
 		ClipSprite16_XOR_R(x, y, 16, ((frame<4) ? spr_SelectionArrowFrame1 : spr_SelectionArrowFrame2), lightPlane);	
 	}
@@ -284,7 +325,7 @@ void drawTimer()
 	// only draw the timer if the game is in select or turn mode!
 	if(Game_timer>0 && (Game_mode==gameMode_WormSelect || Game_mode==gameMode_Turn || Game_mode==gameMode_Cursor || Game_mode==gameMode_WeaponSelect ||  Game_mode==gameMode_Pause))
 	{
-		// exrase space for timer
+		// erase space for timer
 		ClipSprite16_AND_R(2, 87, 11, spr_timerMask, lightPlane);
 		ClipSprite16_AND_R(2, 87, 11, spr_timerMask, darkPlane);
 		
@@ -321,7 +362,6 @@ void drawTimer()
 */
 void drawHUD()
 {		
-	
 	// if the user has a weapon selected and the current mode is TURN, draw it's icon in the top right:
 	if(Game_currentWeaponSelected!=-1 && Game_mode==gameMode_Turn)
 	{
@@ -342,7 +382,7 @@ void drawHUD()
 	ClipSprite32_OR_R(126, 93, 5, spr_WindMeter, lightPlane);
 	ClipSprite32_OR_R(126, 93, 5, spr_WindMeter, darkPlane);
 	
-	// current frame of annimation:
+	// current frame of animation:
 	static char frame=0;
 	if(++frame>33)
 		frame=0;
@@ -384,7 +424,6 @@ void drawWater()
 		ClipSprite32_AND_R(waterX, waterY, 9, &spr_Water_Mask[0+(f*9)], lightPlane);
 		ClipSprite32_OR_R(waterX, waterY, 23, &spr_Water_Light[0+(f*23)], lightPlane);
 	}
-	
 }
 
 
@@ -393,7 +432,6 @@ void drawWater()
 */
 void drawWeaponDetails()
 {
-	
 	short i, x, y;
 
 	// get the direction our current worm is facing
@@ -458,7 +496,7 @@ void drawWeaponDetails()
 					- 3 med
 					- 3 small
 					
-				The charge total goes between 0 and 255, so if we integer devide by 31,
+				The charge total goes between 0 and 255, so if we integer divide by 31,
 				we should get a value between 0-8
 				
 				we need to interpolate the sprites positions from the center of the worm
@@ -479,7 +517,7 @@ void drawWeaponDetails()
 			// calc the charge amount in our scale
 			char chargeAmt = (Game_currentWeaponCharge/31);
 	
-			// loop from furtherst to nearest
+			// loop from furthest to nearest
 			for(i=chargeAmt; i>=0; i--)
 			{
 				// calc the scale index we're in
@@ -509,7 +547,7 @@ void drawWeaponDetails()
 		
 		}// end if has charge
 		
-		// draw the crosshairs last so they're always on top of the charge
+		// draw the crosshair last so they're always on top of the charge
 		ClipSprite8_OR_R(x-4, y-4, 8, spr_CrossHair, lightPlane);
 		ClipSprite8_OR_R(x-4, y-4, 8, spr_CrossHair, darkPlane);
 		
@@ -624,6 +662,9 @@ void Draw_renderGame()
 	// draw weapon objects in the game...
 	Weapons_drawAll();
 	
+	// if a mark was picked with the cursor this will render it
+	drawCursorAndXSpot();
+	
 	// HUD stuff is drawn last since it needs to go on top of all game elements
 	drawHUD();
 	
@@ -656,7 +697,7 @@ void Draw_renderGame()
 	// draw the current team on the screen	
 	//DrawStr(0,40, (Game_currentTeam ? "Team: Black" : "Team: White") , A_XOR);	
 	
-	// drwa the current worm on the screen
+	// draw the current worm on the screen
 	//char wormStr[20];
 	//sprintf(wormStr, "Worm Up: %d", (short)Game_currentWormUp[(short)Game_currentTeam]);
 	//DrawStr(0,50, wormStr , A_XOR);	
@@ -666,7 +707,7 @@ void Draw_renderGame()
 	//sprintf(camStr, "Cam: %d, %d", (short)camX, (short)camY);
 	//DrawStr(0,60, camStr , A_XOR);
 	
-	// draw our free memory on the screen, only when shift is held for debbuging
+	// draw our free memory on the screen, only when shift is held for debuging
 	if(Keys_keyState(keyCameraControl))
 	{
 		char heapStr[40];
@@ -779,11 +820,11 @@ void Draw_renderWeaponsMenu(char wx, char wy)
 	for(y=1; y<6; y++)
 			GrayFastDrawHLine2B(1, 156, 12+(y*12), 1, lightPlane, darkPlane);
 	
-	// drawk black grid lies
-	for(x=0; x<14; x++)
-		GrayFastDrawLine2B(1+(x*12), 13, 1+(x*12), 73, 3, lightPlane, darkPlane);
-	for(y=0; y<6; y++)
-		GrayFastDrawHLine2B(1, 156, 13+(y*12), 3, lightPlane, darkPlane);
+	// draw black grid lies
+	// for(x=0; x<14; x++)
+	// 	GrayFastDrawLine2B(1+(x*12), 13, 1+(x*12), 73, 3, lightPlane, darkPlane);
+	// for(y=0; y<6; y++)
+	// 	GrayFastDrawHLine2B(1, 156, 13+(y*12), 3, lightPlane, darkPlane);
 	
 	// draw drop shadow for weapons box (also to make it "centered" perfectly
 	GrayFastDrawHLine2B(2, 157, 74, 1, lightPlane, darkPlane);
@@ -928,10 +969,10 @@ short Draw_renderText(unsigned long *buffer, char size, char *txt, char color)
 		int chrPix, row;
 		for(chrPix=0; chrPix<chrWidth; chrPix++)
 		{
-			// increment the our buffers colum
+			// increment the our buffers column
 			pixColumn++;
 			
-			// make a mask for our current pixel colum
+			// make a mask for our current pixel column
 			unsigned long pixBitMask = 1;
 			pixBitMask = pixBitMask<<(31-(pixColumn%32));
 			
@@ -964,7 +1005,7 @@ short Draw_renderText(unsigned long *buffer, char size, char *txt, char color)
 	/*
 	 	now we need to center the text.
 	 	
-	 	note: we couldn't have done this earlier, becauwe we needed to convert the chars to our
+	 	note: we couldn't have done this earlier, because we needed to convert the chars to our
 	 	sizes, and total the length in the main loop above...
 	*/
 	
@@ -988,7 +1029,7 @@ short Draw_renderText(unsigned long *buffer, char size, char *txt, char color)
 				// get pointer to our unsigned long
 				unsigned long *current = (buffer + (((col)*5)+(row+1)));
 				
-				// unsigned long on this row in previous colum, or 0 if left-most
+				// unsigned long on this row in previous column, or 0 if left-most
 				unsigned long leftUL=1;
 				leftUL = leftUL<<31;
 				if(col-1>=0)
@@ -1007,7 +1048,3 @@ short Draw_renderText(unsigned long *buffer, char size, char *txt, char color)
 	// return the length of the text
 	return (short)pixColumn;
 }
-
-
-
-
