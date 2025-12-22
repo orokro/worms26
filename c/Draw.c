@@ -4,7 +4,8 @@
 #include "Main.h"
 #include "Worms.h"
 #include "SpriteData.c"
-  
+#include "Weapons.h"
+
 /*
 	Draw
 	----

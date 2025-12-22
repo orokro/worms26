@@ -3,6 +3,7 @@
 
 #include "Main.h"
 #include "Worms.h"
+#include "Weapons.h"
 
 /*
 	Game
