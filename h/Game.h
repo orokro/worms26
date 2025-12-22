@@ -9,7 +9,17 @@
 
 
 // game enums
-enum GameModes {gameMode_WormSelect, gameMode_Turn, gameMode_WeaponSelect, gameMode_Pause, gameMode_Cursor, gameMode_TurnEnd, gameMode_Death, gameMode_AfterTurn, gameMode_GameOver};
+enum GameModes {
+	gameMode_WormSelect,
+	gameMode_Turn,
+	gameMode_WeaponSelect,
+	gameMode_Pause,
+	gameMode_Cursor,
+	gameMode_TurnEnd,
+	gameMode_Death,
+	gameMode_AfterTurn,
+	gameMode_GameOver
+};
 
 // game globals
 extern char Game_mode;
@@ -24,7 +34,7 @@ extern char Game_currentTeam;
 extern char Game_currentWormUp[2];
 extern short Game_cursorX;
 extern short Game_cursorY;
-extern char Game_cursirDir;
+extern char Game_cursorDir;
 extern short Game_xMarkSpotX;
 extern short Game_xMarkSpotY;
 extern char Game_xMarkPlaced;
@@ -33,7 +43,7 @@ extern char Game_cursorEndTurn;
 extern char Game_turn;
 extern short Game_weapInventory[5][13];
 extern char Game_currentWeaponSelected;
-extern unsigned short Game_currentWeaponProperties;
+extern unsigned int Game_currentWeaponProperties;
 extern unsigned short Game_currentWeaponCharge;
 extern char Game_aimAngle;
 

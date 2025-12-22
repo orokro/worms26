@@ -188,7 +188,7 @@ char Game_currentWormUp[2] = {0, 0};
 // the current cursor position, facing direction, xMark spot position and settings
 short Game_cursorX = 0;
 short Game_cursorY = 0;
-char Game_cursirDir = 0;
+char Game_cursorDir = 0;
 short Game_xMarkSpotX = 0;
 short Game_xMarkSpotY = 0;
 char Game_xMarkPlaced = FALSE;
@@ -222,7 +222,7 @@ char Game_turn = 0;
 char Game_currentWeaponSelected = -1;
 
 // the bit masked list of properties this weapon has
-unsigned short Game_currentWeaponProperties = 0;
+unsigned int Game_currentWeaponProperties = 0;
 
 // the charge of the current weapon (if it has charge)
 unsigned short Game_currentWeaponCharge = 0;
