@@ -3,6 +3,7 @@
 
 #include "Main.h"
 #include "Game.h"
+#include "Mines.h"
 #include "Crates.h"
 #include "PhysCol.h"
 #include "Worms.h"

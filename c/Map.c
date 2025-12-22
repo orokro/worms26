@@ -3,6 +3,8 @@
 
 #include "Main.h"
 #include "Worms.h"
+#include "OilDrums.h"
+#include "Mines.h"
 
 /*
 	Map

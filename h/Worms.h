@@ -5,6 +5,8 @@
    WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORMS +++ WORM
    ====================================================================================================================================== */
 
+#include "PhysCol.h"
+
 // Animation States
 #define ANIM_NONE     0
 #define ANIM_JUMP     1
@@ -49,5 +51,8 @@ extern void Worm_spawnWorms();
  * This handles updates, (i.e. phsysics, gravity, and map collisions) for worms, as well as damage checking from explosions.
 */
 extern void Worm_update();
+
+/* updates worms health */
+extern void Worm_setHealth(short index, short health, char additive);
 
 #endif

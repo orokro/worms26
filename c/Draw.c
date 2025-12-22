@@ -4,6 +4,8 @@
 #include "Main.h"
 #include "Game.h"
 #include "Crates.h"
+#include "OilDrums.h"
+#include "Mines.h"
 #include "Worms.h"
 #include "SpriteData.c"
 #include "Weapons.h"
