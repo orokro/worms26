@@ -4,7 +4,7 @@
 	
 	For now this is where we'll store our raw sprite data.
 	
-	Perhaps at some point in the future we'll consider compression with RLE or similar.	
+	Perhapse at some point in the future we'll consider compression with RLE or similar.	
 */
 
 // includes
@@ -348,6 +348,21 @@ const unsigned char spr_CursorOutlineFlipped[] = { // 12 tall
 	0b11111111
 };
 
+const unsigned char spr_Grave[] = { // 12 tall
+	0b00011000,
+	0b00011000,
+	0b00011000,
+	0b11111111,
+	0b11111111,
+	0b00011000,
+	0b00011000,
+	0b00011000,
+	0b00011000,
+	0b00011000,
+	0b00011000,
+	0b00011000
+};
+
 const unsigned char spr_launcher[] = { // 5 tall
 	0b11111111,
 	0b11000011,
@@ -597,6 +612,21 @@ const unsigned short spr_OilDark[] = { // 12 tall
 	0b0001111111110000,
 	0b0010100000001000,
 	0b0011111111111000
+};
+
+const unsigned char spr_OilDrum[] = { // 12 tall
+	0b00011000,
+	0b00011000,
+	0b00011000,
+	0b11111111,
+	0b11111111,
+	0b00011000,
+	0b00011000,
+	0b00011000,
+	0b00011000,
+	0b00011000,
+	0b00011000,
+	0b00011000
 };
 
 const unsigned short spr_OilLight[] = { // 12 tall

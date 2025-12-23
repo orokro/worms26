@@ -482,7 +482,7 @@ short Physics_checkExplosions(PhysObj *obj)
 				
 				// calculate the power to add in this direction:
 				// using size for "physical force" magnitude
-				float power = (pendingDamageRatio*Explosion_size[i])*2; 
+				float power = (pendingDamageRatio*Explosion_size[i])*4; 
 				
 				// FIX 2: Correct Vector Projection
 				// Previously (x/y) would cause division by zero or infinite force 

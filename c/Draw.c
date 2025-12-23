@@ -43,6 +43,9 @@ unsigned short spr_weapons_flipped[NUM_WEAPONS][11];
 // buffers for our weapons screen
 void *weaponsLight, *weaponsDark;
 
+// full screen ref
+const SCR_RECT fullScreen = {{0, 0, 159, 99}};
+
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -334,7 +337,7 @@ void drawWater()
 	static char frames[] = {0, 1, 2, 3, 4, 3, 2, 1};
 	short f = frames[(short)frame];
 	
-	short waterY = 241-camY;
+	short waterY = 241-camY - Game_waterLevel;
 	short i;
 	for(i=0; i<7; i++)
 	{
@@ -343,8 +346,23 @@ void drawWater()
 		// draw just the and dark light planes:
 		ClipSprite32_MASK_R(waterX, waterY, 9, &spr_Water_Dark[0+(f*9)], &spr_Water_Mask[0+(f*9)], darkPlane);
 		ClipSprite32_AND_R(waterX, waterY, 9, &spr_Water_Mask[0+(f*9)], lightPlane);
-		ClipSprite32_OR_R(waterX, waterY, 23, &spr_Water_Light[0+(f*23)], lightPlane);
+		ClipSprite32_OR_R(waterX, waterY, 9, &spr_Water_Light[0+(f*23)], lightPlane);
 	}
+
+	// if the top of the under-area is offscreen, no need to draw the rest
+	if((waterY + 9) >= 99)
+		return;
+
+	// draw the water rectangle to fill in below the waterline
+	SCR_RECT waterRect = {{0, waterY + 9, 159, 99}};
+
+	// Draw Light Gray: LightPlane = 1 (Black), DarkPlane = 0 (White)
+	PortSet(lightPlane, 239, 127);
+	ScrRectFill(&waterRect, &fullScreen, A_NORMAL);  // Force 1s
+	PortRestore();
+	PortSet(darkPlane, 239, 127);
+	ScrRectFill(&waterRect, &fullScreen, A_REVERSE);  // Force 0s
+	PortRestore();
 }
 
 

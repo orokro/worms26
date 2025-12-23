@@ -19,6 +19,7 @@ static void Pause_enter()
 {
 	// always make sure its on continue when we enter
 	pauseMenuItem=0;
+	Game_waterLevel+=10;
 }
 
 

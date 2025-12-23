@@ -44,6 +44,8 @@ extern const unsigned char spr_CursorOutline[];
 
 extern const unsigned char spr_CursorOutlineFlipped[];
 
+extern const unsigned char spr_Grave[];
+
 extern const unsigned char spr_launcher[];
 
 extern const unsigned short spr_Leaf[];
@@ -56,6 +58,8 @@ extern const unsigned char spr_Mine_Light[];
 extern const unsigned long spr_Mountain[][38];
 
 extern const unsigned short spr_OilDark[];
+
+extern const unsigned char spr_OilDrum[];
 
 extern const unsigned short spr_OilLight[];
 

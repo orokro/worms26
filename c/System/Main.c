@@ -114,7 +114,7 @@ void _main(void)
 	Draw_cake(1,1);
 	
 	int i=0;
-	
+
 	// main loop!
 	GameRunning=TRUE;
 	while(GameRunning)

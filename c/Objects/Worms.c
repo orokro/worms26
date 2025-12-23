@@ -112,7 +112,7 @@ void spawnWorm(short index)
 	Worm_physObj[index].bouncinessY = 0.0f;
 	
 	// for debug, give random health:
-	Worm_health[index] = random(200)+1;
+	// Worm_health[index] = random(200)+1;
 	
 	// render initial health sprite
 	renderHealthSprite(index);
@@ -136,7 +136,7 @@ void checkCratesAndMines(short index)
         // Check if active, not triggered, and close enough
         if((Mine_active & (1<<i)) && !(Mine_triggered & (1<<i)))
         {
-             if(abs(Mine_x[i] - Worm_x[index]) < 15 && abs(Mine_y[i] - Worm_y[index]) < 15)
+             if(abs(Mine_x[i] - Worm_x[index]) < 13 && abs(Mine_y[i] - Worm_y[index]) < 13)
              {
                  Mines_trigger(i);
              }
@@ -203,7 +203,7 @@ void Worm_update()
 			// check all explosions if they are near-by and damaging this worm
 			short damage = Physics_checkExplosions(&Worm_physObj[i]);
 			if(damage!=0)
-				Worm_setHealth(i, -damage, TRUE);
+				Worm_setHealth(i, -damage*2, TRUE);
 				
 			// if the worm is considered "settled" no need for physics
 			if(!(Worm_settled & wormMask))
