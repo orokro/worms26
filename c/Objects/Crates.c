@@ -30,7 +30,11 @@
 #include "Explosions.h"
 #include "SpriteData.h"
 #include "Draw.h"
+#include "StatusBar.h"
+#include "Weapons.h"
 
+// defines
+#define NUM_TOOLS 16
 
 // x/y positions of our Crates
 short Crate_x[MAX_CRATES] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -451,6 +455,26 @@ void Crates_update()
 }
 
 
+// array of valid tool indexes
+const char toolIndices[NUM_TOOLS] = {
+	0, // Jetpack
+	7, // Blowtorch
+	8, // Ninja Rope
+	12, // Skip Go
+	20, // Pneumatic Drill
+	21, // Bungie
+	25, // Surrender Flag
+	26, // Fast Walk
+	33, // Girder
+	34, // Parachute
+	38, // Select Worm
+	39, // Laser Sight
+	47, // Teleport
+	51, // Freeze
+	52, // Invisibility
+	59, // Girder Pack
+};
+
 /**
  * allows a worm to pick up a crate
  * @param index - which crate to pick up
@@ -463,7 +487,25 @@ void Crates_pickUp(short index, short worm)
 	
 	// based on the type, upgrade the worm
 	if(Crate_type[index]==crateHealth)
+	{
 		Worm_setHealth(worm, 50, TRUE);
+		StatusBar_showMessage("+50 Health!");
+	}
+	else if(Crate_type[index]==crateTool)
+	{
+
+		// give worm a tool
+		short toolIndex = toolIndices[random(NUM_TOOLS)];
+		Game_weapInventory[toolIndex][0]++;
+		StatusBar_showMessage(weaponNames[toolIndex]);
+	}
+	else if(Crate_type[index]==crateWeapon)
+	{
+		// pick random index from 0-65
+		short weaponIndex = random(65);
+		Game_weapInventory[weaponIndex][0]++;
+		StatusBar_showMessage(weaponNames[weaponIndex]);
+	}
 }
 
 

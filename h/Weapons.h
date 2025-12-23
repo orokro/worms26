@@ -63,6 +63,9 @@ enum Weapons {
 };
 
 
+// names of all weapons
+extern const char weaponNames[65][16];
+
 // weapons globals
 extern char Weapon_type[MAX_WEAPONS];
 extern short Weapon_x[MAX_WEAPONS];

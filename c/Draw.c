@@ -27,7 +27,7 @@
 #include "Explosions.h"
 #include "Map.h"
 #include "Match.h"
-
+#include "StatusBar.h"
 
 // Global Variables (Defined in Game.c)
 extern char Game_wormAnimState;    // Current animation state (0=None, 1=Jump, 2=Backflip)
@@ -39,85 +39,6 @@ unsigned long windSprites[3][3];
 
 // flipped weapon sprites
 unsigned short spr_weapons_flipped[NUM_WEAPONS][11];
-
-// static weapon names declaration since we only really need the names in this draw method
-// using flat ID space
-static const char weaponNames[65][16] = {
-	// row 1
-	"Jetpack",
-	"Bazooka",
-	"Grenade",
-	"Shotgun",
-	"Fire Punch",
-	"Dynamite",
-	"Air Strike",
-	"Blow Torch",
-	"Ninja Rope",
-	"Sup. Banana Bomb",
-	"Petrol Bomb",
-	"Mad Cows",
-	"Skip Go",
-	
-	// row 2
-	"Low Gravity",
-	"Homing Missile",
-	"Cluster Bomb",
-	"Handgun",
-	"Dragon Ball",
-	"Mine",
-	"Napalm Strike",
-	"Pneumatic Drill",
-	"Bungee",
-	"Holy Hand G'nade",
-	"Skunk",
-	"Old Woman",
-	"Surrender",
-	
-	// row 3
-	"Fast Walk",
-	"Mortar",
-	"Banana Bomb",
-	"Uzi",
-	"Kamikaze",
-	"Sheep",
-	"Mail Strike",
-	"Girder",
-	"Parachute",
-	"Flame Thrower",
-	"Ming Vase",
-	"Concrete Donkey",
-	"Select Worm",
-	
-	// row 4
-	"Laser Sight",
-	"Homing Pigeon",
-	"Battle Axe",
-	"Minigun",
-	"Suicide Bomber",
-	"Super Sheep",
-	"Mine Strike",
-	"Baseball Bat",
-	"Teleport",
-	"Salvation Army",
-	"Sheep Strike",
-	"Nuclear Test",
-	"Freeze",
-	
-	// row 5
-	"Invisibility",
-	"Sheep Launcher",
-	"Earthquake",
-	"Longbow",
-	"Prod",
-	"Mole Bomb",
-	"Mole Squadron",
-	"Girder Pack",
-	"ScalesOfJustice",
-	"MB Bomb",
-	"Carpet Bomb",
-	"Armageddon",
-	"Magic Bullet"	
-};
 
 // buffers for our weapons screen
 void *weaponsLight, *weaponsDark;
@@ -612,7 +533,7 @@ void Draw_cake(short amount, short total)
 	
 	char progStr[40];
 	sprintf(progStr, "Loading... %d%%", (short)((float)((float)amount/(float)total)*100));
-	DrawStr(40,70,progStr, A_NORMAL);	
+	DrawStr(40,70, progStr, A_NORMAL);	
 
 	// now flip the planes
 	GrayDBufToggleSync();
@@ -668,6 +589,9 @@ void Draw_renderGame()
 	// HUD stuff is drawn last since it needs to go on top of all game elements
 	drawHUD();
 	
+	// Draw status bar messages
+	StatusBar_draw();
+	
 	// if the game mode is worm select, draw the selection arrow
 	if(Game_mode==gameMode_WormSelect)
 		drawSelectArrow();
@@ -679,10 +603,10 @@ void Draw_renderGame()
 	// for now, we will output a bunch of debug info on the screen
 	
 	// game modes by name	{"Select", "Turn", "WeaponSel", "Pause", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
-	static const char modes[9][16] = {"", "", "", "", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
+	//static const char modes[9][16] = {"", "", "", "", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
 	
 	// draw the current and previous game mode on the screen
-	DrawStr(60,1,modes[(short)Game_mode], A_XOR);
+	//DrawStr(60,1,modes[(short)Game_mode], A_XOR);
 
 	// draw the current grace time, turn time, and retreat time on the screen
 	// NOTE: for some reason, drawing sudden death time instead of retreat time crashes the game)

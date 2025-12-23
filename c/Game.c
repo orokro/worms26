@@ -128,6 +128,7 @@
 #include "Explosions.h"
 #include "CharacterController.h"
 #include "Map.h"
+#include "StatusBar.h"
 
 // this has to be defined before the next set of includes or else they'll try too reference it too early - they're .c includes
 void gameUpdates();
@@ -456,6 +457,9 @@ void gameUpdates()
 	
 	// gravity and physics for worms!
 	Worm_update();
+
+	// status bar update
+	StatusBar_update();
 	
 	// update OilDrums, Crates, Mines, Weapons
 	if(OilDrum_active)

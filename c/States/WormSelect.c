@@ -4,14 +4,17 @@
 	
 	This file is a snippet that is included raw in Game.c
 	
-	This handles the WormSelect statemachine specifc code.
+	This handles the WormSelect state machine specific code.
 */
+
+// reusable msg buffer
+static char buffer[32];
 
 
 /**
  * Renders the 3 sprites used to animate the window meter, for the current wind level.
  *
- * Should only be called once at the begininng of the turn.
+ * Should only be called once at the beginning of the turn.
 */
 void renderWindSprites()
 {
@@ -24,7 +27,7 @@ void renderWindSprites()
 	if(Game_wind>0)
 		arrows[0] = arrows[0]<<1;
 		
-	// build a bitmask that represents the wind strenth, starting from the middle, 16, and left or right if its left wind or right wind...
+	// build a bitmask that represents the wind strength, starting from the middle, 16, and left or right if its left wind or right wind...
 	unsigned long windBar = 0;
 	short i;
 	for(i=0; i<abs(Game_wind); i++)
@@ -92,8 +95,12 @@ static void WormSelect_enter()
 	
 	// toggle teams
 	Game_currentTeam = (Game_currentTeam==1 ? 0 : 1);
-	
-	// when the team changes, temporarily (maybe perminantly) we will reset the weapon
+
+	// show current team on status bar message
+	sprintf(buffer, "%s's Turn", Match_teamNames[(short)Game_currentTeam]);
+	StatusBar_showMessage(buffer);
+
+	// when the team changes, temporarily (maybe permanently) we will reset the weapon
 	// for debug / sanity check
 	Game_currentWeaponSelected = -1;
 	Game_currentWeaponProperties = 0;

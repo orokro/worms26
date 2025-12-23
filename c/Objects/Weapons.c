@@ -477,6 +477,84 @@ unsigned long Weapon_props[72] = {
 };
     
     
+// all weapon names
+const char weaponNames[65][16] = {
+	// row 1
+	"Jetpack", 				// 0
+	"Bazooka",				// 1
+	"Grenade",				// 2
+	"Shotgun",				// 3
+	"Fire Punch",			// 4
+	"Dynamite",				// 5
+	"Air Strike",			// 6
+	"Blow Torch",			// 7
+	"Ninja Rope",			// 8
+	"Sup. Banana Bomb",		// 9
+	"Petrol Bomb",			// 10
+	"Mad Cows",				// 11
+	"Skip Go",				// 12
+	
+	// row 2
+	"Low Gravity",			// 13
+	"Homing Missile",		// 14
+	"Cluster Bomb",			// 15
+	"Handgun",				// 16
+	"Dragon Ball",			// 17
+	"Mine",					// 18
+	"Napalm Strike",		// 19
+	"Pneumatic Drill",		// 20
+	"Bungee",				// 21
+	"Holy Hand G'nade",		// 22
+	"Skunk",				// 23
+	"Old Woman",			// 24
+	"Surrender",			// 25
+	
+	// row 3
+	"Fast Walk",			// 26
+	"Mortar",				// 27
+	"Banana Bomb",			// 28
+	"Uzi",					// 29
+	"Kamikaze",				// 30
+	"Sheep",				// 31
+	"Mail Strike",			// 32
+	"Girder",				// 33
+	"Parachute",			// 34
+	"Flame Thrower",		// 35
+	"Ming Vase",			// 36
+	"Concrete Donkey",		// 37
+	"Select Worm",			// 38
+	
+	// row 4
+	"Laser Sight",			// 39
+	"Homing Pigeon",		// 40
+	"Battle Axe",			// 41
+	"Minigun",				// 42
+	"Suicide Bomber",		// 43
+	"Super Sheep",			// 44
+	"Mine Strike",			// 45
+	"Baseball Bat",			// 46
+	"Teleport",				// 47
+	"Salvation Army",		// 48
+	"Sheep Strike",			// 49
+	"Nuclear Test",			// 50
+	"Freeze",				// 51
+	
+	// row 5
+	"Invisibility",			// 52
+	"Sheep Launcher",		// 53
+	"Earthquake",			// 54
+	"Longbow",				// 55
+	"Prod",					// 56
+	"Mole Bomb",			// 57
+	"Mole Squadron",		// 58
+	"Girder Pack",			// 59
+	"ScalesOfJustice",		// 60
+	"MB Bomb",				// 61
+	"Carpet Bomb",			// 62
+	"Armageddon",			// 63
+	"Magic Bullet"			// 54
+};
+
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 
