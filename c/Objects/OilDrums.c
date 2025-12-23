@@ -161,8 +161,8 @@ void OilDrums_drawAll()
 			if(worldToScreen(&screenX, &screenY))
 			{
 				// draw the oil drums fill and outline
-				ClipSprite16_OR_R(screenX-4, screenY-5, 11, spr_Oil_Dark, darkPlane);
-				ClipSprite16_OR_R(screenX-4, screenY-5, 11, spr_Oil_Light, lightPlane);
+				GrayClipSprite16_AND_R(screenX-4, screenY-5, 12, spr_OilMask, spr_OilMask, lightPlane, darkPlane);
+				GrayClipSprite16_OR_R(screenX-4, screenY-5, 12, spr_OilLight, spr_OilDark, lightPlane, darkPlane);
 				
 				
 				// if the oil drum is "settled" draw an arrow above it, for debug

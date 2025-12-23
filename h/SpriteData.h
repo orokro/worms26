@@ -55,9 +55,11 @@ extern const unsigned char spr_Mine_Light[];
 #define NUM_MOUNTAIN 5
 extern const unsigned long spr_Mountain[][38];
 
-extern const unsigned short spr_Oil_Dark[];
+extern const unsigned short spr_OilDark[];
 
-extern const unsigned short spr_Oil_Light[];
+extern const unsigned short spr_OilLight[];
+
+extern const unsigned short spr_OilMask[];
 
 extern const unsigned short spr_Parachute[];
 
