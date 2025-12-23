@@ -349,6 +349,12 @@ void drawWater()
 		ClipSprite32_OR_R(waterX, waterY, 9, &spr_Water_Light[0+(f*23)], lightPlane);
 	}
 
+	// draw the current worms y position on screen
+	//const short currentWormY = Worm_y[(short)Worm_currentWorm];
+	//static char buffer[32];
+	//sprintf(buffer, "Worm Y: %d", currentWormY);
+	//GrayDrawStr2B(50, 1, buffer, A_XOR, lightPlane, darkPlane);
+
 	// if the top of the under-area is offscreen, no need to draw the rest
 	if((waterY + 9) >= 99)
 		return;
@@ -650,12 +656,12 @@ void Draw_renderGame()
 	//DrawStr(0,60, camStr , A_XOR);
 	
 	// draw our free memory on the screen, only when shift is held for debuging
-	if(Keys_keyState(keyCameraControl))
-	{
-		char heapStr[40];
-		sprintf(heapStr, "%lu", (unsigned long)HeapAvail());
-		DrawStr(0,1, heapStr , A_XOR);
-	}
+	//if(Keys_keyState(keyCameraControl))
+	//{
+	//	char heapStr[40];
+	//	sprintf(heapStr, "%lu", (unsigned long)HeapAvail());
+	//	DrawStr(0,1, heapStr , A_XOR);
+	//}
 }
 
 

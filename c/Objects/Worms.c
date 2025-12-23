@@ -28,6 +28,7 @@
 #include "PhysCol.h"
 #include "Worms.h"
 #include "Map.h"
+#include "StatusBar.h"
 
 
 // the X/Y position of all the worms
@@ -77,8 +78,11 @@ unsigned long healthSprites[16][18];
 unsigned long healthMasks[16][18];
 unsigned long healthLightGray[16][18];
 
-void renderHealthSprite(short index);
+// reusable msg buffer
+static char buffer[32];
 
+// function prototype
+void renderHealthSprite(short index);
 
 
 
@@ -199,6 +203,22 @@ void Worm_update()
 			//	Camera_focusOn(&Worm_x[i], &Worm_y[i]);
 				
 			//}
+
+			// if the worm is below water, insta-kill it
+			if((Worm_isDead & wormMask)==0 && Worm_y[i]>(196-Game_waterLevel)){
+				
+				Worm_isDead |= wormMask;
+				Worm_setHealth(i, 0, FALSE);
+				
+				sprintf(buffer, "Worm %s drowned!", Match_wormNames[i]);
+				StatusBar_showMessage(buffer);				
+				
+				// immediately end the turn if the current worm drowned
+				if(i == Worm_currentWorm)
+					Game_changeMode(gameMode_AfterTurn);
+				
+				continue;
+			}
 			
 			// check all explosions if they are near-by and damaging this worm
 			short damage = Physics_checkExplosions(&Worm_physObj[i]);
@@ -238,10 +258,6 @@ void Worm_update()
 		
 			//check if a worm triggered a crate or a mine
 			checkCratesAndMines(i);
-					
-			// if the worm goes below 200 pixels, its drown:
-			if(Worm_y[i]>200)
-				Worm_isDead |= wormMask;
 					
 		}// end if active worm
 	}// next i
