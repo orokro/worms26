@@ -53,7 +53,7 @@ char Crate_xVelo[MAX_CRATES] = {0, 0, 0, 0, 0, 0, 0, 0};
 char Crate_yVelo[MAX_CRATES] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 // only one crate can have a parachute at a time. if this is -1, none do
-// if this is anything else, it's the index of the parachut crate
+// if this is anything else, it's the index of the parachute crate
 char parachuteCrate=-1;
 
 
@@ -120,7 +120,7 @@ static char spawnCrate()
 		So we need to intelligently pick a place to spawn a crate.
 		
 		The crate will spawn in the sky and fall down, so it will hit the top-most
-		land pixel in the colum of pixels it spawns in.
+		land pixel in the column of pixels it spawns in.
 		
 		However, the crate cannot spawn where it will touch a worm as it's falling
 		down, or after it's landed, because that worm will unfairly get the crate
@@ -141,21 +141,21 @@ static char spawnCrate()
 		that worm exists in.
 		
 		While looping over the worms, we will also build an unsigned long where it's
-		bits represent vertical colums that worms exist in.
+		bits represent vertical columns that worms exist in.
 		
-		it's entirely possible that no worms exist in this colum, or no parts of worms.
+		it's entirely possible that no worms exist in this column, or no parts of worms.
 		
 		Anyway once we have these two things: an array of worms tops in our pixel columns,
 		and a bitwise unsigned long of columns worms exist in in our pixel columns,
 		We can move onto the next phase.
 		
-		We will create another array of 32 unsigned chars, all set to -1 by deault.
+		We will create another array of 32 unsigned chars, all set to -1 by default.
 		We will also use another unsigned long, where it's bits represent if we've
 		seen a pixel in that column.
 		
 		we will then move down the entire 32bit wide column from the top.
 		
-		When we first encounter a pixel in a colum, we check if it's ABOVE any worms
+		When we first encounter a pixel in a column, we check if it's ABOVE any worms
 		that might exist in that pixel column. If it is above, then we save it as a valid
 		pixel.
 		
@@ -163,13 +163,13 @@ static char spawnCrate()
 		that worm on the way down.
 		
 		We can keep moving down until we've either disqualified or found a pixel in all 32 columns,
-		or until we reach the end of the colum in the buffer.
+		or until we reach the end of the column in the buffer.
 		
-		After this colum pass, we will have an array of valid tops that wont conflict and can pick
+		After this column pass, we will have an array of valid tops that wont conflict and can pick
 		a random one.
 	*/
 	
-	// if we found a spawn point or not, and it's x colum
+	// if we found a spawn point or not, and it's x column
 	short spawnCol = -9000;
 	
 	// keep track of which columns we've tested, and how many columns are left to test
@@ -177,13 +177,13 @@ static char spawnCrate()
 	char remaining=10;
 	while(remaining>0)
 	{
-		// pick a random colum to spawn in
+		// pick a random column to spawn in
 		short r = random((short)remaining);
 		short col = cols[r];
 		
 		// since we picked a spot from our array, we will move the highest
 		// remaining column into it's hole, and decrease the remaining counter
-		// this way, on next loop, we will pick a random nubmer in the range of
+		// this way, on next loop, we will pick a random number in the range of
 		// remaining columns
 		cols[r] = cols[(short)remaining];
 		remaining--;
@@ -191,7 +191,7 @@ static char spawnCrate()
 		// calculate the left pixel of the column
 		short colX = col*32;
 		
-		// so, now that we have a colum, we need to loop over all the worms,
+		// so, now that we have a column, we need to loop over all the worms,
 		// and build an array of their tops from left-to-right, if they over lap with our column
 		// we will make the worms default values an impossible one, to know if it's valid or not
 		short wormTops[] = 	{ 900, 900, 900, 900, 900, 900, 900, 900,
@@ -236,7 +236,7 @@ static char spawnCrate()
 		// once we've checked or invalidated all pixels, we can exit the loop early if these bits are all unset
 		unsigned long undoneCols = 0b11111111111111111111111111111111;
 
-		// if we find even one valid colum, we can spawn a crate!
+		// if we find even one valid column, we can spawn a crate!
 		char foundValid = FALSE;
 		
 		// buffer references
@@ -261,18 +261,18 @@ static char spawnCrate()
 			short p;
 			for(p=0; p<32; p++)
 			{
-				// is this colum undone we should check it
+				// is this column undone we should check it
 				if(undoneCols & pixel)
 				{
 					// if the pixel is on, and not interfering with a worm, we can set this pixel as a valid spawn point
 					if((pixels & pixel) && (wormTops[p]==900 || i<wormTops[p]))
 					{
-						// then we can save this top, say that this colum is satisfied, and we found a valid pixel
+						// then we can save this top, say that this column is satisfied, and we found a valid pixel
 						spawnTops[p] = i;
 						undoneCols &= ~pixel;
 						foundValid=TRUE;
 						
-					// otherwise, if the pixel is greater than a worms top, we can deactivte this column
+					// otherwise, if the pixel is greater than a worms top, we can deactivate this column
 					}else if(i>=wormTops[p])
 						undoneCols &= ~pixel;
 						
@@ -491,7 +491,7 @@ void Crates_drawAll()
 					ClipSprite16_MASK_R(screenX-6, screenY-16, 12, spr_Parachute+24, spr_Parachute, darkPlane);
 				}
 				
-				// draw crate (this comes after parachut so it can slightly overlap)
+				// draw crate (this comes after parachute so it can slightly overlap)
 				unsigned short *sprite = ((Crate_type[i]==crateHealth) ? (unsigned short*)&spr_CrateHealth[0] : ((Crate_type[i]==crateWeapon) ? (unsigned short*)&spr_CrateWeapon[0] : (unsigned short*)&spr_CrateTool[0]));					
 				ClipSprite16_MASK_R(screenX-6, screenY-6, 12, sprite+12, sprite, lightPlane);
 				ClipSprite16_MASK_R(screenX-6, screenY-6, 12, sprite+24, sprite, darkPlane);

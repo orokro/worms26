@@ -65,14 +65,14 @@ char Worm_currentWorm = 0;
 // the last frame. We can't end a turn until all worms are "stable"
 unsigned short Worm_settled = 0;
 
-// if the collision dection for DOWN on a worm was true, then the worm is "on the ground"
-// this is important for detecting falling for parachut or for walking
+// if the collision detection for DOWN on a worm was true, then the worm is "on the ground"
+// this is important for detecting falling for parachute or for walking
 unsigned short Worm_onGround = 0;
 
 // the current worms 10x10 tile. we don't need to store both X and Y, just the tile index
 short Worm_tile[MAX_WORMS] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
-// these sprites will be genreated at the beginning and when health changes.
+// these sprites will be generated at the beginning and when health changes.
 unsigned long healthSprites[16][18];
 unsigned long healthMasks[16][18];
 unsigned long healthLightGray[16][18];
@@ -187,7 +187,7 @@ void Worm_update()
 	unsigned short Worm_wasOnGround = Worm_onGround;
 	for(i=0; i<MAX_WORMS; i++)
 	{
-		// caculate the bitmask for this worm once, since we'll use it alot
+		// calculate the bitmask for this worm once, since we'll use it a lot
 		wormMask = 1;
 		wormMask = (unsigned short)((unsigned short)wormMask<<(i));
 		
@@ -299,7 +299,7 @@ void txtToBuffer(unsigned long *buffer, unsigned long *mask, char *txt, char col
 			// convert px to our column
 			short col = (px<32) ? 0 : 5;
 
-			// erase this pixel from all rows on our current colum...
+			// erase this pixel from all rows on our current column...
 			int row;
 			for(row=0; row<5; row++)
 			{

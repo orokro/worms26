@@ -9,7 +9,7 @@
 	Mines can either be enabled or disabled.
 	If disabled, they will not spawn on the map.
 	
-	Mines can have pre-set fuse lenghs, or random fuse lengths.
+	Mines can have pre-set fuse lengths, or random fuse lengths.
 	
 	Mines can optionally have duds, which fizzle out and do not explode
 	when their fuse runs out.
@@ -58,7 +58,6 @@ unsigned short Mine_triggered=0;
 unsigned short Mine_settled=0;
 
 // local vars
-char proxmityCheckTimer = 0;
 PhysObj Mine_physObj[MAX_MINES];
 
 
@@ -93,7 +92,7 @@ void spawnMine(char index)
 /**
  * Updates a Mine of given index, should be called every frame by Mines_update().
  * 
- * @param index the mine to udpate.
+ * @param index the mine to update.
 */
 void updateMine(short index)
 {
@@ -192,7 +191,7 @@ void Mines_update()
 		// only update active mines
 		if(Mine_active & (unsigned short)1<<(i))
 		{
-			// udpates the mine (if it has a timer, decrease it and explode it if necessary)
+			// updates the mine (if it has a timer, decrease it and explode it if necessary)
 			updateMine(i);
 		}	
 	}// next i

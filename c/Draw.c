@@ -129,7 +129,7 @@ void *weaponsLight, *weaponsDark;
 
 
 /**
- * Convents world coordinates to screen coordinates, mutates the passed in pointers, and returns TRUE/FLASE if on screen (roughly).
+ * Convents world coordinates to screen coordinates, mutates the passed in pointers, and returns TRUE/FALSE if on screen (roughly).
  * 
  * The game is updated in world coordinates, but when it comes time to draw,
  * everything needs to be in screen coordinates.
@@ -778,7 +778,7 @@ void Draw_renderPauseMenu(char menuItem)
 	
 	/*
 	// controls text:
-	char controlsStr[] = "[2nd] confirm / use weapon\n[?] jump\n[a] back flip\n[?]+[?]/[?]/[?]/[?] move camera\n[F1]/[CAT] weapons menu\n[APPS] select worm (if enabled)\n[ESC] pause\n[1]/[2]/[3]/[4]/[5] fuse lengh / opts";
+	char controlsStr[] = "[2nd] confirm / use weapon\n[?] jump\n[a] back flip\n[?]+[?]/[?]/[?]/[?] move camera\n[F1]/[CAT] weapons menu\n[APPS] select worm (if enabled)\n[ESC] pause\n[1]/[2]/[3]/[4]/[5] fuse length / opts";
 	
 	// use tiny font to draw controls
 	FontSetSys(0);

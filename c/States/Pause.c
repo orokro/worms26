@@ -4,7 +4,7 @@
 	
 	This file is a snippet that is included raw in Game.c
 	
-	This handles the Pause state machine specifc code.
+	This handles the Pause state machine specific code.
 */
 
 

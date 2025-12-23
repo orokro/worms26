@@ -4,7 +4,7 @@
 	
 	This file is a snippet that is included raw in Game.c
 	
-	This handles the TurnEnd state machine specifc code.
+	This handles the TurnEnd state machine specific code.
 */
 
 

@@ -36,6 +36,6 @@ extern void *darkPlane;
  	 * @param y1 the y value of the first coordinate
  	 * @param x2 the x value of the second coordinate
  	 * @param y2 the y value of the second coordinate
- 	 * @return the distance between 2 points, via Pythags thereom
+ 	 * @return the distance between 2 points, via Pythagorean theorem
 */
 short dist(short, short, short, short);

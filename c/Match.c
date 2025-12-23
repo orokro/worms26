@@ -29,7 +29,7 @@ char Match_wormStartHealth = 100;
 // is worm selection enabled?
 char Match_allowWormSelection = TRUE;
 
-// playing with artilary mode? (no movement allowed)
+// playing with artillery mode? (no movement allowed)
 char Match_artilleryMode = FALSE;
 
 // how long are turns, in seconds?
@@ -40,7 +40,7 @@ char Match_minesEnabled = TRUE;
 char Match_mineFuseLength = 3;
 char Match_dudMines = TRUE;
 
-// playing with oil barrols?
+// playing with oil barrels?
 char Match_oilDrumsEnabled = TRUE;
 
 // allow each type of crate?
@@ -71,4 +71,3 @@ const char *Match_teamNames[2] = {"GMILLER", "LDEBROUX"};
 
 // the names of each worm
 const char *Match_wormNames[MAX_WORMS] = {"MCGUYVER", "SLINKYFISH", "BUB", "STUMPY", "MISTER CHEF", "GERTIE", "KOWALSKI", "MURPHY", "ZULU", "JEAN STAINS", "TITCHY", "MUSCLES", "THE VERT", "DARKNET", "SMOKESTACK", "ROPESY"};
-

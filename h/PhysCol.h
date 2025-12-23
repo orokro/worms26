@@ -63,7 +63,7 @@ typedef struct{
 	// the last X and Y position this object was on the previous frame
 	short lastX, lastY;
 	
-	// the objects bouciness on X and Y:
+	// the objects bounciness on X and Y:
 	// 0.0 = doesn't bounce.
 	// 1.0 = bounces back with full velocity
 	// -1.0 = special case: object not allowed to move on that axis
@@ -77,8 +77,8 @@ typedef struct{
 	// the index this of this object in it's corresponding arrays
 	char index;
 	
-	// the number of frames since this object hasnt moved
-	// when this reaches 3, it will be considered "setteled"
+	// the number of frames since this object hasn't moved
+	// when this reaches 3, it will be considered "settled"
 	char staticFrames;
 	
 	// references to the settled bit wise long for this object
@@ -95,7 +95,7 @@ typedef struct{
 /**
  * to be used like a pseudo constructor for a new Collider
  *
- * a collider can test various points around an objects center, and reposition the object appropriately if it colides with the land.
+ * a collider can test various points around an objects center, and reposition the object appropriately if it collides with the land.
  *
  * @param type the type of collider, which can be COL_UP, COL_DOWN, COL_LEFT, COL_RIGHT, COL_UP, COL_LR, or COL_UDLR
  * @param up the up amount to check, if its COL_UP, COL_UD, or COL_UDLR
@@ -114,9 +114,9 @@ extern Collider new_Collider(unsigned char type, char up, char down, char left, 
  * @param *y pointer to the objects y value
  * @param *xVelo pointer to the objects x velocity
  * @param *yVelo pointer to the objects y velocity
- * @param bounciness the percent amount (0.0 - 1.0) the objets velocity should be after colliding. Note: this sets both bouncinessX and bouncinessY. They can manually be set later if they need to be different.
+ * @param bounciness the percent amount (0.0 - 1.0) the objects velocity should be after colliding. Note: this sets both bouncinessX and bouncinessY. They can manually be set later if they need to be different.
  * @param smoothness the percent amount (0.0 - 1.0) the object should randomly change x directly when bouncing with the ground. 1.0 = always the same x direction. 0.0 = random direction.
- * @param settled the value that should be bit-masked if the object is considered settelted (e.g. hasn't moved in multiple frames)
+ * @param settled the value that should be bit-masked if the object is considered settled (e.g. hasn't moved in multiple frames)
  * @param c the objects Collider struct to test collisions with
 */
 extern PhysObj new_PhysObj(short *x, short *y, char *xVelo, char *yVelo, float bounciness, float smoothness, char objIndex, unsigned short *settled, Collider c);
@@ -157,7 +157,7 @@ extern short Physics_checkExplosions(PhysObj *obj);
 /**
  * This method takes a point in world space, and a direction and tests for collision.
  *
- * If the point collides with the map, it will calculate the first availble point in the opposite direction.
+ * If the point collides with the map, it will calculate the first available point in the opposite direction.
  * This method returns 0 if there is no collision, or the amount of pixels in the opposite direction for the
  * first non map pixel. This return value can be added to the items X/Y so it's not colliding.
  * The valid directions are COL_UP, COL_DOWN, COL_LEFT, COL_RIGHT

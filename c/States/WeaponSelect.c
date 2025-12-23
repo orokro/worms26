@@ -4,7 +4,7 @@
 	
 	This file is a snippet that is included raw in Game.c
 	
-	This handles the WeaponSelect state machine specifc code.
+	This handles the WeaponSelect state machine specific code.
 */
 
 
@@ -18,7 +18,7 @@ char weaponFastMove=0;
  * When a team brings up the weapons menu, we only want to show the items they have in stock.
  *
  * This method updates the Game_weapInventory[5][13] array such that it's vertical columns
- * reflect the weapons the user has available in that colum.
+ * reflect the weapons the user has available in that column.
 */
 void calcWeapInventory()
 {

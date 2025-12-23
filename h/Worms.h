@@ -54,7 +54,7 @@ extern void Worm_spawnWorms();
 
 
 /**
- * This handles updates, (i.e. phsysics, gravity, and map collisions) for worms, as well as damage checking from explosions.
+ * This handles updates, (i.e. physics, gravity, and map collisions) for worms, as well as damage checking from explosions.
 */
 extern void Worm_update();
 

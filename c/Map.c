@@ -176,7 +176,7 @@ void Map_traceEdges()
 			unsigned long changedBelow = current ^ below;
 			
 			// we can see which pixels changed horizontally by comparing with bit-shifts
-			// note that, on the edegs of our 32 bit map columns it will fail to draw horizontally changed pixels edge
+			// note that, on the edges of our 32 bit map columns it will fail to draw horizontally changed pixels edge
 			// it will still draw vertical changed pixels, however
 			unsigned long changedLeft = current ^ current<<1;
 			unsigned long changedRight = current ^ current>>1;
@@ -239,12 +239,12 @@ void Map_makeMap()
 		
 		We will loop from the left edge of the buffer, to the right edge of the buffer and set pixels at various heights
 		
-		Since the buffer will be updated 1 unsigned short at a time, we will generate the pixels for one colum at a time
+		Since the buffer will be updated 1 unsigned short at a time, we will generate the pixels for one column at a time
 		then copy to the map.
 		
 		As we go, every 12 pixels we will add a spawn-point for the upper and lower levels.
 		
-		We need a minum of 34 spawn-points, so we can spawn everything (16 worms, 8 oil drums, 10 mines)
+		We need a minimum of 34 spawn-points, so we can spawn everything (16 worms, 8 oil drums, 10 mines)
 		
 		If we generate land that is 0 height, we cant spawn on there. We, therefore, can't spawn more than 19*12 0 height
 		land points. We will keep track of 0 height land and if we exceed 19*12 pixels worth, stop allowing 0 height land.
@@ -292,7 +292,7 @@ void Map_makeMap()
 			note that these are relative positions - that is, the upper areas
 			will always be +/- 50, and the lower area always +/-150
 			
-			Also note that, the upperLineTop and upperLineBottm can never go below 0
+			Also note that, the upperLineTop and upperLineBottom can never go below 0
 			as they are subtracted from their relative position.
 		*/
 		upperLineTop += upperTopDir * random(3);
@@ -397,17 +397,17 @@ void Map_makeMap()
 			// if it's on, we should OR it on to the current memory of the map
 			if(pixelOn>0)
 			{
-				// we want to find the bit to draw... starting with the highest bit workign right
+				// we want to find the bit to draw... starting with the highest bit working right
 				// therefore, we want 31-(x%32)
 				// then shift that bit to be 1..
 				// then OR it on the map
 				unsigned long mask = 1;
 				mask = mask<<(31-(x%32));
 				
-				// what colum are we in?
+				// what column are we in?
 				short row = (x-(x%32))/32;
 				
-				// the texture will just loop its y colums, every 200 pixels
+				// the texture will just loop its y columns, every 200 pixels
 				light[(row*200)+y] |= (mask);
 				dark[(row*200)+y] |= (spr_LandTexture[y%32] & mask);
 		
@@ -437,7 +437,7 @@ char Map_testPoint(short x, short y)
 	// our X/Y position will be passed in world space.
 	// luckily, our map buffer is also world space.
 
-	// if the point is out of bounds, it's automatially a non-hit:
+	// if the point is out of bounds, it's automatically a non-hit:
 	if((x<0) || (x>=320) || (y<0) || (y>=200))
 		return FALSE;
 		
@@ -530,7 +530,7 @@ void Map_draw()
 				then we can still draw the map, but ScreenTop will be lower on the screen
 			- If the Camera goes below the map (CameraBottom is more than 200 in the map-buffer)
 				then we can still draw the map. ScreenTop will be 0, but we'll only draw till the end of the buffer
-			- If either the CameraBottom is less than 0 or CameraTop is greater than 200 then the map is compeltey
+			- If either the CameraBottom is less than 0 or CameraTop is greater than 200 then the map is complete
 				off screen, and we don't need to draw it at all.
 				
 		This way, the camera can still pan outside the map, into nothingness.
@@ -541,7 +541,7 @@ void Map_draw()
 	// camera top position, in world-space
 	short camTop = camY-50;
 	
-	// camera bottom position, in wrold-space
+	// camera bottom position, in world-space
 	short camBottom = camY+50;
 	
 	// camera left position, in world-space
@@ -566,7 +566,7 @@ void Map_draw()
 		short bufferTop=camTop;
 
 		// if both the top and the bottom of the buffer points are inbounds
-		// we can simplly draw the whole screen worth!
+		// we can simply draw the whole screen worth!
 		// we don't need to change any variables
 		
 		// if, however, the top of the camera is is above the map
@@ -588,8 +588,8 @@ void Map_draw()
                 
             // [FIX] Abort if the map is completely below the screen (Height <= 0)
 	        // This handles camY <= -49 where screenTop >= 99
-	        if(screenTop >= screenBottom) 
-	            return;
+			if(screenTop >= screenBottom) 
+				return;
             
 			// we want to only copy pixels for the rest of the screen
 			screenBottom = 99;
@@ -636,7 +636,7 @@ void Map_draw()
 		// if the right of the camera is beyond the right edge of the buffer...
 		}else if(camRight>319)
 		{
-			// we will definately start drawing on the left side of the screen
+			// we will definitely start drawing on the left side of the screen
 			screenLeft = 0;
 			
 			// we will start the buffer at the left-camera edge:
@@ -663,12 +663,12 @@ void Map_draw()
 		{
 			short offset = screenLeft==0 ? camLeft%32 : 0;
 
-			// take advantage of extgrah's sprite method to handle bit shiting and mem copying in one swoop!
+			// take advantage of extgrah's sprite method to handle bit siting and mem copying in one swoop!
 			ClipSprite32_OR_R(screenLeft+(bufferCol*32)-offset, screenTop, screenBottom-screenTop, &light[((colBuff+bufferCol)*200)+bufferTop], lightPlane);
 			ClipSprite32_XOR_R(screenLeft+(bufferCol*32)-offset, screenTop, screenBottom-screenTop, &dark[((colBuff+bufferCol)*200)+bufferTop], lightPlane);
 			ClipSprite32_OR_R(screenLeft+(bufferCol*32)-offset, screenTop, screenBottom-screenTop, &dark[((colBuff+bufferCol)*200)+bufferTop], darkPlane);
 
-			// on the next iteration we will be on the next buffer 32 bit colum
+			// on the next iteration we will be on the next buffer 32 bit column
 			bufferCol++;
 		
 		}// next x

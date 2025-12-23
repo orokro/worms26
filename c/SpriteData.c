@@ -4,7 +4,7 @@
 	
 	For now this is where we'll store our raw sprite data.
 	
-	Perhapse at some point in the future we'll consider compression with RLE or similar.	
+	Perhaps at some point in the future we'll consider compression with RLE or similar.	
 */
 
 // includes

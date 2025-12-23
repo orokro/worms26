@@ -25,7 +25,7 @@
 	1 - Turn Mode
 			In this mode, the main-turn timer is counting down, if it expires the turn is over.
 			
-			During this mode, the user can put the game into alternate modes, such as cursor, weapon selecet, etc.
+			During this mode, the user can put the game into alternate modes, such as cursor, weapon select, etc.
 			
 			During this mode, weapons can be active.
 			
@@ -48,12 +48,12 @@
 			
 			The user can press 2ND to place a cursor, ending this mode. Depending on the weapon selected, ending
 			this mode will either activate the weapon and move to Turn End mode or, if it's a weapon that requires further
-			action on the users part, such as a homing missle, return to Turn Mode.
+			action on the users part, such as a homing missile, return to Turn Mode.
 			
 			If the user presses ESCAPE during this mode, it will return to Turn Mode
 			
 	5 - Turn End Mode
-			Turn end mode is avtivated by a number of conditions:
+			Turn end mode is activated by a number of conditions:
 				- A worm fires a single shot-weapon
 				- A worm uses a weapon such as air-strike or something else
 				- A worm fires the last shot in a multi-shot weapon
@@ -86,30 +86,30 @@
 				also doesn't end until everything is settled:
 				- No active mines
 				- No moving / falling / sliding worms or objects
-				- No active explosions (worm deaths could explode nearby crates or barrols)
+				- No active explosions (worm deaths could explode nearby crates or barrels)
 				- No active fire particles
 				
 				After all the worms have exploded and things have "settled" we can continue to Crate Spawn mode
 			
 		7 - After Turn Mode
-				After a turn is comlpete, but before the next turn, occasionally crates can spawn.
+				After a turn is complete, but before the next turn, occasionally crates can spawn.
 				
 				A random number will be picked, and if within threshold, a random crate will spawn somewhere on the
 				map, with a parachute attached.
 				
 				Before this mode can exit, the crate must land on the ground, and "settle". If the user presses
-				the keyAction, the parachut will cancel and regular gravity will apply.
+				the keyAction, the parachute will cancel and regular gravity will apply.
 				
 				This mode is also where the water will rise if sudden death is enabled
 				
 		8 - Game Over
-				When one team is completely elimated, or the game ends in a draw, it automatically goes to Game Over mode.
+				When one team is completely elated, or the game ends in a draw, it automatically goes to Game Over mode.
 				
 				If there is a winner, it will be announced and their remaining worms shall dance.
 				
 				If there is a draw, it will be announced.
 				
-				After the user confirms the annoucement with any key, the game will exit.
+				After the user confirms the announcement with any key, the game will exit.
 */
 
 
@@ -209,7 +209,7 @@ char Debug_stopTime = FALSE;
 	Note: the weapons all have fixed places in the matrix for selecting weapons.
 	
 	However, if a worm is out of stock we shouldn't show that weapon. Further,
-	we should slide whatever weapons that are instock, below it, up. This is like
+	we should slide whatever weapons that are in stock, below it, up. This is like
 	real worms. Thus, this array doesn't store weapon counts, but rather, the
 	ID's of the weapons for this current teams inventory.
 */
@@ -266,7 +266,7 @@ void Game_update()
 	// before we do anything else, we should update the states of the keys
 	Keys_update();
 	
-	// always update the camera, even when we arent rendering the game (easier this way)
+	// always update the camera, even when we aren't rendering the game (easier this way)
 	Camera_update();
 	
 	// depending on the current game mode, different logic will be present for each mode
@@ -405,7 +405,7 @@ static void startSuddenDeath()
 */
 static void gameTimers()
 {
-	// always decreates the sudden death timer
+	// always decreases the sudden death timer
 	// Game_suddenDeathTimer--;
 	
 	// note: technically suddenDeathTimer will go negative, but I doubt anyone will play
@@ -421,7 +421,7 @@ static void gameTimers()
 		Game_timer--;
 		
 	// if we hit zero, end the turn!
-	// note the states after turn will keep decremending the timers, so this will go negative
+	// note the states after turn will keep decrementing the timers, so this will go negative
 	// we only want to end the turn on the frame that it hit 0
 	if(Game_timer==0)
 		Game_changeMode(gameMode_TurnEnd);
@@ -486,7 +486,7 @@ char Game_allSettled()
 			
 		we don't care about inactive items weather they are settled or not.
 		
-		if we AND the active items and the setttled items, we will get an unsigned short of items that are
+		if we AND the active items and the settled items, we will get an unsigned short of items that are
 		active and settled.
 		
 		If we AND the active items with the ~ inverse of the result, it should equal 0. This means, all

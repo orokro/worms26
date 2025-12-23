@@ -14,7 +14,7 @@
 		- Ninja rope
 		- Bungee cord
 		- Parachute
-		- Jetpack
+		- Jet pack
 
 	We will handle all of them in here...
 
@@ -217,7 +217,7 @@ void wormWeapon()
  */
 void CharacterController_update()
 {
-	// if the camera is being controled, no need to controll the character
+	// if the camera is being controlled, no need to control the character
 	if (Keys_keyState(keyCameraControl))
 		return;
 
@@ -233,9 +233,9 @@ void CharacterController_update()
 	if (Worm_onGround & wormMask)
 		wormWalk();
 
-	// if the user has a weapon selectedan check for first-frames of keyDown
+	// if the user has a weapon selected and check for first-frames of keyDown
 	if (Game_currentWeaponSelected != -1)
 		wormWeapon();
 
-	// TO-DO: implement parachute, bunjee, and ninja rope
+	// TO-DO: implement parachute, bungee, and ninja rope
 }

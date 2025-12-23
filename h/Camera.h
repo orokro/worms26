@@ -30,7 +30,7 @@ extern void Camera_update();
  * Sets the Camera to focus on a pair of short points.
  *
  * The Camera will follow the pointers set each frame.
- * If the variavles that were passed in as pointers are updated,
+ * If the variables that were passed in as pointers are updated,
  * the Camera will have new coordinates to follow each frame.
  *
  * @param targetX a pointer to a short x variable for the Camera to track

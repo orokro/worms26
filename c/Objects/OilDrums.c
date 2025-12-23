@@ -111,7 +111,7 @@ void OilDrums_update()
 		char enabled = (char)((OilDrum_active & (unsigned short)1<<(i)) > 0);
 		if(enabled)
 		{
-			// check all explosions if they are near-by and damaging this oildrum
+			// check all explosions if they are near-by and damaging this oil drum
 			short damage = Physics_checkExplosions(&OilDrum_physObj[i]);
 			OilDrum_health[i] -= damage;
 			

@@ -18,7 +18,7 @@
 // when spawning a weapon, these can be ORed together to create it's logic
 #define usesAim 				0b00000000000000000000000000000001	// true if this weapon needs to be aimable
 #define usesCharge 				0b00000000000000000000000000000010	// true if this weapon also charges while firing
-#define usesCursor 				0b00000000000000000000000000000100	// true if requires the curusor to pick an x/y location before firiing
+#define usesCursor 				0b00000000000000000000000000000100	// true if requires the cursor to pick an x/y location before firing
 #define usesPhysics 			0b00000000000000000000000000001000	// true if the weapon object that is spawned will use physics system
 #define usesWind 				0b00000000000000000000000000010000	// true if the weapon should be affected by wind physics
 #define usesHoming 				0b00000000000000000000000000100000	// true if weapon object that is spawned needs homing functionality in it's update loop
@@ -28,18 +28,18 @@
 #define usesDetonateOnImpact 	0b00000000000000000000001000000000	// true if it should explode when touching land
 #define isAnimal 				0b00000000000000000000010000000000	// true if it has animal update logic
 #define isCluster 				0b00000000000000000000100000000000	// true if it needs to spawn other items when it detonates
-#define isParticle 				0b00000000000000000001000000000000	// true if it's a object that has alternate physics (partical routine)
+#define isParticle 				0b00000000000000000001000000000000	// true if it's a object that has alternate physics (particular routine)
 #define isMele 					0b00000000000000000010000000000000	// true if it's a mele-type weapon
 #define spawnsSelf 				0b00000000000000000100000000000000	// true if the weapon object that is spawned should use the same sprite as it is in the menu
 #define multiUse 				0b00000000000000001000000000000000	// true if the weapon doesn't end turn
 #define usesRaycast				0b00000000000000010000000000000000	// true if the requires firing uses raycasting instead of spawning objects
 #define holdsSelf				0b00000000000000100000000000000000	// true if the weapon should use it's menu sprite in the worms hand
-#define holdsLauncher			0b00000000000001000000000000000000	// true if the weapon should use the generic rocket launcher when equiped
+#define holdsLauncher			0b00000000000001000000000000000000	// true if the weapon should use the generic rocket launcher when equipped
 #define holdsCustom				0b00000000000010000000000000000000  // true if there needs to be custom switch logic for what the worm should hold
 #define usesAirStrike			0b00000000000100000000000000000000  // weapons that spawn groups of things in the sky
 #define usesRoutine 			0b00000000001000000000000000000000  // true if the weapon needs custom per-frame logic	
-#define isMeta 					0b00000000010000000000000000000000  // true if the weapon needs custom per-frame logic	
-#define isDroppable 			0b00000000100000000000000000000000  // true if the weapon needs custom per-frame logic	
+#define isMeta 					0b00000000010000000000000000000000  // if weapon is meta (affects the round / game state)	
+#define isDroppable 			0b00000000100000000000000000000000  // true if its droppable (dynamite, mines, ming vase, etc)	
 
 /*
   enumerate our list of weapons, with matching index positions as described in the array above
