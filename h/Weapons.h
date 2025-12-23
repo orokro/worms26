@@ -48,7 +48,7 @@
   also note: these enumerations are also used for the current selected weapon, which doesn't
   necessarily have an in-game object, or might be different.
   
-  For isntance, a bow looks like a bow in the hand of the worm, but bow game objet is drawn as an arrow
+  For instance, a bow looks like a bow in the hand of the worm, but bow game objet is drawn as an arrow
   Where as a cluster bomb is drawn as a grenade in game, but spawns WFragments, which aren't a selectable
   weapon, only a weapon that exists as a side effect of a cluster or mortar, or etc. exploding.
   
@@ -88,7 +88,7 @@ extern char Weapon_aimPosList[10][2];
 		- fragments (from cluster bombs, mortars, etc)
 		- Fire / Napalm
 		- Skunk Gas / Poison Gas
-		- Coment (from Armegeddon)
+		- Coment (from Armageddon)
 	
 	Below is an array of 16 bit shorts we will use to bitwise store the properties of
 	each weapon type, so we can optimize the weapon routines to reuse code
@@ -115,7 +115,7 @@ extern unsigned long Weapon_props[72];
  * @param x the starting x position of the weapon
  * @param y the starting y position of the weapon
  * @param xVelocity the starting x velocity of the weapon
- * @param yVelocity the staarting y velocity of the weapon
+ * @param yVelocity the starting y velocity of the weapon
  * @param time weapons use time for different purposes, (e.g. fuse length)
  * @param properties a char that is used as a bitmasked variable for the types of properties this weapon requires
  * @returns a char that is the index of the weapon slot this weapon was spawned into, or -1 if no slot was available.
@@ -130,10 +130,10 @@ extern void Weapons_update();
 
 
 /**
- * When a weapon is a targeted weapon, such as Air Strike or Homing Missle, this sets the current X/Y target.
+ * When a weapon is a targeted weapon, such as Air Strike or Homing Missile, this sets the current X/Y target.
  *
  * @param x the x position in world space for the weapon target.
- * @param y the y posiiion in world space for the weapon target.
+ * @param y the y position in world space for the weapon target.
 */
 extern void Weapons_setTarget(short, short);
 

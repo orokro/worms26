@@ -4,7 +4,7 @@
 
 	It all begins here... as any C program.
 
-	Here we kick off the gray scale rendering, interupt hooks for key presses
+	Here we kick off the gray scale rendering, interrupt hooks for key presses
 	and other INIT.
 
 	The main loop, though sparse, is also here.
@@ -107,32 +107,40 @@ void _main(void)
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	Game_changeMode(gameMode_WormSelect);
 
+	// flips weapon sprites in ram so we can draw them facing left when needed
 	GenerateFlippedSprites();
 	
 	// done loading
 	Draw_cake(1,1);
 	
+	int i=0;
+	
 	// main loop!
 	GameRunning=TRUE;
 	while(GameRunning)
 	{	
-		// temporary (maybe perminant) short cut to always exit the game
+		// temporary (maybe permanent) short cut to always exit the game
 		// (the pause menu also provides a method to exit the game)
-		if(Keys_keyState(keyAction) && Keys_keyDown(keyEscape))
+		//if(Keys_keyState(keyAction) && Keys_keyDown(keyEscape))
+		//	GameRunning=FALSE;
+		if(Keys_keyDown(keyExit))
 			GameRunning=FALSE;
 
-		// handles all updates for the game!
-		Game_update();
-		
+		// update game logic
+		if(i==0) Game_update();
+		//i++;
+		//if(i>400)
+		//	i = 0;
+			
 		// now flip the planes
 		GrayDBufToggleSync();
-	    
-  	/* On HW1, the flip will be effective only after 1 or 2 plane switches
-       depending on the phase. We must not draw to the "hidden" planes before
-       they are really hidden! */
-  	if (!_GrayIsRealHW2()) GrayWaitNSwitches(2);
-  	
-  	lightPlane = GrayDBufGetHiddenPlane(LIGHT_PLANE);
+		
+	  	/* On HW1, the flip will be effective only after 1 or 2 plane switches
+	       depending on the phase. We must not draw to the "hidden" planes before
+	       they are really hidden! */
+	  	if (!_GrayIsRealHW2()) GrayWaitNSwitches(1);
+	  	
+	  	lightPlane = GrayDBufGetHiddenPlane(LIGHT_PLANE);
 		darkPlane = GrayDBufGetHiddenPlane(DARK_PLANE);
 	}
 	

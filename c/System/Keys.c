@@ -95,7 +95,8 @@
 	key3
 	key4
 	key5
-	
+	keyExit 
+
 	C Source File
 	Created 11/11/2017; 11:34:17 PM
 */
@@ -115,16 +116,23 @@ long keysDown, keysState, keysUp;
 
 
 
-// this will be called early in our main-update loop, so all further game logic
-// can have access to the current state of the logical keys
+/**
+ * Reads the current state of the key unput, and updates our bitwise buffers.
+ * 
+ * Three longs are defined: keysDown, keysState, keysUp.
+ * These bits in these longs mirror the key states for each key matching our #defined bitmasks.
+ * keysDown only has it's bits true on the single-frame a key is down on.
+ * keysUp only has it's bits true for the single-frame a key is up on.
+ * keysState has it's bits true on every frame the key is pressed.
+*/
 void Keys_update()
 {
-	// save the current keystate before we update it below, so we can compare agsint it
+	// save the current keystate before we update it below, so we can compare against it
 	// to see what changed
 	long lastKeysState = keysState;
 	
 	// each bit-mask is a binary place, so we can just multiply its values and sum them
-	// by the trutiness of those keys
+	// by the truthiness of those keys
 	keysState = 0;
 	keysState += (_keytest(RR_2ND) || _keytest(RR_ENTER)) * keyAction;
 	keysState += _keytest(RR_DIAMOND) * keyJump;
@@ -144,7 +152,7 @@ void Keys_update()
 	keysState += _keytest(RR_3) * key3;
 	keysState += _keytest(RR_4) * key4;
 	keysState += _keytest(RR_5) * key5;
-	
+	keysState += _keytest(RR_CLEAR) * keyExit;
 	
 	// if we XOR our current state (keysState) and our previous state (lastKeysState)
 	// we will get just the keys that changed ON or OFF from the last frame
@@ -153,12 +161,17 @@ void Keys_update()
 	// if we AND the changed keys to our current keys, we can determine which keys were down this frame:
 	keysDown = (long)(keysState & changedKeys);
 	
-	// if we AND it to our last state, we can detmine which keys were let go
+	// if we AND it to our last state, we can determine which keys were let go
 	keysUp = (long)(lastKeysState & changedKeys);
 }
 
 
-// test if a key is down for the first time this frame
+/**
+ * Checks if a key is FIRST down ON THIS FRAME using it's bitmask.
+ *
+ * @param keyCode the bitmask for our logical key
+ * @return a boolean char set to 0 or 1 if the key is down
+*/
 char Keys_keyDown(long keyCode)
 {
 	// return if the key is down on this frame:
@@ -166,7 +179,12 @@ char Keys_keyDown(long keyCode)
 }
 
 
-// test the current state of any key
+/**
+ * Checks if a key is pressed on this frame using it's bitmask.
+ *
+ * @param keyCode the bitmask for our logical key
+ * @return a boolean char set to 0 or 1 if the key is pressed
+*/
 char Keys_keyState(long keyCode)
 {
 	// return if key is currently down on this frame
@@ -174,7 +192,12 @@ char Keys_keyState(long keyCode)
 }
 
 
-// test if a key was let-go on this frame
+/**
+ * Checks if a key is LET up ON THIS FRAME using it's bitmask.
+ *
+ * @param keyCode the bitmask for our logical key
+ * @ret
+ */
 char Keys_keyUp(long keyCode)
 {
 	// return if the key is let up on this frame:
