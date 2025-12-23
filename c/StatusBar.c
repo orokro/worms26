@@ -104,5 +104,5 @@ extern void StatusBar_draw() {
 		return;
 
 	// render each message
-	GrayDrawStr2B(1, 1, StatusBar_messages[0], A_XOR, lightPlane, darkPlane);
+	GrayDrawStr2B(20, 1, StatusBar_messages[0], A_XOR, lightPlane, darkPlane);
 }

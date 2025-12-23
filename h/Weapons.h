@@ -40,6 +40,8 @@
 #define usesRoutine 			0b00000000001000000000000000000000  // true if the weapon needs custom per-frame logic	
 #define isMeta 					0b00000000010000000000000000000000  // if weapon is meta (affects the round / game state)	
 #define isDroppable 			0b00000000100000000000000000000000  // true if its droppable (dynamite, mines, ming vase, etc)	
+#define usesConstantGravity 	0b00000001000000000000000000000000  // true if weapon is affected by constant gravity (e.g. longbow, magic bullet, etc)
+#define usesJumping 			0b00000010000000000000000000000000  // true if animal jumps
 
 /*
   enumerate our list of weapons, with matching index positions as described in the array above

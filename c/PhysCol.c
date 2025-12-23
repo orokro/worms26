@@ -86,7 +86,6 @@ PhysObj new_PhysObj(short *x, short *y, char *xVelo, char *yVelo, float bouncine
 */
 unsigned char Collider_apply(Collider *col, short *x, short *y)
 {
-
 	// reset the collisions bitmask for this collider
 	col->collisions = 0;
 	
@@ -482,7 +481,7 @@ short Physics_checkExplosions(PhysObj *obj)
 				
 				// calculate the power to add in this direction:
 				// using size for "physical force" magnitude
-				float power = (pendingDamageRatio*Explosion_size[i])*4; 
+				float power = (pendingDamageRatio*Explosion_size[i])*3; 
 				
 				// FIX 2: Correct Vector Projection
 				// Previously (x/y) would cause division by zero or infinite force 

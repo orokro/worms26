@@ -102,10 +102,16 @@ unsigned short Weapon_active = 0;
 // is the weapon settled on land?
 unsigned short Weapon_settled=0;
 
+// which way is the weapon facing
+unsigned short Weapon_facing=0;
+
 // because Weapons are defined BEFORE the Game header file, we cant access the cursor target
 // thus, wherever a target is set, it will have to update our weapon target
 short Weapon_targetX = 0;
 short Weapon_targetY = 0;
+
+// global jump timer
+short Weapon_jumpTimer = 0;
 
 /*
 	Below is a list of relative points to a worm to use for rotating the target
@@ -254,7 +260,7 @@ unsigned long Weapon_props[72] = {
         0,
 
         // bazooka
-        usesAim | usesCharge | usesPhysics | usesWind | usesDetonateOnImpact | holdsLauncher,
+        usesAim | usesCharge | usesPhysics | usesWind | usesDetonateOnImpact | holdsLauncher | usesWind,
         
 		// grenade
         usesAim | usesCharge | usesPhysics | usesWind | usesFuse | holdsSelf | spawnsSelf,
@@ -266,10 +272,10 @@ unsigned long Weapon_props[72] = {
         isMele,
         
 		// dynamite
-        spawnsSelf | usesPhysics | holdsSelf | isDroppable,
+        spawnsSelf | usesPhysics | holdsSelf | isDroppable| usesFuse,
         
 		// air strike
-        usesCursor | usesAirStrike,
+        usesCursor | usesAirStrike | usesWind,
         
 		// blow torch
         0,
@@ -278,10 +284,10 @@ unsigned long Weapon_props[72] = {
         0,
         
 		// super banana bomb
-        usesAim | usesCharge | usesPhysics | usesController | isCluster | spawnsSelf | holdsSelf,
+        usesAim | usesFuse | usesCharge | usesPhysics | usesController | isCluster | spawnsSelf | holdsSelf,
         
 		// petrol bomb
-        usesAim | usesCharge | usesPhysics | usesDetonateOnImpact | holdsSelf | spawnsSelf,
+        usesAim | usesCharge | usesPhysics | usesDetonateOnImpact | holdsSelf | spawnsSelf | isCluster,
         
 		// mad cows
         spawnsSelf | usesFuse | usesController | isAnimal | usesPhysics | holdsSelf,
@@ -294,10 +300,10 @@ unsigned long Weapon_props[72] = {
         isMeta,
         
 		// homing missile
-        usesAim | usesCharge | usesPhysics | usesHoming | usesDetonateOnImpact | holdsLauncher,
+        usesAim | usesCursor | usesCharge | usesPhysics | usesHoming | usesDetonateOnImpact | holdsLauncher,
         
 		// cluster bomb
-        usesAim | usesCharge | usesPhysics | usesWind | isCluster | holdsSelf | spawnsSelf,
+        usesAim | usesCharge| usesFuse | usesPhysics | usesWind | isCluster | holdsSelf | spawnsSelf,
         
 		// hand gun
         usesAim | holdsSelf | usesRaycast | usesRoutine,
@@ -312,16 +318,16 @@ unsigned long Weapon_props[72] = {
         usesCursor | usesAirStrike,
         
 		// pneumatic drill
-        holdsCustom,
+        holdsCustom | usesFuse,
         
 		// bungee
         isMeta,
         
 		// holy hand grenade
-        usesAim | usesCharge | usesPhysics | holdsSelf | spawnsSelf,
+        usesAim | usesFuse | usesCharge | usesPhysics | holdsSelf | spawnsSelf,
         
 		// skunk
-        spawnsSelf | isAnimal | usesPhysics | holdsSelf,
+        spawnsSelf | usesFuse | isAnimal | usesJumping | usesPhysics | holdsSelf,
         
 		// old lady
         spawnsSelf | isAnimal | usesPhysics | usesFuse | holdsSelf,
@@ -347,10 +353,10 @@ unsigned long Weapon_props[72] = {
         isMele,
         
 		// sheep
-        spawnsSelf | usesPhysics | isAnimal | holdsSelf,
+        spawnsSelf | usesFuse | usesPhysics | isAnimal | usesJumping | holdsSelf | usesWind,
         
 		// mail strike
-        usesCursor | usesPhysics | spawnsSelf | usesAirStrike,
+        usesCursor | usesPhysics | spawnsSelf | usesAirStrike | usesWind | usesConstantGravity,
         
 		// girder
         0,
@@ -388,7 +394,7 @@ unsigned long Weapon_props[72] = {
         0,
         
 		// super sheep
-        isAnimal | usesController | usesDetonateOnImpact | holdsSelf | spawnsSelf,
+        isAnimal | usesFuse | usesController | usesDetonateOnImpact | holdsSelf | spawnsSelf,
         
 		// mine strike
         usesCursor | spawnsSelf | usesAirStrike,
@@ -400,7 +406,7 @@ unsigned long Weapon_props[72] = {
         usesCursor | holdsSelf,
         
 		// salvation army lady
-        spawnsSelf | usesPhysics | isAnimal | isCluster | usesController | holdsSelf,
+        spawnsSelf | usesFuse | usesPhysics | isAnimal | isCluster | usesController | holdsSelf,
         
 		// sheep strike
         usesCursor | usesAirStrike,
@@ -423,13 +429,13 @@ unsigned long Weapon_props[72] = {
         usesRoutine | holdsCustom,
         
 		// long bow
-        usesAim | usesPhysics | multiUse | usesDetonateOnImpact | holdsSelf,
+        usesAim | usesPhysics | multiUse | usesDetonateOnImpact | holdsSelf | usesWind,
         
 		// prod
         isMele | holdsSelf,
         
 		// mole
-        spawnsSelf | usesPhysics | isAnimal | usesDetonateOnImpact | usesFuse,
+        spawnsSelf | usesPhysics | isAnimal | usesDetonateOnImpact | usesFuse | usesWind,
         
 		// mole squadron
         usesCursor | spawnsSelf | usesAirStrike,
@@ -441,7 +447,7 @@ unsigned long Weapon_props[72] = {
         usesRoutine | holdsSelf,
         
 		// MB bomb
-        usesCursor | usesDetonateOnImpact | usesAirStrike,
+        usesCursor | usesDetonateOnImpact | usesAirStrike | usesWind | usesConstantGravity,
         
 		// carpet bomb
         usesCursor | usesPhysics | usesDetonateOnImpact | spawnsSelf | usesAirStrike,
@@ -455,19 +461,19 @@ unsigned long Weapon_props[72] = {
     // sub weapons (ones you cannot directly use, but can spawn as a result of other weapons)
     
         // cluster/mortar/salvation army/ming vase fragment
-        usesPhysics | usesDetonateOnImpact | usesFuse | spawnsSelf,
+        usesPhysics | usesDetonateOnImpact | usesFuse | spawnsSelf | usesWind,
         
 		// napalm / fire
-        usesPhysics | usesDetonateOnImpact | usesFuse | spawnsSelf,
+        usesPhysics | usesDetonateOnImpact | usesFuse | spawnsSelf | usesWind | usesConstantGravity,
         
 		// skunk gas
-        isParticle | usesFuse | spawnsSelf,
+        isParticle | usesFuse | spawnsSelf | usesWind | usesConstantGravity,
         
 		// comet from armageddon
         usesPhysics | usesDetonateOnImpact | spawnsSelf,
         
 		// mail from mail strike
-        usesPhysics | usesDetonateOnImpact | spawnsSelf,
+        usesPhysics | usesDetonateOnImpact | spawnsSelf | usesWind | usesConstantGravity,
         
 		// carpet from carpet bomb
         usesPhysics | usesDetonateOnImpact | spawnsSelf,
@@ -593,10 +599,24 @@ void detonateWeapon(short index)
 	
 	// if this is a cluster weapon, spawn some cluster items
 	if(Weapon_props[(short)Weapon_type[index]] & isCluster)
-	{
+	{	
+		short spawnType = 0;
+		switch(Weapon_type[index])
+		{
+			case WSuperBanana:
+				spawnType = WBanana;
+				break;
+			case WPetrolBomb:
+				spawnType = WFire;
+				break;				
+			default:
+				spawnType = WFragment;
+				break;
+		}// swatch 
+		
 		int i;
 		for(i=0; i<5; i++)
-			Weapons_spawn(WFragment, Weapon_x[index], Weapon_y[index], -2+i, -3, 5*TIME_MULTIPLIER);
+			Weapons_spawn(spawnType, Weapon_x[index], Weapon_y[index], -5+i*2, -6, 6*TIME_MULTIPLIER);
 	}
 	
 	// focus back on current worm
@@ -679,7 +699,6 @@ void Weapons_setTarget(short x, short y)
 	// if the current weapon is a an airstrike type, go up and spawn some things
 	if(Game_currentWeaponProperties & usesAirStrike)
 	{
-
 		// air strikes are just bazookas in disguise
 		short spawnItem = WBazooka;
 		char spawnCount = 5;
@@ -746,6 +765,13 @@ void Weapons_setTarget(short x, short y)
  */
 void Weapons_update()
 {
+	unsigned long currentProps;
+
+	// jump timer for animals
+	Weapon_jumpTimer++;
+	if(Weapon_jumpTimer>199)
+		Weapon_jumpTimer=0;
+
 	// loop over all weapons, and update the active ones as necessary
 	short i=0;
 	for(i=0; i<MAX_WEAPONS; i++)
@@ -753,6 +779,8 @@ void Weapons_update()
 		// check if it's active
 		if(Weapon_active & (unsigned short)((unsigned short)1<<(i)))
 		{
+
+			currentProps = Weapon_props[(short)Weapon_type[i]];
 
 			// if weapon is out of bounds deactivate it
 			if(Map_isOOB(Weapon_x[(short)i], Weapon_y[(short)i]))
@@ -768,7 +796,7 @@ void Weapons_update()
 			  I can free up a flag later for more important biz
 			  So for now, we'll add "TRUE ||" so all weapons default timeout
 			*/
-			if(TRUE || Weapon_props[(short)Weapon_type[i]] & usesFuse)
+			if(currentProps & usesFuse)
 			{
 				Weapon_time[i]--;
 				if(Weapon_time[i]<=0)
@@ -778,8 +806,26 @@ void Weapons_update()
 				}
 			}// end if uses fuse/timer
 			
+			// if its an animal make it move in the direction it's facing
+			if(currentProps & isAnimal)
+			{
+				char facingLeft = (Weapon_facing & (unsigned short)1<<(i))>0;
+				
+				// make it jump every so often
+				char jumpVelo = 0;
+				if(currentProps & usesJumping)
+					if((Weapon_jumpTimer+i*2) % 10 == 0)
+						jumpVelo = -5;
+					
+				// impact for the jump
+				Physics_setVelocity(&Weapon_physObj[i], 0, jumpVelo, FALSE, TRUE);
+
+				// set manually for walking
+				Physics_setVelocity(&Weapon_physObj[i], (facingLeft) ? -3 : 3, 0, TRUE, FALSE);
+			}
+
 			// if a weapon uses homing, adjust it's velocity appropriately
-			if(Weapon_props[(short)Weapon_type[i]] & usesHoming)
+			if(currentProps & usesHoming)
 			{
 				// adjust the weapons velocity towards it's target, less aggressively as it gets closer
 				short deltaX = (short)((Weapon_targetX - Weapon_x[i])*0.25f);
@@ -790,25 +836,27 @@ void Weapons_update()
 			}//end if uses homing
 			
 			// if a weapon needs user input to control it, read that now:
-			if(Weapon_props[(short)Weapon_type[i]] & usesController)
+			if(currentProps & usesController)
 			{
 				// TO-DO: implement controller logic	
 			}
 				
 			// if this weapon uses physics, lets update that shit
-			if(Weapon_props[(short)Weapon_type[i]] & usesPhysics)
+			if(currentProps & usesPhysics)
 			{
 				// if the Weapon is considered "settled" no need for physics
 				if(!(Weapon_settled & (unsigned short)1<<(i)))
 				{
 					// apply wind and gravity
-					Physics_setVelocity(&Weapon_physObj[i], (Game_wind/10), 1, TRUE, FALSE);
+					const short wind = (currentProps & usesWind) ? (Game_wind/20) : 0;
+					char noGravity = (currentProps & usesConstantGravity);
+					Physics_setVelocity(&Weapon_physObj[i], (wind), 1, !noGravity, FALSE);
 					
 					// do physics and collision for Weapon
 					Physics_apply(&Weapon_physObj[i]);
 					
 					// if the weapon has detonate on impact, we should detonate if it hit something..
-					if((Weapon_props[(short)Weapon_type[i]] & usesDetonateOnImpact) && (Weapon_physObj[i].col.collisions>0))
+					if((currentProps & usesDetonateOnImpact) && (Weapon_physObj[i].col.collisions>0))
 						detonateWeapon(i);
 						
 				}// end if uses physics
@@ -860,17 +908,27 @@ void Weapons_fire(short charge)
 	// default no velocity unless weapon uses charge
 	short veloX=0;
 	short veloY=0;
-	if(Game_currentWeaponProperties & usesCharge)
-	{
-		veloX = dirX * (float)((float)charge/254.0f);
-		veloY = dirY * (float)((float)charge/254.0f);
-	}
+	charge = (Game_currentWeaponProperties & usesCharge) ? charge : 0;
+	if((Game_currentWeaponProperties & usesCharge)==0 && (Game_currentWeaponProperties & holdsLauncher))
+		charge = 200;
+
+	veloX = dirX * (float)((float)charge/254.0f);
+	veloY = dirY * (float)((float)charge/254.0f);
 	
 	// for now, we'll always default to a 3 second timer
-	short fuseLength = (3 * TIME_MULTIPLIER);
+	short fuseLength = (6 * TIME_MULTIPLIER);
 	
 	// finally spawn the weapon with it's params!
-	Weapons_spawn(Game_currentWeaponSelected, spawnX, spawnY, veloX, veloY, fuseLength);
+	short spawnedWeaponIndex = Weapons_spawn(Game_currentWeaponSelected, spawnX, spawnY, veloX, veloY, fuseLength);
+
+	// if it's an animal, set it's facing direction
+	if(Game_currentWeaponProperties & isAnimal)
+	{
+		if(facingLeft)
+			Weapon_facing |= (unsigned short)1<<(spawnedWeaponIndex);
+		else
+			Weapon_facing &= ~((unsigned short)1<<(spawnedWeaponIndex));
+	}
 }
 
 
@@ -879,7 +937,7 @@ void Weapons_fire(short charge)
 */
 void Weapons_drawAll()
 {
-	short screenX, screenY;
+	short screenX, screenY, weaponType;
 	
 	// loop over all weapons and draw them if active:
 	short i;
@@ -887,23 +945,27 @@ void Weapons_drawAll()
 	{
 		if(Weapon_active & ((unsigned short)1<<(i)))
 		{
+			weaponType = Weapon_type[i];
+			char facingLeft = (Weapon_facing & (unsigned short)1<<(i))>0;
+
 			screenX=Weapon_x[i];
 			screenY=Weapon_y[i];
 			if(worldToScreen(&screenX, &screenY))
 			{	
 				// if weapon uses spawnSelf, we can use it's same sprite as from the menu
-				if(Weapon_props[(short)Weapon_type[i]] & spawnsSelf)
+				if(Weapon_props[(short)weaponType] & spawnsSelf)
 				{
-					// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon
-					ClipSprite16_OR_R(screenX-2, screenY-2, 11, spr_weapons[(short)Weapon_type[i]], lightPlane);
-					ClipSprite16_OR_R(screenX-2, screenY-2, 11, spr_weapons[(short)Weapon_type[i]], darkPlane);
+					// use the weapon sprite with it's facing direction
+					const unsigned short* weaponSprite = facingLeft ? spr_weapons_flipped[(short)weaponType] : spr_weapons[(short)weaponType];
+
+					ClipSprite16_OR_R(screenX-2, screenY-2, 11, weaponSprite, lightPlane);
+					ClipSprite16_OR_R(screenX-2, screenY-2, 11, weaponSprite, darkPlane);
 
 				}else{	
 					// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon
 					ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, lightPlane);
 					ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, darkPlane);
 				}
-
 
 			}// end if on screen
 			

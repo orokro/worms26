@@ -223,7 +223,7 @@ void Worm_update()
 			// check all explosions if they are near-by and damaging this worm
 			short damage = Physics_checkExplosions(&Worm_physObj[i]);
 			if(damage!=0)
-				Worm_setHealth(i, -damage*2, TRUE);
+				Worm_setHealth(i, -damage*6, TRUE);
 				
 			// if the worm is considered "settled" no need for physics
 			if(!(Worm_settled & wormMask))
@@ -435,6 +435,12 @@ void Worm_drawAll()
                 // SPRITE SELECTION LOGIC
                 // ============================================================
                 
+				// if the worm is dead, draw gravestone
+				if(Worm_isDead & (unsigned short)1<<(i)){
+					GrayClipSprite8_AND_R(x-4, screenY-12, 12, spr_Grave, spr_Grave, lightPlane, darkPlane);
+					continue;
+				}
+
                 // Is this the Active Worm doing an Animation?
                 if(i == Worm_currentWorm && Game_wormAnimState != ANIM_NONE)
                 {
