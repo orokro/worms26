@@ -210,7 +210,7 @@ void Worm_update()
 				Worm_isDead |= wormMask;
 				Worm_setHealth(i, 0, FALSE);
 				
-				sprintf(buffer, "Worm %s drowned!", Match_wormNames[i]);
+				sprintf(buffer, "%s drowned!", Match_wormNames[i]);
 				StatusBar_showMessage(buffer);				
 				
 				// immediately end the turn if the current worm drowned

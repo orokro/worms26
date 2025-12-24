@@ -353,7 +353,7 @@ unsigned long Weapon_props[72] = {
         isMele,
         
 		// sheep
-        spawnsSelf | usesFuse | usesPhysics | isAnimal | usesJumping | holdsSelf | usesWind,
+        spawnsSelf | usesFuse | usesPhysics | isAnimal | usesJumping | holdsSelf,
         
 		// mail strike
         usesCursor | usesPhysics | spawnsSelf | usesAirStrike | usesWind | usesConstantGravity,
@@ -814,14 +814,15 @@ void Weapons_update()
 				// make it jump every so often
 				char jumpVelo = 0;
 				if(currentProps & usesJumping)
-					if((Weapon_jumpTimer+i*2) % 10 == 0)
+					if((Weapon_jumpTimer+i*2) % 20 == 0)
 						jumpVelo = -5;
 					
 				// impact for the jump
-				Physics_setVelocity(&Weapon_physObj[i], 0, jumpVelo, FALSE, TRUE);
+				Physics_setVelocity(&Weapon_physObj[i], 0, jumpVelo, TRUE, TRUE);
 
 				// set manually for walking
-				Physics_setVelocity(&Weapon_physObj[i], (facingLeft) ? -3 : 3, 0, TRUE, FALSE);
+				if(Weapon_jumpTimer % 4 == 0)
+					Physics_setVelocity(&Weapon_physObj[i], (facingLeft) ? -1 : 1, 0, TRUE, FALSE);
 			}
 
 			// if a weapon uses homing, adjust it's velocity appropriately
