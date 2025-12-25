@@ -193,7 +193,6 @@ char Game_cursorDir = 0;
 short Game_xMarkSpotX = 0;
 short Game_xMarkSpotY = 0;
 char Game_xMarkAllowedOverLand = TRUE;
-char Game_cursorEndTurn = FALSE;
 
 // for animating jumps
 char Game_wormAnimState = ANIM_NONE;
@@ -253,6 +252,27 @@ char Game_aimAngle=10;
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 
+
+
+/**
+ * Resets all necessary variables to begin a new round in the game.
+*/
+void Game_initRound(){
+
+	Worm_active = 0;
+	Worm_onGround = 0;
+	Worm_settled = 0;
+	Worm_isDead = 0;
+	Weapon_active = 0;
+	Explosion_active = 0;
+	Crate_active = 0;
+	OilDrum_active = 0;
+	Mine_active = 0;
+	Game_currentTeam = 1;
+	Game_waterLevel = 0;
+	Game_wormAnimState = ANIM_NONE;
+	Game_stateFlags = 0;
+}
 
 
 /*

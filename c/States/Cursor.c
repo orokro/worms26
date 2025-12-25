@@ -112,10 +112,6 @@ static void Cursor_update()
 			// at this point we should do whatever weapon spawning junk we need to do..
 			// TO-DO: implement
 			Weapons_setTarget(Game_xMarkSpotX, Game_xMarkSpotY);
-			
-			// depending on the type of weaponing being used
-			// this should either return to TURN mode, or goto TurnEND
-			Game_changeMode((Game_cursorEndTurn==TRUE) ? gameMode_TurnEnd : gameMode_Turn );
 			return;
 		}
 	}

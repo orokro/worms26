@@ -91,6 +91,9 @@ void _main(void)
 	// allocate space for double-buffering
 	void *dbuffer=malloc(GRAYDBUFFER_SIZE);
 
+	// init state related to starting match
+	Game_initRound();
+	
 	// show the cake loading screen
 	Draw_cake(0, 100);
 	
@@ -112,7 +115,7 @@ void _main(void)
 	
 	// done loading
 	Draw_cake(1,1);
-	
+
 	int i=0;
 
 	// main loop!

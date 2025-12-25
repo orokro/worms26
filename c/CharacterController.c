@@ -166,7 +166,7 @@ void wormWeapon()
 				break;
 
 			case WSkipGo:
-				Game_changeMode(gameMode_AfterTurn);
+				Game_changeMode(gameMode_TurnEnd);
 				break;
 
 			case WSurrender:
@@ -316,5 +316,5 @@ void CharacterController_weaponConsumed(char noEndTurn){
 		return;
 		
 	// end turn because we fired a weapon
-	Game_changeMode(gameMode_AfterTurn);
+	Game_changeMode(gameMode_TurnEnd);
 }

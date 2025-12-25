@@ -115,6 +115,9 @@ void spawnWorm(short index)
 	// allow worms to bounce of walls, but not land
 	Worm_physObj[index].bouncinessY = 0.0f;
 	
+	// initial health
+	Worm_health[index] = Match_wormStartHealth;
+
 	// for debug, give random health:
 	// Worm_health[index] = random(200)+1;
 	
@@ -215,7 +218,7 @@ void Worm_update()
 				
 				// immediately end the turn if the current worm drowned
 				if(i == Worm_currentWorm)
-					Game_changeMode(gameMode_AfterTurn);
+					Game_changeMode(gameMode_TurnEnd);
 				
 				continue;
 			}

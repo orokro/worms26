@@ -60,7 +60,6 @@ extern char Game_cursorDir;
 extern short Game_xMarkSpotX;
 extern short Game_xMarkSpotY;
 extern char Game_xMarkAllowedOverLand;
-extern char Game_cursorEndTurn;
 extern char Game_turn;
 extern short Game_weapInventory[5][13];
 extern char Game_currentWeaponSelected;
@@ -71,6 +70,14 @@ extern char Game_aimAngle;
 extern unsigned short Game_stateFlags;
 
 // game function prototypes
+
+
+/**
+ * Resets all necessary variables to begin a new round in the game.
+*/
+extern void Game_initRound();
+
+
 
 /**
  * Changes the Games primary state machine to a new mode.
