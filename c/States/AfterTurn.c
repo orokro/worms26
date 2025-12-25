@@ -15,9 +15,6 @@ char afterCrateFrames;
 // this is that timer
 char waterLevelTimer = 0;
 
-// before we start checking if the game is truely settled, it's good to wait a few frames
-char waitToCheckSettled = 0;
-
 // true once we've attempted to spawn a crate
 char crateLogicDone = FALSE;
 
@@ -32,9 +29,6 @@ static void AfterTurn_enter()
 	// put game timer in -1 to disable it
 	Game_timer=-1;
 
-	// reset the wait-to-check-settled timer
-	waitToCheckSettled = 10;
-	
 	// reset our crate logic
 	crateLogicDone = FALSE;
 }
@@ -51,11 +45,6 @@ static void AfterTurn_update()
 		Game_waterLevel++;
 		waterLevelTimer--;
 	}
-
-	// we wont check settled state right away
-	waitToCheckSettled--;
-	if(waitToCheckSettled<0)
-		waitToCheckSettled=0;
 	
 	// the game
 	Draw_renderGame();
@@ -65,7 +54,7 @@ static void AfterTurn_update()
 	
 	// if everything is settled and nothing is happening, e.g. triggered mines or explosions
 	// we can move on to the next mode
-	if(waitToCheckSettled==0 && Game_allSettled())
+	if(Game_allSettled())
 	{
 
 		// if we haven't run our crate-spawn logic yet, do it now

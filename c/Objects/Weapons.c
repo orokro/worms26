@@ -260,7 +260,7 @@ unsigned long Weapon_props[72] = {
     // row 1
 
         // jet pack
-        doesntEndTurn,
+        isMeta | doesntEndTurn,
 
         // bazooka
         usesAim | usesCharge | usesPhysics | usesWind | usesDetonateOnImpact | holdsLauncher | usesWind | doesntEndTurn,
