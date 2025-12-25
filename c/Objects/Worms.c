@@ -260,6 +260,7 @@ void Worm_update()
 			checkCratesAndMines(i);
 					
 		}// end if active worm
+
 	}// next i
 }
 
@@ -437,7 +438,7 @@ void Worm_drawAll()
                 
 				// if the worm is dead, draw gravestone
 				if(Worm_isDead & (unsigned short)1<<(i)){
-					GrayClipSprite8_AND_R(x-4, screenY-12, 12, spr_Grave, spr_Grave, lightPlane, darkPlane);
+					GrayClipSprite8_OR_R(x-4, screenY-12, 12, spr_Grave, spr_Grave, lightPlane, darkPlane);
 					continue;
 				}
 

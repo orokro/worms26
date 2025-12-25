@@ -32,6 +32,7 @@
 #include "Worms.h"
 #include "Weapons.h"
 #include "Camera.h"
+#include "Match.h"
 
 // local defines: the max slope a worm can walk up:
 #define MAX_WORM_SLOPE 6
@@ -46,7 +47,6 @@ unsigned short wormMask = 0;
  */
 void wormWalk()
 {
-
 	// test keys for a possible direction to walk
 	char moveDir = 0;
 
@@ -90,6 +90,15 @@ void wormWalk()
 		Camera_clearFocus();
 	}
 
+	if ((Game_currentWeaponState &targetPicked) && Keys_keyUp(keyEscape))
+	{
+		// un-set target picked
+		Game_currentWeaponState &= ~targetPicked;
+
+		// no need to continue
+		return;
+	}
+
 	// if we are not moving, gtfo
 	if (moveDir == 0)
 		return;
@@ -127,31 +136,81 @@ void wormWalk()
  */
 void wormWeapon()
 {
+	// handle meta weapons being pressed
+	if((Game_currentWeaponProperties & isMeta)!=0 && Keys_keyUp(keyAction))
+	{
+		switch(Game_currentWeaponSelected)
+		{
+			case WLowGravity:
+				Game_stateFlags |= gs_lowGravity;
+				break;
+			
+			case WFastWalk:
+				Game_stateFlags |= gs_fastWalk;
+				break;
+
+			case WLaserSight:
+				Game_stateFlags |= gs_laserSight;
+				break;
+
+			case WJetPack:
+				Game_stateFlags |= gs_jetpackMode;
+				break;
+
+			case WBungeeCord:
+				Game_stateFlags |= gs_bungeeActive;
+				break;
+
+			case WParachute:
+				Game_stateFlags |= gs_parachuteActive;
+				break;
+
+			case WSkipGo:
+				Game_changeMode(gameMode_AfterTurn);
+				break;
+
+			case WSurrender:
+				Game_changeMode(gameMode_GameOver);
+				break;
+
+			case WSelectWorm:
+				// hackish but works, decrease turn and flip time, so
+				// the state machine puts them back
+				Game_turn--;
+				Game_currentTeam = (Game_currentTeam==1 ? 0 : 1);
+				Game_changeMode(gameMode_WormSelect);
+				CharacterController_weaponConsumed(TRUE);
+				return;
+				break;
+
+			case WFreeze:
+				Game_stateFlags |= ((Game_currentTeam==0) ? gs_team1Frozen : gs_team2Frozen);
+				break;
+
+			case WInvisibility:
+				Game_stateFlags |= ((Game_currentTeam==0) ? gs_team1Invisible : gs_team2Invisible);
+				break;
+		}
+
+		// handle clean up logic
+		CharacterController_weaponConsumed(FALSE);
+
+		// GTFO so we don't spawn a null weapon
+		return;
+	}
+
 	// if the weapon has usesCursor and we haven't picked a spot yet, we should goto cursor mode
 	if ((Game_currentWeaponProperties & usesCursor) && (Game_currentWeaponState & targetPicked) == 0)
 	{
+		// prevent land x-marks if the weapon forbids it
+		Game_xMarkAllowedOverLand = !(Game_currentWeaponSelected==WTeleport);
+
 		// if action was pressed, place the x-mark
 		if (Keys_keyUp(keyAction))
-		{
 			Game_changeMode(gameMode_Cursor);
-		}
 
 		// no need to continue
 		return;
-
-		// otherwise, if a target WAS picked, use escape to cancel instead of pause
-	}
-	else
-	{
-		if (Keys_keyUp(keyEscape))
-		{
-			// un-set target picked
-			Game_currentWeaponState &= ~targetPicked;
-			Game_xMarkPlaced = FALSE;
-
-			// no need to continue
-			return;
-		}
 	}
 
 	// if uses aim we should let them press up and down
@@ -178,12 +237,8 @@ void wormWeapon()
 			Weapons_fire(Game_currentWeaponCharge);
 			Game_currentWeaponCharge = 0;
 
-			// end turn because we fired a weapon
-			//	Game_changeMode(gameMode_TurnEnd);
-
-			return;
-
-			// if the key is pressed, we should add to the charge:
+			// consume the weapon
+			CharacterController_weaponConsumed(FALSE);
 		}
 		else if (Keys_keyState(keyAction))
 		{
@@ -191,26 +246,28 @@ void wormWeapon()
 			if (Game_currentWeaponCharge >= 255)
 				Game_currentWeaponCharge = 255;
 		}
-
-		// otherwise, proceed since this weapon isn't chargeable
 	}
 	else
 	{
-
 		// if 2nd was pressed, activate weapon
 		if (Keys_keyUp(keyAction))
 		{
 			Weapons_fire(Game_currentWeaponCharge);
 			Game_currentWeaponCharge = 0;
 
-			// end turn because we fired a weapon
-			// Game_changeMode(gameMode_TurnEnd);
-			return;
+			// consume the weapon
+			CharacterController_weaponConsumed(FALSE);
+
 		} // end if action was pressed
+
 	} // end if uses charge
 }
 
+
+
 // --------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 /**
  * handles all update frames for controlling worms in the turn game mode
@@ -238,4 +295,26 @@ void CharacterController_update()
 		wormWeapon();
 
 	// TO-DO: implement parachute, bungee, and ninja rope
+}
+
+
+/**
+ * @brief handles clean up after weapon has been decidedly used
+ * 
+ * @param noEndTurn - if set to 1, do not end the turn after weapon use
+ */
+void CharacterController_weaponConsumed(char noEndTurn){
+
+	// decrement the stock of the current weapon
+	Match_teamWeapons[(short)Game_currentTeam][(short)Game_currentWeaponSelected]--;
+
+	// reset current weapon selection
+	Game_currentWeaponSelected = -1;
+
+	// gtfo if turn ending is disabled
+	if(noEndTurn || (Game_currentWeaponProperties & doesntEndTurn))
+		return;
+		
+	// end turn because we fired a weapon
+	Game_changeMode(gameMode_AfterTurn);
 }

@@ -614,7 +614,7 @@ void Draw_renderGame()
 	drawHUD();
 	
 	// Draw status bar messages
-	StatusBar_draw();
+	// StatusBar_draw();
 	
 	// if the game mode is worm select, draw the selection arrow
 	if(Game_mode==gameMode_WormSelect)
@@ -627,10 +627,14 @@ void Draw_renderGame()
 	// for now, we will output a bunch of debug info on the screen
 	
 	// game modes by name	{"Select", "Turn", "WeaponSel", "Pause", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
-	//static const char modes[9][16] = {"", "", "", "", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
+	static const char modes[9][16] = {"Select", "Turn", "", "", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
 	
 	// draw the current and previous game mode on the screen
-	//DrawStr(60,1,modes[(short)Game_mode], A_XOR);
+	DrawStr(60,1,modes[(short)Game_mode], A_XOR);
+
+	static char weaponActiveStr[5];
+	sprintf(weaponActiveStr, "%d", (short)Weapon_active);
+	DrawStr(1, 10, weaponActiveStr, A_XOR);	
 
 	// draw the current grace time, turn time, and retreat time on the screen
 	// NOTE: for some reason, drawing sudden death time instead of retreat time crashes the game)

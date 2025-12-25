@@ -192,7 +192,6 @@ short Game_cursorY = 0;
 char Game_cursorDir = 0;
 short Game_xMarkSpotX = 0;
 short Game_xMarkSpotY = 0;
-char Game_xMarkPlaced = FALSE;
 char Game_xMarkAllowedOverLand = TRUE;
 char Game_cursorEndTurn = FALSE;
 
@@ -200,6 +199,9 @@ char Game_cursorEndTurn = FALSE;
 char Game_wormAnimState = ANIM_NONE;
 int Game_wormAnimTimer = 0;
 char Game_wormFlipStartDir = 0; // 0 = right, 1 = left (matching wormMask)
+
+// game state flags
+unsigned short Game_stateFlags;
 
 // for debug, we can stop the time
 char Debug_stopTime = FALSE;
@@ -303,7 +305,12 @@ void Game_update()
 	}	
 }
 
-// changes the game mode!
+
+/**
+ * Changes the Games primary state machine to a new mode.
+ *
+ * @param newMode a char representing a game mode as defined in the GameModes enum.
+*/
 void Game_changeMode(char newMode)
 {
 	// call the exit method for the current mode
@@ -397,6 +404,7 @@ static void startSuddenDeath()
 		Worm_health[i]=1;
 }
 
+
 /**
  * Updates all the Games main timers each frame, should be called every frame.
  *
@@ -427,6 +435,7 @@ static void gameTimers()
 	if(Game_timer==0)
 		Game_changeMode(gameMode_TurnEnd);
 }
+
 
 /**
  * Handles all the main updates for the Game mode, should be called every frame.
@@ -473,10 +482,19 @@ void gameUpdates()
 		
 	if(Weapon_active)
 		Weapons_update();
-
 }
 
-// returns TRUE or FALSE if all game objects (crates, mines, worms, etc) are settled and not doing anything
+
+/**
+	* Returns TRUE or FALSE if all he game items in the game are settled and not doing anything.
+	* 
+	* Crates, Mines, Drums, and Worms must be settled on the ground.
+	* No active mine timers allowed.
+	* No active explosions.
+	* No active weapons
+	*
+	* @return TRUE or FALSE if everything is settled or not
+*/
 char Game_allSettled()
 {
 	/*
@@ -516,21 +534,22 @@ char Game_allSettled()
 	*/
 	
 	// if this value is NOT 0, something somewhere is active, exploding, or is a triggered mine
-	unsigned short unsettled = (Crate_active & (~Crate_settled)) | (Worm_active & (~Worm_settled)) | (OilDrum_active & (~OilDrum_settled)) | (Mine_active & (~Mine_settled)) | Explosion_active | Mine_triggered;
+	unsigned short unsettled =
+		(Crate_active & (~Crate_settled))
+		|
+		(Worm_active & (~Worm_settled))
+		|
+		(OilDrum_active & (~OilDrum_settled))
+		|
+		(Mine_active & (~Mine_settled))
+		|
+		(Weapon_active>0)
+		|
+		Explosion_active | Mine_triggered;
 	if(unsettled)
 		return FALSE;
 	else
 		return TRUE;
 }
-
-
-
-
-
-
-
-
-
-
 
 

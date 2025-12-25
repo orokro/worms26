@@ -26,6 +26,23 @@ enum GameModes {
 #define strikeLeft  	0b00000010
 #define firstShotTaken  0b00000100
 
+
+// flags for current game state
+#define gs_fastWalk  		0b0000000000000001
+#define gs_lowGravity 		0b0000000000000010
+#define gs_laserSight 		0b0000000000000100
+#define gs_jetpackMode 		0b0000000000001000
+#define gs_ninjaRopeMode 	0b0000000000010000
+#define gs_superSheepMode 	0b0000000000100000
+#define gs_parachuteActive 	0b0000000001000000
+#define gs_parachuteMode 	0b0000000010000000
+#define gs_bungeeActive 	0b0000000100000000
+#define gs_bungeeMode 		0b0000001000000000
+#define gs_team1Invisible 	0b0000010000000000
+#define gs_team2Invisible 	0b0000100000000000
+#define gs_team1Frozen 		0b0001000000000000
+#define gs_team2Frozen 		0b0010000000000000
+
 // game globals
 extern char Game_mode;
 extern char Game_previousMode;
@@ -42,7 +59,6 @@ extern short Game_cursorY;
 extern char Game_cursorDir;
 extern short Game_xMarkSpotX;
 extern short Game_xMarkSpotY;
-extern char Game_xMarkPlaced;
 extern char Game_xMarkAllowedOverLand;
 extern char Game_cursorEndTurn;
 extern char Game_turn;
@@ -52,7 +68,7 @@ extern unsigned long Game_currentWeaponProperties;
 extern unsigned short Game_currentWeaponState;
 extern unsigned short Game_currentWeaponCharge;
 extern char Game_aimAngle;
-
+extern unsigned short Game_stateFlags;
 
 // game function prototypes
 

@@ -42,6 +42,7 @@
 #define isDroppable 			0b00000000100000000000000000000000  // true if its droppable (dynamite, mines, ming vase, etc)	
 #define usesConstantGravity 	0b00000001000000000000000000000000  // true if weapon is affected by constant gravity (e.g. longbow, magic bullet, etc)
 #define usesJumping 			0b00000010000000000000000000000000  // true if animal jumps
+#define doesntEndTurn			0b00000100000000000000000000000000  // true if weapon doesn't end turn when used
 
 /*
   enumerate our list of weapons, with matching index positions as described in the array above

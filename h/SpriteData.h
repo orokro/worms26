@@ -134,6 +134,12 @@ extern const unsigned short spr_WormFlip4_Right_Mask[];
 
 extern const unsigned short spr_WormFlip4_Right_Outline[];
 
+extern const unsigned short spr_WormFrozenDark[];
+
+extern const unsigned short spr_WormFrozenLight[];
+
+extern const unsigned short spr_WormFrozenMask[];
+
 extern const unsigned short spr_WormJump_Left_Mask[];
 
 extern const unsigned short spr_WormJump_Left_Outline[];

@@ -13,7 +13,6 @@
 	Game_cursorDir
 	Game_xMarkSpotX
 	Game_xMarkSpotY
-	Game_xMarkPlaced
 	Game_xMarkAllowedOverLand
 */
 char cursorFastMove=0;
@@ -27,9 +26,6 @@ static void Cursor_enter()
 	// when we enter this mode, always put the cursor over the current worm:
 	Game_cursorX = Worm_x[(short)Worm_currentWorm];
 	Game_cursorY = Worm_y[(short)Worm_currentWorm];
-	
-	// there doesn't exist an xMarkSpot yet..
-	Game_xMarkPlaced = FALSE;
 	
 	// no time on the fast-move mode yet
 	cursorFastMove=0;
@@ -107,11 +103,10 @@ static void Cursor_update()
 	// place the xMark spot and exit...
 	if(Keys_keyUp(keyAction))
 	{
-		if(Game_xMarkAllowedOverLand || Map_testPoint(Game_cursorX, Game_cursorY) )
+		if(Game_xMarkAllowedOverLand || (!Game_xMarkAllowedOverLand && !Map_testPoint(Game_cursorX, Game_cursorY)) )
 		{
 			Game_xMarkSpotX = Game_cursorX;
 			Game_xMarkSpotY = Game_cursorY;
-			Game_xMarkPlaced = TRUE;
 			Game_currentWeaponState |= targetPicked;
 			
 			// at this point we should do whatever weapon spawning junk we need to do..

@@ -13,22 +13,30 @@ char afterCrateFrames;
 
 // during the after turn in sudden death, the water will take 10 frames to advance 10 pixels...
 // this is that timer
-char waterLevelTimer=0;
+char waterLevelTimer = 0;
 
+// before we start checking if the game is truely settled, it's good to wait a few frames
+char waitToCheckSettled = 0;
+
+// true once we've attempted to spawn a crate
+char crateLogicDone = FALSE;
 
 /**
 	Called on the first-frame when the Games state machine is set to AfterTurn mode.
 */
 static void AfterTurn_enter()
 {
-	// incase of sudden death
+	// for sudden death, we will increase the water level after turns
 	waterLevelTimer=10;
+
+	// put game timer in -1 to disable it
 	Game_timer=-1;
+
+	// reset the wait-to-check-settled timer
+	waitToCheckSettled = 10;
 	
-	// randomly spawn a crate
-	if(Crates_spawnCrate())
-		afterCrateFrames=10;
-	
+	// reset our crate logic
+	crateLogicDone = FALSE;
 }
 
 
@@ -43,6 +51,11 @@ static void AfterTurn_update()
 		Game_waterLevel++;
 		waterLevelTimer--;
 	}
+
+	// we wont check settled state right away
+	waitToCheckSettled--;
+	if(waitToCheckSettled<0)
+		waitToCheckSettled=0;
 	
 	// the game
 	Draw_renderGame();
@@ -52,8 +65,19 @@ static void AfterTurn_update()
 	
 	// if everything is settled and nothing is happening, e.g. triggered mines or explosions
 	// we can move on to the next mode
-	if(Game_allSettled())
+	if(waitToCheckSettled==0 && Game_allSettled())
 	{
+
+		// if we haven't run our crate-spawn logic yet, do it now
+		if(crateLogicDone==FALSE)
+		{	
+			crateLogicDone = TRUE;
+
+			// randomly spawn a crate
+			if(Crates_spawnCrate())
+				afterCrateFrames=11;
+		}
+		
 		// but not until we waited a bit
 		afterCrateFrames--;
 		if(afterCrateFrames<=0)

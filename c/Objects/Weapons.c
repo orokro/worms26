@@ -79,6 +79,7 @@
 #include "SpriteData.h"
 #include "Draw.h"
 #include "Map.h"
+#include "CharacterController.h"
 
 
 // the type of the weapon!
@@ -255,12 +256,14 @@ char Weapon_aimPosList[10][2] = {
 	This way, I can avoid the OPs and save space. For debug, it will remain.
 */
 unsigned long Weapon_props[72] = {
+
     // row 1
+
         // jet pack
-        0,
+        doesntEndTurn,
 
         // bazooka
-        usesAim | usesCharge | usesPhysics | usesWind | usesDetonateOnImpact | holdsLauncher | usesWind,
+        usesAim | usesCharge | usesPhysics | usesWind | usesDetonateOnImpact | holdsLauncher | usesWind | doesntEndTurn,
         
 		// grenade
         usesAim | usesCharge | usesPhysics | usesWind | usesFuse | holdsSelf | spawnsSelf,
@@ -281,7 +284,7 @@ unsigned long Weapon_props[72] = {
         0,
         
 		// ninja rope
-        0,
+        0 | doesntEndTurn,
         
 		// super banana bomb
         usesAim | usesFuse | usesCharge | usesPhysics | usesController | isCluster | spawnsSelf | holdsSelf,
@@ -296,8 +299,9 @@ unsigned long Weapon_props[72] = {
         isMeta | holdsSelf,
     
     // row 2
+
         // low gravity
-        isMeta,
+        isMeta | doesntEndTurn,
         
 		// homing missile
         usesAim | usesCursor | usesCharge | usesPhysics | usesHoming | usesDetonateOnImpact | holdsLauncher,
@@ -321,7 +325,7 @@ unsigned long Weapon_props[72] = {
         holdsCustom | usesFuse,
         
 		// bungee
-        isMeta,
+        isMeta | doesntEndTurn,
         
 		// holy hand grenade
         usesAim | usesFuse | usesCharge | usesPhysics | holdsSelf | spawnsSelf,
@@ -338,7 +342,7 @@ unsigned long Weapon_props[72] = {
     // row 3
         
 		// fast walk
-        isMeta,
+        isMeta | doesntEndTurn,
         
 		// mortar
         usesAim | usesPhysics | isCluster | usesDetonateOnImpact | holdsLauncher,
@@ -374,12 +378,12 @@ unsigned long Weapon_props[72] = {
         usesCursor | usesPhysics | usesDetonateOnImpact | usesAirStrike,
         
 		// select worm
-        isMeta | holdsSelf,
+        isMeta | holdsSelf | doesntEndTurn,
     
     // row 4
         
 		// laser sight
-        isMeta | usesRaycast,
+        isMeta | usesRaycast | doesntEndTurn,
         
 		// homing pigeon
         usesAim | usesHoming | usesCursor | usesDetonateOnImpact | spawnsSelf | holdsSelf,
@@ -627,7 +631,6 @@ void detonateWeapon(short index)
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 
-
 /**
  * This spawns a Weapon item in the game.
  *
@@ -696,6 +699,23 @@ void Weapons_setTarget(short x, short y)
 	Weapon_targetX = x;
 	Weapon_targetY = y;
 	
+	// for teleport, just set the worm pos immediately
+	if(Game_currentWeaponSelected == WTeleport)
+	{
+		Worm_x[(short)Worm_currentWorm] = x;
+		Worm_y[(short)Worm_currentWorm] = y;
+
+		// enable worms gravity until it's settled
+		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], 0, 1, FALSE, TRUE);
+
+		// un-set target picked, since teleport instantly consumes the position
+		Game_currentWeaponState &= ~targetPicked;
+
+		// consume the weapon from players inventory
+		CharacterController_weaponConsumed(FALSE);
+		return;
+	}
+
 	// if the current weapon is a an airstrike type, go up and spawn some things
 	if(Game_currentWeaponProperties & usesAirStrike)
 	{
@@ -708,34 +728,42 @@ void Weapons_setTarget(short x, short y)
 			case WNapalmStrike:
 				spawnItem = WFire;
 				break;
+
 			case WMailStrike:
 				spawnItem = WMail;
 				break;
+
 			case WMineStrike:
 				spawnItem = WFakeMine;
 				break;
+
 			case WSheepStrike:
 				spawnItem = WSheep;
 				break;
+
 			case WCarpetBomb:
 				spawnItem = WCarpet;
 				break;
+
 			case WMoleSquadron:
 				spawnItem = WMole;
 				break;
+
 			case WMBBomb:
 				spawnItem = WMBBomb;
 				spawnCount = 1;
 				break;
+
 			case WConcreteDonkey:
 				spawnItem = WConcreteDonkey;
 				spawnCount = 1;
 				break;
+
 			default:
 				spawnItem = WBazooka;
 				break;
 		
-		}// swatch 
+		}// swatch
 		
 		const char spawnXVelo = (Game_currentWeaponState & strikeLeft) ? -1 : 1;
 		
@@ -748,15 +776,17 @@ void Weapons_setTarget(short x, short y)
 		
 		// for now, spawn 5 weapons in a line above the target
 		int i;
-		for(i=-2; i<=2; i++)
-		{
+		for(i=-2; i<=2; i++)		
 			Weapons_spawn(spawnItem, x+(i*5), -50, spawnXVelo, 0, 5*TIME_MULTIPLIER);
-		}
-		
-		// un-set target picked
+
+		// un-set target picked, since these weapons all instantly consume the position
 		Game_currentWeaponState &= ~targetPicked;
-		Game_xMarkPlaced = FALSE;
-	}
+
+		// consume the weapon from players inventory
+		CharacterController_weaponConsumed(FALSE);
+		return;
+
+	}// end if uses airstrike
 }
 
 

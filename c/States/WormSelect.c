@@ -91,11 +91,18 @@ static void nextWorm()
 static void WormSelect_enter()
 {
 	// it's a new turn..
-	Game_turn++;
+	Game_turn++; 
 	
 	// toggle teams
 	Game_currentTeam = (Game_currentTeam==1 ? 0 : 1);
 
+	// if current team WAS frozen or Invisible, clear flags now
+	Game_stateFlags &= ~(Game_currentTeam==0 ? gs_team1Frozen : gs_team2Frozen);
+	Game_stateFlags &= ~(Game_currentTeam==0 ? gs_team1Invisible : gs_team2Invisible);
+
+	// Clear rest of turn-specific flags from last turn
+	Game_stateFlags &= ~0b0000001111111111;
+	
 	// show current team on status bar message
 	sprintf(buffer, "%s's Turn", Match_teamNames[(short)Game_currentTeam]);
 	StatusBar_showMessage(buffer);
@@ -120,7 +127,6 @@ static void WormSelect_enter()
 	// the game is done, to get frames-to-seconds more accurate
 	Game_graceTimer = 5 * TIME_MULTIPLIER;
 	Game_timer = Match_turnTime * TIME_MULTIPLIER;
-	
 }
 
 
