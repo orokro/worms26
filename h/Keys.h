@@ -34,6 +34,9 @@
 #define key5 (long)131072			//00000000000000100000000000000000
 #define keyAction2 (long)262144		//00000000000001000000000000000000
 #define keyExit (long)524288		//00000000000010000000000000000000
+#define keyF1 (long)1048576			//00000000000100000000000000000000
+#define keyF5 (long)2097152			//00000000001000000000000000000000
+
 
 // note this key: because it's all 1's, it will always return true when & on any other int,
 // so long as at least ONE bit is set. This way, we can test for any-key

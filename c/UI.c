@@ -99,7 +99,7 @@ void Draw_timer()
 		char txt[3];
 		sprintf(txt, "%d", time);
 		
-		FontSetSys(1);
+		FontSetSys(F_6x8);
 
 		GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
 		DrawStr(3 + ((time<10) ? 3 : 0), 89, txt, A_NORMAL);

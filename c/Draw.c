@@ -124,7 +124,7 @@ void Draw_renderGame()
 	ClrScr();
 	
 	// small fonts used in game, pause menu different
-	FontSetSys(0);
+	FontSetSys(F_4x6);
 
 	// draw background mountains
 	drawMountains();

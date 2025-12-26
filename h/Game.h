@@ -54,6 +54,7 @@ extern long Game_suddenDeathTimer;
 extern char Game_wind;
 extern char Game_waterLevel;
 extern char Game_currentTeam;
+extern char Game_surrenderedTeam;
 extern char Game_currentWormUp[2];
 extern short Game_cursorX;
 extern short Game_cursorY;

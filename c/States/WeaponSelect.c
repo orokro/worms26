@@ -30,10 +30,10 @@ void Draw_renderWeaponsMenu(char wx, char wy)
 	ClrScr();
 	
 	// draw title with shadow
-	FontSetSys(2);
+	FontSetSys(F_8x10);
 	GrayDrawStr2B(54, 2, "Weapons", A_NORMAL, lightPlane, lightPlane);
 	GrayDrawStr2B(53, 1, "Weapons", A_NORMAL, lightPlane, darkPlane);
-	FontSetSys(1);
+	FontSetSys(F_6x8);
 	
 	// draw light and dark grid lines
 	// for(x=1; x<14; x++)

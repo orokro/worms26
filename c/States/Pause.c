@@ -90,8 +90,8 @@ void Draw_renderPauseMenu(char menuItem)
 	GrayDrawStr2B(62, 30, exitStr, A_XOR, lightPlane, darkPlane);
 	
 	// draw title
-	FontSetSys(2);
-	
+	FontSetSys(F_8x10);
+
 	// dark plane is solid, so we can XOR the shadow area to make it WHITE on the dark plane
 	GrayDrawStr2B(57, 2, "Paused", A_XOR, darkPlane, darkPlane);
 	
@@ -99,7 +99,6 @@ void Draw_renderPauseMenu(char menuItem)
 	GrayDrawStr2B(57, 2, "Paused", A_NORMAL, lightPlane, lightPlane);
 	
 	// draw it to both planes in black, then XOR it to make it WHITE
-	FontSetSys(1);
 	GrayDrawStr2B(56, 1, "Paused", A_NORMAL, lightPlane, darkPlane);
 	GrayDrawStr2B(56, 1, "Paused", A_XOR, lightPlane, darkPlane);
 	
@@ -110,7 +109,7 @@ void Draw_renderPauseMenu(char menuItem)
 		
 		Perhaps I'll use sprites one day if there's space.
 	*/
-	
+	FontSetSys(F_6x8);
 	Draw_pauseMenuWormCounter(50, 0);
 	Draw_pauseMenuWormCounter(70, 1);
 	
@@ -120,13 +119,13 @@ void Draw_renderPauseMenu(char menuItem)
 	char controlsStr[] = "[2nd] confirm / use weapon\n[?] jump\n[a] back flip\n[?]+[?]/[?]/[?]/[?] move camera\n[F1]/[CAT] weapons menu\n[APPS] select worm (if enabled)\n[ESC] pause\n[1]/[2]/[3]/[4]/[5] fuse length / opts";
 	
 	// use tiny font to draw controls
-	FontSetSys(0);
+	FontSetSys(F_4x6);
 
 	// draw dark on light plane, then xor to erase
 	GrayDrawStr2B(10, 30, controlsStr, A_NORMAL, lightPlane, darkPlane);
 	GrayDrawStr2B(10, 30, controlsStr, A_XOR, lightPlane, darkPlane);
 	
-	FontSetSys(1);
+	FontSetSys(F_6x8);
 	*/
 }
 

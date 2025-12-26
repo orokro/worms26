@@ -69,18 +69,6 @@ extern void Draw_HUD();
 
 
 /**
- * Draws the pause menu, with current menu item selected.
- * 
- * The pause menu has three options: continue, quit, show controls.
- * This draws the pause menu instead of the current Game.
- * The pause menu will highlight whichever option is selected.
- *
- * @param menuItem the index of the menu item that is currently selected (continue, quit, show controls)
-*/
-extern void Draw_renderPauseMenu(char);
-
-
-/**
  * Draws the weapons menu for when a player is selecting a weapon.
  * 
  * @param wx a char that contains the x-position of the current weapon selected in the matrix of weapons

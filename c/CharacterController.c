@@ -170,7 +170,9 @@ void wormWeapon()
 				break;
 
 			case WSurrender:
+				Game_surrenderedTeam = Game_currentTeam;
 				Game_changeMode(gameMode_GameOver);
+				return;
 				break;
 
 			case WSelectWorm:

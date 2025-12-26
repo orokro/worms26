@@ -96,6 +96,8 @@
 	key4
 	key5
 	keyExit 
+	keyF1
+	keyF5
 
 	C Source File
 	Created 11/11/2017; 11:34:17 PM
@@ -153,7 +155,9 @@ void Keys_update()
 	keysState += _keytest(RR_4) * key4;
 	keysState += _keytest(RR_5) * key5;
 	keysState += _keytest(RR_CLEAR) * keyExit;
-	
+	keysState += _keytest(RR_F1) * keyF1;
+	keysState += _keytest(RR_F5) * keyF5;
+
 	// if we XOR our current state (keysState) and our previous state (lastKeysState)
 	// we will get just the keys that changed ON or OFF from the last frame
 	long changedKeys = (lastKeysState ^ keysState);

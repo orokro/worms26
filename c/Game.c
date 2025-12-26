@@ -160,6 +160,9 @@ char Game_wind = 0;
 char Game_currentTeam = 1;
 char Game_currentWormUp[2] = {0, 0};
 
+// which team surrendered, if any
+char Game_surrenderedTeam = -1;
+
 // the current cursor position, facing direction, xMark spot position and settings
 short Game_cursorX = 0;
 short Game_cursorY = 0;
@@ -275,6 +278,7 @@ void Game_initRound(){
 	Game_waterLevel = 0;
 	Game_wormAnimState = ANIM_NONE;
 	Game_stateFlags = 0;
+	Game_surrenderedTeam = -1;
 }
 
 
