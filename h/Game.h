@@ -22,11 +22,29 @@ enum GameModes {
 	gameMode_GameOver
 };
 
+// Enum for what the ray hit
+enum {
+    RAY_HIT_NOTHING = 0,
+    RAY_HIT_LAND,
+    RAY_HIT_WORM
+};
+
+// Struct to hold the result of a raycast
+typedef struct {
+    short x;            // The X coordinate of the impact
+    short y;            // The Y coordinate of the impact
+    short hitType;      // RAY_HIT_LAND, RAY_HIT_WORM, or RAY_HIT_NOTHING
+    short hitIndex;     // If hitType == RAY_HIT_WORM, this is the worm index. Otherwise -1.
+} RaycastHit;
+
 // flags for current weapon state
 #define targetPicked 	0b00000001
 #define strikeLeft  	0b00000010
 #define firstShotTaken  0b00000100
 
+// Define Fixed Point precision (16.16)
+#define FP_SHIFT 16
+#define FP_ONE   (1L << FP_SHIFT)
 
 // flags for current game state
 #define gs_fastWalk  		0b0000000000000001
@@ -59,6 +77,7 @@ extern char Game_surrenderedTeam;
 extern char Game_currentWormUp[2];
 extern short Game_cursorX;
 extern short Game_cursorY;
+extern short Game_weaponUsesRemaining;
 extern char Game_cursorDir;
 extern short Game_xMarkSpotX;
 extern short Game_xMarkSpotY;
@@ -74,6 +93,11 @@ extern unsigned short Game_stateFlags;
 extern char Game_debugFreeze;
 
 // game function prototypes
+
+
+// Prototype
+extern RaycastHit Game_raycast(short originX, short originY, short dirX, short dirY, short testWorms);
+
 
 
 /**

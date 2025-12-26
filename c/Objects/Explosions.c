@@ -238,7 +238,7 @@ void spawnFire()
  * @param size - size of explosion to spawn
  * @param hasFire - true if has fire effects
  */
-void Explosion_spawn(short x, short y, char size, char power, char hasFire)
+short Explosion_spawn(short x, short y, char size, char power, char hasFire)
 {
 	// first we gotta find a free explosion. if none is found,
 	// we'll over-write the current closest-to-death explosion
@@ -300,6 +300,8 @@ void Explosion_spawn(short x, short y, char size, char power, char hasFire)
 	// if this explosion has fire, let's spawn it now
 	if(hasFire)
 		spawnFire();
+
+	return expIndex;
 }
 
 

@@ -257,7 +257,8 @@ void wormWeapon()
 			Game_currentWeaponCharge = 0;
 
 			// consume the weapon
-			CharacterController_weaponConsumed(FALSE);
+			if(Game_weaponUsesRemaining==-1)
+				CharacterController_weaponConsumed(FALSE);
 
 		} // end if action was pressed
 

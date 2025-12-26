@@ -172,6 +172,7 @@ char Game_cursorDir = 0;
 short Game_xMarkSpotX = 0;
 short Game_xMarkSpotY = 0;
 char Game_xMarkAllowedOverLand = TRUE;
+short Game_weaponUsesRemaining = -1;
 
 // for animating jumps
 char Game_wormAnimState = ANIM_NONE;
@@ -284,6 +285,7 @@ void Game_initRound(){
 	Game_wormAnimState = ANIM_NONE;
 	Game_stateFlags = 0;
 	Game_surrenderedTeam = -1;
+	Game_weaponUsesRemaining = -1;
 
 	short i=0;
 	for(i=0; i<65; i++)
@@ -612,4 +614,126 @@ char Game_checkWinConditions(){
 		return TRUE;
 	}
 	return FALSE;
+}
+
+
+RaycastHit Game_raycast(short originX, short originY, short dirX, short dirY, short testWorms)
+{
+    RaycastHit result;
+    
+    // Default result: Hit nothing, end at the edge of the map/screen
+    result.hitType = RAY_HIT_NOTHING;
+    result.hitIndex = -1;
+    result.x = originX;
+    result.y = originY;
+
+    // 1. Safety check: prevent infinite loop if direction is 0
+    if(dirX == 0 && dirY == 0) return result;
+
+    // 2. Setup Fixed Point Variables
+    long curX = (long)originX << FP_SHIFT;
+    long curY = (long)originY << FP_SHIFT;
+    
+    long stepX, stepY;
+    
+    // 3. Normalize direction to create steps
+    // We want the "Longest" axis to step exactly 1.0 (FP_ONE) unit per loop
+    // This ensures we never skip a pixel.
+    
+    long absDX = abs(dirX);
+    long absDY = abs(dirY);
+
+    if (absDX >= absDY)
+    {
+        // X is the major axis
+        // If dirX is negative, step is -1.0, else 1.0
+        stepX = (dirX < 0) ? -FP_ONE : FP_ONE;
+        
+        // Y step is the ratio (dirY / dirX) * FP_ONE
+        // We calculate: (dirY * FP_ONE) / abs(dirX) 
+        // We use abs(dirX) because the sign is handled by the direction of dirY naturally? 
+        // Actually simplest math: stepY = (dirY << FP_SHIFT) / abs(dirX);
+        // But we must correct the sign relative to the X movement.
+        // Let's stick to the ratio method:
+        
+        stepY = (long)dirY * FP_ONE / absDX;
+    }
+    else
+    {
+        // Y is the major axis
+        stepY = (dirY < 0) ? -FP_ONE : FP_ONE;
+        stepX = (long)dirX * FP_ONE / absDY;
+    }
+
+    // 4. The Loop
+    // We loop until we hit something or go out of bounds
+    // Max loop safety is map width + height (heuristic)
+    short loopCount = 0;
+    short maxLoops = 300; // Adjust based on max screen diagonal
+
+    while(loopCount < maxLoops)
+    {
+        // Convert Fixed Point back to Short integer for checking
+        short ix = (short)(curX >> FP_SHIFT);
+        short iy = (short)(curY >> FP_SHIFT);
+
+        // A. Check Bounds
+        if(ix < 0 || ix >= 320 || iy < 0 || iy >= 200) 
+		{
+			result.x = ix;
+			result.y = iy;
+			break;
+		}
+
+        // B. Check Terrain (Land)
+        // Helper macro or function to check your specific buffer
+        // Assuming GetPixel returns TRUE if a pixel is set (land)
+        if(Map_testPoint(ix, iy)) 
+        {
+            result.x = ix;
+            result.y = iy;
+            result.hitType = RAY_HIT_LAND;
+            return result;
+        }
+
+        // C. Check Worms (Optional)
+        // We check bounding box: roughly +/- 4 pixels
+        if(testWorms)
+        {
+            short w;
+			unsigned short wormMask = 0;
+            for(w = 0; w < MAX_WORMS; w++)
+            {
+				wormMask = (unsigned short)1<<(w);
+				
+                // Skip dead or current worm (optional: usually you can't shoot yourself)
+                if((Worm_active & wormMask) == 0) 
+					continue; 
+                if(w == Worm_currentWorm) 
+					continue;
+
+                // Simple AABB check
+                // This is very fast integer math
+                if(ix >= Worm_x[w] - 4 && ix <= Worm_x[w] + 4 &&
+                   iy >= Worm_y[w] - 6 && iy <= Worm_y[w] + 5)
+                {
+                    result.x = ix;
+                    result.y = iy;
+                    result.hitType = RAY_HIT_WORM;
+                    result.hitIndex = w;
+                    return result;
+                }
+            }
+        }
+
+        // Increment position
+        curX += stepX;
+        curY += stepY;
+        loopCount++;
+    }
+
+    // If we ran out of loops, return the last known position
+    result.x = (short)(curX >> FP_SHIFT);
+    result.y = (short)(curY >> FP_SHIFT);
+    return result;
 }

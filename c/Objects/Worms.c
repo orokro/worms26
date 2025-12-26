@@ -193,7 +193,7 @@ void Worm_update()
 {
 	// loop over worms, and any active worms should have their gravity and physics applied..
 	short i;
-	long wormMask;
+	unsigned short wormMask;
 	unsigned short Worm_wasOnGround = Worm_onGround;
 	for(i=0; i<MAX_WORMS; i++)
 	{

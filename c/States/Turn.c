@@ -14,6 +14,12 @@
 static void Turn_enter()
 {
 	cameraAutoFocus = TRUE;
+
+	// reset multiuse var unless user equips a multi-use weapon
+	Game_weaponUsesRemaining = -1;
+	
+	// for debug we'll always have laser sight on
+	Game_stateFlags |= gs_laserSight;
 }
 
 

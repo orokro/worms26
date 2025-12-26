@@ -285,7 +285,7 @@ unsigned long Weapon_props[72] = {
         0,
         
 		// ninja rope
-        0 | doesntEndTurn,
+        doesntEndTurn,
         
 		// super banana bomb
         usesAim | usesFuse | usesCharge | usesPhysics | usesController | isCluster | spawnsSelf | holdsSelf,
@@ -384,7 +384,7 @@ unsigned long Weapon_props[72] = {
     // row 4
         
 		// laser sight
-        isMeta | usesRaycast | doesntEndTurn,
+        isMeta | doesntEndTurn,
         
 		// homing pigeon
         usesAim | usesHoming | usesCursor | usesDetonateOnImpact | spawnsSelf | holdsSelf,
@@ -568,7 +568,6 @@ const char weaponNames[65][16] = {
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
-
 
 
 /**
@@ -1231,6 +1230,33 @@ void Weapons_fire(short charge)
 	short spawnX = Worm_x[(short)Worm_currentWorm];
 	short spawnY = Worm_y[(short)Worm_currentWorm];
 	
+	// if it's a multi use weapon, handle usage counter
+	if(Game_currentWeaponProperties & multiUse)
+	{
+		// if not yet initialized
+		if(Game_weaponUsesRemaining == -1){
+
+			switch (Game_currentWeaponSelected){
+				case WShotGun:
+				case WLongbow:
+					Game_weaponUsesRemaining = 2;
+					break;
+				case WGirderPack:
+					Game_weaponUsesRemaining = 5;
+					break;
+			}
+		}
+
+		// drement usage count
+		Game_weaponUsesRemaining--;
+
+		// if we've used it up, consume the weapon
+		if(Game_weaponUsesRemaining<=0)
+			Game_weaponUsesRemaining = -1;
+			
+		// otherwise we can fall through to the regular code for the weapon
+	}
+
 	// if it's the suicide bomb, we'll just immediately spawn an explosion & kill the worm & btfo
 	if(Game_currentWeaponSelected == WSuicideBomb){
 
@@ -1350,6 +1376,31 @@ void Weapons_fire(short charge)
 			dirY *= -1;
 		if(facingLeft)
 			dirX *= -1;
+	}
+
+	// if it has uses raycast, it must be a gun-type weapon. Handle it now
+	if(Game_currentWeaponProperties & usesRaycast)
+	{
+		// perform a raycast to see what we hit
+		short targetX = 0;
+		short targetY = 0;
+		RaycastHit hit = Game_raycast(spawnX, spawnY, dirX, dirY, TRUE);
+
+		if(hit.hitType != RAY_HIT_NOTHING)
+		{
+			// Game_debugFreeze = TRUE;
+			// spawn an impact effect at the target location
+			const short expId = Explosion_spawn(hit.x, hit.y, 6, 15, FALSE);
+		
+			// focus camera on impact
+			Camera_focusOn(&Explosion_x[expId], &Explosion_y[expId]);
+		
+			// consume the weapon from players inventory
+			if(Game_weaponUsesRemaining<=0)
+				CharacterController_weaponConsumed(FALSE);
+		}
+		
+		return;
 	}
 
 	// if it's a mele weapon we have a separate function for that
