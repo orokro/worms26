@@ -19,6 +19,7 @@
 #include "Explosions.h"
 #include "Weapons.h"
 #include "Worms.h"
+#include "Game.h"
 
 
 /**
@@ -197,7 +198,19 @@ char Physics_apply(PhysObj *obj)
 	// before we apply physics, save the inital state of the X/Y
 	short initX = *obj->x;
 	short initY = *obj->y;
-	
+
+	// Check global flag AND ensure we aren't on the ground
+    if((Game_stateFlags & gs_lowGravity) && !(*obj->settled) && *obj->yVelo>0)
+    {
+        // Apply gravity only 1 out of every 3 frames (33% Gravity)
+        // This means on frames 0 and 1, we UNDO the gravity the caller added.
+        if(Game_timer % 2 != 0)
+        {
+            // Subtract 1 to cancel out the caller's "yVelo++" or "yVelo += 1"
+            *obj->yVelo = 1;
+        }
+    }
+
 	// if an object is too far below the water, it is permanently settled, and we dont
 	// need to do anything with it.
 	if(initY>250)
@@ -338,7 +351,6 @@ char Physics_apply(PhysObj *obj)
  */
 void Physics_setVelocity(PhysObj *obj, char x, char y, char additive, char impact)
 {
-
 	static char skipFrame = 0;
 
 	// if not impact, we may skip frames for smoother movement
