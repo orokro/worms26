@@ -489,6 +489,7 @@ void Worm_drawAll()
                         if(sprHeight == 17) y -= 4; 
                         if(sprHeight == 15) y -= 2;
                     }
+
                     // --- JUMPING ---
                     else if(Game_wormAnimState == ANIM_JUMP)
                     {
@@ -510,6 +511,7 @@ void Worm_drawAll()
                         sprMask = spr_WormRight_Mask;
                     }
                 }
+				
                 // ============================================================
                 // STANDARD WALKING / STANDING
                 // ============================================================

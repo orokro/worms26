@@ -697,6 +697,47 @@ void Draw_renderGame()
 
 
 /**
+ * @brief Draws a stack of worms for the pause menu worm counter
+ * 
+ * @param yPos - y position to draw at
+ * @param teamIndex - which team to draw worms for (0 or 1)
+ */
+void Draw_pauseMenuWormCounter(short yPos, short teamIndex)
+{
+	short i, x;
+	
+	// draw the team name on the left
+	x = 80 - 6*strlen(Match_teamNames[teamIndex]);
+	GrayDrawStr2B(x, yPos, Match_teamNames[teamIndex], A_NORMAL, lightPlane, darkPlane);
+	GrayDrawStr2B(x, yPos, Match_teamNames[teamIndex], A_XOR, lightPlane, darkPlane);
+
+	// build a mask for this team's worms
+	const unsigned short teamMask = (teamIndex==0) ? 0b0000000011111111 : 0b1111111100000000;
+
+	// get how many worms are alive for this team
+	unsigned short liveWorms = ~Worm_isDead & teamMask & Worm_active;
+
+	// count how many bits are set in liveWorms
+	short liveCount = 0;
+	for(i=0; i<MAX_WORMS; i++)
+		if((liveWorms & (1<<i))!=0)
+			liveCount++;
+	
+	// loop too draw worm sprites for each teams remaining worms from right to left
+	x = 78 + liveCount * 9;
+	yPos -= 3;
+	for(i=0; i<liveCount; i++)
+	{
+		x-=9;
+		ClipSprite16_AND_R(x, yPos, 13, spr_WormRight_Mask, darkPlane);
+		ClipSprite16_AND_R(x, yPos, 13, spr_WormRight_Mask, lightPlane);
+		ClipSprite16_OR_R(x, yPos, 13, spr_WormRight_Outline, darkPlane);
+		ClipSprite16_OR_R(x, yPos, 13, spr_WormRight_Outline, lightPlane);
+	}// next i
+}
+
+
+/**
  * main drawing routine for the pause menu
  * @param menuItem - which menu item to be selected
  */
@@ -755,6 +796,10 @@ void Draw_renderPauseMenu(char menuItem)
 		Perhaps I'll use sprites one day if there's space.
 	*/
 	
+	Draw_pauseMenuWormCounter(50, 0);
+	Draw_pauseMenuWormCounter(70, 1);
+	
+
 	/*
 	// controls text:
 	char controlsStr[] = "[2nd] confirm / use weapon\n[?] jump\n[a] back flip\n[?]+[?]/[?]/[?]/[?] move camera\n[F1]/[CAT] weapons menu\n[APPS] select worm (if enabled)\n[ESC] pause\n[1]/[2]/[3]/[4]/[5] fuse length / opts";
