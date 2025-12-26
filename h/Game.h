@@ -70,6 +70,7 @@ extern unsigned short Game_currentWeaponState;
 extern unsigned short Game_currentWeaponCharge;
 extern char Game_aimAngle;
 extern unsigned short Game_stateFlags;
+extern char Game_debugFreeze;
 
 // game function prototypes
 

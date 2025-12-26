@@ -65,19 +65,10 @@ void wormWalk()
 	}
 	else if (Keys_keyDown(keyBackflip))
 	{
-		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], ((Worm_dir & wormMask) ? 1 : -1), -6, FALSE, TRUE);
-
-		// Set Animation State
-		Game_wormAnimState = ANIM_BACKFLIP;
-		Game_wormAnimTimer = 0;
-
-		// Store the direction we were facing when we started the flip
-		// (We need this because the worm might spin, but the sequence depends on start dir)
-
-		Game_wormFlipStartDir = (Worm_dir & wormMask);
+		CharacterController_doBackflip();
 		return;
 
-		// test for directions left/right
+	// test for directions left/right
 	}
 	else if (Keys_keyState(keyLeft))
 	{
@@ -269,6 +260,21 @@ void wormWeapon()
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 
+
+
+/**
+ * @brief Initiates a backflip for the current worm
+ * 
+ */
+void CharacterController_doBackflip()
+{
+	Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], ((Worm_dir & wormMask) ? 1 : -1), -6, FALSE, TRUE);
+
+	// Set Animation State
+	Game_wormAnimState = ANIM_BACKFLIP;
+	Game_wormAnimTimer = 0;
+	Game_wormFlipStartDir = (Worm_dir & wormMask);
+}
 
 
 /**

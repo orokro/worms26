@@ -118,7 +118,13 @@ static unsigned long spr_LandTexture[] = { // 32 tall
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 
-
+/**
+ * @brief Determines if a point is considered out of bounds
+ * 
+ * @param x - x
+ * @param y - y
+ * @return char - TRUE if out of bounds, FALSE if in bounds 
+ */
 char Map_isOOB(short x, short y)
 {
 	// out of bounds check

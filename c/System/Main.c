@@ -145,6 +145,14 @@ void _main(void)
 	  	
 	  	lightPlane = GrayDBufGetHiddenPlane(LIGHT_PLANE);
 		darkPlane = GrayDBufGetHiddenPlane(DARK_PLANE);
+
+		if(Game_debugFreeze)
+		{
+			while(!Keys_keyDown(keyF5))
+				Keys_update();
+
+			Game_debugFreeze = FALSE;
+		}
 	}
 	
 	// disable grayscale

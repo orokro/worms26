@@ -58,8 +58,8 @@
 */
 enum Weapons {
 	WJetPack,			WBazooka, 			WGrenade, 	WShotGun,	WFirePunch, 	WDynamite, 		WAirStrike, 	WBlowTorch, 	WNinjaRope, 		WSuperBanana, 		WPetrolBomb, 	WMadCows, 			WSkipGo,
-	WLowGravity, 		WHomingMissle, 		WCluster,	WHandGun,	WDragonBall,	WMine, 			WNapalmStrike, 	WDrill, 		WBungeeCord,		WHolyHandGrenade,	WSkunk, 		WOldLady, 			WSurrender,
-	WFastWalk,			WMortar, 			WBanana, 	WUzi,		WKakamaze, 		WSheep, 		WMailStrike, 	WGirder, 		WParachute,			WFlameThrower, 		WMingVase, 		WConcreteDonkey, 	WSelectWorm,
+	WLowGravity, 		WHomingMissile, 	WCluster,	WHandGun,	WDragonBall,	WMine, 			WNapalmStrike, 	WDrill, 		WBungeeCord,		WHolyHandGrenade,	WSkunk, 		WOldLady, 			WSurrender,
+	WFastWalk,			WMortar, 			WBanana, 	WUzi,		WKamikaze, 		WSheep, 		WMailStrike, 	WGirder, 		WParachute,			WFlameThrower, 		WMingVase, 		WConcreteDonkey, 	WSelectWorm,
 	WLaserSight, 		WHomingPigeon, 		WAxe,		WMiniGun,	WSuicideBomb, 	WSuperSheep, 	WMineStrike, 	WBaseballBat, 	WTeleport, 			WSalvationArmy, 	WSheepStrike,	WNuclearTest, 		WFreeze,
 	WInvisibility,		WSheepLauncher,		WQuake, 	WLongbow,  	WProd, 			WMole, 			WMoleSquadron, 	WGirderPack, 	WScalesOfJustice,	WMBBomb, 			WCarpetBomb, 	WArmageddon, 		WMagicBullet,
 	WFragment, 			WFire,				WSkunkGas,	WComet, 	WMail, 			WCarpet, 		WFakeMine

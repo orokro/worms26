@@ -23,7 +23,15 @@ extern unsigned char mapTiles[640];
 // map function prototypes
 
 
+/**
+ * @brief Determines if a point is considered out of bounds
+ * 
+ * @param x - x
+ * @param y - y
+ * @return char - TRUE if out of bounds, FALSE if in bounds 
+ */
 extern char Map_isOOB(short x, short y);
+
 
 /**
  * Outlines the edges of land in the light and dark map buffers

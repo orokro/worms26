@@ -47,9 +47,6 @@ unsigned short spr_weapons_flipped[NUM_WEAPONS][11];
 // buffers for our weapons screen
 void *weaponsLight, *weaponsDark;
 
-// full screen ref
-const SCR_RECT fullScreen = {{0, 0, 159, 99}};
-
 // Lookup table for N bits set to 1 (0 to 15 bits)
 // Placed outside or static inside to avoid rebuilding it every call
 static const unsigned short BIT_MASKS[] = {

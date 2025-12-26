@@ -11,6 +11,14 @@
 
 // character controller function prototypes
 
+
+/**
+ * @brief Initiates a backflip for the current worm
+ * 
+ */
+extern void CharacterController_doBackflip();
+
+
 /**
  * Updates the character based on user input for a frame turning the turn game mode.
 */

@@ -212,6 +212,8 @@ unsigned short Game_currentWeaponCharge = 0;
 // the angle the current worm is aiming at
 char Game_aimAngle=10;
 
+char Game_debugFreeze = FALSE;
+
 /* 
 	For reference, Game modes:
 	

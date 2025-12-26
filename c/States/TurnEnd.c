@@ -32,7 +32,7 @@ static void TurnEnd_update()
 	// the game
 	Draw_renderGame();
 	
-	if(Game_timer<-10*TIME_MULTIPLIER)
+	if(Game_timer<-5*TIME_MULTIPLIER)
 		Game_changeMode(gameMode_Death);
 }
 

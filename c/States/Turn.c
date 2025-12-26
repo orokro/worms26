@@ -27,11 +27,11 @@ static void Turn_update()
 	// All regular game-updates during this mode
 	gameUpdates();
 	
-	// handle controlling the current worm!
-	CharacterController_update();
-	
 	// the game
 	Draw_renderGame();
+
+	// handle controlling the current worm!
+	CharacterController_update();
 	
 	// if the user pressed escape, we should goto the pause menu
 	if(Keys_keyDown(keyEscape))

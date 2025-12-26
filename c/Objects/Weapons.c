@@ -57,8 +57,8 @@
 	multiUse
 
 	WJetPack,			WBazooka, 			WGrenade, 	WShotGun,		WFirePunch, 	WDynamite, 		WAirStrike, 		WBlowTorch, 	WNinjaRope, 		WSuperBanana, 		WPetrolBomb, 	WMadCows, 			WSkipGo,
-	WLowGravity, 		WHomingMissle, 		WCluster,	WHandGUn,		WDragonBall,	WMine, 			WNapalmStrike, 		WDrill, 		WBungeeCord,		WHolyHandGrenade,	WSkunk, 		WOldLady, 			WSurrender,
-	WFastWalk,			WMortar, 			WBanana, 	WUzi,			WKakamaze, 		WSheep, 		WMailStrike, 		WGirder, 		WParachute,			WFlameThrower, 		WMingVase, 		WConcreteDonkey, 	WSelectWorm,
+	WLowGravity, 		WHomingMissile, 		WCluster,	WHandGUn,		WDragonBall,	WMine, 			WNapalmStrike, 		WDrill, 		WBungeeCord,		WHolyHandGrenade,	WSkunk, 		WOldLady, 			WSurrender,
+	WFastWalk,			WMortar, 			WBanana, 	WUzi,			WKamikaze, 		WSheep, 		WMailStrike, 		WGirder, 		WParachute,			WFlameThrower, 		WMingVase, 		WConcreteDonkey, 	WSelectWorm,
 	WLaserSight, 		WHomingPigeon, 		WAxe,		WMiniGun,		WSuicideBomb, 	WSuperSheep, 	WMineStrike, 		WBaseballBat, 	WTeleport, 			WSalvationArmy, 	WSheepStrike, 	WNuclearTest, 		WFreeze,
 	WInvisibility,		WSheepLauncher,		WQuake, 	WLongbow,  		WProd, 			WMole, 			WMoleSquadron, 		WGirderPack, 	WScalesOfJustice,	WMBBomb, 			WCarpetBomb, 	WArmageddon, 		WMagicBullet,
 	WFragment, 			WFire,				WSkunkGas,	WComet
@@ -313,7 +313,7 @@ unsigned long Weapon_props[72] = {
         usesAim | holdsSelf | usesRaycast | usesRoutine,
         
 		// dragon ball
-        isMele,
+        usesRoutine,
         
 		// mine
         usesFuse | spawnsSelf | holdsSelf | isDroppable,
@@ -354,7 +354,7 @@ unsigned long Weapon_props[72] = {
         usesAim | holdsSelf | usesRaycast | usesRoutine,
         
 		// kamikaze
-        isMele,
+        isMele | usesRoutine,
         
 		// sheep
         spawnsSelf | usesFuse | usesPhysics | isAnimal | usesJumping | holdsSelf,
@@ -901,6 +901,141 @@ void Weapons_update()
 
 
 /**
+ * @brief Performs mele attack logic
+ * 
+ * @param facingLeft - is the worm facing left
+ * @param dirX - direction x
+ * @param dirY - direction y
+ */
+void doMele(char facingLeft, short dirX, short dirY){
+
+	// figure out which worms we'll affect
+	short affectedWorms[MAX_WORMS] = {
+		FALSE, FALSE, FALSE, FALSE, 
+		FALSE, FALSE, FALSE, FALSE, 
+		FALSE, FALSE, FALSE, FALSE, 
+		FALSE, FALSE, FALSE, FALSE, 
+	};
+	short affectedCount = 0;
+
+	const short xMin = facingLeft ? Worm_x[(short)Worm_currentWorm] - 20 : Worm_x[(short)Worm_currentWorm];
+	const short xMax = facingLeft ? Worm_x[(short)Worm_currentWorm] : Worm_x[(short)Worm_currentWorm] + 20;
+	const short yMin = Worm_y[(short)Worm_currentWorm] - 10;
+	const short yMax = Worm_y[(short)Worm_currentWorm] + 10;
+
+	// loop over all worms and see if any area in the mele hitbox
+	unsigned short wormMask;
+	short i, w;
+	for(i=0; i<MAX_WORMS; i++)
+	{	
+		// skip current worm
+		if(i==Worm_currentWorm)
+			continue;
+
+		// reusable mask
+		wormMask = (unsigned short)1<<(i);
+
+		// skip dead or inactive worms
+		if((Worm_isDead & wormMask) || !(Worm_active & wormMask))
+			continue;
+
+		// check if worm is in the hitbox
+		if(Worm_x[i]>=xMin && Worm_x[i]<=xMax && Worm_y[i]>=yMin && Worm_y[i]<=yMax)
+		{
+			affectedWorms[affectedCount] = i;
+			affectedCount++;
+		}
+	}
+
+	// short x1 = xMin;
+	// short y1 = yMin;
+	// short x2 = xMax;
+	// short y2 = yMax;
+	// worldToScreen(&x1, &y1);
+	// worldToScreen(&x2, &y2);
+
+	// // draw the water rectangle to fill in below the waterline
+	// SCR_RECT waterRect = {{x1, y1, x2, y2}};
+	// const SCR_RECT fullScreen = {{0, 0, 159, 99}};
+
+	// // Draw Light Gray: LightPlane = 1 (Black), DarkPlane = 0 (White)
+	// PortSet(lightPlane, 239, 127);
+	// ScrRectFill(&waterRect, &fullScreen, A_NORMAL);  // Force 1s
+	// PortRestore();
+	// PortSet(darkPlane, 239, 127);
+	// ScrRectFill(&waterRect, &fullScreen, A_NORMAL);  // Force 0s
+	// PortRestore();
+
+	// const char debugBuffer[32];
+	// // sprintf((char*)debugBuffer, "Mele Hitbox: %d,%d to %d,%d", xMin, yMin, xMax, yMax);
+	// sprintf((char*)debugBuffer, "Affected Worms: %d", affectedCount);
+	// FontSetSys(F_4x6);
+	// GrayDrawStr2B(1, 20, debugBuffer, A_NORMAL, lightPlane, darkPlane);
+
+	// Game_debugFreeze = TRUE;
+
+	// force to apply based on weapon type
+	short forceX = facingLeft ? -1 : 1;
+	short forceY = 0;
+	short damage = 0;
+	switch(Game_currentWeaponSelected)
+	{
+		case WFirePunch:
+			CharacterController_doBackflip();
+			forceX *= 2;
+			forceY = -8;
+			damage = 20;
+			break;
+
+		case WKamikaze:
+			forceX *= 2;
+			forceY = -6;
+			damage = 30;
+			break;
+
+		case WAxe:
+
+			// battle axe has custom health logic (always cuts health in half)
+			for(i=0; i<affectedCount; i++)
+			{
+				w = affectedWorms[i];
+
+				// apply damage
+				Worm_setHealth((char)w, -(Worm_health[w]>>1), TRUE);
+
+				// apply force
+				Physics_setVelocity(&Worm_physObj[w], forceX, forceY, TRUE, TRUE);				
+			}
+			return;
+			break;
+
+		case WBaseballBat:
+			forceX = dirX*1;
+			forceY = dirY*1;
+			damage = 30;
+			break;
+
+		case WProd:
+			forceX *= 3;
+			forceY = -2;
+			break;
+	}// swatch
+
+	// deal damage and apply force to affected worms
+	for(i=0; i<affectedCount; i++)
+	{
+		w = affectedWorms[i];
+
+		// apply damage
+		Worm_setHealth((char)w, -damage, TRUE);
+
+		// apply force
+		Physics_setVelocity(&Worm_physObj[w], forceX, forceY, TRUE, TRUE);
+	}
+}
+
+
+/**
  * when user fires a weapon
  * @param charge - the charge amount fired with
  */
@@ -915,6 +1050,16 @@ void Weapons_fire(short charge)
 	short spawnX = Worm_x[(short)Worm_currentWorm];
 	short spawnY = Worm_y[(short)Worm_currentWorm];
 	
+	// if it's the suicide bomb, we'll just immediately spawn an explosion & kill the worm & btfo
+	if(Game_currentWeaponSelected == WSuicideBomb){
+
+		Explosion_spawn(spawnX, spawnY, 10, 30, FALSE);
+		Worm_setHealth(Worm_currentWorm, 0, FALSE);
+		Worm_isDead |= (unsigned short)1<<(Worm_currentWorm);
+		Game_changeMode(gameMode_TurnEnd);
+		return;
+	}
+
 	// adjust spawn point if it's a droppable
 	if(Game_currentWeaponProperties & isDroppable)
 	{
@@ -934,6 +1079,13 @@ void Weapons_fire(short charge)
 			dirY *= -1;
 		if(facingLeft)
 			dirX *= -1;
+	}
+
+	// if it's a mele weapon we have a separate function for that
+	if(Game_currentWeaponProperties & isMele)
+	{
+		doMele(facingLeft, dirX, dirY);
+		return;
 	}
 	
 	// default no velocity unless weapon uses charge
