@@ -24,11 +24,14 @@ static void TurnEnd_update()
 {
 	// All regular game-updates during this mode
 	gameUpdates();
-	
+
+	// allow movement while ending the turn
+	CharacterController_update();
+
 	// the game
 	Draw_renderGame();
 	
-	if(Game_timer<-1*TIME_MULTIPLIER)
+	if(Game_timer<-10*TIME_MULTIPLIER)
 		Game_changeMode(gameMode_Death);
 }
 
