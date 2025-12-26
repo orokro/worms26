@@ -57,6 +57,12 @@ extern void Draw_renderGame();
 
 
 /**
+ * Draws the games timer
+*/
+extern void Draw_timer();
+
+
+/**
  * Draws the games HUD (i.e. timer, wind, etc)
 */
 extern void Draw_HUD();

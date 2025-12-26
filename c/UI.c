@@ -75,7 +75,7 @@ void drawSelectArrow()
 /**
  * Draws the games timer
 */
-void drawTimer()
+void Draw_timer()
 {
 	// only draw the timer if the game is in select or turn mode!
 	if(Game_timer>0 && (Game_mode==gameMode_WormSelect || Game_mode==gameMode_Turn || Game_mode==gameMode_Cursor || Game_mode==gameMode_WeaponSelect ||  Game_mode==gameMode_Pause))
@@ -162,7 +162,7 @@ void Draw_HUD()
 	GrayClipSprite32_OR_R(64, 94, 3, teamHealthSprites_light, teamHealthSprites_dark, lightPlane, darkPlane);
 
 	// draw the timer
-	drawTimer();	
+	Draw_timer();	
 }
 
 
