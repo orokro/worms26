@@ -17,9 +17,9 @@ static void Turn_enter()
 
 	// reset multiuse var unless user equips a multi-use weapon
 	Game_weaponUsesRemaining = -1;
-	
+
 	// for debug we'll always have laser sight on
-	Game_stateFlags |= gs_laserSight;
+	// Game_stateFlags |= gs_laserSight;
 }
 
 
@@ -29,12 +29,12 @@ static void Turn_enter()
 static void Turn_update()
 {
 	// all key-logic and movement logic for the worm will happen in WormsUpdate
-
-	// All regular game-updates during this mode
-	gameUpdates();
 	
-	// the game
+	// draw the game first because weapons might need to flash some things, too
 	Draw_renderGame();
+	
+	// All regular game-updates during this mode
+	gameUpdates();	
 
 	// handle controlling the current worm!
 	CharacterController_update();

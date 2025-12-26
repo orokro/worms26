@@ -154,8 +154,11 @@ extern void Weapons_setTarget(short, short);
 
 /**
  * When the user fires a weapon
+ * 
+ * @param charge - the charge amount fired with
+ * @returns TRUE if weapon should be consumed, FALSE if not
 */
-extern void Weapons_fire(short charge);
+extern char Weapons_fire(short charge);
 
 
 /**

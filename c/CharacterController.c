@@ -235,11 +235,12 @@ void wormWeapon()
 		// if the action key was let go we should fire the weapon at it's current charge, reset charge and exit
 		if (Keys_keyUp(keyAction))
 		{
-			Weapons_fire(Game_currentWeaponCharge);
+			const char shouldConsumeWeapon = Weapons_fire(Game_currentWeaponCharge);
 			Game_currentWeaponCharge = 0;
 
 			// consume the weapon
-			CharacterController_weaponConsumed(FALSE);
+			if(shouldConsumeWeapon)
+				CharacterController_weaponConsumed(FALSE);
 		}
 		else if (Keys_keyState(keyAction))
 		{
@@ -253,11 +254,11 @@ void wormWeapon()
 		// if 2nd was pressed, activate weapon
 		if (Keys_keyUp(keyAction))
 		{
-			Weapons_fire(Game_currentWeaponCharge);
+			const char shouldConsumeWeapon = Weapons_fire(Game_currentWeaponCharge);
 			Game_currentWeaponCharge = 0;
 
 			// consume the weapon
-			if(Game_weaponUsesRemaining==-1)
+			if(shouldConsumeWeapon && Game_weaponUsesRemaining==-1)
 				CharacterController_weaponConsumed(FALSE);
 
 		} // end if action was pressed

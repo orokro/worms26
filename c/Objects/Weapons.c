@@ -311,7 +311,7 @@ unsigned long Weapon_props[72] = {
         usesAim | usesCharge| usesFuse | usesPhysics | usesWind | isCluster | holdsSelf | spawnsSelf,
         
 		// hand gun
-        usesAim | holdsSelf | usesRaycast | usesRoutine,
+        usesAim | holdsSelf | usesRaycast | usesRoutine | noRender | usesFuse,
         
 		// dragon ball
         isMele | usesRoutine | spawnsSelf | usesFuse,
@@ -352,7 +352,7 @@ unsigned long Weapon_props[72] = {
         usesAim | usesCharge | usesPhysics | usesFuse | spawnsSelf | holdsSelf,
         
 		// uzi
-        usesAim | holdsSelf | usesRaycast | usesRoutine,
+        usesAim | holdsSelf | usesRaycast | usesRoutine | noRender | usesFuse,
         
 		// kamikaze
         isMele | usesRoutine | usesFuse,
@@ -370,7 +370,7 @@ unsigned long Weapon_props[72] = {
         isMeta,
         
 		// flame thrower
-        usesAim | usesRoutine | holdsSelf,
+        usesAim | usesRoutine | holdsSelf | noRender | usesFuse,
         
 		// priceless ming vase
         spawnsSelf | usesFuse | isCluster | usesPhysics | holdsSelf | isDroppable,
@@ -393,7 +393,7 @@ unsigned long Weapon_props[72] = {
         isMele | holdsSelf,
         
 		// minigun
-        usesAim | holdsSelf | usesRaycast | usesRoutine,
+        usesAim | holdsSelf | usesRaycast | usesRoutine | noRender | usesFuse,
         
 		// suicide bomber
         0,
@@ -726,6 +726,7 @@ void doMele(char facingLeft, short dirX, short dirY){
 		// apply force
 		Physics_setVelocity(&Worm_physObj[w], forceX, forceY, TRUE, TRUE);
 
+		cameraAutoFocus = FALSE;
 		Camera_focusOn(&Worm_x[(short)w], &Worm_y[(short)w]);
 	}
 
@@ -745,6 +746,42 @@ void doMele(char facingLeft, short dirX, short dirY){
 
 
 /**
+ * @brief Performs a raycast shot for weapons like the handgun
+ * 
+ * @param dirX - direction x
+ * @param dirY - direction y 	
+ */
+void doRayCastShot(short dirX, short dirY)
+{
+
+	// perform a raycast to see what we hit
+	short spawnX = Worm_x[(short)Worm_currentWorm];
+	short spawnY = Worm_y[(short)Worm_currentWorm]+4;
+	RaycastHit hit = Game_raycast(spawnX, spawnY, dirX, dirY, TRUE);
+
+	if(hit.hitType != RAY_HIT_NOTHING)
+	{
+		// Game_debugFreeze = TRUE;
+		// spawn an impact effect at the target location
+		const short expId = Explosion_spawn(hit.x, hit.y, 5, 12, FALSE);
+	
+		// focus camera on impact
+		Camera_focusOn(&Explosion_x[expId], &Explosion_y[expId]);
+	
+		// consume the weapon from players inventory
+		if(Game_weaponUsesRemaining<=0)
+			CharacterController_weaponConsumed(FALSE);
+
+		// draw fire ray
+		short sx=spawnX, sy=spawnY, ex=hit.x, ey=hit.y;
+		worldToScreen(&sx, &sy);
+		worldToScreen(&ex, &ey);
+		GrayDrawClipLine2B(sx, sy, ex, ey, 3, lightPlane, darkPlane);
+	}
+}
+
+
+/**
  * @brief Custom logic for specific weapons
  * 
  * @param index - weapon index we're working on
@@ -753,6 +790,15 @@ void doMele(char facingLeft, short dirX, short dirY){
 void doWeaponRoutine(short index, unsigned short props)
 {
 	const unsigned short weaponMask = (unsigned short)1<<(index);
+
+	char facingLeft = (Worm_dir & (unsigned short)1<<(Worm_currentWorm))>0;
+	short dirX = Weapon_aimPosList[(Game_aimAngle<9) ? Game_aimAngle : 9-(Game_aimAngle-9)][0];
+	short dirY = Weapon_aimPosList[(Game_aimAngle<9) ? Game_aimAngle : 9-(Game_aimAngle-9)][1];
+	if(Game_aimAngle>=10)
+		dirY *= -1;
+	if(facingLeft)
+		dirX *= -1;
+
 	switch(Weapon_type[index]){
 
 		case WDragonBall:
@@ -765,113 +811,141 @@ void doWeaponRoutine(short index, unsigned short props)
 			Worm_y[(short)Worm_currentWorm] = Weapon_y[index];
 			break;
 
+		case WHandGun:
+		case WUzi:
+		case WMiniGun:
+		{   
+			// 1. Default to Minigun speed
+			short mod = 3;
+
+			// 2. Set specific values based on the weapon type
+			if (Weapon_type[index] == WHandGun) mod = 11;
+			else if (Weapon_type[index] == WUzi) mod = 6;
+
+			// 3. Run the shared logic
+			if (Weapon_time[index] % mod == 0)			
+				doRayCastShot(dirX, dirY);
+			
+			break;
+		}
+
+		case WFlameThrower:
+			if (Weapon_time[index] % 6 == 0){
+				const short startX = Worm_x[(short)Worm_currentWorm] + dirX;
+				const short startY = Worm_y[(short)Worm_currentWorm] + dirY;
+				Weapons_spawn(WFire, startX, startY, dirX*0.3, dirY*0.3, 30);
+			}
+			break;
+
 		case WQuake:
-            // 1. Setup Camera State
-            Camera_shake = TRUE;
-            cameraAutoFocus = FALSE;
-            
-            // Static variable to track when to switch camera targets
-            static short quakeCamTimer = 0; 
+			{
+				// 1. Setup Camera State
+				Camera_shake = TRUE;
+				cameraAutoFocus = FALSE;
+				
+				// Static variable to track when to switch camera targets
+				static short quakeCamTimer = 0; 
 
-            short w;
-            
-            // 2. General Rumble (Small nudges for everyone)
-            for(w = 0; w < 16; w++)
-            {
-                if((Worm_active & (1 << w)) && !(Worm_isDead & (1 << w)))
-                {
-                    // 25% chance per frame for a small nudge
-                    if(random(4) == 0)
-                    {
-                        // Random X: -1, 0, or 1
-                        // Random Y: -2 (Upward pop to detach from ground)
-                        Physics_setVelocity(&Worm_physObj[w], (random(3)-1), -1, TRUE, TRUE);
-                    }
-                }
-            }
+				short w;
+				
+				// 2. General Rumble (Small nudges for everyone)
+				for(w = 0; w < 16; w++)
+				{
+					if((Worm_active & (1 << w)) && !(Worm_isDead & (1 << w)))
+					{
+						// 25% chance per frame for a small nudge
+						if(random(4) == 0)
+						{
+							// Random X: -1, 0, or 1
+							// Random Y: -2 (Upward pop to detach from ground)
+							Physics_setVelocity(&Worm_physObj[w], (random(3)-1), -1, TRUE, TRUE);
+						}
+					}
+				}
 
-            // 3. Action Camera & Big Boost
-            if(quakeCamTimer <= 0)
-            {
-                // Try to find a random victim to focus on
-                short attempts = 10;
-                while(attempts > 0)
-                {
-                    short victim = random(16);
-                    
-                    if((Worm_active & (1 << victim)) && !(Worm_isDead & (1 << victim)))
-                    {
-                        // Found a valid victim!
-                        
-                        // A. MANUAL CAMERA TARGETING
-                        // Point the camera pointers directly at this worm's coordinates
-						Camera_focusOn(&Worm_x[victim], &Worm_y[victim]);
-                        
-                        // Note: Camera_update will still smoothly pan to this new target
-                        // because we didn't touch logicalCamX/Y, only the target pointers.
+				// 3. Action Camera & Big Boost
+				if(quakeCamTimer <= 0)
+				{
+					// Try to find a random victim to focus on
+					short attempts = 10;
+					while(attempts > 0)
+					{
+						short victim = random(16);
+						
+						if((Worm_active & (1 << victim)) && !(Worm_isDead & (1 << victim)))
+						{
+							// Found a valid victim!
+							
+							// A. MANUAL CAMERA TARGETING
+							// Point the camera pointers directly at this worm's coordinates
+							Camera_focusOn(&Worm_x[victim], &Worm_y[victim]);
+							
+							// Note: Camera_update will still smoothly pan to this new target
+							// because we didn't touch logicalCamX/Y, only the target pointers.
 
-                        // B. BIG BOOST
-                        // Send them flying!
-                        Physics_setVelocity(&Worm_physObj[victim], (random(7)-3), -3, TRUE, TRUE);
-                        
-                        break; 
-                    }
-                    attempts--;
-                }
-                
-                // Switch targets every 8 frames
-                quakeCamTimer = 8;
-            }
-            else
-                quakeCamTimer--;
+							// B. BIG BOOST
+							// Send them flying!
+							Physics_setVelocity(&Worm_physObj[victim], (random(7)-3), -3, TRUE, TRUE);
+							
+							break; 
+						}
+						attempts--;
+					}
+					
+					// Switch targets every 8 frames
+					quakeCamTimer = 8;
+				}
+				else
+					quakeCamTimer--;
 
-            // 4. Cleanup
-            if(Weapon_time[index] <= 1)
-            {
-                Camera_shake = FALSE;
-                cameraAutoFocus = TRUE;
-                quakeCamTimer = 0;
-            }
-            break;
+				// 4. Cleanup
+				if(Weapon_time[index] <= 1)
+				{
+					Camera_shake = FALSE;
+					cameraAutoFocus = TRUE;
+					quakeCamTimer = 0;
+				}
+			}
+			break;
 
 		case WArmageddon:
-            
-			cameraAutoFocus = FALSE;
-			static short focusIndex = 0;
-
-            // Spawn a comet every 7 frames
-            if(Weapon_time[index] % 7 == 0)
             {
-                // 1. Pick a random spot in the sky
-                // Map is approx 320 wide, spawn high up (-50) like airstrikes
-                short spawnX = random(320);
-                short spawnY = -50;
-                
-                // 2. Calculate downward angled velocity
-                // Random X: -3 to 3 (Left or Right angle)
-                // Fixed Y: 5 (Fast downward start) + Gravity will accelerate it
-                char veloX = (random(7) - 3);
-                char veloY = 5;
-                
-                // 3. Spawn the Comet
-                // We use a longer fuse (90) just in case, though it explodes on impact
-                short cometIndex = Weapons_spawn(WComet, spawnX, spawnY, veloX, veloY, 90);
-                
-                // 4. Camera Focus (Every other comet)
-                // We can use the timer to determine "every other". 
-                // Since we spawn every 7 frames, dividing by 7 gives us a sequential counter.
-                // If that counter is Even, we focus.
-                if(((Weapon_time[index] / 7) % 3) == 0)
-					focusIndex = cometIndex;
-                    
-                Camera_focusOn(&Weapon_x[focusIndex], &Weapon_y[focusIndex]);
-            }
+				cameraAutoFocus = FALSE;
+				static short focusIndex = 0;
 
-            // Cleanup when timer runs out
-            if(Weapon_time[index] <= 1)
-            {
-               cameraAutoFocus = TRUE;
-            }
+				// Spawn a comet every 7 frames
+				if(Weapon_time[index] % 7 == 0)
+				{
+					// 1. Pick a random spot in the sky
+					// Map is approx 320 wide, spawn high up (-50) like airstrikes
+					short spawnX = random(320);
+					short spawnY = -50;
+					
+					// 2. Calculate downward angled velocity
+					// Random X: -3 to 3 (Left or Right angle)
+					// Fixed Y: 5 (Fast downward start) + Gravity will accelerate it
+					char veloX = (random(7) - 3);
+					char veloY = 5;
+					
+					// 3. Spawn the Comet
+					// We use a longer fuse (90) just in case, though it explodes on impact
+					short cometIndex = Weapons_spawn(WComet, spawnX, spawnY, veloX, veloY, 90);
+					
+					// 4. Camera Focus (Every other comet)
+					// We can use the timer to determine "every other". 
+					// Since we spawn every 7 frames, dividing by 7 gives us a sequential counter.
+					// If that counter is Even, we focus.
+					if(((Weapon_time[index] / 7) % 3) == 0)
+						focusIndex = cometIndex;
+						
+					Camera_focusOn(&Weapon_x[focusIndex], &Weapon_y[focusIndex]);
+				}
+
+				// Cleanup when timer runs out
+				if(Weapon_time[index] <= 1)
+					cameraAutoFocus = TRUE;
+				
+			}
             break;
 	}
 }
@@ -890,8 +964,8 @@ void Weapons_detonateWeapon(short index)
 	// no longer active
 	Weapon_active &= ~((unsigned short)1<<(index));
 	
-	// if dragon ball, just despawn
-	if(Weapon_type[index] == WDragonBall)
+	// if dragon ball or noRender type, just despawn
+	if(Weapon_type[index] == WDragonBall || (Weapon_props[(short)Weapon_type[index]] & noRender))
 	{
 		// focus back on current worm
 		Weapon_active &= ~((unsigned short)1<<(index));
@@ -1216,10 +1290,12 @@ void Weapons_update()
 
 
 /**
- * when user fires a weapon
+ * When the user fires a weapon
+ * 
  * @param charge - the charge amount fired with
- */
-void Weapons_fire(short charge)
+ * @returns TRUE if weapon should be consumed, FALSE if not
+*/
+char Weapons_fire(short charge)
 {
 	// before we spawn the weapon we need to make sure we have all the params ready to go...
 	
@@ -1264,7 +1340,7 @@ void Weapons_fire(short charge)
 		Worm_setHealth(Worm_currentWorm, 0, FALSE);
 		Worm_isDead |= (unsigned short)1<<(Worm_currentWorm);
 		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], 0, 2, TRUE, TRUE);
-		return;
+		return TRUE;
 	}
 
 	// start an earth square
@@ -1280,7 +1356,7 @@ void Weapons_fire(short charge)
 
         StatusBar_showMessage("Earthquake!");
 		
-        return;
+        return TRUE;
     }
 
 	// start armageddon
@@ -1292,7 +1368,7 @@ void Weapons_fire(short charge)
         Weapons_spawn(WArmageddon, 0, 0, 0, 0, 90);
         
         StatusBar_showMessage("Armageddon has come!");
-        return;
+        return TRUE;
     }
 
 	// if it's a nuke, raise water, poison all worms
@@ -1302,7 +1378,7 @@ void Weapons_fire(short charge)
 		Game_waterLevel += 30;
 		StatusBar_showMessage("Indian Nuclear Test Detonated");
 		StatusBar_showMessage("All Worms are Poisoned!");
-		return;
+		return TRUE;
 	}
 
 	// balance health bars for both teams (aka health redistribution)
@@ -1354,7 +1430,7 @@ void Weapons_fire(short charge)
         }
 
         StatusBar_showMessage("Scales of Justice Applied!");
-        return;
+        return TRUE;
     }
 
 	// adjust spawn point if it's a droppable
@@ -1381,33 +1457,33 @@ void Weapons_fire(short charge)
 	// if it has uses raycast, it must be a gun-type weapon. Handle it now
 	if(Game_currentWeaponProperties & usesRaycast)
 	{
-		// perform a raycast to see what we hit
-		short targetX = 0;
-		short targetY = 0;
-		RaycastHit hit = Game_raycast(spawnX, spawnY, dirX, dirY, TRUE);
-
-		if(hit.hitType != RAY_HIT_NOTHING)
+		// if it's a shot gun, just do a shot right now
+		if(Game_currentWeaponSelected == WShotGun)
 		{
-			// Game_debugFreeze = TRUE;
-			// spawn an impact effect at the target location
-			const short expId = Explosion_spawn(hit.x, hit.y, 6, 15, FALSE);
-		
-			// focus camera on impact
-			Camera_focusOn(&Explosion_x[expId], &Explosion_y[expId]);
-		
-			// consume the weapon from players inventory
-			if(Game_weaponUsesRemaining<=0)
-				CharacterController_weaponConsumed(FALSE);
+			doRayCastShot(dirX, dirY);
+			return TRUE;
+
+		}else{
+			
+			// other wise, we spawn an object too use as routine logic
+			Weapons_spawn(Game_currentWeaponSelected, spawnX, spawnY, 0, 0, 60);
+			return FALSE;
 		}
 		
-		return;
+		return FALSE;
+	}
+
+	if(Game_currentWeaponSelected==WFlameThrower)
+	{
+		Weapons_spawn(Game_currentWeaponSelected, spawnX, spawnY, 0, 0, 30);
+		return FALSE;
 	}
 
 	// if it's a mele weapon we have a separate function for that
 	if(Game_currentWeaponProperties & isMele)
 	{
 		doMele(facingLeft, dirX, dirY);
-		return;
+		return TRUE;
 	}
 	
 	// default no velocity unless weapon uses charge
@@ -1434,6 +1510,8 @@ void Weapons_fire(short charge)
 		else
 			Weapon_facing &= ~((unsigned short)1<<(spawnedWeaponIndex));
 	}
+
+	return TRUE;
 }
 
 
