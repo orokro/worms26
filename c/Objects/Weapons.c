@@ -1133,7 +1133,8 @@ void Weapons_fire(short charge)
 	}
 
 	// if it's a nuke, raise water, poison all worms
-	if(Game_currentWeaponSelected == WNuclearTest){
+	if(Game_currentWeaponSelected == WNuclearTest)
+	{
 		Worm_poisoned = 0b1111111111111111;
 		Game_waterLevel += 30;
 		StatusBar_showMessage("Indian Nuclear Test Detonated");
@@ -1141,6 +1142,58 @@ void Weapons_fire(short charge)
 		return;
 	}
 
+	// balance health bars for both teams (aka health redistribution)
+    if(Game_currentWeaponSelected == WScalesOfJustice)
+    {
+        long totalHealth = 0;
+        short team1Count = 0;
+        short team2Count = 0;
+        short i;
+
+        // 1. Sum total health and count active worms per team
+        for(i = 0; i < 16; i++)
+        {
+            // Check if worm is Active (in game) AND Not Dead (has health)
+            if((Worm_active & (1 << i)) && !(Worm_isDead & (1 << i)))
+            {
+                totalHealth += Worm_health[i];
+                
+                if(i < 8) 
+                    team1Count++;
+                else 
+                    team2Count++;
+            }
+        }
+
+        // 2. Divide total by two for the "Team Pool"
+        long halfHealth = totalHealth / 2;
+
+        // 3. Calculate new health per worm for each team
+        short t1NewHealth = 0;
+        short t2NewHealth = 0;
+
+        if(team1Count > 0)
+            t1NewHealth = (short)(halfHealth / team1Count);
+            
+        if(team2Count > 0)
+            t2NewHealth = (short)(halfHealth / team2Count);
+
+        // 4. Distribute the health
+        for(i = 0; i < 16; i++)
+        {
+            if((Worm_active & (1 << i)) && !(Worm_isDead & (1 << i)))
+            {
+                if(i < 8)
+                    Worm_setHealth(i, t1NewHealth, FALSE); // FALSE = Set absolute value
+                else
+                    Worm_setHealth(i, t2NewHealth, FALSE);
+            }
+        }
+
+        StatusBar_showMessage("Scales of Justice Applied!");
+        return;
+    }
+	
 	// adjust spawn point if it's a droppable
 	if(Game_currentWeaponProperties & isDroppable)
 	{
