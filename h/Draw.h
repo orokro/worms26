@@ -57,6 +57,12 @@ extern void Draw_renderGame();
 
 
 /**
+ * Draws the games HUD (i.e. timer, wind, etc)
+*/
+extern void Draw_HUD();
+
+
+/**
  * Draws the pause menu, with current menu item selected.
  * 
  * The pause menu has three options: continue, quit, show controls.
