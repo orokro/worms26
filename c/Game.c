@@ -272,6 +272,7 @@ void Game_initRound(){
 	Worm_settled = 0;
 	Worm_isDead = 0;
 	Weapon_active = 0;
+	Worm_poisoned = 0;
 	Explosion_active = 0;
 	Crate_active = 0;
 	OilDrum_active = 0;

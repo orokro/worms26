@@ -1123,7 +1123,15 @@ void Weapons_fire(short charge)
 		Worm_setHealth(Worm_currentWorm, 0, FALSE);
 		Worm_isDead |= (unsigned short)1<<(Worm_currentWorm);
 		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], 0, 2, TRUE, TRUE);
-		Game_changeMode(gameMode_TurnEnd);
+		CharacterController_weaponConsumed(FALSE);
+		return;
+	}
+
+	// if it's a nuke, raise water, poison all worms
+	if(Game_currentWeaponSelected == WNuclearTest){
+		Worm_poisoned = 0b1111111111111111;
+		Game_waterLevel += 30;
+		CharacterController_weaponConsumed(FALSE);
 		return;
 	}
 

@@ -1,109 +1,105 @@
 /*
 	StatusBar.c
 	-----------
-
-	This file will provide a system to queue & show status text for things like:
-	- crate pickups
-	- worm deaths
-	- turn changes,
-	- weapon usage
-	- etc
+	
+	This file will provide a system to queue & show status text.
 */
 
 // includes
 #include "Main.h"
+#include "StatusBar.h"
+#include <string.h> // Required for strcpy
 
 // defines
 #define STATUSBAR_MAX_MESSAGES 10
-#define STATUSBAR_MESSAGE_DISPLAY_TIME 50  // in frames
-
+#define STATUSBAR_MESSAGE_DISPLAY_TIME 50 // in frames
+#define STATUSBAR_MSG_LEN 32 
 
 // local vars
 
-// array of 10 string pointers for the messages
-static char* StatusBar_messages[STATUSBAR_MAX_MESSAGES];
+// CHANGED: Now a 2D array to hold copies of strings, not just pointers
+static char StatusBar_messages[STATUSBAR_MAX_MESSAGES][STATUSBAR_MSG_LEN];
+
+// The number of messages currently valid in the queue
+static short StatusBar_count = 0;
 
 // timer to show each message
 static char StatusBar_messageTimer = 0;
 
 
-
 // --------------------------------------------------------------------------------------------------------------------------------------
-
 
 
 /**
  * Shows a message in the status bar for a set amount of time.
- * 
  */
-extern void StatusBar_showMessage(const char* message) {
-
-	// add message to first empty, no shifting
-	short i;
-	for (i = 0; i < STATUSBAR_MAX_MESSAGES; i++) {
-		if(StatusBar_messages[i] == NULL) {
-			
-			StatusBar_messages[i] = (char*)message;
-			
-			// if i is negative we succeeded in adding the message
-			i = -1;
-			break;
+void StatusBar_showMessage(const char *msg)
+{
+	// if we are full, we must shift everything down to make room
+	if(StatusBar_count >= STATUSBAR_MAX_MESSAGES)
+	{
+		short i;
+		for(i = 0; i < STATUSBAR_MAX_MESSAGES - 1; i++)
+		{
+			strcpy(StatusBar_messages[i], StatusBar_messages[i+1]);
 		}
+		StatusBar_count = STATUSBAR_MAX_MESSAGES - 1;
 	}
 
-	// if we just overwrite the end
-	if (i != -1)
-		StatusBar_messages[STATUSBAR_MAX_MESSAGES - 1] = (char*)message;
+	// Copy the incoming string into our local storage
+	strcpy(StatusBar_messages[StatusBar_count], msg);
+	
+	// Reset the timer if this is the only message
+	if(StatusBar_count == 0)
+		StatusBar_messageTimer = STATUSBAR_MESSAGE_DISPLAY_TIME;
 
-	// reset the timer
-	// show for 100 frames (adjust as needed)
-	StatusBar_messageTimer = STATUSBAR_MESSAGE_DISPLAY_TIME; 
+	StatusBar_count++;
 }
 
 
 /**
- * Updates the status bar, showing messages as needed.
- * 
+ * Updates the status bar logic (timers and queue management)
  */
-extern void StatusBar_update() {
-
-	// if we have a message timer running
-	if (StatusBar_messageTimer > 0) {
-
-		// decrement the timer
+void StatusBar_update()
+{
+	// if we have active messages
+	if(StatusBar_count > 0)
+	{
 		StatusBar_messageTimer--;
 
-		// if the timer is done shift the messages
-		if (StatusBar_messageTimer == 0) {
+		// if time is up for the top message
+		if(StatusBar_messageTimer <= 0)
+		{
+			// Shift messages down (remove the top one)
 			short i;
-			for (i = 0; i < STATUSBAR_MAX_MESSAGES - 1; i++) {
-				StatusBar_messages[i] = StatusBar_messages[i + 1];
+			for(i = 0; i < StatusBar_count - 1; i++)
+			{
+				strcpy(StatusBar_messages[i], StatusBar_messages[i+1]);
 			}
+			
+			StatusBar_count--;
 
-			// clear the last message
-			StatusBar_messages[STATUSBAR_MAX_MESSAGES - 1] = NULL;
-
-			// if messages remain, reset the timer
-			if (StatusBar_messages[0] != NULL) {
-				StatusBar_messageTimer = STATUSBAR_MESSAGE_DISPLAY_TIME; 
-			}
+			// Reset timer for the next message (if any)
+			if(StatusBar_count > 0)
+				StatusBar_messageTimer = STATUSBAR_MESSAGE_DISPLAY_TIME;
 		}
-
 	}
 }
 
 
 /**
- * Renders the status bar messages to the screen.
- * 
+ * Draws the current status bar message (index 0)
  */
-extern void StatusBar_draw() {
-
-	// GTFO if clock is 0
-	if (StatusBar_messageTimer == 0)
-		return;
-
-	// render each message centered
-	const short x = 80 - ((strlen(StatusBar_messages[0]) * 4) >> 1);
-	GrayDrawStr2B(x, 1, StatusBar_messages[0], A_XOR, lightPlane, darkPlane);
+void StatusBar_draw()
+{
+	// RESTORED: Original logic using messageTimer and GrayDrawStr2B
+	if(StatusBar_count > 0)
+	{
+		// Calculate centered X position: 80 - (PixelWidth / 2)
+		// Assuming 4x6 font, width is roughly len * 4
+		const short x = 80 - ((strlen(StatusBar_messages[0]) * 4) >> 1);
+		
+		// Draw to both grayscale planes
+		GrayDrawStr2B(x, 1, StatusBar_messages[0], A_XOR, lightPlane, darkPlane);
+	}
 }

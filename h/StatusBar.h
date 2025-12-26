@@ -9,7 +9,7 @@
  * Shows a message in the status bar for a set amount of time.
  * 
  */
-extern void StatusBar_showMessage(const char* message);
+void StatusBar_showMessage(const char *msg);
 
 
 /**

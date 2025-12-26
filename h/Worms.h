@@ -35,6 +35,7 @@ extern unsigned short Worm_dir;
 extern short Worm_health[MAX_WORMS];
 extern unsigned short Worm_isDead;
 extern unsigned short Worm_active;
+extern unsigned short Worm_poisoned;
 extern char Worm_mode[MAX_WORMS];
 extern char Worm_currentWorm;
 extern unsigned short Worm_settled;

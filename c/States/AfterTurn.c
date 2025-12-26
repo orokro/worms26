@@ -31,6 +31,17 @@ static void AfterTurn_enter()
 
 	// reset our crate logic
 	crateLogicDone = FALSE;
+
+	// if any worms are poisoned, damage them now
+	if(Worm_poisoned){
+		short i;
+		unsigned short mask = 1;
+		for(i=0; i<MAX_WORMS; i++){
+			if((Worm_poisoned & mask) && (Worm_health[i]>2))
+				Worm_setHealth(i, -2, TRUE);
+			mask = (unsigned short)(mask<<1);
+		}
+	}
 }
 
 

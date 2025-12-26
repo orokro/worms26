@@ -54,6 +54,9 @@ unsigned short Worm_isDead = 0;
 // bit mask if the worm is ACTIVE... different that dead.
 unsigned short Worm_active = 0;
 
+// poisoned worms bit mask
+unsigned short Worm_poisoned = 0;
+
 // store the current mode for every worm:
 char Worm_mode[MAX_WORMS] = {wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle, wormMode_idle };
 
@@ -422,19 +425,21 @@ void renderHealthSprite(short index)
 */
 void Worm_drawAll()
 {
-    short screenX, screenY;
-    short i;
+    short screenX, screenY, i;
+    unsigned short wormMask;
 
     // Pointers for the sprite data to draw this frame
     const unsigned short* sprOutline;
     const unsigned short* sprMask;
     short sprHeight; // New: sprites have different heights now!
-
+	
     // Loop over all worms
     for(i=0; i<MAX_WORMS; i++)
     {
+		wormMask = (unsigned short)1<<(i);
+
         // Check active bitmask
-        if(Worm_active & (unsigned short)1<<(i))
+        if(Worm_active & wormMask)
         {
             screenX = Worm_x[i];
             screenY = Worm_y[i];
@@ -454,7 +459,7 @@ void Worm_drawAll()
                 // ============================================================
                 
 				// if the worm is dead, draw gravestone
-				if(Worm_isDead & (unsigned short)1<<(i)){
+				if(Worm_isDead & wormMask){
 					GrayClipSprite8_OR_R(x+4, y, 12, spr_Grave, spr_Grave, lightPlane, darkPlane);
 					continue;
 				}
@@ -508,7 +513,7 @@ void Worm_drawAll()
                         y -= 4;         // Align feet
                         
                         // Check Direction
-                        if(Worm_dir & (unsigned short)1<<(i)) {
+                        if(Worm_dir & wormMask) {
                             sprOutline = spr_WormJump_Left_Outline;
                             sprMask = spr_WormJump_Left_Mask;
                         } else {
@@ -528,7 +533,7 @@ void Worm_drawAll()
                 // ============================================================
                 else
                 {
-                    char facing = (Worm_dir & (unsigned short)1<<(i))>0;
+                    char facing = (Worm_dir & wormMask)>0;
                     if(facing) {
                         sprOutline = spr_WormLeft_Outline; // Make sure these match SpriteData.c names!
                         sprMask = spr_WormLeft_Mask;
@@ -555,8 +560,10 @@ void Worm_drawAll()
                      ClipSprite16_AND_R(x, y, sprHeight, sprMask, lightPlane);
                     
                      // Draw Outline (OR logic)
-                     ClipSprite16_OR_R(x, y, sprHeight, sprOutline, darkPlane);
-                     ClipSprite16_OR_R(x, y, sprHeight, sprOutline, lightPlane);
+					 // skip light plane if the worm is poisoned
+					if(!(Worm_poisoned & wormMask))
+						ClipSprite16_OR_R(x, y, sprHeight, sprOutline, darkPlane);
+					ClipSprite16_OR_R(x, y, sprHeight, sprOutline, lightPlane);
                 }
                 
                 // ============================================================
