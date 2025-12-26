@@ -26,6 +26,8 @@
 */
 
 
+// Camera.c
+
 // includes
 #include "Main.h"
 #include "Camera.h"
@@ -35,9 +37,13 @@
 #include "Worms.h"
 
 
-// the current position of the camera in game-world units
+// the current position of the camera in game-world units (RENDER coordinates)
 short camX = 0;
 short camY = 0;
+
+// LOGICAL position (Used for smooth tracking, before shake is applied)
+static short logicalCamX = 0;
+static short logicalCamY = 0;
 
 // boolean if Camera is focused on something
 char cameraIsFocused = FALSE;
@@ -45,22 +51,12 @@ char cameraIsFocused = FALSE;
 // true if camera is in auto-focus mode
 char cameraAutoFocus = TRUE;
 
+// Global shake flag
+char Camera_shake = FALSE;
 
-/* 
-	Pointers to shorts that the Camera should focus on.
-	
-	Notice that we are using POINTERS here...
-	
-	If the x/y position of a worm, weapon, or something else is passed
-	as a focus target as pointers, when that item moves, the Camera's
-	targets will also change (since they're pointers to the original
-	values)
-*/
 short *cameraTargetX;
 short *cameraTargetY;
 
-// if the user is controlling the camera, keep track of the users
-// camera offset
 short userX=0;
 short userY=0;
 
@@ -73,92 +69,91 @@ short userY=0;
 // this is the main update function for the logic of the Camera.
 void Camera_update()
 {
-	short i;
+    short i;
 
-	// if this is the first frame that shift was pressed,
-	// we should reset the user offsets to whatever the camera's current
-	// position is..
-	if(Keys_keyDown(keyCameraControl))
-	{
-		userX = camX;
-		userY = camY;
-	}
-	
-	// if shift is down, we should test for the arrow keys for camera control:
-	if(Keys_keyState(keyCameraControl))
-	{
-		if(Keys_keyState(keyLeft) && camX>-100) userX-=camSpeed;
-		if(Keys_keyState(keyRight) && camX<320+100) userX+=camSpeed;
-		if(Keys_keyState(keyUp) && camY>-100) userY-=camSpeed;
-		if(Keys_keyState(keyDown) && camY<220-6-50) userY+=camSpeed;
-		
-		// at this point, the camera should just be the user-set value:
-		camX = userX;
-		camY = userY;
+    // 1. Handle Manual Control (Operates on LOGICAL pos)
+    if(Keys_keyDown(keyCameraControl))
+    {
+        // Reset user offset to current logical position
+        userX = logicalCamX;
+        userY = logicalCamY;
+    }
+    
+    if(Keys_keyState(keyCameraControl))
+    {
+        if(Keys_keyState(keyLeft) && logicalCamX > -100) userX -= camSpeed;
+        if(Keys_keyState(keyRight) && logicalCamX < 320+100) userX += camSpeed;
+        if(Keys_keyState(keyUp) && logicalCamY > -100) userY -= camSpeed;
+        if(Keys_keyState(keyDown) && logicalCamY < 220-6-50) userY += camSpeed;
+        
+        // Set logical pos directly
+        logicalCamX = userX;
+        logicalCamY = userY;
 
-	// otherwise if we are focusing on a target, we should move towards it...
-	}else if(cameraIsFocused==TRUE)
-	{
-		// calc deltas:
-		short deltaX = (*cameraTargetX - camX);
-		short deltaY = (*cameraTargetY - camY);
-		
-		// move just some small percent
-		short moveX = (short)(deltaX * 0.3f);
-		short moveY = (short)(deltaY * 0.3f);
-		
-		// if the deltas aren't zero (camera perfectly focused) but our moves
-		// just make them 1 pixel in the correct direction. The camera always
-		// gets within 4 pixels of it's target (due to the 0.2f) so we will
-		// always move one pixel at a time towards the target within 4 pixels
-		if(deltaX!=0 && moveX==0)
-			moveX = deltaX / abs(deltaX);
-		if(deltaY!=0 && moveY==0)
-			moveY = deltaY / abs(deltaY);
-		
-		// move the camera pos:
-		camX += moveX;
-		camY += moveY;
+    }
+    // 2. Handle Auto-Focus / Tracking (Operates on LOGICAL pos)
+    else if(cameraIsFocused == TRUE)
+    {
+        // calc deltas based on LOGICAL position
+        short deltaX = (*cameraTargetX - logicalCamX);
+        short deltaY = (*cameraTargetY - logicalCamY);
+        
+        // move just some small percent
+        short moveX = (short)(deltaX * 0.3f);
+        short moveY = (short)(deltaY * 0.3f);
+        
+        // Ensure minimum 1px movement if close but not there
+        if(deltaX != 0 && moveX == 0)
+            moveX = deltaX / abs(deltaX);
+        if(deltaY != 0 && moveY == 0)
+            moveY = deltaY / abs(deltaY);
+        
+        // update logical pos
+        logicalCamX += moveX;
+        logicalCamY += moveY;
+    }
+    
+    // 3. Auto-Focus Target Selection
+    if(cameraAutoFocus == TRUE)
+    {
+        if(Explosion_active)
+        {
+            i = Explosion_getFirstActive();
+            cameraTargetX = &Explosion_x[i];
+            cameraTargetY = &Explosion_y[i];
+        }
+        else if(Weapon_active)
+        {
+            i = Weapons_getFirstActive();
+            cameraTargetX = &Weapon_x[i];
+            cameraTargetY = &Weapon_y[i];
+        }
+        else
+        {
+            cameraTargetX = &Worm_x[(short)Worm_currentWorm];
+            cameraTargetY = &Worm_y[(short)Worm_currentWorm];
+        }
+        cameraIsFocused = TRUE;
+    }
+    
+    // 4. Bounds Check (Clamp LOGICAL position)
+    if(logicalCamY > 220-6-50) logicalCamY = 220-6-50;
+    if(logicalCamY < -100)     logicalCamY = -100;
+    if(logicalCamX < -100)     logicalCamX = -100;
+    if(logicalCamX > 320+100)  logicalCamX = 320+100;
 
-	}
-	
-	if(cameraAutoFocus==TRUE)
-	{
-		// if there's an active explosion, focus on that
-		if(Explosion_active)
-		{
-			// focus on the first active explosion
-			i = Explosion_getFirstActive();
-			cameraTargetX = &Explosion_x[i];
-			cameraTargetY = &Explosion_y[i];
-		}
-
-		// if there's an active weapon, focus on that
-		else if(Weapon_active)
-		{
-			// focus on the first active weapon
-			i = Weapons_getFirstActive();
-			cameraTargetX = &Weapon_x[i];
-			cameraTargetY = &Weapon_y[i];
-		}
-		// otherwise, focus on the current worm
-		else
-		{
-			cameraTargetX = &Worm_x[(short)Worm_currentWorm];
-			cameraTargetY = &Worm_y[(short)Worm_currentWorm];
-		}
-		cameraIsFocused = TRUE;
-	}
-	
-	//  make sure the camera is always within bounds
-	if(camY>220-6-50)
-		camY=220-6-50;
-	if(camY<-100)
-		camY=-100;
-	if(camX<-100)
-		camX=-100;
-	if(camX>320+100)
-		camX=320+100;
+    // 5. Apply Shake and Set Final Render Position (camX/camY)
+    if(Camera_shake)
+    {
+        // Shake randomly between -3 and +3 pixels
+        camX = logicalCamX + (random(7) - 3);
+        camY = logicalCamY + (random(7) - 3);
+    }
+    else
+    {
+        camX = logicalCamX;
+        camY = logicalCamY;
+    }
 }
 
 

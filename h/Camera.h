@@ -18,6 +18,9 @@ extern short camY;
 // true if camera is in auto focus mode
 extern char cameraAutoFocus;
 
+// true to shake
+extern char Camera_shake;
+
 // camera function prototypes
 
 /**

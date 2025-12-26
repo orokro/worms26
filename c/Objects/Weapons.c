@@ -431,7 +431,7 @@ unsigned long Weapon_props[72] = {
         usesAim | usesPhysics | usesController | usesDetonateOnImpact | holdsLauncher,
         
 		// earth quake
-        usesRoutine | holdsCustom,
+        usesRoutine | holdsCustom | noRender | usesFuse,
         
 		// long bow
         usesAim | usesPhysics | multiUse | usesDetonateOnImpact | holdsSelf | usesWind,
@@ -765,6 +765,75 @@ void doWeaponRoutine(short index, unsigned short props)
 			Worm_x[(short)Worm_currentWorm] = Weapon_x[index];
 			Worm_y[(short)Worm_currentWorm] = Weapon_y[index];
 			break;
+
+		case WQuake:
+            // 1. Setup Camera State
+            Camera_shake = TRUE;
+            cameraAutoFocus = FALSE; // We will manually tell the camera where to look
+            
+            // Static variable to track when to switch camera targets
+            static short quakeCamTimer = 0; 
+
+            short w;
+            
+            // 2. General Rumble (Small nudges for everyone)
+            for(w = 0; w < 16; w++)
+            {
+                if((Worm_active & (1 << w)) && !(Worm_isDead & (1 << w)))
+                {
+                    // 25% chance per frame for a small nudge
+                    if(random(4) == 0)
+                    {
+                        // Random X: -1, 0, or 1
+                        // Random Y: -2 (Upward pop to detach from ground)
+                        Physics_setVelocity(&Worm_physObj[w], (random(3)-1), -1, TRUE, TRUE);
+                    }
+                }
+            }
+
+            // 3. Action Camera & Big Boost
+            if(quakeCamTimer <= 0)
+            {
+                // Try to find a random victim to focus on
+                short attempts = 10;
+                while(attempts > 0)
+                {
+                    short victim = random(16);
+                    
+                    if((Worm_active & (1 << victim)) && !(Worm_isDead & (1 << victim)))
+                    {
+                        // Found a valid victim!
+                        
+                        // A. MANUAL CAMERA TARGETING
+                        // Point the camera pointers directly at this worm's coordinates
+						Camera_focusOn(&Worm_x[victim], &Worm_y[victim]);
+                        
+                        // Note: Camera_update will still smoothly pan to this new target
+                        // because we didn't touch logicalCamX/Y, only the target pointers.
+
+                        // B. BIG BOOST
+                        // Send them flying!
+                        Physics_setVelocity(&Worm_physObj[victim], (random(7)-3), -3, TRUE, TRUE);
+                        
+                        break; 
+                    }
+                    attempts--;
+                }
+                
+                // Switch targets every 8 frames
+                quakeCamTimer = 8;
+            }
+            else
+                quakeCamTimer--;
+
+            // 4. Cleanup
+            if(Weapon_time[index] <= 1)
+            {
+                Camera_shake = FALSE;
+                cameraAutoFocus = TRUE; // Restore normal camera behavior
+                quakeCamTimer = 0;
+            }
+            break;
 	}
 }
 
@@ -1132,6 +1201,22 @@ void Weapons_fire(short charge)
 		return;
 	}
 
+	// start an earth square
+	if(Game_currentWeaponSelected == WQuake)
+    {
+        // Spawn the Quake object
+        // Params: Type, X, Y, XVelo, YVelo, Timer
+        // Timer: 90 frames (approx 5 seconds?)
+        Weapons_spawn(WQuake, 0, 0, 0, 0, 90);
+        
+		// dont auto track the weapon
+		cameraAutoFocus = FALSE;
+
+        StatusBar_showMessage("Earthquake!");
+		
+        return;
+    }
+
 	// if it's a nuke, raise water, poison all worms
 	if(Game_currentWeaponSelected == WNuclearTest)
 	{
@@ -1193,7 +1278,7 @@ void Weapons_fire(short charge)
         StatusBar_showMessage("Scales of Justice Applied!");
         return;
     }
-	
+
 	// adjust spawn point if it's a droppable
 	if(Game_currentWeaponProperties & isDroppable)
 	{
@@ -1278,7 +1363,8 @@ void Weapons_drawAll()
 					ClipSprite16_OR_R(screenX-2, screenY-2, 11, weaponSprite, lightPlane);
 					ClipSprite16_OR_R(screenX-2, screenY-2, 11, weaponSprite, darkPlane);
 
-				}else{	
+				}else if(!(Weapon_props[(short)weaponType] & noRender)){	
+
 					// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon
 					ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, lightPlane);
 					ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, darkPlane);
