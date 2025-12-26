@@ -18,6 +18,7 @@
 #include "Map.h"
 #include "Explosions.h"
 #include "Weapons.h"
+#include "Worms.h"
 
 
 /**
@@ -513,10 +514,12 @@ short Physics_checkExplosions(PhysObj *obj)
 /**
  * check if a worm collides with a weapon
  * 
+ * @param wormIndex the index of the worm to test
+ * @param wormMask the bitmask of the worm to test
  * @param *obj the physics object to test with
  * @return the total damage taken by the worm
  */
-short Physics_checkWeapons(PhysObj *obj)
+short Physics_checkWeapons(short wormIndex, unsigned short wormMask, PhysObj *obj)
 {
 	// gtfo early if no active weapons
 	if(Weapon_active==0)
@@ -526,19 +529,19 @@ short Physics_checkWeapons(PhysObj *obj)
 	short totalDamage = 0;
 
 	// worm hit box around physobj
-	short wormMinX = (short)(*obj->x - 4);
-	short wormMaxX = (short)(*obj->x + 4);
-	short wormMinY = (short)(*obj->y - 6);
-	short wormMaxY = (short)(*obj->y + 5);
+	short wormMinX = (short)(*obj->x - 3);
+	short wormMaxX = (short)(*obj->x + 3);
+	short wormMinY = (short)(*obj->y - 5);
+	short wormMaxY = (short)(*obj->y + 4);
 
 	// weapon half-size: 3 => 6x6, 4 => 8x8
 	// tune this
-	const short weaponHalf = 3;
+	const short weaponHalf = 2;
 
 	for(i=0; i<MAX_WEAPONS; i++)
 	{
 		// skip inactive weapons
-		if((Weapon_active & (unsigned short)(1<<(1)) )==0)
+		if((Weapon_active & (unsigned short)(1<<(i)) )==0)
 			continue;
 
 		// early-out X (cheapest + most likely reject)
@@ -566,14 +569,15 @@ short Physics_checkWeapons(PhysObj *obj)
 		// example (you’ll replace these with your own rules):
 		if(Weapon_type[i] == WDragonBall || Weapon_type[i] == WKamikaze)
 		{
-			totalDamage += 2;
+			totalDamage += 12;
 		}
-		else if(Weapon_type[i] == WSkunk)
+		else if(Weapon_type[i] == WSkunkGas)
 		{
-			totalDamage += 1;
+			totalDamage += 3;
+			Worm_poisoned |= wormMask;
 		}
 
-		if((Weapon_props[i] & usesDetonateOnImpact) != 0)
+		if((Weapon_props[(short)Weapon_type[i]] & usesDetonateOnImpact) != 0)
 			Weapons_detonateWeapon(i);
 	}
 

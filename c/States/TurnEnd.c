@@ -14,6 +14,7 @@
 static void TurnEnd_enter()
 {
 	Game_timer=-1;
+	cameraAutoFocus = TRUE;
 }
 
 
@@ -42,5 +43,7 @@ static void TurnEnd_update()
 */
 static void TurnEnd_exit()
 {
-	
+	// note, this doesn't imply that the turn is over.
+	// just that we are switching to it
+	cameraAutoFocus = FALSE;
 }

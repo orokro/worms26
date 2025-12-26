@@ -157,10 +157,12 @@ extern short Physics_checkExplosions(PhysObj *obj);
 /**
  * check if a worm collides with a weapon
  * 
+ * @param wormIndex the index of the worm to test
+ * @param wormMask the bitmask of the worm to test
  * @param *obj the physics object to test with
  * @return the total damage taken by the worm
  */
-short Physics_checkWeapons(PhysObj *obj);
+short Physics_checkWeapons(short wormIndex, unsigned short wormMask, PhysObj *obj);
 
 
 /**

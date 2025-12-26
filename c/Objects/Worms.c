@@ -234,7 +234,7 @@ void Worm_update()
 			// check active weapons to see if one hit and its not the current worm
 			if(Worm_currentWorm!=i)
 			{
-				damage = Physics_checkWeapons(&Worm_physObj[i]);
+				damage = Physics_checkWeapons(i, wormMask, &Worm_physObj[i]);
 				if(damage!=0)
 					Worm_setHealth(i, -damage, TRUE);
 			}

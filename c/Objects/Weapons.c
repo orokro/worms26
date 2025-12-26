@@ -725,6 +725,8 @@ void doMele(char facingLeft, short dirX, short dirY){
 
 		// apply force
 		Physics_setVelocity(&Worm_physObj[w], forceX, forceY, TRUE, TRUE);
+
+		Camera_focusOn(&Worm_x[(short)w], &Worm_y[(short)w]);
 	}
 
 	// if this type also needs a weapon particle..
@@ -984,6 +986,9 @@ void Weapons_setTarget(short x, short y)
 		return;
 
 	}// end if uses airstrike
+
+	// return to normal flow for other weapons that use targets
+	Game_changeMode(Game_previousMode);
 }
 
 
