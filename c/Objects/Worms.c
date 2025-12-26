@@ -464,6 +464,13 @@ void Worm_drawAll()
 					continue;
 				}
 
+				// if the current team is invisible, skip drawing them
+				const short team1invisible = (Game_stateFlags & gs_team1Invisible);
+				const short team2invisible = (Game_stateFlags & gs_team2Invisible);
+
+				if( (team1invisible && (i<8)) || (team2invisible && (i>=8)) )
+					continue;
+					
                 // Is this the Active Worm doing an Animation?
                 if(i == Worm_currentWorm && Game_wormAnimState != ANIM_NONE)
                 {
