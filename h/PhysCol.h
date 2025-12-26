@@ -155,6 +155,15 @@ extern short Physics_checkExplosions(PhysObj *obj);
 
 
 /**
+ * check if a worm collides with a weapon
+ * 
+ * @param *obj the physics object to test with
+ * @return the total damage taken by the worm
+ */
+short Physics_checkWeapons(PhysObj *obj);
+
+
+/**
  * This method takes a point in world space, and a direction and tests for collision.
  *
  * If the point collides with the map, it will calculate the first available point in the opposite direction.

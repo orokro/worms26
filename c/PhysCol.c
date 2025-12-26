@@ -17,6 +17,7 @@
 #include "PhysCol.h"
 #include "Map.h"
 #include "Explosions.h"
+#include "Weapons.h"
 
 
 /**
@@ -505,5 +506,76 @@ short Physics_checkExplosions(PhysObj *obj)
 	}// next i
 	
 	// return the total damage that was done
+	return totalDamage;
+}
+
+
+/**
+ * check if a worm collides with a weapon
+ * 
+ * @param *obj the physics object to test with
+ * @return the total damage taken by the worm
+ */
+short Physics_checkWeapons(PhysObj *obj)
+{
+	// gtfo early if no active weapons
+	if(Weapon_active==0)
+		return 0;
+
+	short i;
+	short totalDamage = 0;
+
+	// worm hit box around physobj
+	short wormMinX = (short)(*obj->x - 4);
+	short wormMaxX = (short)(*obj->x + 4);
+	short wormMinY = (short)(*obj->y - 6);
+	short wormMaxY = (short)(*obj->y + 5);
+
+	// weapon half-size: 3 => 6x6, 4 => 8x8
+	// tune this
+	const short weaponHalf = 3;
+
+	for(i=0; i<MAX_WEAPONS; i++)
+	{
+		// skip inactive weapons
+		if((Weapon_active & (unsigned short)(1<<(1)) )==0)
+			continue;
+
+		// early-out X (cheapest + most likely reject)
+		{
+			short wx = Weapon_x[i];
+
+			if(wx < (short)(wormMinX - weaponHalf))
+				continue;
+			if(wx > (short)(wormMaxX + weaponHalf))
+				continue;
+		}
+
+		// early-out Y
+		{
+			short wy = Weapon_y[i];
+
+			if(wy < (short)(wormMinY - weaponHalf))
+				continue;
+			if(wy > (short)(wormMaxY + weaponHalf))
+				continue;
+		}
+
+		// collision!
+
+		// example (you’ll replace these with your own rules):
+		if(Weapon_type[i] == WDragonBall || Weapon_type[i] == WKamikaze)
+		{
+			totalDamage += 2;
+		}
+		else if(Weapon_type[i] == WSkunk)
+		{
+			totalDamage += 1;
+		}
+
+		if((Weapon_props[i] & usesDetonateOnImpact) != 0)
+			Weapons_detonateWeapon(i);
+	}
+
 	return totalDamage;
 }

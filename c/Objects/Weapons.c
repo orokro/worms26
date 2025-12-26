@@ -313,7 +313,7 @@ unsigned long Weapon_props[72] = {
         usesAim | holdsSelf | usesRaycast | usesRoutine,
         
 		// dragon ball
-        usesRoutine,
+        isMele | usesRoutine | spawnsSelf | usesFuse,
         
 		// mine
         usesFuse | spawnsSelf | holdsSelf | isDroppable,
@@ -354,7 +354,7 @@ unsigned long Weapon_props[72] = {
         usesAim | holdsSelf | usesRaycast | usesRoutine,
         
 		// kamikaze
-        isMele | usesRoutine,
+        isMele | usesRoutine | usesFuse,
         
 		// sheep
         spawnsSelf | usesFuse | usesPhysics | isAnimal | usesJumping | holdsSelf,
@@ -589,18 +589,218 @@ short findFreeWeaponSlot()
 
 
 /**
+ * @brief Performs mele attack logic
+ * 
+ * @param facingLeft - is the worm facing left
+ * @param dirX - direction x
+ * @param dirY - direction y
+ */
+void doMele(char facingLeft, short dirX, short dirY){
+
+	// figure out which worms we'll affect
+	short affectedWorms[MAX_WORMS] = {
+		FALSE, FALSE, FALSE, FALSE, 
+		FALSE, FALSE, FALSE, FALSE, 
+		FALSE, FALSE, FALSE, FALSE, 
+		FALSE, FALSE, FALSE, FALSE, 
+	};
+	short affectedCount = 0;
+
+	const short xMin = facingLeft ? Worm_x[(short)Worm_currentWorm] - 15 : Worm_x[(short)Worm_currentWorm];
+	const short xMax = facingLeft ? Worm_x[(short)Worm_currentWorm] : Worm_x[(short)Worm_currentWorm] + 15;
+	const short yMin = Worm_y[(short)Worm_currentWorm] - 10;
+	const short yMax = Worm_y[(short)Worm_currentWorm] + 10;
+
+	// loop over all worms and see if any area in the mele hitbox
+	unsigned short wormMask;
+	short i, w;
+	for(i=0; i<MAX_WORMS; i++)
+	{	
+		// skip current worm
+		if(i==Worm_currentWorm)
+			continue;
+
+		// reusable mask
+		wormMask = (unsigned short)1<<(i);
+
+		// skip dead or inactive worms
+		if((Worm_isDead & wormMask) || !(Worm_active & wormMask))
+			continue;
+
+		// check if worm is in the hitbox
+		if(Worm_x[i]>=xMin && Worm_x[i]<=xMax && Worm_y[i]>=yMin && Worm_y[i]<=yMax)
+		{
+			affectedWorms[affectedCount] = i;
+			affectedCount++;
+		}
+	}
+
+	// short x1 = xMin;
+	// short y1 = yMin;
+	// short x2 = xMax;
+	// short y2 = yMax;
+	// worldToScreen(&x1, &y1);
+	// worldToScreen(&x2, &y2);
+
+	// // draw the water rectangle to fill in below the waterline
+	// SCR_RECT waterRect = {{x1, y1, x2, y2}};
+	// const SCR_RECT fullScreen = {{0, 0, 159, 99}};
+
+	// // Draw Light Gray: LightPlane = 1 (Black), DarkPlane = 0 (White)
+	// PortSet(lightPlane, 239, 127);
+	// ScrRectFill(&waterRect, &fullScreen, A_NORMAL);  // Force 1s
+	// PortRestore();
+	// PortSet(darkPlane, 239, 127);
+	// ScrRectFill(&waterRect, &fullScreen, A_NORMAL);  // Force 0s
+	// PortRestore();
+
+	// const char debugBuffer[32];
+	// // sprintf((char*)debugBuffer, "Mele Hitbox: %d,%d to %d,%d", xMin, yMin, xMax, yMax);
+	// sprintf((char*)debugBuffer, "Affected Worms: %d", affectedCount);
+	// FontSetSys(F_4x6);
+	// GrayDrawStr2B(1, 20, debugBuffer, A_NORMAL, lightPlane, darkPlane);
+
+	// Game_debugFreeze = TRUE;
+
+	// force to apply based on weapon type
+	short forceX = facingLeft ? -1 : 1;
+	short forceY = 0;
+	short damage = 0;
+	char spawnsWeapon = FALSE;
+	switch(Game_currentWeaponSelected)
+	{
+		case WFirePunch:
+			CharacterController_doBackflip();
+			forceX *= 2;
+			forceY = -8;
+			damage = 20;
+			break;
+
+		case WKamikaze:
+			forceX *= 2;
+			forceY = -6;
+			damage = 30;
+			spawnsWeapon = TRUE;
+			break;
+
+		case WDragonBall:
+			spawnsWeapon = TRUE;
+			break;
+
+		case WAxe:
+
+			// battle axe has custom health logic (always cuts health in half)
+			for(i=0; i<affectedCount; i++)
+			{
+				w = affectedWorms[i];
+
+				// apply damage
+				Worm_setHealth((char)w, -(Worm_health[w]>>1), TRUE);
+
+				// apply force
+				Physics_setVelocity(&Worm_physObj[w], forceX, forceY, TRUE, TRUE);				
+			}
+			return;
+			break;
+
+		case WBaseballBat:
+			forceX = dirX*1;
+			forceY = dirY*1;
+			damage = 30;
+			break;
+
+		case WProd:
+			forceX *= 3;
+			forceY = -2;
+			break;
+	}// swatch
+
+	// deal damage and apply force to affected worms
+	for(i=0; i<affectedCount; i++)
+	{
+		w = affectedWorms[i];
+
+		// apply damage
+		Worm_setHealth((char)w, -damage, TRUE);
+
+		// apply force
+		Physics_setVelocity(&Worm_physObj[w], forceX, forceY, TRUE, TRUE);
+	}
+
+	// if this type also needs a weapon particle..
+	if(spawnsWeapon)
+	{
+		// finally spawn the weapon with it's params!
+		short spawnedWeaponIndex = Weapons_spawn(Game_currentWeaponSelected, Worm_x[(short)Worm_currentWorm], Worm_y[(short)Worm_currentWorm]-2, 0, 0, 5);
+		Camera_focusOn(&Weapon_x[(short)spawnedWeaponIndex], &Weapon_y[(short)spawnedWeaponIndex]);
+
+		if(facingLeft)
+			Weapon_facing |= (unsigned short)1<<(spawnedWeaponIndex);
+		else
+			Weapon_facing &= ~((unsigned short)1<<(spawnedWeaponIndex));
+	}
+}
+
+
+/**
+ * @brief Custom logic for specific weapons
+ * 
+ * @param index - weapon index we're working on
+ * @param props - bitmask of weapon properties
+ */
+void doWeaponRoutine(short index, unsigned short props)
+{
+	const unsigned short weaponMask = (unsigned short)1<<(index);
+	switch(Weapon_type[index]){
+
+		case WDragonBall:
+			Weapon_x[index] += (Weapon_facing & weaponMask) ? -5 : 5;
+			break;
+
+		case WKamikaze:
+			Weapon_x[index] += (Weapon_facing & weaponMask) ? -5 : 5;
+			Worm_x[(short)Worm_currentWorm] = Weapon_x[index];
+			Worm_y[(short)Worm_currentWorm] = Weapon_y[index];
+			break;
+	}
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
+/**
  * detonates the weapon of index
  *
  * @param index the index of the weapon to detonate
 */
-void detonateWeapon(short index)
+void Weapons_detonateWeapon(short index)
 {
 	// no longer active
 	Weapon_active &= ~((unsigned short)1<<(index));
 	
+	// if dragon ball, just despawn
+	if(Weapon_type[index] == WDragonBall)
+	{
+		// focus back on current worm
+		Weapon_active &= ~((unsigned short)1<<(index));
+		return;
+	}
+
+	// if kamikaze, explode and kill worm
+	if(Weapon_type[index] == WKamikaze)
+	{
+		// kill the worm
+		Worm_setHealth((char)Worm_currentWorm, 0, FALSE);
+		Worm_isDead |= (unsigned short)1<<(Worm_currentWorm);
+		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], 0, 2, TRUE, TRUE);
+		Explosion_spawn(Weapon_x[index], Weapon_y[index], 7, 15, TRUE);
+		return;
+	}
+
 	// for debug: always create an explosion for now
 	Explosion_spawn(Weapon_x[index], Weapon_y[index], 10, 10, TRUE);
-	
+
 	// if this is a cluster weapon, spawn some cluster items
 	if(Weapon_props[(short)Weapon_type[index]] & isCluster)
 	{	
@@ -626,9 +826,6 @@ void detonateWeapon(short index)
 	// focus back on current worm
 	Camera_focusOn(&Worm_x[(short)Worm_currentWorm], &Worm_y[(short)Worm_currentWorm]);
 }
-
-
-// --------------------------------------------------------------------------------------------------------------------------------------
 
 
 /**
@@ -809,7 +1006,6 @@ void Weapons_update()
 		// check if it's active
 		if(Weapon_active & (unsigned short)((unsigned short)1<<(i)))
 		{
-
 			currentProps = Weapon_props[(short)Weapon_type[i]];
 
 			// if weapon is out of bounds deactivate it
@@ -831,11 +1027,16 @@ void Weapons_update()
 				Weapon_time[i]--;
 				if(Weapon_time[i]<=0)
 				{
-					detonateWeapon(i);
+					Weapons_detonateWeapon(i);
 					continue;		
 				}
 			}// end if uses fuse/timer
 			
+			// if the weapon has a custom routine, call that now
+			if(currentProps & usesRoutine){
+				doWeaponRoutine(i, currentProps);
+			}
+
 			// if its an animal make it move in the direction it's facing
 			if(currentProps & isAnimal)
 			{
@@ -888,7 +1089,7 @@ void Weapons_update()
 					
 					// if the weapon has detonate on impact, we should detonate if it hit something..
 					if((currentProps & usesDetonateOnImpact) && (Weapon_physObj[i].col.collisions>0))
-						detonateWeapon(i);
+						Weapons_detonateWeapon(i);
 						
 				}// end if uses physics
 						
@@ -897,141 +1098,6 @@ void Weapons_update()
 		}// endif active
 
 	}// next i
-}
-
-
-/**
- * @brief Performs mele attack logic
- * 
- * @param facingLeft - is the worm facing left
- * @param dirX - direction x
- * @param dirY - direction y
- */
-void doMele(char facingLeft, short dirX, short dirY){
-
-	// figure out which worms we'll affect
-	short affectedWorms[MAX_WORMS] = {
-		FALSE, FALSE, FALSE, FALSE, 
-		FALSE, FALSE, FALSE, FALSE, 
-		FALSE, FALSE, FALSE, FALSE, 
-		FALSE, FALSE, FALSE, FALSE, 
-	};
-	short affectedCount = 0;
-
-	const short xMin = facingLeft ? Worm_x[(short)Worm_currentWorm] - 20 : Worm_x[(short)Worm_currentWorm];
-	const short xMax = facingLeft ? Worm_x[(short)Worm_currentWorm] : Worm_x[(short)Worm_currentWorm] + 20;
-	const short yMin = Worm_y[(short)Worm_currentWorm] - 10;
-	const short yMax = Worm_y[(short)Worm_currentWorm] + 10;
-
-	// loop over all worms and see if any area in the mele hitbox
-	unsigned short wormMask;
-	short i, w;
-	for(i=0; i<MAX_WORMS; i++)
-	{	
-		// skip current worm
-		if(i==Worm_currentWorm)
-			continue;
-
-		// reusable mask
-		wormMask = (unsigned short)1<<(i);
-
-		// skip dead or inactive worms
-		if((Worm_isDead & wormMask) || !(Worm_active & wormMask))
-			continue;
-
-		// check if worm is in the hitbox
-		if(Worm_x[i]>=xMin && Worm_x[i]<=xMax && Worm_y[i]>=yMin && Worm_y[i]<=yMax)
-		{
-			affectedWorms[affectedCount] = i;
-			affectedCount++;
-		}
-	}
-
-	// short x1 = xMin;
-	// short y1 = yMin;
-	// short x2 = xMax;
-	// short y2 = yMax;
-	// worldToScreen(&x1, &y1);
-	// worldToScreen(&x2, &y2);
-
-	// // draw the water rectangle to fill in below the waterline
-	// SCR_RECT waterRect = {{x1, y1, x2, y2}};
-	// const SCR_RECT fullScreen = {{0, 0, 159, 99}};
-
-	// // Draw Light Gray: LightPlane = 1 (Black), DarkPlane = 0 (White)
-	// PortSet(lightPlane, 239, 127);
-	// ScrRectFill(&waterRect, &fullScreen, A_NORMAL);  // Force 1s
-	// PortRestore();
-	// PortSet(darkPlane, 239, 127);
-	// ScrRectFill(&waterRect, &fullScreen, A_NORMAL);  // Force 0s
-	// PortRestore();
-
-	// const char debugBuffer[32];
-	// // sprintf((char*)debugBuffer, "Mele Hitbox: %d,%d to %d,%d", xMin, yMin, xMax, yMax);
-	// sprintf((char*)debugBuffer, "Affected Worms: %d", affectedCount);
-	// FontSetSys(F_4x6);
-	// GrayDrawStr2B(1, 20, debugBuffer, A_NORMAL, lightPlane, darkPlane);
-
-	// Game_debugFreeze = TRUE;
-
-	// force to apply based on weapon type
-	short forceX = facingLeft ? -1 : 1;
-	short forceY = 0;
-	short damage = 0;
-	switch(Game_currentWeaponSelected)
-	{
-		case WFirePunch:
-			CharacterController_doBackflip();
-			forceX *= 2;
-			forceY = -8;
-			damage = 20;
-			break;
-
-		case WKamikaze:
-			forceX *= 2;
-			forceY = -6;
-			damage = 30;
-			break;
-
-		case WAxe:
-
-			// battle axe has custom health logic (always cuts health in half)
-			for(i=0; i<affectedCount; i++)
-			{
-				w = affectedWorms[i];
-
-				// apply damage
-				Worm_setHealth((char)w, -(Worm_health[w]>>1), TRUE);
-
-				// apply force
-				Physics_setVelocity(&Worm_physObj[w], forceX, forceY, TRUE, TRUE);				
-			}
-			return;
-			break;
-
-		case WBaseballBat:
-			forceX = dirX*1;
-			forceY = dirY*1;
-			damage = 30;
-			break;
-
-		case WProd:
-			forceX *= 3;
-			forceY = -2;
-			break;
-	}// swatch
-
-	// deal damage and apply force to affected worms
-	for(i=0; i<affectedCount; i++)
-	{
-		w = affectedWorms[i];
-
-		// apply damage
-		Worm_setHealth((char)w, -damage, TRUE);
-
-		// apply force
-		Physics_setVelocity(&Worm_physObj[w], forceX, forceY, TRUE, TRUE);
-	}
 }
 
 
@@ -1056,6 +1122,7 @@ void Weapons_fire(short charge)
 		Explosion_spawn(spawnX, spawnY, 10, 30, FALSE);
 		Worm_setHealth(Worm_currentWorm, 0, FALSE);
 		Worm_isDead |= (unsigned short)1<<(Worm_currentWorm);
+		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], 0, 2, TRUE, TRUE);
 		Game_changeMode(gameMode_TurnEnd);
 		return;
 	}

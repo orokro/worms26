@@ -227,6 +227,14 @@ void Worm_update()
 			short damage = Physics_checkExplosions(&Worm_physObj[i]);
 			if(damage!=0)
 				Worm_setHealth(i, -damage*6, TRUE);
+
+			// check active weapons to see if one hit and its not the current worm
+			if(Worm_currentWorm!=i)
+			{
+				damage = Physics_checkWeapons(&Worm_physObj[i]);
+				if(damage!=0)
+					Worm_setHealth(i, -damage, TRUE);
+			}
 				
 			// if the worm is considered "settled" no need for physics
 			if(!(Worm_settled & wormMask))
@@ -239,8 +247,7 @@ void Worm_update()
 					Worm_xVelo[i]=0;
 
 				// do physics and collision for worm
-				Physics_apply(&Worm_physObj[i]);
-				
+				Physics_apply(&Worm_physObj[i]);				
 				
 				// if we collided with the ground on the last frame, assume the worm is grounded.
 				// (it should collide with the ground ever frame its grounded, due to gravity.

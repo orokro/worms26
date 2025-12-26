@@ -62,7 +62,7 @@ enum Weapons {
 	WFastWalk,			WMortar, 			WBanana, 	WUzi,		WKamikaze, 		WSheep, 		WMailStrike, 	WGirder, 		WParachute,			WFlameThrower, 		WMingVase, 		WConcreteDonkey, 	WSelectWorm,
 	WLaserSight, 		WHomingPigeon, 		WAxe,		WMiniGun,	WSuicideBomb, 	WSuperSheep, 	WMineStrike, 	WBaseballBat, 	WTeleport, 			WSalvationArmy, 	WSheepStrike,	WNuclearTest, 		WFreeze,
 	WInvisibility,		WSheepLauncher,		WQuake, 	WLongbow,  	WProd, 			WMole, 			WMoleSquadron, 	WGirderPack, 	WScalesOfJustice,	WMBBomb, 			WCarpetBomb, 	WArmageddon, 		WMagicBullet,
-	WFragment, 			WFire,				WSkunkGas,	WComet, 	WMail, 			WCarpet, 		WFakeMine
+	WFragment, 			WFire,				WSkunkGas,	WComet, 	WMail, 			WCarpet, 		WFakeMine,
 };
 
 
@@ -127,6 +127,14 @@ extern unsigned long Weapon_props[72];
  * @returns a char that is the index of the weapon slot this weapon was spawned into, or -1 if no slot was available.
 */
 extern char Weapons_spawn(char, short, short, char, char, unsigned short);
+
+
+/**
+ * detonates the weapon of index
+ *
+ * @param index the index of the weapon to detonate
+*/
+extern void Weapons_detonateWeapon(short index);
 
 
 /**
