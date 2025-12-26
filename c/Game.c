@@ -130,6 +130,8 @@
 #include "Map.h"
 #include "StatusBar.h"
 
+const SCR_RECT fullScreen = {{0, 0, 159, 99}};
+ 
 // vars
 
 // current game mode!

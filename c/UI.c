@@ -246,6 +246,14 @@ void drawWeaponDetails()
 		y=wormY+yComponent+4;
 		worldToScreen(&x, &y);
 
+		// draw aline if the user has laser sight enabled
+		if(Game_stateFlags & gs_laserSight){
+
+			const short endX = x + (xComponent * 10);
+			const short endY = y + (yComponent * 10);
+			GrayDrawClipLine2B(x, y, endX, endY, A_NORMAL, lightPlane, darkPlane);
+		}
+
 		// if the weapon is being charged, draw the charge circles
 		if(Game_currentWeaponCharge>0)
 		{

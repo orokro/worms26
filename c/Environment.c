@@ -15,9 +15,6 @@
 	- Water	
 */
 
-// full screen ref
-const SCR_RECT fullScreen = {{0, 0, 159, 99}};
-
 
 /**
  * draw falling leave wind and cloud speed indicators

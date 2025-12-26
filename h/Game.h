@@ -7,6 +7,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+extern const SCR_RECT fullScreen;
 
 // game enums
 enum GameModes {
