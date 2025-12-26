@@ -458,7 +458,7 @@ unsigned long Weapon_props[72] = {
         usesCursor | usesPhysics | usesDetonateOnImpact | spawnsSelf | usesAirStrike,
         
 		// armageddon
-        usesRoutine | holdsCustom,
+        usesRoutine | holdsCustom | usesFuse | noRender,
         
 		// magic bullet
         usesCursor | usesAim | usesHoming | usesDetonateOnImpact | holdsLauncher,
@@ -475,7 +475,7 @@ unsigned long Weapon_props[72] = {
         isParticle | usesFuse | spawnsSelf | usesWind | usesConstantGravity,
         
 		// comet from armageddon
-        usesPhysics | usesDetonateOnImpact | spawnsSelf,
+        usesPhysics | usesDetonateOnImpact | spawnsSelf | usesPhysics,
         
 		// mail from mail strike
         usesPhysics | usesDetonateOnImpact | spawnsSelf | usesWind | usesConstantGravity,
@@ -769,7 +769,7 @@ void doWeaponRoutine(short index, unsigned short props)
 		case WQuake:
             // 1. Setup Camera State
             Camera_shake = TRUE;
-            cameraAutoFocus = FALSE; // We will manually tell the camera where to look
+            cameraAutoFocus = FALSE;
             
             // Static variable to track when to switch camera targets
             static short quakeCamTimer = 0; 
@@ -830,8 +830,48 @@ void doWeaponRoutine(short index, unsigned short props)
             if(Weapon_time[index] <= 1)
             {
                 Camera_shake = FALSE;
-                cameraAutoFocus = TRUE; // Restore normal camera behavior
+                cameraAutoFocus = TRUE;
                 quakeCamTimer = 0;
+            }
+            break;
+
+		case WArmageddon:
+            
+			cameraAutoFocus = FALSE;
+			static focusIndex = 0;
+
+            // Spawn a comet every 7 frames
+            if(Weapon_time[index] % 7 == 0)
+            {
+                // 1. Pick a random spot in the sky
+                // Map is approx 320 wide, spawn high up (-50) like airstrikes
+                short spawnX = random(320);
+                short spawnY = -50;
+                
+                // 2. Calculate downward angled velocity
+                // Random X: -3 to 3 (Left or Right angle)
+                // Fixed Y: 5 (Fast downward start) + Gravity will accelerate it
+                char veloX = (random(7) - 3);
+                char veloY = 5;
+                
+                // 3. Spawn the Comet
+                // We use a longer fuse (90) just in case, though it explodes on impact
+                short cometIndex = Weapons_spawn(WComet, spawnX, spawnY, veloX, veloY, 90);
+                
+                // 4. Camera Focus (Every other comet)
+                // We can use the timer to determine "every other". 
+                // Since we spawn every 7 frames, dividing by 7 gives us a sequential counter.
+                // If that counter is Even, we focus.
+                if(((Weapon_time[index] / 7) % 3) == 0)
+					focusIndex = cometIndex;
+                    
+                Camera_focusOn(&Weapon_x[focusIndex], &Weapon_y[focusIndex]);
+            }
+
+            // Cleanup when timer runs out
+            if(Weapon_time[index] <= 1)
+            {
+               cameraAutoFocus = TRUE;
             }
             break;
 	}
@@ -1214,6 +1254,18 @@ void Weapons_fire(short charge)
 
         StatusBar_showMessage("Earthquake!");
 		
+        return;
+    }
+
+	// start armageddon
+	if(Game_currentWeaponSelected == WArmageddon)
+    {
+        // Spawn the Armageddon controller
+        // Type, X, Y, XVelo, YVelo, Timer
+        // Timer: 90 frames
+        Weapons_spawn(WArmageddon, 0, 0, 0, 0, 90);
+        
+        StatusBar_showMessage("Armageddon has come!");
         return;
     }
 
