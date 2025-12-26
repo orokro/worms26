@@ -80,6 +80,7 @@
 #include "Draw.h"
 #include "Map.h"
 #include "CharacterController.h"
+#include "StatusBar.h"
 
 
 // the type of the weapon!
@@ -1128,7 +1129,6 @@ void Weapons_fire(short charge)
 		Worm_setHealth(Worm_currentWorm, 0, FALSE);
 		Worm_isDead |= (unsigned short)1<<(Worm_currentWorm);
 		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], 0, 2, TRUE, TRUE);
-		CharacterController_weaponConsumed(FALSE);
 		return;
 	}
 
@@ -1136,7 +1136,8 @@ void Weapons_fire(short charge)
 	if(Game_currentWeaponSelected == WNuclearTest){
 		Worm_poisoned = 0b1111111111111111;
 		Game_waterLevel += 30;
-		CharacterController_weaponConsumed(FALSE);
+		StatusBar_showMessage("Indian Nuclear Test Detonated");
+		StatusBar_showMessage("All Worms are Poisoned!");
 		return;
 	}
 
