@@ -33,6 +33,7 @@
 #include "Weapons.h"
 #include "Camera.h"
 #include "Match.h"
+#include "StatusBar.h"
 
 // local defines: the max slope a worm can walk up:
 #define MAX_WORM_SLOPE 6
@@ -72,12 +73,12 @@ void wormWalk()
 	}
 	else if (Keys_keyState(keyLeft))
 	{
-		moveDir = -1;
+		moveDir = (Game_stateFlags & gs_fastWalk) ? -2 : -1;
 		Camera_clearFocus();
 	}
 	else if (Keys_keyState(keyRight))
 	{
-		moveDir = 1;
+		moveDir = (Game_stateFlags & gs_fastWalk) ? 2 : 1;
 		Camera_clearFocus();
 	}
 
@@ -134,14 +135,17 @@ void wormWeapon()
 		{
 			case WLowGravity:
 				Game_stateFlags |= gs_lowGravity;
+				StatusBar_showMessage("Low Gravity Activated!");
 				break;
 			
 			case WFastWalk:
 				Game_stateFlags |= gs_fastWalk;
+				StatusBar_showMessage("Fast Walk Activated!");
 				break;
 
 			case WLaserSight:
 				Game_stateFlags |= gs_laserSight;
+				StatusBar_showMessage("Laser Sight Activated!");
 				break;
 
 			case WJetPack:
@@ -150,14 +154,17 @@ void wormWeapon()
 
 			case WBungeeCord:
 				Game_stateFlags |= gs_bungeeActive;
+				StatusBar_showMessage("Bungee Equipped!");
 				break;
 
 			case WParachute:
 				Game_stateFlags |= gs_parachuteActive;
+				StatusBar_showMessage("Parachute Equipped!");
 				break;
 
 			case WSkipGo:
 				Game_changeMode(gameMode_TurnEnd);
+				StatusBar_showMessage("Turn Skipped");
 				break;
 
 			case WSurrender:

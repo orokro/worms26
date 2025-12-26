@@ -838,7 +838,7 @@ void doWeaponRoutine(short index, unsigned short props)
 		case WArmageddon:
             
 			cameraAutoFocus = FALSE;
-			static focusIndex = 0;
+			static short focusIndex = 0;
 
             // Spawn a comet every 7 frames
             if(Weapon_time[index] % 7 == 0)
