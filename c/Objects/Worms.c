@@ -283,6 +283,12 @@ void Worm_update()
  */
 void Worm_setHealth(short index, short health, char additive)
 {
+	// cant adjust health if this worms team is frozen
+	const short team1frozen = (Game_stateFlags & gs_team1Frozen);
+	const short team2frozen = (Game_stateFlags & gs_team2Frozen);
+	if( (team1frozen && (index<8)) || (team2frozen && (index>=8)) )
+		return;
+
 	if(additive)
 		Worm_health[index] += health;
 	else
@@ -297,6 +303,13 @@ void Worm_setHealth(short index, short health, char additive)
 
 	// update team health sprites
 	Draw_renderTeamHealth();
+
+	// if it's the current worm & health was lowered, end turn and lock turn end
+	if(additive && index==Worm_currentWorm && health<0)
+	{
+		Game_stateFlags |= gs_lockTurnEnd;
+		Game_changeMode(gameMode_TurnEnd);
+	}
 }
 
 
@@ -470,6 +483,21 @@ void Worm_drawAll()
 
 				if( (team1invisible && (i<8)) || (team2invisible && (i>=8)) )
 					continue;
+					
+				// if the current team is invisible, skip drawing them
+				const short team1frozen = (Game_stateFlags & gs_team1Frozen);
+				const short team2frozen = (Game_stateFlags & gs_team2Frozen);
+
+				if( (team1frozen && (i<8)) || (team2frozen && (i>=8)) )
+				{
+					// Draw Mask (AND logic)
+					sprHeight = 13;
+					ClipSprite16_AND_R(x, y, sprHeight, spr_WormFrozenMask, darkPlane);
+					ClipSprite16_AND_R(x, y, sprHeight, spr_WormFrozenMask, lightPlane);
+					ClipSprite16_OR_R(x, y, sprHeight, spr_WormFrozenDark, darkPlane);
+					ClipSprite16_OR_R(x, y, sprHeight, spr_WormFrozenLight, lightPlane);
+					continue;
+				}
 					
                 // Is this the Active Worm doing an Animation?
                 if(i == Worm_currentWorm && Game_wormAnimState != ANIM_NONE)

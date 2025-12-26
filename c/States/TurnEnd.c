@@ -26,10 +26,11 @@ static void TurnEnd_update()
 	// All regular game-updates during this mode
 	gameUpdates();
 
-	// allow movement while ending the turn, unless the current worm is dead
-	if((Worm_isDead & (1<<Worm_currentWorm))==0)
+	// allow movement while ending the turn, unless the current worm is dead or if the turn end is locked
+	// (it gets locked of the worm takes damage or freezes during their turn)
+	if((Worm_isDead & (1<<Worm_currentWorm))==0 && (Game_stateFlags & gs_lockTurnEnd)==0)
 		CharacterController_update();
-
+	
 	// the game
 	Draw_renderGame();
 	
@@ -46,4 +47,7 @@ static void TurnEnd_exit()
 	// note, this doesn't imply that the turn is over.
 	// just that we are switching to it
 	cameraAutoFocus = FALSE;
+
+	// disable the lock turn 
+	Game_stateFlags &= ~gs_lockTurnEnd;
 }

@@ -284,6 +284,13 @@ void Game_initRound(){
 	Game_wormAnimState = ANIM_NONE;
 	Game_stateFlags = 0;
 	Game_surrenderedTeam = -1;
+
+	short i=0;
+	for(i=0; i<65; i++)
+	{
+		Match_teamWeapons[0][i] = Match_defaultWeapons[i];
+		Match_teamWeapons[1][i] = Match_defaultWeapons[i];
+	}
 }
 
 

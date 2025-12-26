@@ -43,7 +43,7 @@ enum GameModes {
 #define gs_team2Invisible 	0b0000100000000000
 #define gs_team1Frozen 		0b0001000000000000
 #define gs_team2Frozen 		0b0010000000000000
-
+#define gs_lockTurnEnd 		0b0100000000000000
 
 // game globals
 extern char Game_mode;

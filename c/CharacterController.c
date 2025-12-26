@@ -184,6 +184,7 @@ void wormWeapon()
 				break;
 
 			case WFreeze:
+				Game_stateFlags |= gs_lockTurnEnd;
 				Game_stateFlags |= ((Game_currentTeam==0) ? gs_team1Frozen : gs_team2Frozen);
 				break;
 
