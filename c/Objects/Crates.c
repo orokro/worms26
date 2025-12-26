@@ -189,9 +189,9 @@ static char spawnCrate()
 		// remaining column into it's hole, and decrease the remaining counter
 		// this way, on next loop, we will pick a random number in the range of
 		// remaining columns
-		cols[r] = cols[(short)remaining];
 		remaining--;
-		
+		cols[r] = cols[(short)remaining];
+				
 		// calculate the left pixel of the column
 		short colX = col*32;
 		
