@@ -339,7 +339,7 @@ void drawHUD()
 	ClipSprite32_OR_R(64, 93, 5, spr_WindMeter, darkPlane);
 
 	// // draw the health for both teams:
-	GrayClipSprite32_OR_R(65, 94, 3, teamHealthSprites_light, teamHealthSprites_dark, lightPlane, darkPlane);
+	GrayClipSprite32_OR_R(64, 94, 3, teamHealthSprites_light, teamHealthSprites_dark, lightPlane, darkPlane);
 
 	// draw the timer
 	drawTimer();	
