@@ -277,6 +277,10 @@ void Worm_setHealth(short index, short health, char additive)
 		Worm_health[index] += health;
 	else
 		Worm_health[index] = health;
+	
+	// don't let go below 0
+	if(Worm_health[index]<0)
+		Worm_health[index]=0;
 		
 	// update it's sprite
 	renderHealthSprite(index);
@@ -444,7 +448,7 @@ void Worm_drawAll()
                 
 				// if the worm is dead, draw gravestone
 				if(Worm_isDead & (unsigned short)1<<(i)){
-					GrayClipSprite8_OR_R(x-4, screenY-12, 12, spr_Grave, spr_Grave, lightPlane, darkPlane);
+					GrayClipSprite8_OR_R(x-4, screenY, 12, spr_Grave, spr_Grave, lightPlane, darkPlane);
 					continue;
 				}
 
@@ -511,7 +515,7 @@ void Worm_drawAll()
                         sprMask = spr_WormRight_Mask;
                     }
                 }
-				
+
                 // ============================================================
                 // STANDARD WALKING / STANDING
                 // ============================================================
@@ -572,11 +576,10 @@ void Worm_drawAll()
                         ClipSprite32_OR_R(hX, hY, 9, healthSprites[i]+(n*9), lightPlane);
                         ClipSprite32_OR_R(hX, hY, 9, healthSprites[i]+(n*9), darkPlane);
                     }
-                } // end HUD
-                
-                
+                } // end HUD            
                 
             } // end if on screen
+
         } // end if active
         
         // check if we're the current worm and we need to draw weapons or anything

@@ -263,7 +263,7 @@ unsigned long Weapon_props[72] = {
         isMeta | doesntEndTurn,
 
         // bazooka
-        usesAim | usesCharge | usesPhysics | usesWind | usesDetonateOnImpact | holdsLauncher | usesWind | doesntEndTurn,
+        usesAim | usesCharge | usesPhysics | usesWind | usesDetonateOnImpact | holdsLauncher | usesWind,
         
 		// grenade
         usesAim | usesCharge | usesPhysics | usesWind | usesFuse | holdsSelf | spawnsSelf,

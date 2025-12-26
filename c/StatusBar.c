@@ -103,6 +103,7 @@ extern void StatusBar_draw() {
 	if (StatusBar_messageTimer == 0)
 		return;
 
-	// render each message
-	GrayDrawStr2B(20, 1, StatusBar_messages[0], A_XOR, lightPlane, darkPlane);
+	// render each message centered
+	const short x = 80 - ((strlen(StatusBar_messages[0]) * 4) >> 1);
+	GrayDrawStr2B(x, 1, StatusBar_messages[0], A_XOR, lightPlane, darkPlane);
 }

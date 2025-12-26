@@ -25,8 +25,9 @@ static void TurnEnd_update()
 	// All regular game-updates during this mode
 	gameUpdates();
 
-	// allow movement while ending the turn
-	CharacterController_update();
+	// allow movement while ending the turn, unless the current worm is dead
+	if((Worm_isDead & (1<<Worm_currentWorm))==0)
+		CharacterController_update();
 
 	// the game
 	Draw_renderGame();

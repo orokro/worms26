@@ -281,6 +281,8 @@ void drawTimer()
 		char txt[3];
 		sprintf(txt, "%d", time);
 		
+		FontSetSys(1);
+
 		GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
 		DrawStr(3 + ((time<10) ? 3 : 0), 89, txt, A_NORMAL);
 		GrayDBufSetHiddenAMSPlane(DARK_PLANE);
@@ -599,11 +601,16 @@ void Draw_cake(short amount, short total)
  */
 void Draw_renderGame()
 {
+	// maindraw
+
 	GrayDBufSetHiddenAMSPlane(DARK_PLANE);
 	ClrScr();
 	GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
 	ClrScr();
 	
+	// small fonts used in game, pause menu different
+	FontSetSys(0);
+
 	// draw background mountains
 	drawMountains();
 	
@@ -637,11 +644,11 @@ void Draw_renderGame()
 	// if a mark was picked with the cursor this will render it
 	drawCursorAndXSpot();
 	
+	// Draw status bar messages
+	StatusBar_draw();
+
 	// HUD stuff is drawn last since it needs to go on top of all game elements
 	drawHUD();
-	
-	// Draw status bar messages
-	// StatusBar_draw();
 	
 	// if the game mode is worm select, draw the selection arrow
 	if(Game_mode==gameMode_WormSelect)
@@ -654,10 +661,10 @@ void Draw_renderGame()
 	// for now, we will output a bunch of debug info on the screen
 	
 	// game modes by name	{"Select", "Turn", "WeaponSel", "Pause", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
-	// static const char modes[9][16] = {"Select", "Turn", "", "", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
+	static const char modes[9][16] = {"Select", "Turn", "", "", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
 	
 	// draw the current and previous game mode on the screen
-	// DrawStr(60,1,modes[(short)Game_mode], A_XOR);
+	DrawStr(60,8,modes[(short)Game_mode], A_XOR);
 
 	// static char weaponActiveStr[5];
 	// sprintf(weaponActiveStr, "%d", (short)Weapon_active);
@@ -783,10 +790,9 @@ void Draw_renderPauseMenu(char menuItem)
 	GrayDrawStr2B(57, 2, "Paused", A_NORMAL, lightPlane, lightPlane);
 	
 	// draw it to both planes in black, then XOR it to make it WHITE
+	FontSetSys(1);
 	GrayDrawStr2B(56, 1, "Paused", A_NORMAL, lightPlane, darkPlane);
 	GrayDrawStr2B(56, 1, "Paused", A_XOR, lightPlane, darkPlane);
-	
-	FontSetSys(1);
 	
 	/*
 		NOTE:
