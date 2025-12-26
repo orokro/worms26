@@ -280,6 +280,9 @@ void Worm_setHealth(short index, short health, char additive)
 		
 	// update it's sprite
 	renderHealthSprite(index);
+
+	// update team health sprites
+	Draw_renderTeamHealth();
 }
 
 
@@ -578,8 +581,3 @@ void Worm_drawAll()
         
     } // next i
 }
-
-
-
-
-

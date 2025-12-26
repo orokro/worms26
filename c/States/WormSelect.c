@@ -45,7 +45,6 @@ void renderWindSprites()
 		arrows[0] = (unsigned long)((Game_wind>0) ? arrows[0]>>1 : arrows[0]<<1);
 		arrows[1] = (unsigned long)((Game_wind>0) ? arrows[1]>>1 : arrows[1]<<1);
 	}// next f
-	
 }
 
 
@@ -90,6 +89,9 @@ static void nextWorm()
 */
 static void WormSelect_enter()
 {
+	// make sure health sprites are up to date
+	Draw_renderTeamHealth();
+
 	// it's a new turn..
 	Game_turn++; 
 	

@@ -37,6 +37,10 @@ extern char Game_wormFlipStartDir; // Direction worm was facing when flip starte
 // these sprites will be generated at the begining of the each turn to match the current wind conditions
 unsigned long windSprites[3][3];
 
+// these sprites will be updated when a worm takes damage
+unsigned long teamHealthSprites_light[3] = { 0, 0, 0 };
+unsigned long teamHealthSprites_dark[3] = { 0, 0, 0 };
+
 // flipped weapon sprites
 unsigned short spr_weapons_flipped[NUM_WEAPONS][11];
 
@@ -45,6 +49,15 @@ void *weaponsLight, *weaponsDark;
 
 // full screen ref
 const SCR_RECT fullScreen = {{0, 0, 159, 99}};
+
+// Lookup table for N bits set to 1 (0 to 15 bits)
+// Placed outside or static inside to avoid rebuilding it every call
+static const unsigned short BIT_MASKS[] = {
+ 	0x0000, 0x0001, 0x0003, 0x0007, 0x000F, // 0-4
+ 	0x001F, 0x003F, 0x007F, 0x00FF,         // 5-8
+ 	0x01FF, 0x03FF, 0x07FF, 0x0FFF,         // 9-12
+ 	0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF          // 13-15
+};
 
 
 
@@ -305,6 +318,9 @@ void drawHUD()
 	ClipSprite32_AND_R(126, 93, 5, spr_WindMeter_Mask, darkPlane);
 	ClipSprite32_OR_R(126, 93, 5, spr_WindMeter, lightPlane);
 	ClipSprite32_OR_R(126, 93, 5, spr_WindMeter, darkPlane);
+
+	// GrayClipSprite32_AND_R(126, 93, 5, spr_WindMeter_Mask, spr_WindMeter_Mask, lightPlane, darkPlane);
+	// GrayClipSprite32_OR_R(126, 93, 5, spr_WindMeter, spr_WindMeter, lightPlane, darkPlane);
 	
 	// current frame of animation:
 	static char frame=0;
@@ -314,6 +330,17 @@ void drawHUD()
 	// draw current frame of animated bar
 	ClipSprite32_OR_R(127, 94, 3, windSprites[(short)((frame/3)%3)], darkPlane);
 	
+	// reuse the wind bar in the center of the screen to draw the team health:
+	// GrayClipSprite32_AND_R(64, 93, 5, spr_WindMeter_Mask, spr_WindMeter_Mask, lightPlane, darkPlane);
+	// GrayClipSprite32_OR_R(64, 93, 5, spr_WindMeter, spr_WindMeter, lightPlane, darkPlane);
+	ClipSprite32_AND_R(64, 93, 5, spr_WindMeter_Mask, lightPlane);
+	ClipSprite32_AND_R(64, 93, 5, spr_WindMeter_Mask, darkPlane);
+	ClipSprite32_OR_R(64, 93, 5, spr_WindMeter, lightPlane);
+	ClipSprite32_OR_R(64, 93, 5, spr_WindMeter, darkPlane);
+
+	// // draw the health for both teams:
+	GrayClipSprite32_OR_R(65, 94, 3, teamHealthSprites_light, teamHealthSprites_dark, lightPlane, darkPlane);
+
 	// draw the timer
 	drawTimer();	
 }
@@ -627,14 +654,14 @@ void Draw_renderGame()
 	// for now, we will output a bunch of debug info on the screen
 	
 	// game modes by name	{"Select", "Turn", "WeaponSel", "Pause", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
-	static const char modes[9][16] = {"Select", "Turn", "", "", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
+	// static const char modes[9][16] = {"Select", "Turn", "", "", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
 	
 	// draw the current and previous game mode on the screen
-	DrawStr(60,1,modes[(short)Game_mode], A_XOR);
+	// DrawStr(60,1,modes[(short)Game_mode], A_XOR);
 
-	static char weaponActiveStr[5];
-	sprintf(weaponActiveStr, "%d", (short)Weapon_active);
-	DrawStr(1, 10, weaponActiveStr, A_XOR);	
+	// static char weaponActiveStr[5];
+	// sprintf(weaponActiveStr, "%d", (short)Weapon_active);
+	// DrawStr(1, 10, weaponActiveStr, A_XOR);	
 
 	// draw the current grace time, turn time, and retreat time on the screen
 	// NOTE: for some reason, drawing sudden death time instead of retreat time crashes the game)
@@ -660,12 +687,12 @@ void Draw_renderGame()
 	//DrawStr(0,60, camStr , A_XOR);
 	
 	// draw our free memory on the screen, only when shift is held for debuging
-	//if(Keys_keyState(keyCameraControl))
-	//{
-	//	char heapStr[40];
-	//	sprintf(heapStr, "%lu", (unsigned long)HeapAvail());
-	//	DrawStr(0,1, heapStr , A_XOR);
-	//}
+	// if(Keys_keyState(keyCameraControl))
+	// {
+	// 	char heapStr[40];
+	// 	sprintf(heapStr, "%lu", (unsigned long)HeapAvail());
+	// 	DrawStr(0,1, heapStr , A_XOR);
+	// }
 }
 
 
@@ -999,4 +1026,83 @@ short Draw_renderText(unsigned long *buffer, char size, char *txt, char color)
 	
 	// return the length of the text
 	return (short)pixColumn;
+}
+
+
+/**
+ * Renders the sprite to use for team health bar
+*/
+void Draw_renderTeamHealth()
+{
+    // 1. Sum Health
+    // We use longs to prevent overflow during the *15 calculation later, 
+    // though shorts would likely suffice given standard worm health.
+    unsigned long hSum1 = 0;
+    unsigned long hSum2 = 0;
+    int i;
+
+    // Team 1 (Indices 0 to 7)
+    // Only iterate up to the active count to save cycles
+    for(i = 0; i < Match_wormCount[0]; i++) {
+        hSum1 += Worm_health[i];
+    }
+
+    // Team 2 (Indices 8 to 15)
+    // Offset by MAX_WORMS/2 (assuming 8 is the split based on your snippet)
+    // Adjust '8' to whatever your specific team split index is.
+    for(i = 0; i < Match_wormCount[1]; i++) {
+        hSum2 += Worm_health[8 + i];
+    }
+
+    // 2. Calculate Pixels (Integer Math)
+    // Formula: (CurrentSum * 15) / MaxSum
+    // We calculate MaxSum dynamically to handle different team sizes correctly.
+    // We check for divide by zero just in case a team has 0 worms.
+    
+    unsigned short count1 = Match_wormCount[0];
+    unsigned short count2 = Match_wormCount[1];
+    
+    unsigned short bars1 = 0;
+    if(count1) {
+        unsigned long max1 = count1 * Match_wormStartHealth;
+        bars1 = (hSum1 * 15) / max1; 
+        if(bars1 > 15) bars1 = 15; // Clamp for safety
+    }
+
+    unsigned short bars2 = 0;
+    if(count2) {
+        unsigned long max2 = count2 * Match_wormStartHealth;
+        bars2 = (hSum2 * 15) / max2;
+        if(bars2 > 15) bars2 = 15;
+    }
+
+    // 3. Generate Bit Masks
+    // Team 1: Left side (Upper 16 bits). Grows left.
+    // We take the mask and shift it into the upper word.
+    unsigned long team1pixels = (unsigned long)BIT_MASKS[bars1] << 16;
+
+    // Team 2: Right side (Lower 16 bits). Grows right from center.
+    // To grow right from bit 15: Shift the mask LEFT by (16 - N).
+    // Ex: 1 bit -> 0000...0001 << 15 -> 1000...0000 (Bit 15 set)
+    unsigned long team2pixels = (unsigned long)BIT_MASKS[bars2] << (16 - bars2);
+	
+    // 4. Combine for Planes
+    // Dark  = Plane 0 & Plane 1 (Team 1)
+    // Light = Plane 1 Only      (Team 2)
+    
+    // Plane 0 (Dark Plane): Only Team 1 needs to be here.
+    unsigned long p0 = team1pixels; 
+    
+    // Plane 1 (Light Plane): Team 1 (to make it dark) + Team 2 (to make it light)
+    unsigned long p1 = team1pixels | team2pixels;
+
+    // 5. Fill Buffers (Unrolled)
+    // Direct assignment is faster than a loop for 3 elements
+    teamHealthSprites_dark[0] = p0;
+    teamHealthSprites_dark[1] = p0;
+    teamHealthSprites_dark[2] = p0;
+
+    teamHealthSprites_light[0] = p1;
+    teamHealthSprites_light[1] = p1;
+    teamHealthSprites_light[2] = p1;
 }

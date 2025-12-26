@@ -16,6 +16,8 @@
 
 // Draw globals
 extern unsigned long windSprites[3][3];
+extern unsigned long teamHealthSprites_light[3];
+extern unsigned long teamHealthSprites_dark[3];
 extern unsigned long healthSprites[16][18];
 extern unsigned long healthMasks[16][18];
 
@@ -93,5 +95,11 @@ extern short Draw_renderText(unsigned long *buffer, char size, char *txt, char c
  * @param the index of the worm to draw the health sprite for
 */
 extern void Draw_healthSprite(short index);
+
+
+/**
+ * Renders the sprite to use for team health bar
+*/
+extern void Draw_renderTeamHealth();
 
 #endif
