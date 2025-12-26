@@ -448,7 +448,7 @@ void Worm_drawAll()
                 
 				// if the worm is dead, draw gravestone
 				if(Worm_isDead & (unsigned short)1<<(i)){
-					GrayClipSprite8_OR_R(x-4, screenY, 12, spr_Grave, spr_Grave, lightPlane, darkPlane);
+					GrayClipSprite8_OR_R(x+4, y, 12, spr_Grave, spr_Grave, lightPlane, darkPlane);
 					continue;
 				}
 

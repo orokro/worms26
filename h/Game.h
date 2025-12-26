@@ -43,6 +43,7 @@ enum GameModes {
 #define gs_team1Frozen 		0b0001000000000000
 #define gs_team2Frozen 		0b0010000000000000
 
+
 // game globals
 extern char Game_mode;
 extern char Game_previousMode;
@@ -108,5 +109,11 @@ extern void Game_update();
 	* @return TRUE or FALSE if everything is settled or not
 */
 extern char Game_allSettled();
+
+
+/**
+ * @brief checks if all of one teams worms are dead, or if both teams are dead
+ */
+extern char Game_checkWinConditions();
 
 #endif

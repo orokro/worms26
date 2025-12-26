@@ -95,7 +95,7 @@ static void Death_update()
 		if(killAnimTimer==30){
 
 			// spawn explosion at worm position
-			Explosion_spawn(Worm_x[wormToKill], Worm_y[wormToKill]+7, 10, 50, TRUE);
+			Explosion_spawn(Worm_x[wormToKill], Worm_y[wormToKill]+7, 6, 40, TRUE);
 
 			// mark worm as dead, it will now render as a grave stone
 			Worm_isDead |= (unsigned short)(1<<wormToKill);
@@ -113,6 +113,12 @@ static void Death_update()
 		// (this mode can cause explosions and physics to happen)
 		if(Game_allSettled())
 		{
+
+			// if the game is over, no need to goto AfterTurn
+			if(Game_checkWinConditions())
+				return;
+			
+			// otherwise, continue to AfterTurn mode
 			Game_changeMode(gameMode_AfterTurn);
 		}
 	}

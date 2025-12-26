@@ -130,33 +130,7 @@
 #include "Map.h"
 #include "StatusBar.h"
 
-// this has to be defined before the next set of includes or else they'll try too reference it too early - they're .c includes
-void gameUpdates();
-
-// function prototypes for our local game-mode logic methods!
-/*
-	Due to TIGCC's weird path rules, these files are stored in the Game/States folder on DISK
-	but in TIGCC IDE they are under Header Files/States
-	
-	The only way I was able to include them was to move them under Headers...
-	
-	At least in Headers they wont compile on their own, since we just want them included in this file.
-	
-	Anyway, below, each of the states for the state machine is defined, and any methods or variables they need
-	will be defined in their file.
-	
-	Each state has a State_enter, State_update, and State_exit method. Yay, state-machines!
-*/
-#include "States/WormSelect.c"
-#include "States/Turn.c"
-#include "States/WeaponSelect.c"
-#include "States/Pause.c"
-#include "States/Cursor.c"
-#include "States/TurnEnd.c"
-#include "States/Death.c"
-#include "States/AfterTurn.c"
-#include "States/GameOver.c"
-
+// vars
 
 // current game mode!
 char Game_mode = gameMode_WormSelect;
@@ -247,6 +221,35 @@ char Game_aimAngle=10;
 	gameMode_Death
 	gameMode_AfterTurn
 */
+
+
+// function prototypes for our local game-mode logic methods!
+// this has to be defined before the next set of includes or else they'll try too reference it too early - they're .c includes
+void gameUpdates();
+
+
+/*
+	Due to TIGCC's weird path rules, these files are stored in the Game/States folder on DISK
+	but in TIGCC IDE they are under Header Files/States
+	
+	The only way I was able to include them was to move them under Headers...
+	
+	At least in Headers they wont compile on their own, since we just want them included in this file.
+	
+	Anyway, below, each of the states for the state machine is defined, and any methods or variables they need
+	will be defined in their file.
+	
+	Each state has a State_enter, State_update, and State_exit method. Yay, state-machines!
+*/
+#include "States/WormSelect.c"
+#include "States/Turn.c"
+#include "States/WeaponSelect.c"
+#include "States/Pause.c"
+#include "States/Cursor.c"
+#include "States/TurnEnd.c"
+#include "States/Death.c"
+#include "States/AfterTurn.c"
+#include "States/GameOver.c"
 
 
 
@@ -573,3 +576,24 @@ char Game_allSettled()
 }
 
 
+/**
+ * @brief checks if all of one teams worms are dead, or if both teams are dead
+ */
+char Game_checkWinConditions(){
+
+	// build masks for each team
+	const unsigned short team1Mask = 0b0000000011111111;
+	const unsigned short team2Mask = 0b1111111100000000;
+	
+	// get alive worms for each team
+	unsigned short team1Alive = Worm_active & ~Worm_isDead & team1Mask;
+	unsigned short team2Alive = Worm_active & ~Worm_isDead & team2Mask;
+	
+	// check if either team is all dead
+	// if only one team is dead, the other team wins
+	if((team1Alive==0) || (team2Alive==0)){
+		Game_changeMode(gameMode_GameOver);
+		return TRUE;
+	}
+	return FALSE;
+}
