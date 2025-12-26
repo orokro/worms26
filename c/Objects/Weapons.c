@@ -57,7 +57,7 @@
 	multiUse
 
 	WJetPack,			WBazooka, 			WGrenade, 	WShotGun,		WFirePunch, 	WDynamite, 		WAirStrike, 		WBlowTorch, 	WNinjaRope, 		WSuperBanana, 		WPetrolBomb, 	WMadCows, 			WSkipGo,
-	WLowGravity, 		WHomingMissile, 		WCluster,	WHandGUn,		WDragonBall,	WMine, 			WNapalmStrike, 		WDrill, 		WBungeeCord,		WHolyHandGrenade,	WSkunk, 		WOldLady, 			WSurrender,
+	WLowGravity, 		WHomingMissile, 	WCluster,	WHandGUn,		WDragonBall,	WMine, 			WNapalmStrike, 		WDrill, 		WBungeeCord,		WHolyHandGrenade,	WSkunk, 		WOldLady, 			WSurrender,
 	WFastWalk,			WMortar, 			WBanana, 	WUzi,			WKamikaze, 		WSheep, 		WMailStrike, 		WGirder, 		WParachute,			WFlameThrower, 		WMingVase, 		WConcreteDonkey, 	WSelectWorm,
 	WLaserSight, 		WHomingPigeon, 		WAxe,		WMiniGun,		WSuicideBomb, 	WSuperSheep, 	WMineStrike, 		WBaseballBat, 	WTeleport, 			WSalvationArmy, 	WSheepStrike, 	WNuclearTest, 		WFreeze,
 	WInvisibility,		WSheepLauncher,		WQuake, 	WLongbow,  		WProd, 			WMole, 			WMoleSquadron, 		WGirderPack, 	WScalesOfJustice,	WMBBomb, 			WCarpetBomb, 	WArmageddon, 		WMagicBullet,
@@ -387,7 +387,7 @@ unsigned long Weapon_props[72] = {
         isMeta | doesntEndTurn,
         
 		// homing pigeon
-        usesAim | usesHoming | usesCursor | usesDetonateOnImpact | spawnsSelf | holdsSelf,
+        usesAim | usesCursor | usesCharge | usesPhysics | usesHoming | usesDetonateOnImpact | holdsLauncher | spawnsSelf,
         
 		// battle axe
         isMele | holdsSelf,
@@ -461,7 +461,7 @@ unsigned long Weapon_props[72] = {
         usesRoutine | holdsCustom | usesFuse | noRender,
         
 		// magic bullet
-        usesCursor | usesAim | usesHoming | usesDetonateOnImpact | holdsLauncher,
+        usesAim | usesCursor | usesCharge | usesPhysics | usesHoming | usesDetonateOnImpact | holdsLauncher,
     
     // sub weapons (ones you cannot directly use, but can spawn as a result of other weapons)
     
@@ -1248,11 +1248,14 @@ void Weapons_update()
 			if(currentProps & usesHoming)
 			{
 				// adjust the weapons velocity towards it's target, less aggressively as it gets closer
-				short deltaX = (short)((Weapon_targetX - Weapon_x[i])*0.25f);
-				short deltaY = (short)((Weapon_targetY - Weapon_y[i])*0.25f);
-				
-				Weapon_xVelo[i] += deltaX;
-				Weapon_yVelo[i] += deltaY;
+				if(Game_timer%5==0){
+					short deltaX = (short)((Weapon_targetX - Weapon_x[i])*0.1f);
+					short deltaY = (short)((Weapon_targetY - Weapon_y[i])*0.1f);
+					
+					Weapon_xVelo[i] += deltaX;
+					Weapon_yVelo[i] += deltaY;
+				}
+
 			}//end if uses homing
 			
 			// if a weapon needs user input to control it, read that now:
@@ -1464,7 +1467,7 @@ char Weapons_fire(short charge)
 			return TRUE;
 
 		}else{
-			
+
 			// other wise, we spawn an object too use as routine logic
 			Weapons_spawn(Game_currentWeaponSelected, spawnX, spawnY, 0, 0, 60);
 			return FALSE;
