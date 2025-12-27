@@ -249,7 +249,7 @@ void drawWeaponDetails()
 		||
 		(Game_currentWeaponProperties & usesCharge)
 		||
-		(Game_currentWeaponState &= keepAimDuringUse)
+		(Game_currentWeaponState & keepAimDuringUse)
 		)
 	{
 	

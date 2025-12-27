@@ -1284,17 +1284,19 @@ void Weapons_update()
 				// if the Weapon is considered "settled" no need for physics
 				if(!(Weapon_settled & (unsigned short)1<<(i)))
 				{
-					// apply wind and gravity
-					const short wind = (currentProps & usesWind) ? (Game_wind) : 0;
-
+					// previously I tried applying wind via Physics, but it was too floaty
+					// so now we just directly modify the x position
+					if(currentProps & usesWind)					
+						Weapon_x[i] += Game_wind/2;
+					
 					if(currentProps & usesConstantGravity)
 					{
-						Physics_setVelocity(&Weapon_physObj[i], wind, ((Game_timer%2==0) ? 1 : 0), FALSE, TRUE);
+						Physics_setVelocity(&Weapon_physObj[i], 0, ((Game_timer%2==0) ? 1 : 0), FALSE, TRUE);
 					}else
 					{
 						Weapon_yVelo[i] += 1; // constant gravity effect
 						char noGravity = (currentProps & usesConstantGravity);
-						Physics_setVelocity(&Weapon_physObj[i], (wind), 1, !noGravity, FALSE);
+						Physics_setVelocity(&Weapon_physObj[i], 0, 1, !noGravity, FALSE);
 					}
 
 					// if the worm is dead, it's gravestone can only have vertical velocity, no X
