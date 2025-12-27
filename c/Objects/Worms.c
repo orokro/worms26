@@ -305,7 +305,7 @@ void Worm_setHealth(short index, short health, char additive)
 	Draw_renderTeamHealth();
 
 	// if it's the current worm & health was lowered, end turn and lock turn end
-	if(additive && index==Worm_currentWorm && health<0)
+	if(additive && index==Worm_currentWorm && health<0 && Game_mode==gameMode_Turn)
 	{
 		Game_stateFlags |= gs_lockTurnEnd;
 		Game_changeMode(gameMode_TurnEnd);

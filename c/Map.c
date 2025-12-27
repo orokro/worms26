@@ -128,7 +128,7 @@ static unsigned long spr_LandTexture[] = { // 32 tall
 char Map_isOOB(short x, short y)
 {
 	// out of bounds check
-	if(x<-100 || x>=420 || y<-500 || y>=200)
+	if(x<-1000 || x>=1420 || y<-500 || y>=200)
 		return TRUE;
 		
 	return FALSE;

@@ -434,13 +434,13 @@ unsigned long Weapon_props[72] = {
         usesRoutine | holdsCustom | noRender | usesFuse,
         
 		// long bow
-        usesAim | usesPhysics | multiUse | usesDetonateOnImpact | holdsSelf | usesWind,
+        usesAim | usesPhysics | multiUse | usesDetonateOnImpact | holdsSelf,
         
 		// prod
         isMele | holdsSelf,
         
 		// mole
-        spawnsSelf | usesPhysics | isAnimal | usesDetonateOnImpact | usesFuse | usesWind,
+        spawnsSelf | usesPhysics | isAnimal | usesDetonateOnImpact | usesFuse,
         
 		// mole squadron
         usesCursor | spawnsSelf | usesAirStrike,
@@ -974,7 +974,13 @@ void Weapons_detonateWeapon(short index)
 		Weapon_yVelo[index]=-12;
 		return;
 	}
-	
+
+	if(weaponType == WMBBomb)
+	{
+		Explosion_spawn(Weapon_x[index], Weapon_y[index]+1, 15, 10, TRUE);
+		return;
+	}
+
 	// if dragon ball or noRender type, just despawn
 	if(weaponType == WDragonBall || (Weapon_props[weaponType] & noRender))
 	{
@@ -1287,19 +1293,18 @@ void Weapons_update()
 					// previously I tried applying wind via Physics, but it was too floaty
 					// so now we just directly modify the x position
 					if(currentProps & usesWind)					
-						Weapon_x[i] += Game_wind/2;
+						Weapon_x[i] += Game_wind/5;
 					
 					if(currentProps & usesConstantGravity)
 					{
 						Physics_setVelocity(&Weapon_physObj[i], 0, ((Game_timer%2==0) ? 1 : 0), FALSE, TRUE);
 					}else
 					{
-						Weapon_yVelo[i] += 1; // constant gravity effect
 						char noGravity = (currentProps & usesConstantGravity);
 						Physics_setVelocity(&Weapon_physObj[i], 0, 1, !noGravity, FALSE);
 					}
 
-					// if the worm is dead, it's gravestone can only have vertical velocity, no X
+					// don't allow the concrete donkey to love left or right or stop falling
 					if(Weapon_type[i] == WConcreteDonkey){
 						Weapon_xVelo[i]=0;
 						if(Weapon_yVelo[i] == 0)
@@ -1416,7 +1421,7 @@ char Weapons_fire(short charge)
 		Game_waterLevel += 30;
 		StatusBar_showMessage("Indian Nuclear Test Detonated");
 		StatusBar_showMessage("All Worms are Poisoned!");
-		return FALSE;
+		return TRUE;
 	}
 
 	// balance health bars for both teams (aka health redistribution)
@@ -1617,11 +1622,11 @@ void Weapons_drawAll()
 						case WSalvationArmy:
 							{
 								const unsigned short* ladySprite = facingLeft ? spr_weapons_flipped[24] : spr_weapons[24];
-								const char weaponPosX = facingLeft ? screenX-4 : screenX+4;
+								const char shakerPos = facingLeft ? screenX-4 : screenX+4;
 								ClipSprite16_OR_R(screenX-8, screenY-11, 11, ladySprite, lightPlane);
 								ClipSprite16_OR_R(screenX-8, screenY-11, 11, ladySprite, darkPlane);
-								ClipSprite16_OR_R(screenX-8, screenY-9, 8, spr_weapons[48]+2, lightPlane);
-								ClipSprite16_OR_R(screenX-8, screenY-9, 8, spr_weapons[48]+2, darkPlane);
+								ClipSprite16_OR_R(shakerPos, screenY-9, 8, spr_weapons[48]+2, lightPlane);
+								ClipSprite16_OR_R(shakerPos, screenY-9, 8, spr_weapons[48]+2, darkPlane);
 							}
 							break;
 					}// swatch

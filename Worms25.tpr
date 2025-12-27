@@ -50,7 +50,7 @@ Use Return Value=0
 Enable Error Return=0
 Save Screen=1
 [File Editing]
-Open File=C:\Users\geem4\Desktop\worms17\c\Objects\Weapons.c
+Open File=C:\Users\geem4\Desktop\worms17\c\Map.c
 [Included Files]
 C File 1=c\PhysCol.c
 C File 2=c\Match.c
