@@ -173,10 +173,10 @@ void Draw_renderGame()
 	// for now, we will output a bunch of debug info on the screen
 	
 	// game modes by name	{"Select", "Turn", "WeaponSel", "Pause", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
-	static const char modes[9][16] = {"Select", "Turn", "", "", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
+	// static const char modes[9][16] = {"Select", "Turn", "", "", "Cursor", "TurnEnd", "Death", "AfterTurn", "GameOver"};
 	
-	// draw the current and previous game mode on the screen
-	DrawStr(60,8,modes[(short)Game_mode], A_XOR);
+	// // draw the current and previous game mode on the screen
+	// DrawStr(60,8,modes[(short)Game_mode], A_XOR);
 
 	// static char weaponActiveStr[5];
 	// sprintf(weaponActiveStr, "%d", (short)Weapon_active);
