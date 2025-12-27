@@ -82,7 +82,7 @@ void wormWalk()
 		Camera_clearFocus();
 	}
 
-	if ((Game_currentWeaponState &targetPicked) && Keys_keyUp(keyEscape))
+	if ((Game_currentWeaponState & targetPicked) && Keys_keyUp(keyEscape))
 	{
 		// un-set target picked
 		Game_currentWeaponState &= ~targetPicked;

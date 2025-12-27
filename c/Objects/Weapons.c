@@ -376,7 +376,7 @@ unsigned long Weapon_props[72] = {
         spawnsSelf | usesFuse | isCluster | usesPhysics | holdsSelf | isDroppable,
         
 		// concrete donkey
-        usesCursor | usesPhysics | usesDetonateOnImpact | usesAirStrike,
+        usesCursor | usesPhysics | usesDetonateOnImpact | usesAirStrike | customRender,
         
 		// select worm
         isMeta | holdsSelf | doesntEndTurn,
@@ -411,13 +411,13 @@ unsigned long Weapon_props[72] = {
         usesCursor | holdsSelf,
         
 		// salvation army lady
-        spawnsSelf | usesFuse | usesPhysics | isAnimal | isCluster | usesController | holdsSelf,
+        usesFuse | usesPhysics | isAnimal | isCluster | usesController | holdsSelf | customRender,
         
 		// sheep strike
         usesCursor | usesAirStrike,
         
 		// indian nuclear nuclear test
-        usesRoutine | holdsCustom,
+        holdsCustom,
         
 		// freeze
         isMeta | holdsSelf,
@@ -452,7 +452,7 @@ unsigned long Weapon_props[72] = {
         usesRoutine | holdsSelf,
         
 		// MB bomb
-        usesCursor | usesDetonateOnImpact | usesAirStrike | usesWind | usesConstantGravity,
+        usesCursor | usesDetonateOnImpact | usesAirStrike | usesWind | usesConstantGravity | usesPhysics | customRender,
         
 		// carpet bomb
         usesCursor | usesPhysics | usesDetonateOnImpact | spawnsSelf | usesAirStrike,
@@ -753,7 +753,6 @@ void doMele(char facingLeft, short dirX, short dirY){
  */
 void doRayCastShot(short dirX, short dirY)
 {
-
 	// perform a raycast to see what we hit
 	short spawnX = Worm_x[(short)Worm_currentWorm];
 	short spawnY = Worm_y[(short)Worm_currentWorm]+4;
@@ -961,11 +960,23 @@ void doWeaponRoutine(short index, unsigned short props)
 */
 void Weapons_detonateWeapon(short index)
 {
-	// no longer active
-	Weapon_active &= ~((unsigned short)1<<(index));
+	const short weaponType = Weapon_type[index];
+	
+	// no longer active, only the concrete donkey stays active until its OOB
+	if(weaponType != WConcreteDonkey)
+		Weapon_active &= ~((unsigned short)1<<(index));
+
+	// if it's concrete donkey, make a big explosion and focus on donkey
+	if(weaponType == WConcreteDonkey)
+	{
+		Explosion_spawn(Weapon_x[index], Weapon_y[index]+1, 15, 10, TRUE);
+		Camera_focusOn(&Weapon_x[index], &Weapon_y[index]);
+		Weapon_yVelo[index]=-12;
+		return;
+	}
 	
 	// if dragon ball or noRender type, just despawn
-	if(Weapon_type[index] == WDragonBall || (Weapon_props[(short)Weapon_type[index]] & noRender))
+	if(weaponType == WDragonBall || (Weapon_props[weaponType] & noRender))
 	{
 		// focus back on current worm
 		Weapon_active &= ~((unsigned short)1<<(index));
@@ -973,7 +984,7 @@ void Weapons_detonateWeapon(short index)
 	}
 
 	// if kamikaze, explode and kill worm
-	if(Weapon_type[index] == WKamikaze)
+	if(weaponType == WKamikaze)
 	{
 		// kill the worm
 		Worm_setHealth((char)Worm_currentWorm, 0, FALSE);
@@ -987,10 +998,10 @@ void Weapons_detonateWeapon(short index)
 	Explosion_spawn(Weapon_x[index], Weapon_y[index], 10, 10, TRUE);
 
 	// if this is a cluster weapon, spawn some cluster items
-	if(Weapon_props[(short)Weapon_type[index]] & isCluster)
+	if(Weapon_props[weaponType] & isCluster)
 	{	
 		short spawnType = 0;
-		switch(Weapon_type[index])
+		switch(weaponType)
 		{
 			case WSuperBanana:
 				spawnType = WBanana;
@@ -1152,20 +1163,23 @@ void Weapons_setTarget(short x, short y)
 		// if only 1
 		if(spawnCount==1)
 		{
-			Weapons_spawn(spawnItem, x, -50, spawnXVelo, 0, 5*TIME_MULTIPLIER);
-			return;
-		}
+			// spawn the single weapon
+			Weapons_spawn(spawnItem, x, -50, spawnXVelo, 0, 5*TIME_MULTIPLIER);			
+
+		}else {
 		
-		// for now, spawn 5 weapons in a line above the target
-		int i;
-		for(i=-2; i<=2; i++)		
-			Weapons_spawn(spawnItem, x+(i*5), -50, spawnXVelo, 0, 5*TIME_MULTIPLIER);
+			// for now, spawn 5 weapons in a line above the target
+			int i;
+			for(i=-2; i<=2; i++)		
+				Weapons_spawn(spawnItem, x+(i*8), -50, spawnXVelo, 0, 5*TIME_MULTIPLIER);
+		}
 
 		// un-set target picked, since these weapons all instantly consume the position
 		Game_currentWeaponState &= ~targetPicked;
 
 		// consume the weapon from players inventory
 		CharacterController_weaponConsumed(FALSE);
+
 		return;
 
 	}// end if uses airstrike
@@ -1271,10 +1285,29 @@ void Weapons_update()
 				if(!(Weapon_settled & (unsigned short)1<<(i)))
 				{
 					// apply wind and gravity
-					const short wind = (currentProps & usesWind) ? (Game_wind/20) : 0;
-					char noGravity = (currentProps & usesConstantGravity);
-					Physics_setVelocity(&Weapon_physObj[i], (wind), 1, !noGravity, FALSE);
-					
+					const short wind = (currentProps & usesWind) ? (Game_wind) : 0;
+
+					if(currentProps & usesConstantGravity)
+					{
+						Physics_setVelocity(&Weapon_physObj[i], wind, ((Game_timer%2==0) ? 1 : 0), FALSE, TRUE);
+					}else
+					{
+						Weapon_yVelo[i] += 1; // constant gravity effect
+						char noGravity = (currentProps & usesConstantGravity);
+						Physics_setVelocity(&Weapon_physObj[i], (wind), 1, !noGravity, FALSE);
+					}
+
+					// if the worm is dead, it's gravestone can only have vertical velocity, no X
+					if(Weapon_type[i] == WConcreteDonkey){
+						Weapon_xVelo[i]=0;
+						if(Weapon_yVelo[i] == 0)
+							Weapon_yVelo[i]=2;
+					}
+
+					// sane clamp
+					if(Weapon_yVelo[i]>10)
+							Weapon_yVelo[i]=10;
+
 					// do physics and collision for Weapon
 					Physics_apply(&Weapon_physObj[i]);
 					
@@ -1381,7 +1414,7 @@ char Weapons_fire(short charge)
 		Game_waterLevel += 30;
 		StatusBar_showMessage("Indian Nuclear Test Detonated");
 		StatusBar_showMessage("All Worms are Poisoned!");
-		return TRUE;
+		return FALSE;
 	}
 
 	// balance health bars for both teams (aka health redistribution)
@@ -1557,7 +1590,42 @@ void Weapons_drawAll()
 					ClipSprite16_OR_R(screenX-2, screenY-2, 11, weaponSprite, lightPlane);
 					ClipSprite16_OR_R(screenX-2, screenY-2, 11, weaponSprite, darkPlane);
 
-				}else if(!(Weapon_props[(short)weaponType] & noRender)){	
+				}
+				else if(Weapon_props[(short)weaponType] & customRender)
+				{
+					switch(weaponType)
+					{
+						case WMBBomb:
+							{
+								ClipSprite32_AND_R(screenX-16, screenY-32, 32, spr_MB_Mask, lightPlane);
+								ClipSprite32_AND_R(screenX-16, screenY-32, 32, spr_MB_Mask, darkPlane);
+								ClipSprite32_OR_R(screenX-16, screenY-32, 32, spr_MB_Light, lightPlane);
+								ClipSprite32_OR_R(screenX-16, screenY-32, 32, spr_MB_Dark, darkPlane);
+							}
+							break;
+
+						case WConcreteDonkey:
+							{
+								ClipSprite32_AND_R(screenX-16, screenY-32, 32, spr_Donkey_Mask, lightPlane);
+								ClipSprite32_AND_R(screenX-16, screenY-32, 32, spr_Donkey_Mask, darkPlane);
+								ClipSprite32_OR_R(screenX-16, screenY-32, 32, spr_Donkey_Light, lightPlane);
+								ClipSprite32_OR_R(screenX-16, screenY-32, 32, spr_Donkey_Dark, darkPlane);
+							}
+							break;
+						case WSalvationArmy:
+							{
+								const unsigned short* ladySprite = facingLeft ? spr_weapons_flipped[24] : spr_weapons[24];
+								const char weaponPosX = facingLeft ? screenX-4 : screenX+4;
+								ClipSprite16_OR_R(screenX-8, screenY-11, 11, ladySprite, lightPlane);
+								ClipSprite16_OR_R(screenX-8, screenY-11, 11, ladySprite, darkPlane);
+								ClipSprite16_OR_R(screenX-8, screenY-9, 8, spr_weapons[48]+2, lightPlane);
+								ClipSprite16_OR_R(screenX-8, screenY-9, 8, spr_weapons[48]+2, darkPlane);
+							}
+							break;
+					}// swatch
+				}
+				else if(!(Weapon_props[(short)weaponType] & noRender))
+				{	
 
 					// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon
 					ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, lightPlane);

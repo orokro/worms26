@@ -116,17 +116,18 @@ void Camera_update()
     // 3. Auto-Focus Target Selection
     if(cameraAutoFocus == TRUE)
     {
-        if(Explosion_active)
-        {
-            i = Explosion_getFirstActive();
-            cameraTargetX = &Explosion_x[i];
-            cameraTargetY = &Explosion_y[i];
-        }
-        else if(Weapon_active)
+        
+        if(Weapon_active)
         {
             i = Weapons_getFirstActive();
             cameraTargetX = &Weapon_x[i];
             cameraTargetY = &Weapon_y[i];
+        }
+		else if(Explosion_active)
+        {
+            i = Explosion_getFirstActive();
+            cameraTargetX = &Explosion_x[i];
+            cameraTargetY = &Explosion_y[i];
         }
         else
         {

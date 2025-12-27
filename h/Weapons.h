@@ -43,7 +43,10 @@
 #define usesConstantGravity 	0b00000001000000000000000000000000  // true if weapon is affected by constant gravity (e.g. longbow, magic bullet, etc)
 #define usesJumping 			0b00000010000000000000000000000000  // true if animal jumps
 #define doesntEndTurn			0b00000100000000000000000000000000  // true if weapon doesn't end turn when used
-#define noRender				0b00001000000000000000000000000000  // true if weapon object shouldn't be rendered (e.g. fragments, fire, skunk gas, etc)
+#define noRender				0b00001000000000000000000000000000  // true if weapon object shouldn't be rendered (e.g. weapons that spawn just to run a routine)
+#define customRender			0b00010000000000000000000000000000  // true if weapon object needs custom case to render itself
+
+
 /*
   enumerate our list of weapons, with matching index positions as described in the array above
   note: the last row is for secondary weapons: they don't use the same game logic as the primaries
