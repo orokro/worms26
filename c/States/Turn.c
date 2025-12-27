@@ -48,7 +48,7 @@ static void Turn_update()
 	}
 	
 	// if the user pressed weapon select, we should goto the weapons menu
-	if(Keys_keyDown(keyWeaponsSelect))
+	if(Keys_keyDown(keyWeaponsSelect) && (Game_currentWeaponState & firstShotTaken)==0)
 	{
 		Game_changeMode(gameMode_WeaponSelect);
 		return;

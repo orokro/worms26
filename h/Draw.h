@@ -24,8 +24,22 @@ extern unsigned long healthMasks[16][18];
 // This is the new RAM buffer (takes 0 bytes of ROM space)
 extern unsigned short spr_weapons_flipped[NUM_WEAPONS][11];
 
+// if the user fired a gun-type weapon we should draw a line on screen for a frame
+extern short shot_sx;
+extern short shot_sy;
+extern short shot_ex;
+extern short shot_ey;
+extern char shot_active;
+
 // draw function prototypes
 
+/**
+ * @brief converts world coordinates to screen coordinates
+ * 
+ * @param x a pointer reference to the x value to change to screen coordinates
+ * @param y a pointer reference to the y value to change to screen coordinates
+ * @return a char boolean either TRUE or FALSE if the coordinates are roughly on screen
+*/
 extern char worldToScreen(short *x, short *y);
 
 
@@ -101,5 +115,16 @@ extern void Draw_healthSprite(short index);
  * Renders the sprite to use for team health bar
 */
 extern void Draw_renderTeamHealth();
+
+
+/**
+ * @brief Sets up the shot ray coordinates for drawing
+ * 
+ * @param sx - start x
+ * @param sy - start y
+ * @param ex - end x
+ * @param ey - end y
+ */
+extern void Draw_setShotRay(short sx, short sy, short ex, short ey);
 
 #endif

@@ -38,9 +38,10 @@ typedef struct {
 } RaycastHit;
 
 // flags for current weapon state
-#define targetPicked 	0b00000001
-#define strikeLeft  	0b00000010
-#define firstShotTaken  0b00000100
+#define targetPicked 		0b00000001
+#define strikeLeft  		0b00000010
+#define firstShotTaken  	0b00000100
+#define keepAimDuringUse	0b00001000
 
 // Define Fixed Point precision (16.16)
 #define FP_SHIFT 16
@@ -57,11 +58,12 @@ typedef struct {
 #define gs_parachuteMode 	0b0000000010000000
 #define gs_bungeeActive 	0b0000000100000000
 #define gs_bungeeMode 		0b0000001000000000
-#define gs_team1Invisible 	0b0000010000000000
-#define gs_team2Invisible 	0b0000100000000000
-#define gs_team1Frozen 		0b0001000000000000
-#define gs_team2Frozen 		0b0010000000000000
-#define gs_lockTurnEnd 		0b0100000000000000
+#define gs_lockTurnEnd 		0b0000010000000000
+#define gs_team1Invisible 	0b0000100000000000
+#define gs_team2Invisible 	0b0001000000000000
+#define gs_team1Frozen 		0b0010000000000000
+#define gs_team2Frozen 		0b0100000000000000
+
 
 // game globals
 extern char Game_mode;
@@ -85,6 +87,7 @@ extern char Game_xMarkAllowedOverLand;
 extern char Game_turn;
 extern short Game_weapInventory[5][13];
 extern char Game_currentWeaponSelected;
+extern char Game_lastWeaponSelected;
 extern unsigned long Game_currentWeaponProperties;
 extern unsigned short Game_currentWeaponState;
 extern unsigned short Game_currentWeaponCharge;

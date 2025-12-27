@@ -41,6 +41,13 @@ unsigned long windSprites[3][3];
 unsigned long teamHealthSprites_light[3] = { 0, 0, 0 };
 unsigned long teamHealthSprites_dark[3] = { 0, 0, 0 };
 
+// for drawing shot rays
+short shot_sx = 0;
+short shot_sy = 0;
+short shot_ex = 0;
+short shot_ey = 0;
+char shot_active = FALSE;
+
 // flipped weapon sprites
 unsigned short spr_weapons_flipped[NUM_WEAPONS][11];
 
@@ -156,6 +163,9 @@ void Draw_renderGame()
 	// if a mark was picked with the cursor this will render it
 	drawCursorAndXSpot();
 	
+	// draw any shot rays if needed
+	drawShotRay();
+	
 	// Draw status bar messages
 	StatusBar_draw();
 
@@ -167,7 +177,7 @@ void Draw_renderGame()
 		drawSelectArrow();
 	
 	// extra stuff to draw if the worm has certain weapons selected
-	if(Game_currentWeaponSelected!=-1)
+	if(Game_currentWeaponSelected!=-1 || (Game_currentWeaponState &= keepAimDuringUse))
 		drawWeaponDetails();
 		
 	// for now, we will output a bunch of debug info on the screen

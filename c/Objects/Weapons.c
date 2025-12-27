@@ -776,7 +776,7 @@ void doRayCastShot(short dirX, short dirY)
 		short sx=spawnX, sy=spawnY, ex=hit.x, ey=hit.y;
 		worldToScreen(&sx, &sy);
 		worldToScreen(&ex, &ey);
-		GrayDrawClipLine2B(sx, sy, ex, ey, 3, lightPlane, darkPlane);
+		Draw_setShotRay(sx, sy, ex, ey);
 	}
 }
 
@@ -1464,12 +1464,18 @@ char Weapons_fire(short charge)
 		if(Game_currentWeaponSelected == WShotGun)
 		{
 			doRayCastShot(dirX, dirY);
+			Game_currentWeaponState |= firstShotTaken;
 			return TRUE;
 
 		}else{
+			// the weapon group that uses raycast allows guys to move while firing
+			Game_currentWeaponState |= keepAimDuringUse;
 
 			// other wise, we spawn an object too use as routine logic
 			Weapons_spawn(Game_currentWeaponSelected, spawnX, spawnY, 0, 0, 60);
+
+			// do one shot immediately
+			doRayCastShot(dirX, dirY);
 			return FALSE;
 		}
 		
@@ -1478,8 +1484,12 @@ char Weapons_fire(short charge)
 
 	if(Game_currentWeaponSelected==WFlameThrower)
 	{
+		// flame thrower lets use aim while firing
+		Game_currentWeaponState |= keepAimDuringUse;
+
+		// spawn null weapon to handle routine
 		Weapons_spawn(Game_currentWeaponSelected, spawnX, spawnY, 0, 0, 30);
-		return FALSE;
+		return TRUE;
 	}
 
 	// if it's a mele weapon we have a separate function for that

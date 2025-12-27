@@ -103,8 +103,8 @@ static void WormSelect_enter()
 	Game_stateFlags &= ~(Game_currentTeam==0 ? gs_team1Invisible : gs_team2Invisible);
 
 	// Clear rest of turn-specific flags from last turn
-	Game_stateFlags &= ~0b0000001111111111;
-	
+	Game_stateFlags &= ~0b0000011111111111;
+						
 	// show current team on status bar message
 	sprintf(buffer, "%s's Turn", Match_teamNames[(short)Game_currentTeam]);
 	StatusBar_showMessage(buffer);
@@ -113,6 +113,7 @@ static void WormSelect_enter()
 	// for debug / sanity check
 	Game_currentWeaponSelected = -1;
 	Game_currentWeaponProperties = 0;
+	Game_currentWeaponState = 0;
 	
 	// pick a new wind speed:
 	Game_wind = -16+random(32);

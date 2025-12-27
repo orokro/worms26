@@ -10,6 +10,38 @@
 
 
 /**
+ * @brief Draws the shot ray for gun-type weapons
+ */
+void drawShotRay(){
+	
+	// gtfo if no shot to draw
+	if(shot_active==FALSE)
+		return;
+	shot_active=FALSE;
+
+	GrayDrawClipLine2B(shot_sx, shot_sy, shot_ex, shot_ey, 3, lightPlane, darkPlane);
+}
+
+
+/**
+ * @brief Sets up the shot ray coordinates for drawing
+ * 
+ * @param sx - start x
+ * @param sy - start y
+ * @param ex - end x
+ * @param ey - end y
+ */
+extern void Draw_setShotRay(short sx, short sy, short ex, short ey)
+{
+	shot_ex = ex;
+	shot_ey = ey;
+	shot_sx = sx;
+	shot_sy = sy;
+	shot_active = TRUE;
+}
+
+
+/**
  * Draws the X picked in arrow mode
  */
 void drawCursorAndXSpot()
@@ -210,12 +242,14 @@ void drawWeaponDetails()
 	// the center is slightly off center
 	if(facingLeft)
 		wormX-=4;
-			
+
 	// if the weapon requires aiming or charge
 	if(
 		(Game_currentWeaponProperties & usesAim)
 		||
 		(Game_currentWeaponProperties & usesCharge)
+		||
+		(Game_currentWeaponState &= keepAimDuringUse)
 		)
 	{
 	
@@ -330,11 +364,15 @@ void drawWeaponDetails()
 		
 	}// end if uses aim or charge
 	
+
+	// if the current weapon is -1, 
 	// if the weapon needs to draw itself being held, do that now
 	if(Game_currentWeaponProperties & holdsSelf)
 	{
+		// for guns, they get consumed on use, but we still want to draw them because they can aim while firing
+		const short weaponToDraw = (Game_currentWeaponSelected==-1) ? Game_lastWeaponSelected : Game_currentWeaponSelected;
 
-		const unsigned short* heldSprite = facingLeft ? spr_weapons_flipped[(short)Game_currentWeaponSelected] : spr_weapons[(short)Game_currentWeaponSelected];
+		const unsigned short* heldSprite = facingLeft ? spr_weapons_flipped[(short)weaponToDraw] : spr_weapons[(short)weaponToDraw];
 		short wx = facingLeft ? wormX-14 : wormX+2;
 		short wy = wormY-5;
 		worldToScreen(&wx, &wy);

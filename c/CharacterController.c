@@ -124,6 +124,26 @@ void wormWalk()
 
 
 /**
+ * @brief Adjusts aim for weapons that require it
+ * 
+ */
+void adjustAim(){
+
+	// if uses aim we should let them press up and down
+	if (Keys_keyState(keyUp))
+		Game_aimAngle++;
+	else if (Keys_keyState(keyDown))
+		Game_aimAngle--;
+
+	// bound check
+	if (Game_aimAngle <= 0)
+		Game_aimAngle = 0;
+	else if (Game_aimAngle > 18)
+		Game_aimAngle = 18;
+}
+
+
+/**
  * This method handles weapon-specific logic if a weapon is currently selected
  */
 void wormWeapon()
@@ -214,21 +234,6 @@ void wormWeapon()
 		return;
 	}
 
-	// if uses aim we should let them press up and down
-	if (Game_currentWeaponProperties & usesAim)
-	{
-		if (Keys_keyState(keyUp))
-			Game_aimAngle++;
-		else if (Keys_keyState(keyDown))
-			Game_aimAngle--;
-
-		// bound check
-		if (Game_aimAngle <= 0)
-			Game_aimAngle = 0;
-		else if (Game_aimAngle > 18)
-			Game_aimAngle = 18;
-	}
-
 	// if this weapon uses charge
 	if (Game_currentWeaponProperties & usesCharge)
 	{
@@ -312,6 +317,10 @@ void CharacterController_update()
 	if (Game_currentWeaponSelected != -1)
 		wormWeapon();
 
+	// separate from our other controls, if weapons use aim, handle those inputs:
+	if ((Game_currentWeaponProperties & usesAim) || (Game_currentWeaponState & keepAimDuringUse))
+		adjustAim();
+
 	// TO-DO: implement parachute, bungee, and ninja rope
 }
 
@@ -327,6 +336,8 @@ void CharacterController_weaponConsumed(char noEndTurn){
 	Match_teamWeapons[(short)Game_currentTeam][(short)Game_currentWeaponSelected]--;
 
 	// reset current weapon selection
+	if(Game_currentWeaponSelected!=-1)
+		Game_lastWeaponSelected = Game_currentWeaponSelected;
 	Game_currentWeaponSelected = -1;
 
 	// gtfo if turn ending is disabled
