@@ -45,10 +45,10 @@ void Draw_pauseMenuWormCounter(short yPos, short teamIndex)
 	for(i=0; i<liveCount; i++)
 	{
 		x-=9;
-		ClipSprite16_AND_R(x, yPos, 13, spr_WormRight_Mask, darkPlane);
-		ClipSprite16_AND_R(x, yPos, 13, spr_WormRight_Mask, lightPlane);
-		ClipSprite16_OR_R(x, yPos, 13, spr_WormRight_Outline, darkPlane);
-		ClipSprite16_OR_R(x, yPos, 13, spr_WormRight_Outline, lightPlane);
+		ClipSprite16_AND_R(x, yPos, 13, wormsSprites[WORM_IDLE_MASK], darkPlane);
+		ClipSprite16_AND_R(x, yPos, 13, wormsSprites[WORM_IDLE_MASK], lightPlane);
+		ClipSprite16_OR_R(x, yPos, 13, wormsSprites[WORM_IDLE_LIGHT], darkPlane);
+		ClipSprite16_OR_R(x, yPos, 13, wormsSprites[WORM_IDLE_LIGHT], lightPlane);
 	}// next i
 }
 

@@ -109,60 +109,6 @@ extern const unsigned long spr_WindMeter[];
 
 extern const unsigned long spr_WindMeter_Mask[];
 
-extern const unsigned short spr_WormFlip1_Left_Mask[];
-
-extern const unsigned short spr_WormFlip1_Left_Outline[];
-
-extern const unsigned short spr_WormFlip1_Right_Mask[];
-
-extern const unsigned short spr_WormFlip1_Right_Outline[];
-
-extern const unsigned short spr_WormFlip2_Left_Mask[];
-
-extern const unsigned short spr_WormFlip2_Left_Outline[];
-
-extern const unsigned short spr_WormFlip2_Right_Mask[];
-
-extern const unsigned short spr_WormFlip2_Right_Outline[];
-
-extern const unsigned short spr_WormFlip3_Left_Mask[];
-
-extern const unsigned short spr_WormFlip3_Left_Outline[];
-
-extern const unsigned short spr_WormFlip3_Right_Mask[];
-
-extern const unsigned short spr_WormFlip3_Right_Outline[];
-
-extern const unsigned short spr_WormFlip4_Left_Mask[];
-
-extern const unsigned short spr_WormFlip4_Left_Outline[];
-
-extern const unsigned short spr_WormFlip4_Right_Mask[];
-
-extern const unsigned short spr_WormFlip4_Right_Outline[];
-
-extern const unsigned short spr_WormFrozenDark[];
-
-extern const unsigned short spr_WormFrozenLight[];
-
-extern const unsigned short spr_WormFrozenMask[];
-
-extern const unsigned short spr_WormJump_Left_Mask[];
-
-extern const unsigned short spr_WormJump_Left_Outline[];
-
-extern const unsigned short spr_WormJump_Right_Mask[];
-
-extern const unsigned short spr_WormJump_Right_Outline[];
-
-extern const unsigned short spr_WormLeft_Mask[];
-
-extern const unsigned short spr_WormLeft_Outline[];
-
-extern const unsigned short spr_WormRight_Mask[];
-
-extern const unsigned short spr_WormRight_Outline[];
-
 extern const unsigned char spr_XSpot[];
 
 extern const unsigned char spr_XSpotMask[];

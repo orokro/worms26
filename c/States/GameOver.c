@@ -54,8 +54,8 @@ void drawGameOverTeam(short yPos, short teamIndex)
     {
         // 1. DEFAULT STATE (Standing)
         // Point to the standard "standing" sprite data by default
-        const void* currentMask = spr_WormRight_Mask;
-        const void* currentOutline = spr_WormRight_Outline;
+        const void* currentMask = wormsSprites[WORM_IDLE_MASK];
+        const void* currentOutline = wormsSprites[WORM_IDLE_LIGHT];
         short currentHeight = 13;
         short currentY = yPos;
 
@@ -71,8 +71,8 @@ void drawGameOverTeam(short yPos, short teamIndex)
             // Adjust '3' to '5' if you want them to stay in the air longer.
             if(cycleTime < 6)
             {
-                currentMask = spr_WormFlip1_Right_Mask;
-                currentOutline = spr_WormFlip1_Right_Outline;
+                currentMask = wormsSprites[WORM_BACKFLIP1_MASK];
+                currentOutline = wormsSprites[WORM_BACKFLIP1_LIGHT];
                 currentHeight = 17;
                 
                 // Move the sprite UP by 4 pixels to simulate the jump height
