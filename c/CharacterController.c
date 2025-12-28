@@ -355,18 +355,6 @@ void wormParachute()
         // Skip standard walk logic
         return; 
     }
-
-	// if the worm is grounded, we should test for walking:
-	if (Worm_onGround & wormMask)
-		wormWalk();
-
-	// if the user has a weapon selected and check for first-frames of keyDown
-	if (Game_currentWeaponSelected != -1)
-		wormWeapon();
-
-	// separate from our other controls, if weapons use aim, handle those inputs:
-	if ((Game_currentWeaponProperties & usesAim) || (Game_currentWeaponState & keepAimDuringUse))
-		adjustAim();
 }
 
 
@@ -413,6 +401,18 @@ void CharacterController_update()
 	// handle parachute logic
     wormParachute();
     
+	// if the worm is grounded, we should test for walking:
+	if (Worm_onGround & wormMask)
+		wormWalk();
+
+	// if the user has a weapon selected and check for first-frames of keyDown
+	if (Game_currentWeaponSelected != -1)
+		wormWeapon();
+
+	// separate from our other controls, if weapons use aim, handle those inputs:
+	if ((Game_currentWeaponProperties & usesAim) || (Game_currentWeaponState & keepAimDuringUse))
+		adjustAim();
+		
 	// TO-DO: implement bungee, and ninja rope
 }
 
