@@ -1406,7 +1406,7 @@ void Weapons_update()
 				if(Weapon_type[i] == WAirMole)
 				{
 					// gravity
-					if(Weapon_yVelo[i] < 10)
+					if(Weapon_yVelo[i] < 3)
 						Weapon_yVelo[i]++;
 					
 					// move
