@@ -792,7 +792,7 @@ void doRayCastShot(short dirX, short dirY)
 		short sx=spawnX, sy=spawnY, ex=hit.x, ey=hit.y;
 		worldToScreen(&sx, &sy);
 		worldToScreen(&ex, &ey);
-		Draw_setShotRay(sx, sy, ex, ey);
+		Draw_setRayLine(sx, sy, ex, ey);
 	}
 }
 

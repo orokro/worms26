@@ -7,17 +7,6 @@
 
 	This file handles all input for moving the worm, as well as actually moving the worm.
 
-	The worm can be moved in various ways:
-		- Walking left/right
-		- Jumping forward
-		- Backfliping
-		- Ninja rope
-		- Bungee cord
-		- Parachute
-		- Jet pack
-
-	We will handle all of them in here...
-
 	C Source File
 	Created 11/22/2017; 2:56:22 AM
 */
@@ -34,7 +23,7 @@
 #include "Camera.h"
 #include "Match.h"
 #include "StatusBar.h"
-#include "Worms.h"
+#include "Draw.h"
 
 // local defines: the max slope a worm can walk up:
 #define MAX_WORM_SLOPE 6
@@ -45,11 +34,22 @@ short *wX, *wY;
 unsigned short wormMask = 0;
 static char parachuteLatch = 0;
 
+// Bungee vars
+static short lastGroundX = 0;
+static short lastGroundY = 0;
+static short ungroundedTimer = 0;
+static char bungeeLatch = 0;
+
 /**
  * Handles moving the worm in the character controller, if its on the ground.
  */
 void wormWalk()
 {
+	// Update last ground position if on ground
+    lastGroundX = *wX;
+    lastGroundY = *wY;
+    ungroundedTimer = 0;
+
 	// test keys for a possible direction to walk
 	char moveDir = 0;
 
@@ -104,8 +104,6 @@ void wormWalk()
 		Worm_dir &= ~wormMask;
 
 	// worms can't move up slops steeper than MAX_WORM_SLOPE pixels.
-	// lets test pixels to the left or right +MAX_WORM_SLOPE pixels higher
-	// if we find land, can't move
 	if (Map_testPoint((*wX) + moveDir, (*wY) - MAX_WORM_SLOPE) == FALSE)
 	{
 		// so the map position is free, now lets move down till we hit land:
@@ -196,8 +194,6 @@ void wormWeapon()
 				break;
 
 			case WSelectWorm:
-				// hackish but works, decrease turn and flip time, so
-				// the state machine puts them back
 				Game_turn--;
 				Game_currentTeam = (Game_currentTeam==1 ? 0 : 1);
 				Game_changeMode(gameMode_WormSelect);
@@ -217,35 +213,23 @@ void wormWeapon()
 
 		// handle clean up logic
 		CharacterController_weaponConsumed(FALSE);
-
-		// GTFO so we don't spawn a null weapon
 		return;
 	}
 
-	// if the weapon has usesCursor and we haven't picked a spot yet, we should goto cursor mode
 	if ((Game_currentWeaponProperties & usesCursor) && (Game_currentWeaponState & targetPicked) == 0)
 	{
-		// prevent land x-marks if the weapon forbids it
 		Game_xMarkAllowedOverLand = !(Game_currentWeaponSelected==WTeleport);
-
-		// if action was pressed, place the x-mark
 		if (Keys_keyUp(keyAction))
 			Game_changeMode(gameMode_Cursor);
-
-		// no need to continue
 		return;
 	}
 
-	// if this weapon uses charge
 	if (Game_currentWeaponProperties & usesCharge)
 	{
-		// if the action key was let go we should fire the weapon at it's current charge, reset charge and exit
 		if (Keys_keyUp(keyAction))
 		{
 			const char shouldConsumeWeapon = Weapons_fire(Game_currentWeaponCharge);
 			Game_currentWeaponCharge = 0;
-
-			// consume the weapon
 			if(shouldConsumeWeapon && Game_weaponUsesRemaining==-1)
 				CharacterController_weaponConsumed(FALSE);
 		}
@@ -258,19 +242,14 @@ void wormWeapon()
 	}
 	else
 	{
-		// if 2nd was pressed, activate weapon
 		if (Keys_keyUp(keyAction))
 		{
 			const char shouldConsumeWeapon = Weapons_fire(Game_currentWeaponCharge);
 			Game_currentWeaponCharge = 0;
-
-			// consume the weapon
 			if(shouldConsumeWeapon && Game_weaponUsesRemaining==-1)
 				CharacterController_weaponConsumed(FALSE);
-
-		} // end if action was pressed
-
-	} // end if uses charge
+		} 
+	}
 }
 
 
@@ -287,28 +266,22 @@ void wormParachute()
     // Toggle Logic
     if(!(Worm_onGround & wormMask)) 
     {
-        // Deploy if either it's already "Active" (equipped) OR if it's currently selected in the menu
         if((Game_stateFlags & gs_parachuteActive) || (Game_currentWeaponSelected == WParachute))
         {
             if(Keys_keyState(keyAction)) {
                 if(!parachuteLatch) {
-                    parachuteLatch = 1; // Latch to prevent repeat
+                    parachuteLatch = 1; 
 
                     if(Game_stateFlags & gs_parachuteMode) {
-                        // Deactivate
                         Game_stateFlags &= ~gs_parachuteMode;
                     } else {
-                        // Activate
                         Game_stateFlags |= gs_parachuteMode;
-                        // Kill momentum immediately
                         Worm_xVelo[(short)Worm_currentWorm] = 0;
                         Worm_yVelo[(short)Worm_currentWorm] = 0;
 
-                        // If we deployed by using the selected weapon, consume it now
                         if(Game_currentWeaponSelected == WParachute) {
-                            // Mark as active so we can toggle it off later (since we lose selection)
                             Game_stateFlags |= gs_parachuteActive;
-                            CharacterController_weaponConsumed(TRUE); // TRUE = don't end turn
+                            CharacterController_weaponConsumed(TRUE); 
                         }
                     }
                 }
@@ -321,121 +294,159 @@ void wormParachute()
     // Flight Logic
     if(Game_stateFlags & gs_parachuteMode)
     {
-        // FORCE UNSETTLED
-        // The parachute velocity is low (0 or 1), which causes the physics engine to mark us as "Settled/Grounded"
-        // after a few frames. We must prevent this to stay airborne.
         Worm_physObj[(short)Worm_currentWorm].staticFrames = 0;
         Worm_settled &= ~wormMask;
 
-        // 1. Steering
         if(Keys_keyState(keyLeft)) {
             Worm_xVelo[(short)Worm_currentWorm] = -1;
-            Worm_dir |= wormMask; // Face Left
+            Worm_dir |= wormMask; 
         } else if(Keys_keyState(keyRight)) {
             Worm_xVelo[(short)Worm_currentWorm] = 1;
-            Worm_dir &= ~wormMask; // Face Right
+            Worm_dir &= ~wormMask; 
         } else {
             Worm_xVelo[(short)Worm_currentWorm] = 0;
         }
 
-        // 2. Wind Influence (every 4th frame add wind direction?)
-        // Or just add constant drift.
-        // Game_wind is char (-10 to 10 maybe?).
-        // Let's just add a small drift if not steering.
         if(Worm_xVelo[(short)Worm_currentWorm] == 0 && Game_wind != 0 && (Game_timer % 4 == 0)) {
             Worm_xVelo[(short)Worm_currentWorm] = (Game_wind > 0) ? 1 : -1;
         }
 
-        // 3. Constant Fall Speed (avg 0.5 px/frame)
-        // Worm_update increments yVelo (gravity) at start of frame.
-        // If we set -1 -> becomes 0 -> move 0.
-        // If we set 0 -> becomes 1 -> move 1.
         Worm_yVelo[(short)Worm_currentWorm] = (Game_timer % 2 == 0) ? -1 : 0;
-
-        // Skip standard walk logic
-        return; 
     }
 }
 
+/**
+ * @brief Handles Bungee logic
+ */
+void wormBungee()
+{
+    if(Game_stateFlags & gs_bungeeActive)
+    {
+        if(Worm_onGround & wormMask) {
+            if(Game_stateFlags & gs_bungeeMode) {
+                 Game_stateFlags &= ~gs_bungeeMode; 
+            }
+            lastGroundX = *wX;
+            lastGroundY = *wY;
+            ungroundedTimer = 0;
+        } 
+        else if(!(Game_stateFlags & gs_bungeeMode))
+        {
+            ungroundedTimer++;
+            if(ungroundedTimer == 3) 
+            {
+                RaycastHit hit = Game_raycast(*wX, *wY, 0, 1, FALSE);
+                short dist = hit.y - *wY;
+                if(hit.hitType == RAY_HIT_NOTHING || dist > 30) {
+                    Game_stateFlags |= gs_bungeeMode;
+                }
+            }
+        }
+    }
 
-// --------------------------------------------------------------------------------------------------------------------------------------
+    if(Game_stateFlags & gs_bungeeMode)
+    {
+        if(Keys_keyState(keyAction)) {
+            if(!bungeeLatch) {
+                bungeeLatch = 1;
+                Game_stateFlags &= ~gs_bungeeMode;
+                Worm_yVelo[(short)Worm_currentWorm] = -4; 
+                return;
+            }
+        } else {
+            bungeeLatch = 0;
+        }
 
+        Worm_physObj[(short)Worm_currentWorm].staticFrames = 0;
+        Worm_settled &= ~wormMask;
 
+        Draw_setRayLine(lastGroundX, lastGroundY, *wX, *wY);
+
+        long dx = (long)*wX - lastGroundX;
+        long dy = (long)*wY - lastGroundY;
+        long distSq = dx*dx + dy*dy;
+        long maxLenSq = 30L * 30L;
+
+        if(distSq > maxLenSq)
+        {
+            float d = sqrt((float)distSq);
+            float ratio = 30.0f / d;
+            
+            *wX = lastGroundX + (short)(dx * ratio);
+            *wY = lastGroundY + (short)(dy * ratio);
+            
+            float nx = dx / d;
+            float ny = dy / d;
+            float vx = (float)Worm_xVelo[(short)Worm_currentWorm];
+            float vy = (float)Worm_yVelo[(short)Worm_currentWorm];
+            float dot = vx * nx + vy * ny;
+            
+            if(dot > 0) {
+                float bounce = 0.5f; 
+                float impulse = (1.0f + bounce) * dot;
+                vx -= impulse * nx;
+                vy -= impulse * ny;
+                Worm_xVelo[(short)Worm_currentWorm] = (char)vx;
+                Worm_yVelo[(short)Worm_currentWorm] = (char)vy;
+            }
+        }
+
+        if(Keys_keyState(keyLeft)) {
+            Worm_xVelo[(short)Worm_currentWorm] -= 1;
+        } else if(Keys_keyState(keyRight)) {
+            Worm_xVelo[(short)Worm_currentWorm] += 1;
+        }
+    }
+}
 
 /**
  * @brief Initiates a backflip for the current worm
- * 
  */
 void CharacterController_doBackflip()
 {
 	Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], ((Worm_dir & wormMask) ? 1 : -1), -6, FALSE, TRUE);
-
-	// Set Animation State
 	Game_wormAnimState = ANIM_BACKFLIP;
 	Game_wormAnimTimer = 0;
 	Game_wormFlipStartDir = (Worm_dir & wormMask);
 }
-
 
 /**
  * handles all update frames for controlling worms in the turn game mode
  */
 void CharacterController_update()
 {
-	// if the camera is being controlled, no need to control the character
 	if (Keys_keyState(keyCameraControl))
 		return;
 
-	// worm mask...
-	wormMask = 1;
-	wormMask = (unsigned short)((unsigned short)wormMask << (Worm_currentWorm));
-
-	// save references to our pos
+	wormMask = (unsigned short)1 << (Worm_currentWorm);
 	wX = &Worm_x[(short)Worm_currentWorm];
 	wY = &Worm_y[(short)Worm_currentWorm];
 
-	// ignore controls if a sheep is in action
 	if(Weapon_superSheepDir != SHEEP_INACTIVE)
 		return;
 
-	// handle parachute logic
     wormParachute();
+    wormBungee();
     
-	// if the worm is grounded, we should test for walking:
 	if (Worm_onGround & wormMask)
 		wormWalk();
 
-	// if the user has a weapon selected and check for first-frames of keyDown
 	if (Game_currentWeaponSelected != -1)
 		wormWeapon();
 
-	// separate from our other controls, if weapons use aim, handle those inputs:
 	if ((Game_currentWeaponProperties & usesAim) || (Game_currentWeaponState & keepAimDuringUse))
 		adjustAim();
-		
-	// TO-DO: implement bungee, and ninja rope
 }
-
 
 /**
  * @brief handles clean up after weapon has been decidedly used
- * 
- * @param noEndTurn - if set to 1, do not end the turn after weapon use
  */
 void CharacterController_weaponConsumed(char noEndTurn){
-
-	// decrement the stock of the current weapon
 	Match_teamWeapons[(short)Game_currentTeam][(short)Game_currentWeaponSelected]--;
-
-	// reset current weapon selection
 	if(Game_currentWeaponSelected!=-1)
 		Game_lastWeaponSelected = Game_currentWeaponSelected;
 	Game_currentWeaponSelected = -1;
-
-	// gtfo if turn ending is disabled
 	if(noEndTurn || (Game_currentWeaponProperties & doesntEndTurn))
 		return;
-		
-	// end turn because we fired a weapon
 	Game_changeMode(gameMode_TurnEnd);
 }

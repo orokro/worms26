@@ -41,12 +41,12 @@ unsigned long windSprites[3][3];
 unsigned long teamHealthSprites_light[3] = { 0, 0, 0 };
 unsigned long teamHealthSprites_dark[3] = { 0, 0, 0 };
 
-// for drawing shot rays
-short shot_sx = 0;
-short shot_sy = 0;
-short shot_ex = 0;
-short shot_ey = 0;
-char shot_active = FALSE;
+// for drawing rays (gunshots, bungee, etc)
+short ray_sx = 0;
+short ray_sy = 0;
+short ray_ex = 0;
+short ray_ey = 0;
+char ray_active = FALSE;
 
 // flipped weapon sprites
 unsigned short spr_weapons_flipped[NUM_WEAPONS][11];
@@ -168,7 +168,7 @@ void Draw_renderGame()
 	drawCursorAndXSpot();
 	
 	// draw any shot rays if needed
-	drawShotRay();
+	Draw_renderRayLine();
 
 	// Draw status bar messages
 	StatusBar_draw();

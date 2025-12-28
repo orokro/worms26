@@ -29,11 +29,11 @@ extern unsigned short* wormsSpritesFlipped[NUM_WORM_SPRITES];
 extern unsigned short wormFlipBuffer[WORM_FLIP_BUFFER_SIZE];
 
 // if the user fired a gun-type weapon we should draw a line on screen for a frame
-extern short shot_sx;
-extern short shot_sy;
-extern short shot_ex;
-extern short shot_ey;
-extern char shot_active;
+extern short ray_sx;
+extern short ray_sy;
+extern short ray_ex;
+extern short ray_ey;
+extern char ray_active;
 
 // draw function prototypes
 
@@ -122,13 +122,13 @@ extern void Draw_renderTeamHealth();
 
 
 /**
- * @brief Sets up the shot ray coordinates for drawing
+ * @brief Sets up the ray coordinates for drawing
  * 
  * @param sx - start x
  * @param sy - start y
  * @param ex - end x
  * @param ey - end y
  */
-extern void Draw_setShotRay(short sx, short sy, short ex, short ey);
+extern void Draw_setRayLine(short sx, short sy, short ex, short ey);
 
 #endif

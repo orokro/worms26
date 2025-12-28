@@ -10,34 +10,37 @@
 
 
 /**
- * @brief Draws the shot ray for gun-type weapons
+ * @brief Draws the ray for gun-type weapons or bungee
  */
-void drawShotRay(){
+void Draw_renderRayLine(){
 	
 	// gtfo if no shot to draw
-	if(shot_active==FALSE)
+	if(ray_active==FALSE)
 		return;
-	shot_active=FALSE;
+	
+	// Only clear if it's NOT a bungee (which needs to persist/update every frame manually)
+	// Actually, bungee logic will call SetRayLine every frame, so we can clear it here.
+	ray_active=FALSE;
 
-	GrayDrawClipLine2B(shot_sx, shot_sy, shot_ex, shot_ey, 3, lightPlane, darkPlane);
+	GrayDrawClipLine2B(ray_sx, ray_sy, ray_ex, ray_ey, 3, lightPlane, darkPlane);
 }
 
 
 /**
- * @brief Sets up the shot ray coordinates for drawing
+ * @brief Sets up the ray coordinates for drawing
  * 
  * @param sx - start x
  * @param sy - start y
  * @param ex - end x
  * @param ey - end y
  */
-extern void Draw_setShotRay(short sx, short sy, short ex, short ey)
+extern void Draw_setRayLine(short sx, short sy, short ex, short ey)
 {
-	shot_ex = ex;
-	shot_ey = ey;
-	shot_sx = sx;
-	shot_sy = sy;
-	shot_active = TRUE;
+	ray_ex = ex;
+	ray_ey = ey;
+	ray_sx = sx;
+	ray_sy = sy;
+	ray_active = TRUE;
 }
 
 
