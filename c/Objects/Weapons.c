@@ -1027,6 +1027,27 @@ void Weapons_detonateWeapon(short index)
 		return;
 	}
 
+	// if it's a WMole, instead of exploding, replace it with a WMole2 with an upward velocity
+	if(weaponType == WMole)
+	{
+		short mole2Index = Weapons_spawn(WAirMole, Weapon_x[index], Weapon_y[index], 0, -5, 60);
+
+		// set it to face the same way as the original mole and give it x velocity in the same direction
+		if(Weapon_facing & (unsigned short)1<<(index))
+		{
+			Weapon_facing |= (unsigned short)1<<(mole2Index);
+			Weapon_xVelo[mole2Index] = -3;
+		}
+		else
+		{
+			Weapon_facing &= ~((unsigned short)1<<(mole2Index));
+			Weapon_xVelo[mole2Index] = 3;
+		}
+
+		Camera_focusOn(&Weapon_x[mole2Index], &Weapon_y[mole2Index]);
+		return;
+	}
+
 	// Longbow: Stick to map if hit map, else just disappear (worm hit)
 	if(weaponType == WLongbow)
 	{
@@ -1748,6 +1769,15 @@ void Weapons_drawAll()
 					{
 						case WLongbow:
 							drawArrow(i, screenX, screenY);
+							break;
+
+						case WAirMole:
+							{
+								short spriteIndex = (Weapon_yVelo[i] < 0) ? 72 : 73;
+								const unsigned short* moleSprite = facingLeft ? spr_weapons_flipped[spriteIndex] : spr_weapons[spriteIndex];
+								ClipSprite16_OR_R(screenX-2, screenY-2, 11, moleSprite, lightPlane);
+								ClipSprite16_OR_R(screenX-2, screenY-2, 11, moleSprite, darkPlane);
+							}
 							break;
 
 						case WMBBomb:
