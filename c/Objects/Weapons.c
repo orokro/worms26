@@ -332,7 +332,7 @@ unsigned long Weapon_props[72] = {
         usesAim | usesFuse | usesCharge | usesPhysics | holdsSelf | spawnsSelf,
         
 		// skunk
-        spawnsSelf | usesFuse | isAnimal | usesJumping | usesPhysics | holdsSelf,
+        spawnsSelf | usesFuse | isAnimal | usesJumping | usesPhysics | holdsSelf | usesRoutine,
         
 		// old lady
         spawnsSelf | isAnimal | usesPhysics | usesFuse | holdsSelf,
@@ -472,7 +472,7 @@ unsigned long Weapon_props[72] = {
         usesPhysics | usesDetonateOnImpact | usesFuse | spawnsSelf | usesWind | usesConstantGravity,
         
 		// skunk gas
-        isParticle | usesFuse | spawnsSelf | usesWind | usesConstantGravity,
+        isParticle | usesFuse | spawnsSelf | usesDetonateOnImpact | usesRoutine,
         
 		// comet from armageddon
         usesPhysics | usesDetonateOnImpact | spawnsSelf | usesPhysics,
@@ -810,6 +810,26 @@ void doWeaponRoutine(short index, unsigned short props)
 			Worm_y[(short)Worm_currentWorm] = Weapon_y[index];
 			break;
 
+		case WSkunk:
+			if (Weapon_time[index] % 8 == 0) {
+				// Spawn gas behind the skunk
+				short spawnX = Weapon_x[index] + ((Weapon_facing & weaponMask) ? 5 : -5);
+				short spawnY = Weapon_y[index] - 3; // Slightly above
+				Weapons_spawn(WSkunkGas, spawnX, spawnY, 0, 0, 90); // 90 frame fuse
+			}
+			break;
+
+		case WSkunkGas:
+			if (Game_timer % 3 == 0) {
+				Weapon_y[index]--; // Move up 1 pixel
+			}
+			if (Game_wind > 0) {
+				Weapon_x[index]++; // Move with wind (1 pixel)
+			} else if (Game_wind < 0) {
+				Weapon_x[index]--; // Move against wind (1 pixel)
+			}
+			break;
+
 		case WHandGun:
 		case WUzi:
 		case WMiniGun:
@@ -962,17 +982,17 @@ void Weapons_detonateWeapon(short index)
 {
 	const short weaponType = Weapon_type[index];
 	
-	// no longer active, only the concrete donkey stays active until its OOB
+	// Deactivate the weapon by default unless a special case keeps it active (e.g., WConcreteDonkey)
 	if(weaponType != WConcreteDonkey)
 		Weapon_active &= ~((unsigned short)1<<(index));
 
-	// if it's concrete donkey, make a big explosion and focus on donkey
+	// Handle special cases that should NOT explode or should have custom explosions/behavior
 	if(weaponType == WConcreteDonkey)
 	{
 		Explosion_spawn(Weapon_x[index], Weapon_y[index]+1, 15, 10, TRUE);
 		Camera_focusOn(&Weapon_x[index], &Weapon_y[index]);
 		Weapon_yVelo[index]=-12;
-		return;
+		return; // Concrete Donkey handles its own deactivation (when OOB)
 	}
 
 	if(weaponType == WMBBomb)
@@ -981,15 +1001,13 @@ void Weapons_detonateWeapon(short index)
 		return;
 	}
 
-	// if dragon ball or noRender type, just despawn
-	if(weaponType == WDragonBall || (Weapon_props[weaponType] & noRender))
+	// If dragon ball, noRender type, or particle type, just despawn without explosion
+	if(weaponType == WDragonBall || (Weapon_props[weaponType] & noRender) || (Weapon_props[weaponType] & isParticle))
 	{
-		// focus back on current worm
-		Weapon_active &= ~((unsigned short)1<<(index));
-		return;
+		return; // Already deactivated at the top
 	}
 
-	// if kamikaze, explode and kill worm
+	// If kamikaze, explode and kill worm
 	if(weaponType == WKamikaze)
 	{
 		// kill the worm
@@ -1000,7 +1018,7 @@ void Weapons_detonateWeapon(short index)
 		return;
 	}
 
-	// for debug: always create an explosion for now
+	// Default: create an explosion
 	Explosion_spawn(Weapon_x[index], Weapon_y[index], 10, 10, TRUE);
 
 	// if this is a cluster weapon, spawn some cluster items

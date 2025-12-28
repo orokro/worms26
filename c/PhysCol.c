@@ -585,8 +585,9 @@ short Physics_checkWeapons(short wormIndex, unsigned short wormMask, PhysObj *ob
 		}
 		else if(Weapon_type[i] == WSkunkGas)
 		{
-			totalDamage += 3;
+			totalDamage += 1;
 			Worm_poisoned |= wormMask;
+			// WSkunkGas lingers, so it is not detonated on impact.
 		}
 
 		if((Weapon_props[(short)Weapon_type[i]] & usesDetonateOnImpact) != 0)
