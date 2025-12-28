@@ -115,6 +115,9 @@ static void WormSelect_enter()
 	Game_currentWeaponProperties = 0;
 	Game_currentWeaponState = 0;
 	
+	// no sheeps yet
+	Weapon_superSheepDir = SHEEP_INACTIVE;
+	
 	// pick a new wind speed:
 	Game_wind = -16+random(32);
 	

@@ -13,6 +13,12 @@
 
 #import "PhysCol.h"
 
+// defines
+#define SHEEP_INACTIVE -1
+#define SHEEP_RIGHT 0
+#define SHEEP_LEFT 1
+#define SHEEP_UP 2
+#define SHEEP_DOWN 3
 
 // Define bitmask flags for the types of properties a weapon can have:
 // when spawning a weapon, these can be ORed together to create it's logic
@@ -85,7 +91,7 @@ extern unsigned short Weapon_settled;
 extern short Weapon_targetX;
 extern short Weapon_targetY;
 extern char Weapon_aimPosList[10][2];
-
+extern char Weapon_superSheepDir;
 
 /*
 	there are currently 69 different types of weapon objects that can be on screen

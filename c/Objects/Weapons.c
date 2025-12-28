@@ -68,6 +68,9 @@
 */
 
 
+
+
+
 // includes
 #include "Main.h"
 #include "Camera.h"
@@ -116,6 +119,9 @@ short Weapon_targetY = 0;
 
 // global jump timer
 short Weapon_jumpTimer = 0;
+
+// current direction super sheep is going
+char Weapon_superSheepDir = SHEEP_UP;
 
 /*
 	Below is a list of relative points to a worm to use for rotating the target
@@ -401,7 +407,7 @@ unsigned long Weapon_props[75] = {
         0,
         
 		// super sheep
-        spawnsSelf | usesFuse | usesPhysics | isAnimal | usesJumping | holdsSelf | isDroppable | usesDetonation,
+        usesFuse | usesPhysics | isAnimal | usesJumping | holdsSelf | isDroppable | usesDetonation | spawnsSelf,
         
 		// mine strike
         usesCursor | spawnsSelf | usesAirStrike,
@@ -492,7 +498,7 @@ unsigned long Weapon_props[75] = {
 		usesRoutine | usesFuse | noRender,
 
 		// super sheep 2 - this is the second stage of the super sheep weapon
-		usesFuse | usesRoutine | usesDetonateOnImpact | customRender,
+		usesFuse | usesRoutine | usesDetonateOnImpact | usesPhysics | customRender,
 
 		// air mole - the mole that drops from the mole squadron or second stage of the mole weapon
 		usesRoutine | usesFuse | customRender | usesPhysics | usesDetonateOnImpact,
@@ -811,6 +817,41 @@ void doWeaponRoutine(short index, unsigned short props)
 
 	switch(Weapon_type[index]){
 
+		case WSuperSheep2:
+
+			switch(Weapon_superSheepDir){
+				case SHEEP_LEFT:
+					Weapon_x[index] -= 4;
+					break;
+
+				case SHEEP_RIGHT:
+					Weapon_x[index] += 4;
+					break;
+
+				case SHEEP_UP:
+					Weapon_y[index] -= 4;
+					break;
+
+				case SHEEP_DOWN:
+					Weapon_y[index] += 4;
+					break;
+			}
+
+			// we're using physics for collision but we want total control over the sheep
+			Weapon_xVelo[index] = 0;
+			Weapon_yVelo[index] = 0;
+
+			if(Keys_keyDown(keyLeft))
+				Weapon_superSheepDir = SHEEP_LEFT;			
+			else if(Keys_keyDown(keyRight))
+				Weapon_superSheepDir = SHEEP_RIGHT;			
+			else if(Keys_keyDown(keyUp))
+				Weapon_superSheepDir = SHEEP_UP;			
+			else if(Keys_keyDown(keyDown))
+				Weapon_superSheepDir = SHEEP_DOWN;
+			
+			break;
+
 		case WDragonBall:
 			Weapon_x[index] += (Weapon_facing & weaponMask) ? -5 : 5;
 			break;
@@ -1024,6 +1065,16 @@ void Weapons_detonateWeapon(short index)
 	{
 		Mines_spawnAt(Weapon_x[index], Weapon_y[index]);
 		Camera_focusOn(&Worm_x[(short)Worm_currentWorm], &Worm_y[(short)Worm_currentWorm]);
+		return;
+	}
+
+	// if it's a super sheep, instead of exploding, replace it with a super sheep 2
+	if(weaponType == WSuperSheep)
+	{
+		short sheep2Index = Weapons_spawn(WSuperSheep2, Weapon_x[index], Weapon_y[index]-5, 0, 0, 120);
+		Weapon_superSheepDir = SHEEP_UP;
+
+		Camera_focusOn(&Weapon_x[sheep2Index], &Weapon_y[sheep2Index]);
 		return;
 	}
 
@@ -1795,6 +1846,19 @@ void Weapons_drawAll()
 								const unsigned short* moleSprite = facingLeft ? spr_weapons_flipped[spriteIndex] : spr_weapons[spriteIndex];
 								ClipSprite16_OR_R(screenX-2, screenY-2, 11, moleSprite, lightPlane);
 								ClipSprite16_OR_R(screenX-2, screenY-2, 11, moleSprite, darkPlane);
+							}
+							break;
+
+						case WSuperSheep2:
+							{
+								const unsigned short* sprites[] = {
+									spr_weapons[44],
+									spr_weapons_flipped[44],
+									spr_weapons[74],
+									spr_weapons[75],
+								};
+								ClipSprite16_OR_R(screenX-2, screenY-2, 11, sprites[(short)Weapon_superSheepDir], lightPlane);
+								ClipSprite16_OR_R(screenX-2, screenY-2, 11, sprites[(short)Weapon_superSheepDir], darkPlane);
 							}
 							break;
 

@@ -309,6 +309,10 @@ void CharacterController_update()
 	wX = &Worm_x[(short)Worm_currentWorm];
 	wY = &Worm_y[(short)Worm_currentWorm];
 
+	// ignore controls if a sheep is in action
+	if(Weapon_superSheepDir != SHEEP_INACTIVE)
+		return;
+
 	// if the worm is grounded, we should test for walking:
 	if (Worm_onGround & wormMask)
 		wormWalk();
