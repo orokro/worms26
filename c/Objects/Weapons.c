@@ -1555,6 +1555,24 @@ char Weapons_fire(short charge)
 	// for now, we'll always default to a 3 second timer
 	short fuseLength = (6 * TIME_MULTIPLIER);
 	
+	// if it's the sheep launcher, spawn a sheep
+	if(Game_currentWeaponSelected == WSheepLauncher)
+	{
+		// finally spawn the weapon with it's params!
+		short spawnedWeaponIndex = Weapons_spawn(WSheep, spawnX, spawnY, veloX, veloY, fuseLength);
+
+		// if the spawned weapon is an animal, set its facing direction
+		// (WSheep has the isAnimal property)
+		if(Weapon_props[(short)WSheep] & isAnimal)
+		{
+			if(facingLeft)
+				Weapon_facing |= (unsigned short)1<<(spawnedWeaponIndex);
+			else
+				Weapon_facing &= ~((unsigned short)1<<(spawnedWeaponIndex));
+		}
+		return TRUE; // Consume the weapon and end the turn
+	}
+	
 	// finally spawn the weapon with it's params!
 	short spawnedWeaponIndex = Weapons_spawn(Game_currentWeaponSelected, spawnX, spawnY, veloX, veloY, fuseLength);
 
