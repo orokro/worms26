@@ -244,7 +244,7 @@ void wormWeapon()
 			Game_currentWeaponCharge = 0;
 
 			// consume the weapon
-			if(shouldConsumeWeapon)
+			if(shouldConsumeWeapon && Game_weaponUsesRemaining==-1)
 				CharacterController_weaponConsumed(FALSE);
 		}
 		else if (Keys_keyState(keyAction))
