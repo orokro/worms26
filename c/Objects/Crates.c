@@ -497,14 +497,14 @@ void Crates_pickUp(short index, short worm)
 
 		// give worm a tool
 		short toolIndex = toolIndices[random(NUM_TOOLS)];
-		Game_weapInventory[toolIndex][0]++;
+		Match_teamWeapons[(short)Game_currentTeam][toolIndex]++;
 		StatusBar_showMessage(weaponNames[toolIndex]);
 	}
 	else if(Crate_type[index]==crateWeapon)
 	{
 		// pick random index from 0-65
 		short weaponIndex = random(65);
-		Game_weapInventory[weaponIndex][0]++;
+		Match_teamWeapons[(short)Game_currentTeam][weaponIndex]++;
 		StatusBar_showMessage(weaponNames[weaponIndex]);
 	}
 }
