@@ -587,16 +587,6 @@ void Worm_drawAll()
                 {
                     spriteIdx = WORM_CHUTE_MASK;
                     useFlipped = (Worm_dir & wormMask) > 0;
-                    
-                    // Draw Parachute Sprite (Above worm)
-                    // Logic copied from Crates.c
-                    // screenX, screenY are worm positions.
-                    // Crate draws at screenX-6, screenY-16.
-                    // Worm draws at x=screenX-8, y=screenY-6.
-                    // We want parachute relative to worm center.
-                    // screenX is center-ish?
-                    ClipSprite16_MASK_R(screenX-6, screenY-16, 12, spr_Parachute+12, spr_Parachute, lightPlane);
-                    ClipSprite16_MASK_R(screenX-6, screenY-16, 12, spr_Parachute+24, spr_Parachute, darkPlane);
                 }
 
                 // ============================================================
@@ -700,6 +690,17 @@ void Worm_drawAll()
                      // (Drawn to dark plane UNLESS poisoned)
 					if(!(Worm_poisoned & wormMask)) {
 						ClipSprite16_OR_R(x, y, sprHeight, pDark, darkPlane);
+                    }
+
+                    // 4. Parachute Canopy (Draw on top of worm)
+                    if(i == Worm_currentWorm && (Game_stateFlags & gs_parachuteMode))
+                    {
+                        // Draw at screenX-8 (centered for 16px) and screenY-20 (above worm)
+                        // Use 12px height canopy
+                        ClipSprite16_AND_R(screenX-8, screenY-20, 12, spr_Parachute, darkPlane);
+                        ClipSprite16_AND_R(screenX-8, screenY-20, 12, spr_Parachute, lightPlane);
+                        ClipSprite16_OR_R(screenX-8, screenY-20, 12, spr_Parachute+12, lightPlane);
+                        ClipSprite16_OR_R(screenX-8, screenY-20, 12, spr_Parachute+24, darkPlane);
                     }
                 }
                 
