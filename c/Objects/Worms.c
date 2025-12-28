@@ -606,10 +606,10 @@ void Worm_drawAll()
                         // Idle Animation: Occasional Blink to IDLE2
                         // Use prime multiplier (37) to desync worms
                         // Interval: 128 ticks (approx 8.5s at 15FPS)
-                        // Duration: 4 ticks (approx 0.25s)
+                        // Duration: 10 ticks (approx 0.66s)
                         short timerVal = (Game_timer + (i * 37)) & 127; 
                         
-                        if(timerVal < 4) {
+                        if(timerVal < 10) {
                             spriteIdx = WORM_IDLE2_MASK;
                         } else {
                             spriteIdx = WORM_IDLE_MASK;
