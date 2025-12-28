@@ -107,7 +107,7 @@ extern const unsigned long spr_Water_Mask[];
 
 extern const unsigned short spr_weaponSelect[];
 
-#define NUM_WEAPONS 72
+#define NUM_WEAPONS 76
 extern const unsigned short spr_weapons[][11];
 
 extern const unsigned long spr_WindMeter[];
