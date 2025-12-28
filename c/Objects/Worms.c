@@ -29,7 +29,7 @@
 #include "Worms.h"
 #include "Map.h"
 #include "StatusBar.h"
-
+#include "Keys.h"
 
 // the X/Y position of all the worms
 short Worm_x[MAX_WORMS] = {15, 81, 120, 65, 90, 35, 150, 40, 175, 95, 250, 210, 25, 140, 150, 10};
@@ -568,13 +568,54 @@ void Worm_drawAll()
                          y -= 4;
                     }
                 } // End Animation
-                else 
+                // ============================================================
+                // STANDARD WALKING / STANDING
+                // ============================================================
+                else
                 {
-                    // Standard Idle/Walk
-                    spriteIdx = WORM_IDLE_MASK;
-                    // Direction handled by default 'useFlipped' logic
-                }
+                    char facing = (Worm_dir & wormMask)>0;
+                    if(facing) {
+                        // Default Left (Flipped) - will be handled by useFlipped below
+                        useFlipped = TRUE;
+                    } else {
+                        // Default Right (Normal)
+                        useFlipped = FALSE;
+                    }
+                    
+                    // -- ANIMATION LOGIC --
+                    
+                    // Check if walking (Active worm, Turn mode, Keys pressed)
+                    // Note: CharacterController handles movement, we just visualize it here
+                    char isWalking = FALSE;
+                    if(i == Worm_currentWorm && Game_mode == gameMode_Turn) {
+                        if(Keys_keyState(keyLeft) || Keys_keyState(keyRight)) {
+                            isWalking = TRUE;
+                        }
+                    }
 
+                    if(isWalking) {
+                        // Walking Animation: Toggle WALK / IDLE fast
+                        // 15FPS -> 8 frame cycle (approx 0.5s)
+                        if((Game_timer & 0x07) < 4) {
+                             spriteIdx = WORM_WALK_MASK;
+                        } else {
+                             spriteIdx = WORM_IDLE_MASK;
+                        }
+                    } 
+                    else {
+                        // Idle Animation: Occasional Blink to IDLE2
+                        // Use prime multiplier (37) to desync worms
+                        // Interval: 128 ticks (approx 8.5s at 15FPS)
+                        // Duration: 4 ticks (approx 0.25s)
+                        short timerVal = (Game_timer + (i * 37)) & 127; 
+                        
+                        if(timerVal < 4) {
+                            spriteIdx = WORM_IDLE2_MASK;
+                        } else {
+                            spriteIdx = WORM_IDLE_MASK;
+                        }
+                    }
+                }
 
                 // ============================================================
                 // FETCH DATA & DRAW
