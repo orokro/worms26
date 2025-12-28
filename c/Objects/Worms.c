@@ -507,7 +507,7 @@ void Worm_drawAll()
                 else if(Game_mode == gameMode_Death && (Worm_health[i] <= 0) && !((Worm_isDead & wormMask)))
                 {
                     // Timer counts 60 -> 30 (Explosion) -> 0
-                    if(Game_deathTimer > 38) {
+                    if(Game_deathTimer > 45) {
                         spriteIdx = WORM_TNT1_MASK; // Plunger Up
                     } else {
                         spriteIdx = WORM_TNT2_MASK; // Plunger Down
@@ -579,6 +579,26 @@ void Worm_drawAll()
                          y -= 4;
                     }
                 } // End Animation
+                
+                // ============================================================
+                // PARACHUTE
+                // ============================================================
+                else if(i == Worm_currentWorm && (Game_stateFlags & gs_parachuteMode))
+                {
+                    spriteIdx = WORM_CHUTE_MASK;
+                    useFlipped = (Worm_dir & wormMask) > 0;
+                    
+                    // Draw Parachute Sprite (Above worm)
+                    // Logic copied from Crates.c
+                    // screenX, screenY are worm positions.
+                    // Crate draws at screenX-6, screenY-16.
+                    // Worm draws at x=screenX-8, y=screenY-6.
+                    // We want parachute relative to worm center.
+                    // screenX is center-ish?
+                    ClipSprite16_MASK_R(screenX-6, screenY-16, 12, spr_Parachute+12, spr_Parachute, lightPlane);
+                    ClipSprite16_MASK_R(screenX-6, screenY-16, 12, spr_Parachute+24, spr_Parachute, darkPlane);
+                }
+
                 // ============================================================
                 // STANDARD WALKING / STANDING
                 // ============================================================

@@ -34,6 +34,7 @@
 #include "Camera.h"
 #include "Match.h"
 #include "StatusBar.h"
+#include "Worms.h"
 
 // local defines: the max slope a worm can walk up:
 #define MAX_WORM_SLOPE 6
@@ -42,6 +43,7 @@
 // so we don't have to constantly calculate them...
 short *wX, *wY;
 unsigned short wormMask = 0;
+static char parachuteLatch = 0;
 
 /**
  * Handles moving the worm in the character controller, if its on the ground.
@@ -312,6 +314,87 @@ void CharacterController_update()
 	// ignore controls if a sheep is in action
 	if(Weapon_superSheepDir != SHEEP_INACTIVE)
 		return;
+
+    // ------------------------------------------------------------------------
+    // PARACHUTE LOGIC
+    // ------------------------------------------------------------------------
+    
+    // Auto-disable if grounded
+    if(Worm_onGround & wormMask) {
+        Game_stateFlags &= ~gs_parachuteMode;
+    }
+    
+    // Toggle Logic
+    if(!(Worm_onGround & wormMask)) 
+    {
+        // Deploy if either it's already "Active" (equipped) OR if it's currently selected in the menu
+        if((Game_stateFlags & gs_parachuteActive) || (Game_currentWeaponSelected == WParachute))
+        {
+            if(Keys_keyState(keyAction)) {
+                if(!parachuteLatch) {
+                    parachuteLatch = 1; // Latch to prevent repeat
+
+                    if(Game_stateFlags & gs_parachuteMode) {
+                        // Deactivate
+                        Game_stateFlags &= ~gs_parachuteMode;
+                    } else {
+                        // Activate
+                        Game_stateFlags |= gs_parachuteMode;
+                        // Kill momentum immediately
+                        Worm_xVelo[(short)Worm_currentWorm] = 0;
+                        Worm_yVelo[(short)Worm_currentWorm] = 0;
+
+                        // If we deployed by using the selected weapon, consume it now
+                        if(Game_currentWeaponSelected == WParachute) {
+                            // Mark as active so we can toggle it off later (since we lose selection)
+                            Game_stateFlags |= gs_parachuteActive;
+                            CharacterController_weaponConsumed(TRUE); // TRUE = don't end turn
+                        }
+                    }
+                }
+            } else {
+                parachuteLatch = 0;
+            }
+        }
+    }
+
+    // Flight Logic
+    if(Game_stateFlags & gs_parachuteMode)
+    {
+        // FORCE UNSETTLED
+        // The parachute velocity is low (0 or 1), which causes the physics engine to mark us as "Settled/Grounded"
+        // after a few frames. We must prevent this to stay airborne.
+        Worm_physObj[(short)Worm_currentWorm].staticFrames = 0;
+        Worm_settled &= ~wormMask;
+
+        // 1. Steering
+        if(Keys_keyState(keyLeft)) {
+            Worm_xVelo[(short)Worm_currentWorm] = -1;
+            Worm_dir |= wormMask; // Face Left
+        } else if(Keys_keyState(keyRight)) {
+            Worm_xVelo[(short)Worm_currentWorm] = 1;
+            Worm_dir &= ~wormMask; // Face Right
+        } else {
+            Worm_xVelo[(short)Worm_currentWorm] = 0;
+        }
+
+        // 2. Wind Influence (every 4th frame add wind direction?)
+        // Or just add constant drift.
+        // Game_wind is char (-10 to 10 maybe?).
+        // Let's just add a small drift if not steering.
+        if(Worm_xVelo[(short)Worm_currentWorm] == 0 && Game_wind != 0 && (Game_timer % 4 == 0)) {
+            Worm_xVelo[(short)Worm_currentWorm] = (Game_wind > 0) ? 1 : -1;
+        }
+
+        // 3. Constant Fall Speed (avg 0.5 px/frame)
+        // Worm_update increments yVelo (gravity) at start of frame.
+        // If we set -1 -> becomes 0 -> move 0.
+        // If we set 0 -> becomes 1 -> move 1.
+        Worm_yVelo[(short)Worm_currentWorm] = (Game_timer % 2 == 0) ? -1 : 0;
+
+        // Skip standard walk logic
+        return; 
+    }
 
 	// if the worm is grounded, we should test for walking:
 	if (Worm_onGround & wormMask)
