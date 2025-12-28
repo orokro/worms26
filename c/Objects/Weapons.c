@@ -294,7 +294,7 @@ unsigned long Weapon_props[73] = {
         usesAim | usesCharge | usesPhysics | usesDetonateOnImpact | holdsSelf | spawnsSelf | isCluster,
         
 		// mad cows
-        spawnsSelf | usesFuse | usesController | isAnimal | usesPhysics | holdsSelf | isDroppable,
+        spawnsSelf | usesFuse | usesController | isAnimal | usesPhysics | holdsSelf | isDroppable | usesRoutine,
         
 		// skip turn
         isMeta | holdsSelf,
@@ -807,6 +807,17 @@ void doWeaponRoutine(short index, unsigned short props)
 			Weapon_x[index] += (Weapon_facing & weaponMask) ? -5 : 5;
 			break;
 
+		case WKamikaze:
+			Weapon_x[index] += (Weapon_facing & weaponMask) ? -5 : 5;
+			Worm_x[(short)Worm_currentWorm] = Weapon_x[index];
+			Worm_y[(short)Worm_currentWorm] = Weapon_y[index];
+			break;
+
+		case WMadCows:
+			if(Weapon_yVelo[index]==0)
+				Weapon_yVelo[index] = 2;
+			break;
+			
 		case WCowController:
 			if (Weapon_time[index] % 12 == 0) {
 				
@@ -814,7 +825,7 @@ void doWeaponRoutine(short index, unsigned short props)
 				short spawnX = Worm_x[(short)Worm_currentWorm] + (facingLeft ? -5 : 5);
 				short spawnY = Worm_y[(short)Worm_currentWorm] - 5; // Slightly above
 				const short spawnedID = Weapons_spawn(WMadCows, spawnX, spawnY, 0, 0, 6*TIME_MULTIPLIER); // 90 frame fuse
-				
+
 				// Set cow to face the right way
 				if (facingLeft) {
 					Weapon_facing |= (unsigned short)1 << spawnedID;
@@ -822,12 +833,6 @@ void doWeaponRoutine(short index, unsigned short props)
 					Weapon_facing &= ~((unsigned short)1 << spawnedID);
 				}
 			}
-			break;
-
-		case WKamikaze:
-			Weapon_x[index] += (Weapon_facing & weaponMask) ? -5 : 5;
-			Worm_x[(short)Worm_currentWorm] = Weapon_x[index];
-			Worm_y[(short)Worm_currentWorm] = Weapon_y[index];
 			break;
 
 		case WSkunk:
