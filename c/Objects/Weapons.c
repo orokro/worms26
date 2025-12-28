@@ -495,7 +495,7 @@ unsigned long Weapon_props[75] = {
 		usesFuse | usesRoutine | usesDetonateOnImpact | customRender,
 
 		// air mole - the mole that drops from the mole squadron or second stage of the mole weapon
-		usesRoutine | usesFuse | customRender | usesPhysics,
+		usesRoutine | usesFuse | customRender | usesPhysics | usesDetonateOnImpact,
 };
     
     
@@ -1402,6 +1402,24 @@ void Weapons_update()
 				// animals are self propelled and should never settle
 				Weapon_settled &= ~((unsigned short)1<<(i));
 				
+				// Custom physics for Air Mole (Digging)
+				if(Weapon_type[i] == WAirMole)
+				{
+					// gravity
+					if(Weapon_yVelo[i] < 10)
+						Weapon_yVelo[i]++;
+					
+					// move
+					Weapon_x[i] += Weapon_xVelo[i];
+					Weapon_y[i] += Weapon_yVelo[i];
+					
+					// dig
+					if(Map_testPoint(Weapon_x[i], Weapon_y[i]))
+						Explosion_dig(Weapon_x[i], Weapon_y[i], 5);
+						
+					continue;
+				}
+
 				// if the Weapon is considered "settled" no need for physics
 				if(!(Weapon_settled & (unsigned short)1<<(i)))
 				{

@@ -372,3 +372,70 @@ char Explosion_getFirstActive()
 	
 	return -1;
 }
+
+
+/**
+ * Digs a hole in the map
+ * 
+ * @param x x position
+ * @param y y position
+ * @param s radius
+ */
+void Explosion_dig(short x, short y, short s)
+{
+	// determine the pixel edges:
+	short t = y-s;
+	short b = y+s;
+	short l = x-s;
+	short r = x+s;
+	
+	// determine the columns
+	short lCol = (l-(l%32))/32;
+	short rCol = (r-(r%32))/32;
+	
+	// make virtual screen
+	void *virtual=malloc(LCD_SIZE);
+	if(virtual == NULL) return;
+	
+	PortSet(virtual, 239, 127);
+	ClrScr();
+	
+	short drawX = x - (lCol*32);
+	short drawY = y - t;
+	
+	short e;
+	for(e=1; e<s; e++)
+	{
+		DrawClipEllipse(drawX, drawY, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
+		DrawClipEllipse(drawX, drawY-1, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
+	}
+	
+	unsigned long *light = (unsigned long*)mapLight;
+	unsigned long *dark = (unsigned long*)mapDark;
+	
+	short startRow = (t < 0) ? 0 : t;
+	short endRow = (b > 199) ? 199 : b;
+	short startCol = (lCol < 0) ? 0 : lCol;
+	short endCol = (rCol > 9) ? 9 : rCol;
+
+	short row, col;
+	for(row=startRow; row<=endRow; row++)
+	{
+		for(col=startCol; col<=endCol; col++)
+		{
+			unsigned long ulLight = light[(col*200)+row];
+			unsigned long ulDark = dark[(col*200)+row];
+			
+			unsigned short *expShort = (unsigned short*)virtual;
+			unsigned long *expLong = (unsigned long*)(expShort+((15*(row-t))+((col-lCol)*2)));
+			
+			unsigned long ulExp = ~(*expLong);
+
+			light[(col*200)+row] = ulLight & ulExp;
+			dark[(col*200)+row] = ulDark & ulExp;
+		}
+	}
+	
+	PortRestore();
+	free(virtual);
+}

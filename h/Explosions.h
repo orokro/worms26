@@ -50,10 +50,31 @@ extern void Explosion_drawAll();
 
 
 /**
- * @brief Returns the index of the first active explosion, or -1 if none are active
- * 
+ * updates active explosions
+ */
+extern void Explosion_update();
+
+
+/**
+ * Draws active explosions, if there are any
+*/
+extern void Explosion_drawAll();
+
+
+/**
+ * returns the index of the first active explosion, or -1 if none are active
  * @return char index of first active explosion
  */
 extern char Explosion_getFirstActive();
+
+
+/**
+ * Digs a hole in the map
+ * 
+ * @param x x position
+ * @param y y position
+ * @param s radius
+ */
+extern void Explosion_dig(short x, short y, short s);
 
 #endif
