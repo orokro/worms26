@@ -256,7 +256,7 @@ char Weapon_aimPosList[10][2] = {
 	
 	This way, I can avoid the OPs and save space. For debug, it will remain.
 */
-unsigned long Weapon_props[73] = {
+unsigned long Weapon_props[75] = {
 
     // row 1
 
@@ -288,13 +288,13 @@ unsigned long Weapon_props[73] = {
         doesntEndTurn,
         
 		// super banana bomb
-        usesAim | usesFuse | usesCharge | usesPhysics | usesController | isCluster | spawnsSelf | holdsSelf,
+        usesAim | usesFuse | usesCharge | usesPhysics | usesDetonation | isCluster | spawnsSelf | holdsSelf,
         
 		// petrol bomb
         usesAim | usesCharge | usesPhysics | usesDetonateOnImpact | holdsSelf | spawnsSelf | isCluster,
         
 		// mad cows
-        spawnsSelf | usesFuse | usesController | isAnimal | usesPhysics | holdsSelf | isDroppable | usesRoutine,
+        spawnsSelf | usesFuse | isAnimal | usesPhysics | holdsSelf | isDroppable | usesRoutine,
         
 		// skip turn
         isMeta | holdsSelf,
@@ -358,7 +358,7 @@ unsigned long Weapon_props[73] = {
         isMele | usesRoutine | usesFuse,
         
 		// sheep
-        spawnsSelf | usesFuse | usesPhysics | isAnimal | usesJumping | holdsSelf | isDroppable,
+        spawnsSelf | usesFuse | usesPhysics | isAnimal | usesJumping | holdsSelf | isDroppable | usesDetonation,
         
 		// mail strike
         usesCursor | usesPhysics | spawnsSelf | usesAirStrike | usesWind | usesConstantGravity,
@@ -399,7 +399,7 @@ unsigned long Weapon_props[73] = {
         0,
         
 		// super sheep
-        isAnimal | usesFuse | usesController | usesDetonateOnImpact | holdsSelf | spawnsSelf,
+        spawnsSelf | usesFuse | usesPhysics | isAnimal | usesJumping | holdsSelf | isDroppable | usesDetonation,
         
 		// mine strike
         usesCursor | spawnsSelf | usesAirStrike,
@@ -411,7 +411,7 @@ unsigned long Weapon_props[73] = {
         usesCursor | holdsSelf,
         
 		// salvation army lady
-        usesFuse | usesPhysics | isAnimal | isCluster | usesController | holdsSelf | customRender,
+        usesFuse | usesPhysics | isAnimal | isCluster | usesDetonation | holdsSelf | customRender,
         
 		// sheep strike
         usesCursor | usesAirStrike,
@@ -428,7 +428,7 @@ unsigned long Weapon_props[73] = {
         isMeta,
         
 		// sheep launcher
-        usesAim | usesPhysics | usesController | usesDetonateOnImpact | holdsLauncher,
+        usesAim | usesPhysics | usesDetonateOnImpact | holdsLauncher,
         
 		// earth quake
         usesRoutine | holdsCustom | noRender | usesFuse,
@@ -440,7 +440,7 @@ unsigned long Weapon_props[73] = {
         isMele | holdsSelf,
         
 		// mole
-        spawnsSelf | usesPhysics | isAnimal | usesDetonateOnImpact | usesFuse,
+        spawnsSelf | usesPhysics | isAnimal | usesFuse | usesDetonation,
         
 		// mole squadron
         usesCursor | spawnsSelf | usesAirStrike,
@@ -487,7 +487,13 @@ unsigned long Weapon_props[73] = {
         usesPhysics | usesFuse | spawnsSelf,
 
 		// cow controller
-		usesRoutine | usesFuse | noRender
+		usesRoutine | usesFuse | noRender,
+
+		// super sheep 2 - this is the second stage of the super sheep weapon
+		usesFuse | usesRoutine | usesDetonateOnImpact | customRender,
+
+		// air mole - the mole that drops from the mole squadron or second stage of the mole weapon
+		usesRoutine | usesFuse | customRender | usesPhysics,
 };
     
     
@@ -817,7 +823,7 @@ void doWeaponRoutine(short index, unsigned short props)
 			if(Weapon_yVelo[index]==0)
 				Weapon_yVelo[index] = 2;
 			break;
-			
+
 		case WCowController:
 			if (Weapon_time[index] % 12 == 0) {
 				

@@ -65,7 +65,7 @@ enum Weapons {
 	WFastWalk,			WMortar, 			WBanana, 	WUzi,		WKamikaze, 		WSheep, 		WMailStrike, 	WGirder, 		WParachute,			WFlameThrower, 		WMingVase, 		WConcreteDonkey, 	WSelectWorm,
 	WLaserSight, 		WHomingPigeon, 		WAxe,		WMiniGun,	WSuicideBomb, 	WSuperSheep, 	WMineStrike, 	WBaseballBat, 	WTeleport, 			WSalvationArmy, 	WSheepStrike,	WNuclearTest, 		WFreeze,
 	WInvisibility,		WSheepLauncher,		WQuake, 	WLongbow,  	WProd, 			WMole, 			WMoleSquadron, 	WGirderPack, 	WScalesOfJustice,	WMBBomb, 			WCarpetBomb, 	WArmageddon, 		WMagicBullet,
-	WFragment, 			WFire,				WSkunkGas,	WComet, 	WMail, 			WCarpet, 		WFakeMine,		WCowController,
+	WFragment, 			WFire,				WSkunkGas,	WComet, 	WMail, 			WCarpet, 		WFakeMine,		WCowController, WSuperSheep2,		WAirMole
 };
 
 
@@ -102,7 +102,7 @@ extern char Weapon_aimPosList[10][2];
 	Below is an array of 16 bit shorts we will use to bitwise store the properties of
 	each weapon type, so we can optimize the weapon routines to reuse code
 */
-extern unsigned long Weapon_props[73];
+extern unsigned long Weapon_props[75];
 
 
 // weapons function prototypes
