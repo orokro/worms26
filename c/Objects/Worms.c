@@ -270,7 +270,8 @@ void Worm_update()
 			Worm_tile[i] = (Worm_x[i]/10) * (Worm_y[i]/10);
 		
 			//check if a worm triggered a crate or a mine
-			checkCratesAndMines(i);
+			if(i == Worm_currentWorm)
+				checkCratesAndMines(i);
 					
 		}// end if active worm
 
