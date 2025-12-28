@@ -1291,6 +1291,9 @@ void Weapons_update()
 			// if its an animal make it move in the direction it's facing
 			if(currentProps & isAnimal)
 			{
+				// animals are self propelled and should never settle
+				Weapon_settled &= ~((unsigned short)1<<(i));
+
 				char facingLeft = (Weapon_facing & (unsigned short)1<<(i))>0;
 				char onGround = (Weapon_physObj[i].col.collisions & COL_DOWN);
 
