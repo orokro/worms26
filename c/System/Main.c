@@ -48,10 +48,29 @@ unsigned short reverseBits16(unsigned short n)
 // Call this ONCE in _main()
 void GenerateFlippedSprites() {
     int w, r;
+    
+    // 1. Flip weapons
     for(w = 0; w < NUM_WEAPONS; w++) {
         for(r = 0; r < 11; r++) {
             // Read ROM, flip bits, write to RAM
             spr_weapons_flipped[w][r] = reverseBits16(spr_weapons[w][r]);
+        }
+    }
+
+    // 2. Flip worms
+    unsigned short* currentBufferPos = wormFlipBuffer;
+    for(w = 0; w < NUM_WORM_SPRITES; w++) {
+        // save the pointer to the start of this flipped sprite
+        wormsSpritesFlipped[w] = currentBufferPos;
+
+        // get info about the original sprite
+        const unsigned short* src = wormsSprites[w];
+        unsigned char h = wormSpriteHeights[w];
+
+        // flip each row
+        for(r = 0; r < h; r++) {
+            *currentBufferPos = reverseBits16(src[r]);
+            currentBufferPos++;
         }
     }
 }

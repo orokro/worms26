@@ -29,22 +29,15 @@ const HEADER_COMMENT_H = `/*
 #ifndef SPRITEDATA_H
 #define SPRITEDATA_H
 
-/* Width Codes for Worms */
-#define WORM_8  0
-#define WORM_16 1
-#define WORM_32 2
-
 `;
 
 const FOOTER_H = `
 #endif /* SPRITEDATA_H */
 `;
 
-// Helper: Read BMP (24-bit only, simple parsing)
 function readBMP(filePath) {
     if (!fs.existsSync(filePath)) return null;
     const buffer = fs.readFileSync(filePath);
-    
     const pixelOffset = buffer.readUInt32LE(10);
     const width = buffer.readInt32LE(18);
     const height = Math.abs(buffer.readInt32LE(22));
@@ -52,7 +45,7 @@ function readBMP(filePath) {
     const isTopDown = buffer.readInt32LE(22) < 0;
 
     if (bitsPerPixel !== 24) {
-        throw new Error(`File ${path.basename(filePath)}: Only 24-bit BMPs supported (found ${bitsPerPixel})`);
+        throw new Error(`File ${path.basename(filePath)}: Only 24-bit BMPs supported.`);
     }
 
     const rowSize = Math.ceil((width * 3) / 4) * 4;
@@ -61,60 +54,41 @@ function readBMP(filePath) {
     for (let y = 0; y < height; y++) {
         const readY = isTopDown ? y : (height - 1 - y);
         let rowVal = 0n;
-
         for (let x = 0; x < width; x++) {
             const bIndex = pixelOffset + (readY * rowSize) + (x * 3);
             const b = buffer[bIndex];
             const g = buffer[bIndex + 1];
             const r = buffer[bIndex + 2];
-
-            // Threshold: Dark < 128 = 1, Light >= 128 = 0
             const brightness = (r + g + b) / 3;
             const bit = brightness < 128 ? 1n : 0n;
-
             const shift = BigInt(width - 1 - x);
             if (bit) rowVal |= (1n << shift);
         }
         pixels.push(rowVal);
     }
-
     return { width, height, pixels };
 }
 
 function getCType(width) {
     if (width <= 8) return "unsigned char";
     if (width <= 16) return "unsigned short";
-    if (width <= 32) return "unsigned long";
     return "unsigned long";
 }
 
-function getWidthCode(width) {
-    if (width <= 8) return "WORM_8";
-    if (width <= 16) return "WORM_16";
-    if (width <= 32) return "WORM_32";
-    return "WORM_32";
-}
-
-// Main Logic
 try {
-    // Ensure output directories exist
     if (!fs.existsSync(OUTPUT_DIR_C)) fs.mkdirSync(OUTPUT_DIR_C, { recursive: true });
     if (!fs.existsSync(OUTPUT_DIR_H)) fs.mkdirSync(OUTPUT_DIR_H, { recursive: true });
 
     let cOutput = HEADER_COMMENT_C;
     let hOutput = HEADER_COMMENT_H;
 
-    // ---------------------------------------------------------
-    // 1. Process Standard Sprites (Root Folder)
-    // ---------------------------------------------------------
-    console.log("Processing Standard Sprites...");
+    // 1. Standard Sprites
     const rootFiles = fs.readdirSync(INPUT_DIR).filter(f => f.toLowerCase().endsWith('.bmp') && fs.statSync(path.join(INPUT_DIR, f)).isFile());
     const groups = {};
 
     rootFiles.forEach(file => {
         const base = path.basename(file, '.bmp');
-        const match = base.match(/^(.+)_(\d+)$/); // check for _index
-        
+        const match = base.match(/^(.+)_(\d+)$/);
         if (match) {
             const name = match[1];
             const idx = parseInt(match[2]);
@@ -127,211 +101,131 @@ try {
 
     for (const name of Object.keys(groups)) {
         const entry = groups[name];
-
         if (entry.isArray) {
-            // 2D Array
             let arrayWidth = 0;
             let blocks = [];
-
             for (let i = 0; i < entry.sprites.length; i++) {
                 if (!entry.sprites[i]) continue;
                 const data = readBMP(path.join(INPUT_DIR, entry.sprites[i]));
                 if (arrayWidth === 0) arrayWidth = data.width;
-                else if (arrayWidth !== data.width) console.warn(`Warning: ${name} index ${i} width mismatch.`);
                 blocks.push(data.pixels);
             }
-
             const cType = getCType(arrayWidth);
             const innerLen = blocks[0].length;
-            const count = blocks.length;
-
             cOutput += `const ${cType} ${name}[][${innerLen}] = {\n`;
             blocks.forEach((pixels, idx) => {
                 cOutput += `\t{\n`;
                 pixels.forEach((row, rIdx) => {
-                    let binStr = row.toString(2).padStart(arrayWidth, '0');
-                    cOutput += `\t0b${binStr}${rIdx < pixels.length - 1 ? ',' : ''}\n`;
+                    cOutput += `\t0b${row.toString(2).padStart(arrayWidth, '0')}${rIdx < pixels.length - 1 ? ',' : ''}\n`;
                 });
                 cOutput += `\t}${idx < blocks.length - 1 ? ',' : ''}\n`;
             });
             cOutput += `};\n\n`;
-
-            hOutput += `#define NUM_${name.replace(/^spr_/i, '').toUpperCase()} ${count}\n`;
+            hOutput += `#define NUM_${name.replace(/^spr_/i, '').toUpperCase()} ${blocks.length}\n`;
             hOutput += `extern const ${cType} ${name}[][${innerLen}];\n\n`;
-
         } else {
-            // Single Array
             const data = readBMP(path.join(INPUT_DIR, entry.file));
             const cType = getCType(data.width);
-
             cOutput += `const ${cType} ${name}[] = {\n`;
             data.pixels.forEach((row, idx) => {
-                let binStr = row.toString(2).padStart(data.width, '0');
-                cOutput += `\t0b${binStr}${idx < data.pixels.length - 1 ? ',' : ''}\n`;
+                cOutput += `\t0b${row.toString(2).padStart(data.width, '0')}${idx < data.pixels.length - 1 ? ',' : ''}\n`;
             });
             cOutput += `};\n\n`;
-
             hOutput += `extern const ${cType} ${name}[];\n\n`;
         }
     }
 
-    // ---------------------------------------------------------
-    // 2. Process Worm Sprites (Subdirectory)
-    // ---------------------------------------------------------
+    // 2. Worm Sprites
     if (fs.existsSync(WORMS_DIR)) {
-        console.log("Processing Worm Sprites...");
         const wormFiles = fs.readdirSync(WORMS_DIR).filter(f => f.toLowerCase().endsWith('.bmp'));
-        
-        // Group by POSE
-        // Expect format: worm_POSE_Type.bmp
         const poses = {};
-
         wormFiles.forEach(file => {
-            // Regex to capture POSE and Type (Mask, Light, Dark, Outline)
-            // Example: worm_Walk_Mask.bmp -> POSE=Walk, Type=Mask
-            // Example: worm_Jump_Outline.bmp -> POSE=Jump, Type=Outline
             const match = file.match(/^worm_(.+?)_(Mask|Light|Dark|Outline)\.bmp$/i);
             if (match) {
                 const pose = match[1];
-                const type = match[2]; // Capitalized by convention in file, but we should normalize if needed
+                const type = match[2];
                 if (!poses[pose]) poses[pose] = {};
                 poses[pose][type] = file;
             }
         });
 
         const sortedPoses = Object.keys(poses).sort();
-        
-        const wormSpritePointers = []; // Stores strings of variable names: "&worm_Walk_Mask"
-        const wormSpriteSizes = [];    // Stores { h: 10, wCode: 'WORM_16' }
-        let currentSpriteIndex = 0;
+        const wormSpritePointers = [];
+        const wormSpriteHeights = [];
         let wormDefines = "";
-        
+        let currentSpriteIndex = 0;
+        let totalWordsNeeded = 0;
+
         hOutput += `/* --- Worms Data --- */\n\n`;
         cOutput += `/* --- Worms Data --- */\n\n`;
 
         sortedPoses.forEach(pose => {
             const group = poses[pose];
-            
-            // Validate Mask
-            if (!group['Mask']) {
-                console.warn(`Warning: Pose '${pose}' missing Mask. Skipping.`);
-                return;
-            }
-
-            // Determine if Outline or Light/Dark
+            if (!group['Mask']) return;
             const hasOutline = !!group['Outline'];
-            const hasLight = !!group['Light'];
-            const hasDark = !!group['Dark'];
+            const typesToProcess = hasOutline ? ['Mask', 'Outline'] : ['Mask', 'Light', 'Dark'];
 
-            if (!hasOutline && (!hasLight || !hasDark)) {
-                console.warn(`Warning: Pose '${pose}' incomplete. Needs either Outline OR (Light AND Dark). Skipping.`);
-                return;
-            }
-
-            // List of types to process for C array generation
-            // We always generate unique arrays for what exists on disk
-            const typesToProcess = ['Mask'];
-            if (hasOutline) typesToProcess.push('Outline');
-            else {
-                typesToProcess.push('Light');
-                typesToProcess.push('Dark');
-            }
-
-            // --- Generate Individual C Arrays ---
-            const spriteInfo = {}; // Store name, width, height for pointer array
-
+            const spriteInfo = {};
             typesToProcess.forEach(type => {
-                const filename = group[type];
-                const data = readBMP(path.join(WORMS_DIR, filename));
+                const data = readBMP(path.join(WORMS_DIR, group[type]));
+                if (data.width !== 16) {
+                    console.warn(`Warning: Worm sprite ${group[type]} is ${data.width}px wide. Expected 16.`);
+                }
                 const cVarName = `worm_${pose}_${type}`;
-                const cType = getCType(data.width);
-                
-                // Store info for the pointer array logic
-                spriteInfo[type] = {
-                    name: cVarName,
-                    height: data.height,
-                    widthCode: getWidthCode(data.width)
-                };
+                spriteInfo[type] = { name: cVarName, height: data.height };
+                totalWordsNeeded += data.height;
 
-                // Output raw array
-                cOutput += `const ${cType} ${cVarName}[] = {\n`;
+                cOutput += `const unsigned short ${cVarName}[] = {\n`;
                 data.pixels.forEach((row, idx) => {
-                    let binStr = row.toString(2).padStart(data.width, '0');
-                    cOutput += `\t0b${binStr}${idx < data.pixels.length - 1 ? ',' : ''}\n`;
+                    cOutput += `\t0b${row.toString(2).padStart(16, '0')}${idx < data.pixels.length - 1 ? ',' : ''}\n`;
                 });
                 cOutput += `};\n\n`;
-
-                hOutput += `extern const ${cType} ${cVarName}[];\n`;
+                hOutput += `extern const unsigned short ${cVarName}[];\n`;
             });
             hOutput += "\n";
 
-            // --- Build Metadata and Defines ---
-            
-            // 1. Mask (Always first)
-            wormSpritePointers.push(`(void*)${spriteInfo['Mask'].name}`);
-            wormSpriteSizes.push({ h: spriteInfo['Mask'].height, w: spriteInfo['Mask'].widthCode });
-            
-            // Define for Mask
-            wormDefines += `#define WORM_${pose.toUpperCase()}_MASK ${currentSpriteIndex}\n`;
-            const maskIdx = currentSpriteIndex;
-            currentSpriteIndex++;
+            // Mask
+            wormSpritePointers.push(`worm_${pose}_Mask`);
+            wormSpriteHeights.push(spriteInfo['Mask'].height);
+            wormDefines += `#define WORM_${pose.toUpperCase()}_MASK ${currentSpriteIndex++}\n`;
 
             if (hasOutline) {
-                // 2. Outline (Acts as Light and Dark)
-                wormSpritePointers.push(`(void*)${spriteInfo['Outline'].name}`);
-                wormSpriteSizes.push({ h: spriteInfo['Outline'].height, w: spriteInfo['Outline'].widthCode });
-                
-                wormDefines += `#define WORM_${pose.toUpperCase()}_LIGHT ${currentSpriteIndex}\n`;
-                wormDefines += `#define WORM_${pose.toUpperCase()}_DARK ${currentSpriteIndex}\n`;
-                
-                currentSpriteIndex++;
+                wormSpritePointers.push(`worm_${pose}_Outline`);
+                wormSpriteHeights.push(spriteInfo['Outline'].height);
+                wormDefines += `#define WORM_${pose.toUpperCase()}_LIGHT ${currentSpriteIndex}
+`;
+                wormDefines += `#define WORM_${pose.toUpperCase()}_DARK ${currentSpriteIndex++}\n`;
             } else {
-                // 2. Light
-                wormSpritePointers.push(`(void*)${spriteInfo['Light'].name}`);
-                wormSpriteSizes.push({ h: spriteInfo['Light'].height, w: spriteInfo['Light'].widthCode });
-                wormDefines += `#define WORM_${pose.toUpperCase()}_LIGHT ${currentSpriteIndex}\n`;
-                currentSpriteIndex++;
+                wormSpritePointers.push(`worm_${pose}_Light`);
+                wormSpriteHeights.push(spriteInfo['Light'].height);
+                wormDefines += `#define WORM_${pose.toUpperCase()}_LIGHT ${currentSpriteIndex++}\n`;
 
-                // 3. Dark
-                wormSpritePointers.push(`(void*)${spriteInfo['Dark'].name}`);
-                wormSpriteSizes.push({ h: spriteInfo['Dark'].height, w: spriteInfo['Dark'].widthCode });
-                wormDefines += `#define WORM_${pose.toUpperCase()}_DARK ${currentSpriteIndex}\n`;
-                currentSpriteIndex++;
+                wormSpritePointers.push(`worm_${pose}_Dark`);
+                wormSpriteHeights.push(spriteInfo['Dark'].height);
+                wormDefines += `#define WORM_${pose.toUpperCase()}_DARK ${currentSpriteIndex++}\n`;
             }
         });
 
-        // --- Generate Lookup Arrays ---
-        
-        // wormsSprites[]
-        cOutput += `const void* wormsSprites[] = {\n`;
-        cOutput += wormSpritePointers.map(ptr => `\t${ptr}`).join(',\n');
-        cOutput += `\n};
-
-`;
-
-        // wormSpriteSizes[][2]
-        cOutput += `const unsigned char wormSpriteSizes[][2] = {\n`;
-        cOutput += wormSpriteSizes.map(s => `\t{ ${s.h}, ${s.w} }`).join(',\n');
-        cOutput += `\n};
-
-`;
-
-        // Output Defines to Header
+        hOutput += `#define NUM_WORM_SPRITES ${currentSpriteIndex}\n`;
+        hOutput += `#define WORM_FLIP_BUFFER_SIZE ${totalWordsNeeded}\n\n`;
         hOutput += wormDefines;
-        hOutput += `\nextern const void* wormsSprites[];\n`;
-        hOutput += `extern const unsigned char wormSpriteSizes[][2];\n`;
+
+        cOutput += `const unsigned short* wormsSprites[] = {\n`;
+        cOutput += wormSpritePointers.map(ptr => `\t${ptr}`).join(',\n') + `\n};
+
+`;
+
+        cOutput += `const unsigned char wormSpriteHeights[] = {\n`;
+        cOutput += wormSpriteHeights.join(', ') + `\n};
+
+`;
+
+        hOutput += `extern const unsigned short* wormsSprites[];\n`;
+        hOutput += `extern const unsigned char wormSpriteHeights[];\n`;
     }
 
-    // Finalize
     hOutput += FOOTER_H;
-
     fs.writeFileSync(OUTPUT_FILE_C, cOutput);
     fs.writeFileSync(OUTPUT_FILE_H, hOutput);
-    
-    console.log(`\nSuccess!`);
-    console.log(`Written C file to: ${OUTPUT_FILE_C}`);
-    console.log(`Written H file to: ${OUTPUT_FILE_H}`);
-
-} catch (err) {
-    console.error("Error:", err);
-}
+    console.log(`Success!`);
+} catch (err) { console.error("Error:", err); }

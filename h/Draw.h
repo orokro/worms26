@@ -24,6 +24,10 @@ extern unsigned long healthMasks[16][18];
 // This is the new RAM buffer (takes 0 bytes of ROM space)
 extern unsigned short spr_weapons_flipped[NUM_WEAPONS][11];
 
+// This is the new RAM buffer for flipped worm sprites
+extern unsigned short* wormsSpritesFlipped[NUM_WORM_SPRITES];
+extern unsigned short wormFlipBuffer[WORM_FLIP_BUFFER_SIZE];
+
 // if the user fired a gun-type weapon we should draw a line on screen for a frame
 extern short shot_sx;
 extern short shot_sy;

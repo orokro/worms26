@@ -2996,39 +2996,25 @@ const unsigned short worm_JUMP_Outline[] = {
 	0b0000011000000000
 };
 
-const void* wormsSprites[] = {
-	(void*)worm_BACKFLIP1_Mask,
-	(void*)worm_BACKFLIP1_Outline,
-	(void*)worm_BACKFLIP2_Mask,
-	(void*)worm_BACKFLIP2_Outline,
-	(void*)worm_BACKFLIP3_Mask,
-	(void*)worm_BACKFLIP3_Outline,
-	(void*)worm_BACKFLIP4_Mask,
-	(void*)worm_BACKFLIP4_Outline,
-	(void*)worm_FROZEN_Mask,
-	(void*)worm_FROZEN_Light,
-	(void*)worm_FROZEN_Dark,
-	(void*)worm_IDLE_Mask,
-	(void*)worm_IDLE_Outline,
-	(void*)worm_JUMP_Mask,
-	(void*)worm_JUMP_Outline
+const unsigned short* wormsSprites[] = {
+	worm_BACKFLIP1_Mask,
+	worm_BACKFLIP1_Outline,
+	worm_BACKFLIP2_Mask,
+	worm_BACKFLIP2_Outline,
+	worm_BACKFLIP3_Mask,
+	worm_BACKFLIP3_Outline,
+	worm_BACKFLIP4_Mask,
+	worm_BACKFLIP4_Outline,
+	worm_FROZEN_Mask,
+	worm_FROZEN_Light,
+	worm_FROZEN_Dark,
+	worm_IDLE_Mask,
+	worm_IDLE_Outline,
+	worm_JUMP_Mask,
+	worm_JUMP_Outline
 };
 
-const unsigned char wormSpriteSizes[][2] = {
-	{ 17, WORM_16 },
-	{ 17, WORM_16 },
-	{ 10, WORM_16 },
-	{ 10, WORM_16 },
-	{ 13, WORM_16 },
-	{ 13, WORM_16 },
-	{ 10, WORM_16 },
-	{ 10, WORM_16 },
-	{ 13, WORM_16 },
-	{ 13, WORM_16 },
-	{ 13, WORM_16 },
-	{ 13, WORM_16 },
-	{ 13, WORM_16 },
-	{ 15, WORM_16 },
-	{ 15, WORM_16 }
+const unsigned char wormSpriteHeights[] = {
+17, 17, 10, 10, 13, 13, 10, 10, 13, 13, 13, 13, 13, 15, 15
 };
 

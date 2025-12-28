@@ -7,11 +7,6 @@
 #ifndef SPRITEDATA_H
 #define SPRITEDATA_H
 
-/* Width Codes for Worms */
-#define WORM_8  0
-#define WORM_16 1
-#define WORM_32 2
-
 extern const unsigned long spi_CandleCake_Dark[];
 
 extern const unsigned long spi_CandleCake_Light[];
@@ -196,6 +191,9 @@ extern const unsigned short worm_IDLE_Outline[];
 extern const unsigned short worm_JUMP_Mask[];
 extern const unsigned short worm_JUMP_Outline[];
 
+#define NUM_WORM_SPRITES 15
+#define WORM_FLIP_BUFFER_SIZE 195
+
 #define WORM_BACKFLIP1_MASK 0
 #define WORM_BACKFLIP1_LIGHT 1
 #define WORM_BACKFLIP1_DARK 1
@@ -217,8 +215,7 @@ extern const unsigned short worm_JUMP_Outline[];
 #define WORM_JUMP_MASK 13
 #define WORM_JUMP_LIGHT 14
 #define WORM_JUMP_DARK 14
-
-extern const void* wormsSprites[];
-extern const unsigned char wormSpriteSizes[][2];
+extern const unsigned short* wormsSprites[];
+extern const unsigned char wormSpriteHeights[];
 
 #endif /* SPRITEDATA_H */
