@@ -256,7 +256,7 @@ char Weapon_aimPosList[10][2] = {
 	
 	This way, I can avoid the OPs and save space. For debug, it will remain.
 */
-unsigned long Weapon_props[72] = {
+unsigned long Weapon_props[73] = {
 
     // row 1
 
@@ -484,7 +484,10 @@ unsigned long Weapon_props[72] = {
         usesPhysics | usesDetonateOnImpact | spawnsSelf,
         
 		// fake mine
-        usesPhysics | usesFuse | spawnsSelf
+        usesPhysics | usesFuse | spawnsSelf,
+
+		// cow controller
+		usesRoutine | usesFuse | noRender
 };
     
     
@@ -802,6 +805,23 @@ void doWeaponRoutine(short index, unsigned short props)
 
 		case WDragonBall:
 			Weapon_x[index] += (Weapon_facing & weaponMask) ? -5 : 5;
+			break;
+
+		case WCowController:
+			if (Weapon_time[index] % 12 == 0) {
+				
+				// Spawn gas behind the skunk
+				short spawnX = Worm_x[(short)Worm_currentWorm] + (facingLeft ? -5 : 5);
+				short spawnY = Worm_y[(short)Worm_currentWorm] - 5; // Slightly above
+				const short spawnedID = Weapons_spawn(WMadCows, spawnX, spawnY, 0, 0, 6*TIME_MULTIPLIER); // 90 frame fuse
+				
+				// Set cow to face the right way
+				if (facingLeft) {
+					Weapon_facing |= (unsigned short)1 << spawnedID;
+				} else {
+					Weapon_facing &= ~((unsigned short)1 << spawnedID);
+				}
+			}
 			break;
 
 		case WKamikaze:
@@ -1601,6 +1621,10 @@ char Weapons_fire(short charge)
 			Weapon_facing |= (unsigned short)1<<(spawnedWeaponIndex);
 		else
 			Weapon_facing &= ~((unsigned short)1<<(spawnedWeaponIndex));
+
+		// if it's a mad cow, also spawn an WCowController
+		if(Game_currentWeaponSelected == WMadCows)
+			Weapons_spawn(WCowController, spawnX, spawnY, 0, 0, (12*5)-1);
 	}
 
 	return TRUE;
