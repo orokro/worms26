@@ -443,10 +443,14 @@ void Worm_drawAll()
     unsigned short wormMask;
 
     // Pointers for the sprite data to draw this frame
-    const unsigned short* sprOutline;
-    const unsigned short* sprMask;
-    short sprHeight; // New: sprites have different heights now!
-	
+    const unsigned short* pMask;
+    const unsigned short* pLight;
+    const unsigned short* pDark;
+    
+    // index of the sprite to use (base index, e.g. MASK)
+    int spriteIdx = -1;
+    char useFlipped = FALSE; // TRUE to use wormsSpritesFlipped
+
     // Loop over all worms
     for(i=0; i<MAX_WORMS; i++)
     {
@@ -462,17 +466,20 @@ void Worm_drawAll()
             if(worldToScreen(&screenX, &screenY))
             {
                 // Align sprite (centered x, feet y adjustment)
+                // Note: Standard width is 16, so center is -8.
                 short x = screenX - 8;
                 short y = screenY - 6;
 
-                // Default to standard height
-                sprHeight = 13; 
+                // Reset defaults
+                spriteIdx = WORM_IDLE_MASK;
+                useFlipped = (Worm_dir & wormMask) > 0; // Default: 0=Right (Normal), 1=Left (Flipped)
 
                 // ============================================================
                 // SPRITE SELECTION LOGIC
                 // ============================================================
                 
-				// if the worm is dead, draw gravestone
+				// if the worm is dead, draw gravestone (Legacy sprite, not in new system yet?)
+                // Assuming spr_Grave still exists in standard sprites.
 				if(Worm_isDead & wormMask){
 					GrayClipSprite8_OR_R(x+4, y, 12, spr_Grave, spr_Grave, lightPlane, darkPlane);
 					continue;
@@ -485,30 +492,26 @@ void Worm_drawAll()
 				if( (team1invisible && (i<8)) || (team2invisible && (i>=8)) )
 					continue;
 					
-				// if the current team is invisible, skip drawing them
+				// if the current team is frozen
 				const short team1frozen = (Game_stateFlags & gs_team1Frozen);
 				const short team2frozen = (Game_stateFlags & gs_team2Frozen);
 
 				if( (team1frozen && (i<8)) || (team2frozen && (i>=8)) )
 				{
-					// Draw Mask (AND logic)
-					sprHeight = 13;
-					ClipSprite16_AND_R(x, y, sprHeight, spr_WormFrozenMask, darkPlane);
-					ClipSprite16_AND_R(x, y, sprHeight, spr_WormFrozenMask, lightPlane);
-					ClipSprite16_OR_R(x, y, sprHeight, spr_WormFrozenDark, darkPlane);
-					ClipSprite16_OR_R(x, y, sprHeight, spr_WormFrozenLight, lightPlane);
-					continue;
+                    // Use Frozen Sprites
+                    spriteIdx = WORM_FROZEN_MASK;
+                    useFlipped = (Worm_dir & wormMask) > 0;
+                    // Note: Frozen has Light/Dark distinct sprites
 				}
-					
                 // Is this the Active Worm doing an Animation?
-                if(i == Worm_currentWorm && Game_wormAnimState != ANIM_NONE)
+                else if(i == Worm_currentWorm && Game_wormAnimState != ANIM_NONE)
                 {
                     // --- BACKFLIP ---
                     if(Game_wormAnimState == ANIM_BACKFLIP)
                     {
                         Game_wormAnimTimer++; // Advance frame
                         
-                        // Determine Stage
+                        // Determine Stage (1-4)
                         int stage = 1;
                         if(Game_wormAnimTimer < 6)       stage = 1; 
                         else if(Game_wormAnimTimer < 8)  stage = 2; 
@@ -516,90 +519,121 @@ void Worm_drawAll()
                         else if(Game_wormAnimTimer < 12) stage = 4; 
                         else                             stage = 1; 
 
-                        // Handle Directions (Start Dir 0=Right, >0=Left)
-                        if(Game_wormFlipStartDir == 0) 
-                        {
-                            // Started facing RIGHT
-                            if(stage==1) { sprOutline=spr_WormFlip1_Right_Outline; sprMask=spr_WormFlip1_Right_Mask; sprHeight=17; }
-                            else if(stage==2) { sprOutline=spr_WormFlip2_Right_Outline; sprMask=spr_WormFlip2_Right_Mask; sprHeight=10; }
-                            else if(stage==3) { sprOutline=spr_WormFlip3_Left_Outline;  sprMask=spr_WormFlip3_Left_Mask; sprHeight=13; }
-                            else if(stage==4) { sprOutline=spr_WormFlip4_Left_Outline;  sprMask=spr_WormFlip4_Left_Mask; sprHeight=10; }
-                            else { sprOutline=spr_WormFlip1_Right_Outline; sprMask=spr_WormFlip1_Right_Mask; sprHeight=17; }
+                        /* 
+                           Backflip Logic Transition:
+                           Old Code: 
+                             Start Right: Flip1_R -> Flip2_R -> Flip3_L -> Flip4_L
+                             Start Left:  Flip1_L -> Flip2_L -> Flip3_R -> Flip4_R
+                           
+                           New Code (using flipped arrays):
+                             Start Right (StartDir=0):
+                               Stage 1: BACKFLIP1 (Normal)
+                               Stage 2: BACKFLIP2 (Normal)
+                               Stage 3: BACKFLIP3 (Flipped)
+                               Stage 4: BACKFLIP4 (Flipped)
+                             
+                             Start Left (StartDir=1):
+                               Stage 1: BACKFLIP1 (Flipped)
+                               Stage 2: BACKFLIP2 (Flipped)
+                               Stage 3: BACKFLIP3 (Normal)
+                               Stage 4: BACKFLIP4 (Normal)
+                        */
+                        
+                        // Select Base Sprite
+                        switch(stage) {
+                            case 1: spriteIdx = WORM_BACKFLIP1_MASK; break;
+                            case 2: spriteIdx = WORM_BACKFLIP2_MASK; break;
+                            case 3: spriteIdx = WORM_BACKFLIP3_MASK; break;
+                            case 4: spriteIdx = WORM_BACKFLIP4_MASK; break;
                         }
-                        else 
-                        {
+
+                        // Determine Orientation
+                        if(Game_wormFlipStartDir == 0) {
+                            // Started facing RIGHT
+                            useFlipped = (stage >= 3); 
+                        } else {
                             // Started facing LEFT
-                            if(stage==1) { sprOutline=spr_WormFlip1_Left_Outline; sprMask=spr_WormFlip1_Left_Mask; sprHeight=17; }
-                            else if(stage==2) { sprOutline=spr_WormFlip2_Left_Outline; sprMask=spr_WormFlip2_Left_Mask; sprHeight=10; }
-                            else if(stage==3) { sprOutline=spr_WormFlip3_Right_Outline; sprMask=spr_WormFlip3_Right_Mask; sprHeight=13; }
-                            else if(stage==4) { sprOutline=spr_WormFlip4_Right_Outline; sprMask=spr_WormFlip4_Right_Mask; sprHeight=10; }
-                            else { sprOutline=spr_WormFlip1_Left_Outline; sprMask=spr_WormFlip1_Left_Mask; sprHeight=17; }
+                            useFlipped = (stage < 3);
                         }
                         
                         // Adjust Y for tall sprites so feet stay aligned
-                        // (17px tall needs to be drawn 4px higher than 13px tall)
-                        if(sprHeight == 17) y -= 4; 
-                        if(sprHeight == 15) y -= 2;
+                        // We check the height of the selected sprite
+                        short h = wormSpriteHeights[spriteIdx];
+                        if(h >= 17) y -= 4; 
+                        else if(h >= 15) y -= 2;
                     }
 
                     // --- JUMPING ---
                     else if(Game_wormAnimState == ANIM_JUMP)
                     {
-                        sprHeight = 15; // Jump sprites are tall
-                        y -= 4;         // Align feet
+                        spriteIdx = WORM_JUMP_MASK;
+                        // Direction handled by default 'useFlipped' logic at top
                         
-                        // Check Direction
-                        if(Worm_dir & wormMask) {
-                            sprOutline = spr_WormJump_Left_Outline;
-                            sprMask = spr_WormJump_Left_Mask;
-                        } else {
-                            sprOutline = spr_WormJump_Right_Outline;
-                            sprMask = spr_WormJump_Right_Mask;
-                        }
+                        // Manual Y Adjustment for Jump (assumed tall)
+                         y -= 4;
                     }
-                    // Safety Fallback
-                    else {
-                        sprOutline = spr_WormRight_Outline;
-                        sprMask = spr_WormRight_Mask;
-                    }
-                }
-
-                // ============================================================
-                // STANDARD WALKING / STANDING
-                // ============================================================
-                else
+                } // End Animation
+                else 
                 {
-                    char facing = (Worm_dir & wormMask)>0;
-                    if(facing) {
-                        sprOutline = spr_WormLeft_Outline; // Make sure these match SpriteData.c names!
-                        sprMask = spr_WormLeft_Mask;
-                    } else {
-                        sprOutline = spr_WormRight_Outline;
-                        sprMask = spr_WormRight_Mask;
-                    }
+                    // Standard Idle/Walk
+                    spriteIdx = WORM_IDLE_MASK;
+                    // Direction handled by default 'useFlipped' logic
                 }
 
-                // ============================================================
-                // DRAWING
-                // ============================================================
 
-                // 1. Calculate the final Bottom-Right coordinate
-                // short finalY = y + sprHeight;
+                // ============================================================
+                // FETCH DATA & DRAW
+                // ============================================================
+                
+                // 1. Get Height
+                short sprHeight = wormSpriteHeights[spriteIdx];
+                
+                // 2. Get Pointers (Normal or Flipped)
+                // Note: The macros like WORM_IDLE_LIGHT point to the index in the array.
+                // Since MASK is the base, and Light/Dark follow, we need to resolve them relative to spriteIdx.
+                
+                // ASSUMPTION: The macros are defined sequentially: MASK, LIGHT, DARK (or LIGHT/DARK same if outline)
+                // We can use the defines directly if we know the offset, but since we have a variable 'spriteIdx' (which is the Mask index),
+                // we can assume:
+                // Mask  = spriteIdx
+                // Light = spriteIdx + 1
+                // Dark  = spriteIdx + 2 (if distinct) OR spriteIdx + 1 (if Outline)
+                
+                // However, to be safe and generic without hardcoding +1/+2, we should probably check if it's Frozen.
+                // For Frozen, we know we have distinct Light/Dark.
+                // For others (Idle, Jump, Backflip), we used Outline (Light == Dark).
+                
+                int idxMask = spriteIdx;
+                int idxLight = spriteIdx + 1;
+                int idxDark  = spriteIdx + (spriteIdx == WORM_FROZEN_MASK ? 2 : 1);
 
-                // 2. SAFETY CHECK:
-                // Ensure we do not draw to negative memory addresses (Fatal Crash)
-                // AND ensure we don't draw off the bottom (Visual Glitch)
+                if(useFlipped) {
+                    pMask = wormsSpritesFlipped[idxMask];
+                    pLight = wormsSpritesFlipped[idxLight];
+                    pDark = wormsSpritesFlipped[idxDark];
+                } else {
+                    pMask = wormsSprites[idxMask];
+                    pLight = wormsSprites[idxLight];
+                    pDark = wormsSprites[idxDark];
+                }
+
+                // 3. Draw
+                // SAFETY CHECK:
                 if(y > -sprHeight && y < 100) 
                 {
                      // Draw Mask (AND logic)
-                     ClipSprite16_AND_R(x, y, sprHeight, sprMask, darkPlane);
-                     ClipSprite16_AND_R(x, y, sprHeight, sprMask, lightPlane);
+                     ClipSprite16_AND_R(x, y, sprHeight, pMask, darkPlane);
+                     ClipSprite16_AND_R(x, y, sprHeight, pMask, lightPlane);
                     
-                     // Draw Outline (OR logic)
-					 // skip light plane if the worm is poisoned
-					if(!(Worm_poisoned & wormMask))
-						ClipSprite16_OR_R(x, y, sprHeight, sprOutline, darkPlane);
-					ClipSprite16_OR_R(x, y, sprHeight, sprOutline, lightPlane);
+                     // Draw Light Component (OR logic)
+                     // (Always drawn to light plane)
+                     ClipSprite16_OR_R(x, y, sprHeight, pLight, lightPlane);
+                     
+                     // Draw Dark Component (OR logic)
+                     // (Drawn to dark plane UNLESS poisoned)
+					if(!(Worm_poisoned & wormMask)) {
+						ClipSprite16_OR_R(x, y, sprHeight, pDark, darkPlane);
+                    }
                 }
                 
                 // ============================================================
