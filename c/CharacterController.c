@@ -274,52 +274,12 @@ void wormWeapon()
 }
 
 
-
-// --------------------------------------------------------------------------------------------------------------------------------------
-
-
-
 /**
- * @brief Initiates a backflip for the current worm
- * 
+ * @brief Handles parachute logic
  */
-void CharacterController_doBackflip()
+void wormParachute()
 {
-	Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], ((Worm_dir & wormMask) ? 1 : -1), -6, FALSE, TRUE);
-
-	// Set Animation State
-	Game_wormAnimState = ANIM_BACKFLIP;
-	Game_wormAnimTimer = 0;
-	Game_wormFlipStartDir = (Worm_dir & wormMask);
-}
-
-
-/**
- * handles all update frames for controlling worms in the turn game mode
- */
-void CharacterController_update()
-{
-	// if the camera is being controlled, no need to control the character
-	if (Keys_keyState(keyCameraControl))
-		return;
-
-	// worm mask...
-	wormMask = 1;
-	wormMask = (unsigned short)((unsigned short)wormMask << (Worm_currentWorm));
-
-	// save references to our pos
-	wX = &Worm_x[(short)Worm_currentWorm];
-	wY = &Worm_y[(short)Worm_currentWorm];
-
-	// ignore controls if a sheep is in action
-	if(Weapon_superSheepDir != SHEEP_INACTIVE)
-		return;
-
-    // ------------------------------------------------------------------------
-    // PARACHUTE LOGIC
-    // ------------------------------------------------------------------------
-    
-    // Auto-disable if grounded
+	// Auto-disable if grounded
     if(Worm_onGround & wormMask) {
         Game_stateFlags &= ~gs_parachuteMode;
     }
@@ -407,8 +367,53 @@ void CharacterController_update()
 	// separate from our other controls, if weapons use aim, handle those inputs:
 	if ((Game_currentWeaponProperties & usesAim) || (Game_currentWeaponState & keepAimDuringUse))
 		adjustAim();
+}
 
-	// TO-DO: implement parachute, bungee, and ninja rope
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+/**
+ * @brief Initiates a backflip for the current worm
+ * 
+ */
+void CharacterController_doBackflip()
+{
+	Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], ((Worm_dir & wormMask) ? 1 : -1), -6, FALSE, TRUE);
+
+	// Set Animation State
+	Game_wormAnimState = ANIM_BACKFLIP;
+	Game_wormAnimTimer = 0;
+	Game_wormFlipStartDir = (Worm_dir & wormMask);
+}
+
+
+/**
+ * handles all update frames for controlling worms in the turn game mode
+ */
+void CharacterController_update()
+{
+	// if the camera is being controlled, no need to control the character
+	if (Keys_keyState(keyCameraControl))
+		return;
+
+	// worm mask...
+	wormMask = 1;
+	wormMask = (unsigned short)((unsigned short)wormMask << (Worm_currentWorm));
+
+	// save references to our pos
+	wX = &Worm_x[(short)Worm_currentWorm];
+	wY = &Worm_y[(short)Worm_currentWorm];
+
+	// ignore controls if a sheep is in action
+	if(Weapon_superSheepDir != SHEEP_INACTIVE)
+		return;
+
+	// handle parachute logic
+    wormParachute();
+    
+	// TO-DO: implement bungee, and ninja rope
 }
 
 
