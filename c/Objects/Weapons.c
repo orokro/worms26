@@ -1249,19 +1249,18 @@ void Weapons_update()
 			if(currentProps & isAnimal)
 			{
 				char facingLeft = (Weapon_facing & (unsigned short)1<<(i))>0;
-				
-				// make it jump every so often
-				char jumpVelo = 0;
-				if(currentProps & usesJumping)
-					if((Weapon_jumpTimer+i*2) % 20 == 0)
-						jumpVelo = -5;
-					
-				// impact for the jump
-				Physics_setVelocity(&Weapon_physObj[i], 0, jumpVelo, TRUE, TRUE);
+				char onGround = (Weapon_physObj[i].col.collisions & COL_DOWN);
 
-				// set manually for walking
-				if(Weapon_jumpTimer % 4 == 0)
-					Physics_setVelocity(&Weapon_physObj[i], (facingLeft) ? -1 : 1, 0, TRUE, FALSE);
+				// only allow jumping if on the ground to prevent air-jumping
+				if (onGround) {
+					// make it jump every so often
+					if((currentProps & usesJumping) && ((Weapon_jumpTimer + i*5) % 40 == 0)) {
+						 Physics_setVelocity(&Weapon_physObj[i], (facingLeft) ? -2 : 2, -7, FALSE, TRUE);
+					} else {
+						// Set walking velocity every frame if on ground and not jumping
+						Weapon_xVelo[i] = (facingLeft) ? -1 : 1;
+					}
+				}
 			}
 
 			// if a weapon uses homing, adjust it's velocity appropriately
@@ -1318,6 +1317,10 @@ void Weapons_update()
 					// do physics and collision for Weapon
 					Physics_apply(&Weapon_physObj[i]);
 					
+					// if its an animal and hit a wall, reverse it
+					if((currentProps & isAnimal) && (Weapon_physObj[i].col.collisions & COL_LR))
+						Weapon_facing ^= (unsigned short)1<<(i);
+
 					// if the weapon has detonate on impact, we should detonate if it hit something..
 					if((currentProps & usesDetonateOnImpact) && (Weapon_physObj[i].col.collisions>0))
 						Weapons_detonateWeapon(i);
