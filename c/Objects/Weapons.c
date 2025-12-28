@@ -1248,7 +1248,7 @@ void Weapons_setTarget(short x, short y)
 				break;
 
 			case WMoleSquadron:
-				spawnItem = WMole;
+				spawnItem = WAirMole;
 				break;
 
 			case WMBBomb:
