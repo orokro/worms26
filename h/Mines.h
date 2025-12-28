@@ -69,4 +69,13 @@ extern void Worm_setHealth(short, short, char);
  */
 extern void Mines_drawAll();
 
+
+/**
+ * @brief Spawns a mine at a specific location
+ * 
+ * @param x x position
+ * @param y y position
+ */
+extern void Mines_spawnAt(short x, short y);
+
 #endif /* MINES_H */

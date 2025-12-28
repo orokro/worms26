@@ -82,6 +82,7 @@
 #include "CharacterController.h"
 #include "StatusBar.h"
 #include "Keys.h"
+#include "Mines.h"
 
 
 // the type of the weapon!
@@ -1018,6 +1019,14 @@ void Weapons_detonateWeapon(short index)
 	if(weaponType != WConcreteDonkey)
 		Weapon_active &= ~((unsigned short)1<<(index));
 
+	// Convert mines to real mines instead of exploding
+	if(weaponType == WMine || weaponType == WFakeMine)
+	{
+		Mines_spawnAt(Weapon_x[index], Weapon_y[index]);
+		Camera_focusOn(&Worm_x[(short)Worm_currentWorm], &Worm_y[(short)Worm_currentWorm]);
+		return;
+	}
+
 	// Handle special cases that should NOT explode or should have custom explosions/behavior
 	if(weaponType == WConcreteDonkey)
 	{
@@ -1307,9 +1316,6 @@ void Weapons_update()
 			// if its an animal make it move in the direction it's facing
 			if(currentProps & isAnimal)
 			{
-				// animals are self propelled and should never settle
-				Weapon_settled &= ~((unsigned short)1<<(i));
-
 				char facingLeft = (Weapon_facing & (unsigned short)1<<(i))>0;
 				char onGround = (Weapon_physObj[i].col.collisions & COL_DOWN);
 
@@ -1348,6 +1354,10 @@ void Weapons_update()
 			// if this weapon uses physics, lets update that shit
 			if(currentProps & usesPhysics)
 			{
+				// for now, let's disable all settled weapons from physics updates
+				// animals are self propelled and should never settle
+				Weapon_settled &= ~((unsigned short)1<<(i));
+				
 				// if the Weapon is considered "settled" no need for physics
 				if(!(Weapon_settled & (unsigned short)1<<(i)))
 				{

@@ -255,10 +255,40 @@ void Mines_drawAll()
 				sprintf(txt, "%d", (short)Mine_yVelo[i]);
 				DrawStr(screenX-3, screenY-8, txt, A_NORMAL);
 				*/
-				
-			}// end if on screen
-		}// end if active
+			
+			}
+		}
 	}// next i
 }
+			
+			
+/**
+ * Spawns a mine at a specific location
+ * 
+ * @param x x position
+ * @param y y position
+ */
+void Mines_spawnAt(short x, short y)
+{
+	short i;
+	for(i=0; i<MAX_MINES; i++)
+	{
+		// if not active, we can use this slot
+		if(!(Mine_active & (unsigned short)((unsigned short)1<<i)))
+		{
+			Mine_x[i] = x;
+			Mine_y[i] = y;
+			Mine_xVelo[i] = 0;
+			Mine_yVelo[i] = 0;
+			Mine_fuse[i] = -1; // No fuse initially
+			
+			Mine_active |= (unsigned short)1<<i;
+			Mine_triggered &= ~((unsigned short)1<<i);
+			Mine_settled &= ~((unsigned short)1<<i); // Assume unsettled initially
 
-
+			Collider col = new_Collider(COL_UDLR, 2, 2, 3, 3);
+			Mine_physObj[i] = new_PhysObj(&Mine_x[i], &Mine_y[i], &Mine_xVelo[i], &Mine_yVelo[i], 0.65f, 1.0f, (char)i, &Mine_settled, col);
+			return;
+		}
+	}
+}
