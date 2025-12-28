@@ -805,6 +805,7 @@ void doRayCastShot(short dirX, short dirY)
  */
 void doWeaponRoutine(short index, unsigned short props)
 {
+	(void)props;
 	const unsigned short weaponMask = (unsigned short)1<<(index);
 
 	char facingLeft = (Worm_dir & (unsigned short)1<<(Worm_currentWorm))>0;

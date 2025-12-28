@@ -39,6 +39,7 @@ static short lastGroundX = 0;
 static short lastGroundY = 0;
 static short ungroundedTimer = 0;
 static char bungeeLatch = 0;
+static char bungeeDisabled = 0;
 
 /**
  * Handles moving the worm in the character controller, if its on the ground.
@@ -49,6 +50,7 @@ void wormWalk()
     lastGroundX = *wX;
     lastGroundY = *wY;
     ungroundedTimer = 0;
+    bungeeDisabled = 0;
 
 	// test keys for a possible direction to walk
 	char moveDir = 0;
@@ -61,6 +63,9 @@ void wormWalk()
 		// set jump animation
 		Game_wormAnimState = ANIM_JUMP;
 		Game_wormAnimTimer = 0;
+        
+        // Disable bungee until grounded again
+        bungeeDisabled = 1;
 
 		return;
 
@@ -69,6 +74,7 @@ void wormWalk()
 	else if (Keys_keyDown(keyBackflip))
 	{
 		CharacterController_doBackflip();
+        bungeeDisabled = 1;
 		return;
 
 	// test for directions left/right
@@ -329,14 +335,18 @@ void wormBungee()
             lastGroundX = *wX;
             lastGroundY = *wY;
             ungroundedTimer = 0;
+            bungeeDisabled = 0;
         } 
-        else if(!(Game_stateFlags & gs_bungeeMode))
+        else if(!(Game_stateFlags & gs_bungeeMode) && !bungeeDisabled)
         {
             ungroundedTimer++;
-            if(ungroundedTimer == 3) 
+            if(ungroundedTimer >= 3) 
             {
+                // Raycast straight down from center of worm
                 RaycastHit hit = Game_raycast(*wX, *wY, 0, 1, FALSE);
                 short dist = hit.y - *wY;
+                
+                // Activation Condition: falling over a gap or water
                 if(hit.hitType == RAY_HIT_NOTHING || dist > 30) {
                     Game_stateFlags |= gs_bungeeMode;
                 }
@@ -360,17 +370,21 @@ void wormBungee()
         Worm_physObj[(short)Worm_currentWorm].staticFrames = 0;
         Worm_settled &= ~wormMask;
 
-        Draw_setRayLine(lastGroundX, lastGroundY, *wX, *wY);
+        // Draw Line (World to Screen translation)
+        short sx = lastGroundX, sy = lastGroundY, ex = *wX, ey = *wY;
+        worldToScreen(&sx, &sy);
+        worldToScreen(&ex, &ey);
+        Draw_setRayLine(sx, sy, ex, ey);
 
         long dx = (long)*wX - lastGroundX;
         long dy = (long)*wY - lastGroundY;
         long distSq = dx*dx + dy*dy;
-        long maxLenSq = 30L * 30L;
+        long maxLenSq = 40L * 40L;
 
         if(distSq > maxLenSq)
         {
             float d = sqrt((float)distSq);
-            float ratio = 30.0f / d;
+            float ratio = 40.0f / d;
             
             *wX = lastGroundX + (short)(dx * ratio);
             *wY = lastGroundY + (short)(dy * ratio);

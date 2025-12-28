@@ -127,6 +127,9 @@ extern const unsigned short worm_BACKFLIP3_Outline[];
 extern const unsigned short worm_BACKFLIP4_Mask[];
 extern const unsigned short worm_BACKFLIP4_Outline[];
 
+extern const unsigned short worm_BUNGEE_Mask[];
+extern const unsigned short worm_BUNGEE_Outline[];
+
 extern const unsigned short worm_CHUTE_Mask[];
 extern const unsigned short worm_CHUTE_Outline[];
 
@@ -158,8 +161,8 @@ extern const unsigned short worm_TORCH_Outline[];
 extern const unsigned short worm_WALK_Mask[];
 extern const unsigned short worm_WALK_Outline[];
 
-#define NUM_WORM_SPRITES 29
-#define WORM_FLIP_BUFFER_SIZE 409
+#define NUM_WORM_SPRITES 31
+#define WORM_FLIP_BUFFER_SIZE 443
 
 #define WORM_BACKFLIP1_MASK 0
 #define WORM_BACKFLIP1_LIGHT 1
@@ -173,36 +176,39 @@ extern const unsigned short worm_WALK_Outline[];
 #define WORM_BACKFLIP4_MASK 6
 #define WORM_BACKFLIP4_LIGHT 7
 #define WORM_BACKFLIP4_DARK 7
-#define WORM_CHUTE_MASK 8
-#define WORM_CHUTE_LIGHT 9
-#define WORM_CHUTE_DARK 9
-#define WORM_DRILL_MASK 10
-#define WORM_DRILL_LIGHT 11
-#define WORM_DRILL_DARK 11
-#define WORM_FROZEN_MASK 12
-#define WORM_FROZEN_LIGHT 13
-#define WORM_FROZEN_DARK 14
-#define WORM_IDLE_MASK 15
-#define WORM_IDLE_LIGHT 16
-#define WORM_IDLE_DARK 16
-#define WORM_IDLE2_MASK 17
-#define WORM_IDLE2_LIGHT 18
-#define WORM_IDLE2_DARK 18
-#define WORM_JUMP_MASK 19
-#define WORM_JUMP_LIGHT 20
-#define WORM_JUMP_DARK 20
-#define WORM_TNT1_MASK 21
-#define WORM_TNT1_LIGHT 22
-#define WORM_TNT1_DARK 22
-#define WORM_TNT2_MASK 23
-#define WORM_TNT2_LIGHT 24
-#define WORM_TNT2_DARK 24
-#define WORM_TORCH_MASK 25
-#define WORM_TORCH_LIGHT 26
-#define WORM_TORCH_DARK 26
-#define WORM_WALK_MASK 27
-#define WORM_WALK_LIGHT 28
-#define WORM_WALK_DARK 28
+#define WORM_BUNGEE_MASK 8
+#define WORM_BUNGEE_LIGHT 9
+#define WORM_BUNGEE_DARK 9
+#define WORM_CHUTE_MASK 10
+#define WORM_CHUTE_LIGHT 11
+#define WORM_CHUTE_DARK 11
+#define WORM_DRILL_MASK 12
+#define WORM_DRILL_LIGHT 13
+#define WORM_DRILL_DARK 13
+#define WORM_FROZEN_MASK 14
+#define WORM_FROZEN_LIGHT 15
+#define WORM_FROZEN_DARK 16
+#define WORM_IDLE_MASK 17
+#define WORM_IDLE_LIGHT 18
+#define WORM_IDLE_DARK 18
+#define WORM_IDLE2_MASK 19
+#define WORM_IDLE2_LIGHT 20
+#define WORM_IDLE2_DARK 20
+#define WORM_JUMP_MASK 21
+#define WORM_JUMP_LIGHT 22
+#define WORM_JUMP_DARK 22
+#define WORM_TNT1_MASK 23
+#define WORM_TNT1_LIGHT 24
+#define WORM_TNT1_DARK 24
+#define WORM_TNT2_MASK 25
+#define WORM_TNT2_LIGHT 26
+#define WORM_TNT2_DARK 26
+#define WORM_TORCH_MASK 27
+#define WORM_TORCH_LIGHT 28
+#define WORM_TORCH_DARK 28
+#define WORM_WALK_MASK 29
+#define WORM_WALK_LIGHT 30
+#define WORM_WALK_DARK 30
 extern const unsigned short* wormsSprites[];
 extern const unsigned char wormSpriteHeights[];
 

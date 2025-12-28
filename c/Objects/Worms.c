@@ -31,6 +31,7 @@
 #include "StatusBar.h"
 #include "Keys.h"
 
+
 // the X/Y position of all the worms
 short Worm_x[MAX_WORMS] = {15, 81, 120, 65, 90, 35, 150, 40, 175, 95, 250, 210, 25, 140, 150, 10};
 short Worm_y[MAX_WORMS] = {100, 195, 55, 40, 15, 140, 20, 135, 30, 20, 150, 45, 170, 15, 75, 5};
@@ -83,35 +84,6 @@ unsigned long healthLightGray[16][18];
 
 // reusable msg buffer
 static char buffer[32];
-
-// Bungee sprite buffers (Vertically flipped BACKFLIP1)
-static unsigned short spr_bungee_right_mask[20];
-static unsigned short spr_bungee_right_outline[20];
-static unsigned short spr_bungee_left_mask[20];
-static unsigned short spr_bungee_left_outline[20];
-static char bungee_sprites_init = 0;
-
-void initBungeeSprites() {
-    if(bungee_sprites_init) return;
-    
-    // BACKFLIP1 height is 17
-    const unsigned short* srcMaskR = wormsSprites[WORM_BACKFLIP1_MASK];
-    const unsigned short* srcOutlineR = wormsSprites[WORM_BACKFLIP1_LIGHT];
-    const unsigned short* srcMaskL = wormsSpritesFlipped[WORM_BACKFLIP1_MASK];
-    const unsigned short* srcOutlineL = wormsSpritesFlipped[WORM_BACKFLIP1_LIGHT];
-    
-    short h = wormSpriteHeights[WORM_BACKFLIP1_MASK];
-    
-    short i;
-    for(i=0; i<h; i++) {
-        // Vertical flip: dest[i] = src[h-1-i]
-        spr_bungee_right_mask[i] = srcMaskR[h-1-i];
-        spr_bungee_right_outline[i] = srcOutlineR[h-1-i];
-        spr_bungee_left_mask[i] = srcMaskL[h-1-i];
-        spr_bungee_left_outline[i] = srcOutlineL[h-1-i];
-    }
-    bungee_sprites_init = 1;
-}
 
 // function prototype
 void renderHealthSprite(short index);
@@ -479,9 +451,6 @@ void Worm_drawAll()
     // index of the sprite to use (base index, e.g. MASK)
     int spriteIdx = -1;
     char useFlipped = FALSE; // TRUE to use wormsSpritesFlipped
-    char isBungee = FALSE;   // TRUE to use custom bungee buffers
-
-    initBungeeSprites();
 
     // Loop over all worms
     for(i=0; i<MAX_WORMS; i++)
@@ -562,26 +531,6 @@ void Worm_drawAll()
                         else if(Game_wormAnimTimer < 12) stage = 4; 
                         else                             stage = 1; 
 
-                        /* 
-                           Backflip Logic Transition:
-                           Old Code: 
-                             Start Right: Flip1_R -> Flip2_R -> Flip3_L -> Flip4_L
-                             Start Left:  Flip1_L -> Flip2_L -> Flip3_R -> Flip4_R
-                           
-                           New Code (using flipped arrays):
-                             Start Right (StartDir=0):
-                               Stage 1: BACKFLIP1 (Normal)
-                               Stage 2: BACKFLIP2 (Normal)
-                               Stage 3: BACKFLIP3 (Flipped)
-                               Stage 4: BACKFLIP4 (Flipped)
-                             
-                             Start Left (StartDir=1):
-                               Stage 1: BACKFLIP1 (Flipped)
-                               Stage 2: BACKFLIP2 (Flipped)
-                               Stage 3: BACKFLIP3 (Normal)
-                               Stage 4: BACKFLIP4 (Normal)
-                        */
-                        
                         // Select Base Sprite
                         switch(stage) {
                             case 1: spriteIdx = WORM_BACKFLIP1_MASK; break;
@@ -626,9 +575,8 @@ void Worm_drawAll()
                 // ============================================================
                 else if(i == Worm_currentWorm && (Game_stateFlags & gs_bungeeMode))
                 {
-                    spriteIdx = WORM_BACKFLIP1_MASK; // Use height of Backflip
+                    spriteIdx = WORM_BUNGEE_MASK;
                     useFlipped = (Worm_dir & wormMask) > 0;
-                    isBungee = TRUE;
                 }
 
                 // ============================================================
@@ -688,34 +636,32 @@ void Worm_drawAll()
                 short sprHeight = wormSpriteHeights[spriteIdx];
                 
                 // 2. Get Pointers (Normal or Flipped)
-                if(isBungee)
-                {
-                    if(useFlipped) {
-                        pMask = spr_bungee_left_mask;
-                        pLight = spr_bungee_left_outline;
-                        pDark = spr_bungee_left_outline;
-                    } else {
-                        pMask = spr_bungee_right_mask;
-                        pLight = spr_bungee_right_outline;
-                        pDark = spr_bungee_right_outline;
-                    }
-                }
-                else 
-                {
-                    // Standard Logic
-                    int idxMask = spriteIdx;
-                    int idxLight = spriteIdx + 1;
-                    int idxDark  = spriteIdx + (spriteIdx == WORM_FROZEN_MASK ? 2 : 1);
+                // Note: The macros like WORM_IDLE_LIGHT point to the index in the array.
+                // Since MASK is the base, and Light/Dark follow, we need to resolve them relative to spriteIdx.
+                
+                // ASSUMPTION: The macros are defined sequentially: MASK, LIGHT, DARK (or LIGHT/DARK same if outline)
+                // We can use the defines directly if we know the offset, but since we have a variable 'spriteIdx' (which is the Mask index),
+                // we can assume:
+                // Mask  = spriteIdx
+                // Light = spriteIdx + 1
+                // Dark  = spriteIdx + 2 (if distinct) OR spriteIdx + 1 (if Outline)
+                
+                // However, to be safe and generic without hardcoding +1/+2, we should probably check if it's Frozen.
+                // For Frozen, we know we have distinct Light/Dark.
+                // For others (Idle, Jump, Backflip), we used Outline (Light == Dark).
+                
+                int idxMask = spriteIdx;
+                int idxLight = spriteIdx + 1;
+                int idxDark  = spriteIdx + (spriteIdx == WORM_FROZEN_MASK ? 2 : 1);
 
-                    if(useFlipped) {
-                        pMask = wormsSpritesFlipped[idxMask];
-                        pLight = wormsSpritesFlipped[idxLight];
-                        pDark = wormsSpritesFlipped[idxDark];
-                    } else {
-                        pMask = wormsSprites[idxMask];
-                        pLight = wormsSprites[idxLight];
-                        pDark = wormsSprites[idxDark];
-                    }
+                if(useFlipped) {
+                    pMask = wormsSpritesFlipped[idxMask];
+                    pLight = wormsSpritesFlipped[idxLight];
+                    pDark = wormsSpritesFlipped[idxDark];
+                } else {
+                    pMask = wormsSprites[idxMask];
+                    pLight = wormsSprites[idxLight];
+                    pDark = wormsSprites[idxDark];
                 }
 
                 // 3. Draw
