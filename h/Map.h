@@ -78,4 +78,15 @@ extern void Map_makeMap();
  */
 extern void Map_draw();
 
+
+/**
+ * @brief Adds a line of terrain to the map
+ * 
+ * @param x0 start x
+ * @param y0 start y
+ * @param x1 end x
+ * @param y1 end y
+ */
+extern void Map_addTerrainLine(short x0, short y0, short x1, short y1);
+
 #endif

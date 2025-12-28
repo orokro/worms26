@@ -681,3 +681,37 @@ void Map_draw()
 		
 	}// end if draw map
 }
+
+
+/**
+ * Adds a line of terrain to the map
+ * 
+ * @param x0 start x
+ * @param y0 start y
+ * @param x1 end x
+ * @param y1 end y
+ */
+void Map_addTerrainLine(short x0, short y0, short x1, short y1)
+{
+    unsigned long *light = (unsigned long*)mapLight;
+	unsigned long *dark = (unsigned long*)mapDark;
+
+    short dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    short dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    short err = dx + dy, e2;
+
+    while (1) {
+        if(x0 >= 0 && x0 < 320 && y0 >= 0 && y0 < 200) {
+            short row = x0 >> 5; 
+            short bit = 31 - (x0 & 31);
+            unsigned long mask = 1UL << bit;
+            int idx = (row * 200) + y0;
+            light[idx] |= mask;
+            dark[idx] |= mask;
+        }
+        if (x0 == x1 && y0 == y1) break;
+        e2 = 2 * err;
+        if (e2 >= dy) { err += dy; x0 += sx; }
+        if (e2 <= dx) { err += dx; y0 += sy; }
+    }
+}

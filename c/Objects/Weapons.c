@@ -1027,6 +1027,29 @@ void Weapons_detonateWeapon(short index)
 		return;
 	}
 
+	// Longbow: Stick to map if hit map, else just disappear (worm hit)
+	if(weaponType == WLongbow)
+	{
+		if(Weapon_physObj[index].col.collisions != 0)
+		{
+			float vx = (float)Weapon_xVelo[index];
+			float vy = (float)Weapon_yVelo[index];
+			float len = sqrt(vx*vx + vy*vy);
+			
+			if(len >= 0.1f)
+			{
+				short startX = Weapon_x[index];
+				short startY = Weapon_y[index];
+				short endX = startX + (short)((vx / len) * 6.0f);
+				short endY = startY + (short)((vy / len) * 6.0f);
+				
+				Map_addTerrainLine(startX, startY, endX, endY);
+			}
+		}
+		Camera_focusOn(&Worm_x[(short)Worm_currentWorm], &Worm_y[(short)Worm_currentWorm]);
+		return;
+	}
+
 	// Handle special cases that should NOT explode or should have custom explosions/behavior
 	if(weaponType == WConcreteDonkey)
 	{
