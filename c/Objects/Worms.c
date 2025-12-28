@@ -503,6 +503,17 @@ void Worm_drawAll()
                     useFlipped = (Worm_dir & wormMask) > 0;
                     // Note: Frozen has Light/Dark distinct sprites
 				}
+                // Is this the dying worm during Death mode?
+                else if(Game_mode == gameMode_Death && (Worm_health[i] <= 0) && !((Worm_isDead & wormMask)))
+                {
+                    // Timer counts 60 -> 30 (Explosion) -> 0
+                    if(Game_deathTimer > 38) {
+                        spriteIdx = WORM_TNT1_MASK; // Plunger Up
+                    } else {
+                        spriteIdx = WORM_TNT2_MASK; // Plunger Down
+                    }
+                    useFlipped = (Worm_dir & wormMask) > 0;
+                }
                 // Is this the Active Worm doing an Animation?
                 else if(i == Worm_currentWorm && Game_wormAnimState != ANIM_NONE)
                 {

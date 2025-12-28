@@ -69,6 +69,7 @@ typedef struct {
 extern char Game_mode;
 extern char Game_previousMode;
 extern short Game_timer;
+extern short Game_deathTimer;
 extern short Game_retreatTimer;
 extern short Game_graceTimer;
 extern long Game_suddenDeathTimer;

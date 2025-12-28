@@ -13,7 +13,7 @@
 static short wormToKill = -1;
 
 // timer for kill animation
-static short killAnimTimer = 0;
+short Game_deathTimer = 0;
 
 /**
  * @brief Figures out which worm death to animate right now
@@ -35,7 +35,7 @@ static void processWormDeath(){
 
 			// note the worm to kill & reset timer
 			wormToKill = i;
-			killAnimTimer = 60;
+			Game_deathTimer = 60;
 
 			// reset minimum game timer
 			Game_timer = -1;
@@ -60,7 +60,7 @@ static void Death_enter()
 
 	// reset the worm to kill & timer
 	wormToKill = -1;
-	killAnimTimer = 0;
+	Game_deathTimer = 0;
 
 	// we'll manually focus camera for this
 	cameraAutoFocus = FALSE;
@@ -89,10 +89,10 @@ static void Death_update()
 	if(wormToKill!=-1){
 
 		// countdown timer
-		killAnimTimer--;
+		Game_deathTimer--;
 
 		// half way thru the timer, spawn explosion & kill the worm
-		if(killAnimTimer==30){
+		if(Game_deathTimer==30){
 
 			// spawn explosion at worm position
 			Explosion_spawn(Worm_x[wormToKill], Worm_y[wormToKill]+7, 8, 20, TRUE);
@@ -102,9 +102,10 @@ static void Death_update()
 		}
 
 		// if timer is up, process next worm death
-		if(killAnimTimer<=0)
+		if(Game_deathTimer<=0)
 			processWormDeath();
 	}
+
 
 	// don't attempt to exit this state until minimum time passed or if we have any worms to process
 	if(Game_timer<-1*TIME_MULTIPLIER && wormToKill==-1){
