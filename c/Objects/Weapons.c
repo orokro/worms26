@@ -81,6 +81,7 @@
 #include "Map.h"
 #include "CharacterController.h"
 #include "StatusBar.h"
+#include "Keys.h"
 
 
 // the type of the weapon!
@@ -1256,6 +1257,8 @@ void Weapons_update()
 	if(Weapon_jumpTimer>199)
 		Weapon_jumpTimer=0;
 
+	char actionPressed = Keys_keyDown(keyAction);
+
 	// loop over all weapons, and update the active ones as necessary
 	short i=0;
 	for(i=0; i<MAX_WEAPONS; i++)
@@ -1264,6 +1267,13 @@ void Weapons_update()
 		if(Weapon_active & (unsigned short)((unsigned short)1<<(i)))
 		{
 			currentProps = Weapon_props[(short)Weapon_type[i]];
+
+			// check for manual detonation
+			if(actionPressed && (currentProps & usesDetonation))
+			{
+				Weapons_detonateWeapon(i);
+				continue;
+			}
 
 			// if weapon is out of bounds deactivate it
 			if(Map_isOOB(Weapon_x[(short)i], Weapon_y[(short)i]))
