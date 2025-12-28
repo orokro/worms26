@@ -436,7 +436,7 @@ unsigned long Weapon_props[75] = {
         usesRoutine | holdsCustom | noRender | usesFuse,
         
 		// long bow
-        usesAim | usesPhysics | multiUse | usesDetonateOnImpact | holdsSelf,
+        usesAim | usesCharge | usesPhysics | multiUse | usesDetonateOnImpact | holdsSelf | customRender,
         
 		// prod
         isMele | holdsSelf,
@@ -1666,6 +1666,30 @@ char Weapons_fire(short charge)
 
 
 /**
+ * @brief Draws an arrow for the longbow weapon
+ * 
+ * @param i weapon index
+ * @param screenX screen x
+ * @param screenY screen y
+ */
+void drawArrow(short i, short screenX, short screenY)
+{
+	float vx = (float)Weapon_xVelo[i];
+	float vy = (float)Weapon_yVelo[i];
+	float len = sqrt(vx*vx + vy*vy);
+
+	if(len < 0.1f) return;
+
+	// Normalize and scale to 6 pixels
+	short endX = screenX + (short)((vx / len) * 6.0f);
+	short endY = screenY + (short)((vy / len) * 6.0f);
+
+	// Draw line (using 3 for Black)
+	GrayFastDrawLine2B(screenX, screenY, endX, endY, 3, lightPlane, darkPlane);
+}
+
+
+/**
 	Draws all the in-game, on-screen Weapon objects.
 */
 void Weapons_drawAll()
@@ -1699,6 +1723,10 @@ void Weapons_drawAll()
 				{
 					switch(weaponType)
 					{
+						case WLongbow:
+							drawArrow(i, screenX, screenY);
+							break;
+
 						case WMBBomb:
 							{
 								ClipSprite32_AND_R(screenX-16, screenY-32, 32, spr_MB_Mask, lightPlane);

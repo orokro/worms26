@@ -533,8 +533,8 @@ short Physics_checkExplosions(PhysObj *obj)
  */
 short Physics_checkWeapons(short wormIndex, unsigned short wormMask, PhysObj *obj)
 {
-	// gtfo early if no active weapons
-	if(Weapon_active==0)
+	// gtfo early if no active weapons or if it's the current worm
+	if(Weapon_active==0 || wormIndex == Worm_currentWorm)
 		return 0;
 
 	short i;
@@ -582,6 +582,11 @@ short Physics_checkWeapons(short wormIndex, unsigned short wormMask, PhysObj *ob
 		if(Weapon_type[i] == WDragonBall || Weapon_type[i] == WKamikaze)
 		{
 			totalDamage += 12;
+		}
+		else if(Weapon_type[i] == WLongbow)
+		{
+			totalDamage += 15;
+			Physics_setVelocity(&Worm_physObj[wormIndex], Weapon_xVelo[i], -2, TRUE, TRUE);
 		}
 		else if(Weapon_type[i] == WSkunkGas)
 		{
