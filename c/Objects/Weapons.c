@@ -294,7 +294,7 @@ unsigned long Weapon_props[72] = {
         usesAim | usesCharge | usesPhysics | usesDetonateOnImpact | holdsSelf | spawnsSelf | isCluster,
         
 		// mad cows
-        spawnsSelf | usesFuse | usesController | isAnimal | usesPhysics | holdsSelf,
+        spawnsSelf | usesFuse | usesController | isAnimal | usesPhysics | holdsSelf | isDroppable,
         
 		// skip turn
         isMeta | holdsSelf,
@@ -358,7 +358,7 @@ unsigned long Weapon_props[72] = {
         isMele | usesRoutine | usesFuse,
         
 		// sheep
-        spawnsSelf | usesFuse | usesPhysics | isAnimal | usesJumping | holdsSelf,
+        spawnsSelf | usesFuse | usesPhysics | isAnimal | usesJumping | holdsSelf | isDroppable,
         
 		// mail strike
         usesCursor | usesPhysics | spawnsSelf | usesAirStrike | usesWind | usesConstantGravity,
@@ -1625,7 +1625,7 @@ void Weapons_drawAll()
 						case WSalvationArmy:
 							{
 								const unsigned short* ladySprite = facingLeft ? spr_weapons_flipped[24] : spr_weapons[24];
-								const char shakerPos = facingLeft ? screenX-4 : screenX+4;
+								const char shakerPos = facingLeft ? screenX-6 : screenX-3;
 								ClipSprite16_OR_R(screenX-8, screenY-11, 11, ladySprite, lightPlane);
 								ClipSprite16_OR_R(screenX-8, screenY-11, 11, ladySprite, darkPlane);
 								ClipSprite16_OR_R(shakerPos, screenY-9, 8, spr_weapons[48]+2, lightPlane);
