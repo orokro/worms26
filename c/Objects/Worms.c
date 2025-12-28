@@ -548,13 +548,8 @@ void Worm_drawAll()
                         }
 
                         // Determine Orientation
-                        if(Game_wormFlipStartDir == 0) {
-                            // Started facing RIGHT
-                            useFlipped = (stage >= 3); 
-                        } else {
-                            // Started facing LEFT
-                            useFlipped = (stage < 3);
-                        }
+                        // 0 = Right (Normal), >0 = Left (Flipped)
+                        useFlipped = (Game_wormFlipStartDir > 0);
                         
                         // Adjust Y for tall sprites so feet stay aligned
                         // We check the height of the selected sprite
