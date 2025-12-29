@@ -25,8 +25,10 @@
 #include "StatusBar.h"
 #include "Draw.h"
 
+
 // local defines: the max slope a worm can walk up:
 #define MAX_WORM_SLOPE 6
+
 
 // these will be updated by CharacterController_update()
 // so we don't have to constantly calculate them...
@@ -40,6 +42,9 @@ static short lastGroundY = 0;
 static short ungroundedTimer = 0;
 static char bungeeLatch = 0;
 static char bungeeDisabled = 0;
+static short bungeeValidX = 0;
+static short bungeeValidY = 0;
+
 
 /**
  * Handles moving the worm in the character controller, if its on the ground.
@@ -82,12 +87,12 @@ void wormWalk()
 	else if (Keys_keyState(keyLeft))
 	{
 		moveDir = (Game_stateFlags & gs_fastWalk) ? -2 : -1;
-		Camera_clearFocus();
+		Camera_clearUnless(&Worm_x[(short)Worm_currentWorm], &Worm_y[(short)Worm_currentWorm]);
 	}
 	else if (Keys_keyState(keyRight))
 	{
 		moveDir = (Game_stateFlags & gs_fastWalk) ? 2 : 1;
-		Camera_clearFocus();
+		Camera_clearUnless(&Worm_x[(short)Worm_currentWorm], &Worm_y[(short)Worm_currentWorm]);
 	}
 
 	if ((Game_currentWeaponState & targetPicked) && Keys_keyUp(keyEscape))
@@ -321,12 +326,13 @@ void wormParachute()
     }
 }
 
+
 /**
  * @brief Handles Bungee logic
  */
 void wormBungee()
 {
-    if(Game_stateFlags & gs_bungeeActive)
+    if((Game_stateFlags & gs_bungeeActive) || (Game_currentWeaponSelected == WBungeeCord))
     {
         if(Worm_onGround & wormMask) {
             if(Game_stateFlags & gs_bungeeMode) {
@@ -347,8 +353,16 @@ void wormBungee()
                 short dist = hit.y - *wY;
                 
                 // Activation Condition: falling over a gap or water
-                if(hit.hitType == RAY_HIT_NOTHING || dist > 30) {
+                if(hit.hitType == RAY_HIT_NOTHING || dist > 40) {
                     Game_stateFlags |= gs_bungeeMode;
+                    
+                    // If we used the selected weapon, consume it
+                    if(Game_currentWeaponSelected == WBungeeCord) {
+                        CharacterController_weaponConsumed(TRUE);
+                    }
+                    
+                    // Clear active flag so it's single-use
+                    Game_stateFlags &= ~gs_bungeeActive;
                 }
             }
         }
@@ -356,10 +370,30 @@ void wormBungee()
 
     if(Game_stateFlags & gs_bungeeMode)
     {
+        // Check for collisions to prevent teleporting
+        if(Worm_physObj[(short)Worm_currentWorm].col.collisions != 0) {
+            // "Bonk" - Revert to last valid position
+            *wX = bungeeValidX;
+            *wY = bungeeValidY;
+            Worm_xVelo[(short)Worm_currentWorm] = 0;
+            Worm_yVelo[(short)Worm_currentWorm] = 0;
+        } else {
+            // Update valid position
+            bungeeValidX = *wX;
+            bungeeValidY = *wY;
+        }
+
+        // Auto-disable if grounded (extra check inside mode block)
+        if(Worm_onGround & wormMask) {
+            Game_stateFlags &= ~gs_bungeeMode;
+            return;
+        }
+
         if(Keys_keyState(keyAction)) {
             if(!bungeeLatch) {
                 bungeeLatch = 1;
                 Game_stateFlags &= ~gs_bungeeMode;
+                ungroundedTimer = 0; // Reset timer to prevent instant re-activation
                 Worm_yVelo[(short)Worm_currentWorm] = -4; 
                 return;
             }
@@ -413,6 +447,7 @@ void wormBungee()
     }
 }
 
+
 /**
  * @brief Initiates a backflip for the current worm
  */
@@ -423,6 +458,7 @@ void CharacterController_doBackflip()
 	Game_wormAnimTimer = 0;
 	Game_wormFlipStartDir = (Worm_dir & wormMask);
 }
+
 
 /**
  * handles all update frames for controlling worms in the turn game mode
@@ -451,6 +487,7 @@ void CharacterController_update()
 	if ((Game_currentWeaponProperties & usesAim) || (Game_currentWeaponState & keepAimDuringUse))
 		adjustAim();
 }
+
 
 /**
  * @brief handles clean up after weapon has been decidedly used

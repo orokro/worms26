@@ -52,6 +52,15 @@ extern void Camera_clearIf(short *targetX, short *targetY);
 
 
 /**
+ * @brief Clears the camera focus if it's currently focused on a different target than the given one
+ * 
+ * @param targetX - The target X pointer to check
+ * @param targetY - The target Y pointer to check
+ */
+extern void Camera_clearUnless(short *targetX, short *targetY);
+
+
+/**
  * Removes the current focal reference pointers from the camera.
  *
  * After calling, the Camera will be static until moved by the user,

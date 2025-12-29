@@ -192,6 +192,22 @@ void Camera_clearIf(short *targetX, short *targetY)
 
 
 /**
+ * @brief Clears the camera focus if it's currently focused on a different target than the given one
+ * 
+ * @param targetX - The target X pointer to check
+ * @param targetY - The target Y pointer to check
+ */
+void Camera_clearUnless(short *targetX, short *targetY)
+{
+	// only clear if the current target does NOT match the given target
+	if(cameraIsFocused==TRUE && (cameraTargetX!=targetX || cameraTargetY!=targetY))
+	{
+		Camera_clearFocus();
+	}
+}
+
+
+/**
  * @brief stops the camera from focusing on anything in particular
  */
 void Camera_clearFocus()
