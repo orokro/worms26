@@ -1,3 +1,4 @@
+
 /*
 	CharacterController.c
 	---------------------
@@ -34,7 +35,6 @@
 // so we don't have to constantly calculate them...
 short *wX, *wY;
 unsigned short wormMask = 0;
-static char parachuteLatch = 0;
 
 // Bungee vars
 static short lastGroundX = 0;
@@ -188,11 +188,6 @@ void wormWeapon()
 				StatusBar_showMessage("Bungee Equipped!");
 				break;
 
-			case WParachute:
-				Game_stateFlags |= gs_parachuteActive;
-				StatusBar_showMessage("Parachute Equipped!");
-				break;
-
 			case WSkipGo:
 				Game_changeMode(gameMode_TurnEnd);
 				StatusBar_showMessage("Turn Skipped");
@@ -277,29 +272,19 @@ void wormParachute()
     // Toggle Logic
     if(!(Worm_onGround & wormMask)) 
     {
-        if((Game_stateFlags & gs_parachuteActive) || (Game_currentWeaponSelected == WParachute))
-        {
-            if(Keys_keyState(keyAction)) {
-                if(!parachuteLatch) {
-                    parachuteLatch = 1; 
+		if(Keys_keyDown(keyAction)) 
+		{
+			if((Game_currentWeaponSelected == WParachute) && !(Game_stateFlags & gs_parachuteMode))
+			{				
+				Game_stateFlags |= gs_parachuteMode;
+				Worm_xVelo[(short)Worm_currentWorm] = 0;
+				Worm_yVelo[(short)Worm_currentWorm] = 0;
 
-                    if(Game_stateFlags & gs_parachuteMode) {
-                        Game_stateFlags &= ~gs_parachuteMode;
-                    } else {
-                        Game_stateFlags |= gs_parachuteMode;
-                        Worm_xVelo[(short)Worm_currentWorm] = 0;
-                        Worm_yVelo[(short)Worm_currentWorm] = 0;
-
-                        if(Game_currentWeaponSelected == WParachute) {
-                            Game_stateFlags |= gs_parachuteActive;
-                            CharacterController_weaponConsumed(TRUE); 
-                        }
-                    }
-                }
-            } else {
-                parachuteLatch = 0;
-            }
-        }
+				CharacterController_weaponConsumed(TRUE); 					
+			}else{
+				Game_stateFlags &= ~gs_parachuteMode;
+			}
+		}
     }
 
     // Flight Logic
@@ -465,6 +450,7 @@ void CharacterController_doBackflip()
  */
 void CharacterController_update()
 {
+	// GTFO if camera is being manually controlled
 	if (Keys_keyState(keyCameraControl))
 		return;
 

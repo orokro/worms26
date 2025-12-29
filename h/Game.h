@@ -54,15 +54,14 @@ typedef struct {
 #define gs_jetpackMode 		0b0000000000001000
 #define gs_ninjaRopeMode 	0b0000000000010000
 #define gs_superSheepMode 	0b0000000000100000
-#define gs_parachuteActive 	0b0000000001000000
-#define gs_parachuteMode 	0b0000000010000000
-#define gs_bungeeActive 	0b0000000100000000
-#define gs_bungeeMode 		0b0000001000000000
-#define gs_lockTurnEnd 		0b0000010000000000
-#define gs_team1Invisible 	0b0000100000000000
-#define gs_team2Invisible 	0b0001000000000000
-#define gs_team1Frozen 		0b0010000000000000
-#define gs_team2Frozen 		0b0100000000000000
+#define gs_parachuteMode 	0b0000000001000000
+#define gs_bungeeActive 	0b0000000010000000
+#define gs_bungeeMode 		0b0000000100000000
+#define gs_lockTurnEnd 		0b0000001000000000
+#define gs_team1Invisible 	0b0000010000000000
+#define gs_team2Invisible 	0b0000100000000000
+#define gs_team1Frozen 		0b0001000000000000
+#define gs_team2Frozen 		0b0010000000000000
 
 
 // game globals
