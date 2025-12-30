@@ -276,7 +276,10 @@ void Worm_update()
 
 				// reset jump animation if any
 				if(!(Worm_wasOnGround & wormMask) && (Worm_onGround & wormMask))
-					Game_wormAnimState = ANIM_NONE;
+                {
+                    if (Game_wormAnimState != ANIM_DRILL && Game_wormAnimState != ANIM_TORCH)
+					    Game_wormAnimState = ANIM_NONE;
+                }
 			}
 			
 			// calculate the worms tile, and if it changed, we need to check for mine and crate updates
