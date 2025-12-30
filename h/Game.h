@@ -44,7 +44,7 @@ typedef struct {
 #define keepAimDuringUse	0b00001000
 
 // For max fuel allowed for jetback
-#define MAX_JETPACK_FUEL 200.0
+#define MAX_JETPACK_FUEL 150.0
 
 // Define Fixed Point precision (16.16)
 #define FP_SHIFT 16
@@ -65,7 +65,7 @@ typedef struct {
 #define gs_team2Invisible 	0b0000100000000000
 #define gs_team1Frozen 		0b0001000000000000
 #define gs_team2Frozen 		0b0010000000000000
-
+#define gs_girderPlace 		0b0100000000000000
 
 // game globals
 extern char Game_mode;

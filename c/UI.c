@@ -45,6 +45,59 @@ extern void Draw_setRayLine(short sx, short sy, short ex, short ey)
 
 
 /**
+ * @brief Get the Girder Coords object
+ * 
+ * @param x - center x to rotate around
+ * @param y - center y to rotate around
+ * @param outX1 - output x1
+ * @param outY1 - output y1
+ * @param outX2 - output x2
+ * @param outY2 - output y2
+ */
+void getGirderCoords(short x, short y, short* outX1, short* outY1, short* outX2, short* outY2)
+{
+	const short xPos[] = {-5, -4, 0, -4, -5, -4, 0, -4};
+	const short yPos[] = {0, -4, -5, -4, 0, -4, -5, -4};
+	const char multipler = (Game_jetPackFuel > 3) ? 2 : 1;
+
+	*outX1 = x + xPos[(short)Game_jetPackFuel] * multipler;
+	*outY1 = y + yPos[(short)Game_jetPackFuel] * multipler;
+	*outX2 = x - xPos[(short)Game_jetPackFuel] * multipler;
+	*outY2 = x - yPos[(short)Game_jetPackFuel] * multipler;
+}	
+
+
+/**
+ * @brief Draws a thicker line than normal
+ * 
+ * @param x1 - starting x
+ * @param y1 - starting y
+ * @param x2 - ending x
+ * @param y2 - ending y
+ * @param color - color to draw with
+ * @param lightPlane - light plane
+ * @param darkPlane - dark plane
+ */
+void DrawThickLine(short x1, short y1, short x2, short y2, short color, void* lightPlane, void* darkPlane) {
+
+    // 1. Draw the center line
+    GrayDrawClipLine2B(x1, y1, x2, y2, color, lightPlane, darkPlane);
+
+    // 2. Determine direction to expand based on slope
+    // If width (dx) is greater than height (dy), it's a horizontal-ish line.
+    if (abs(x2 - x1) >= abs(y2 - y1)) {
+        // Expand Vertically (Up and Down)
+        GrayDrawClipLine2B(x1, y1 - 1, x2, y2 - 1, color, lightPlane, darkPlane);
+        GrayDrawClipLine2B(x1, y1 + 1, x2, y2 + 1, color, lightPlane, darkPlane);
+    } else {
+        // Expand Horizontally (Left and Right)
+        GrayDrawClipLine2B(x1 - 1, y1, x2 - 1, y2, color, lightPlane, darkPlane);
+        GrayDrawClipLine2B(x1 + 1, y1, x2 + 1, y2, color, lightPlane, darkPlane);
+    }
+}
+
+
+/**
  * Draws the X picked in arrow mode
  */
 void drawCursorAndXSpot()
@@ -60,12 +113,25 @@ void drawCursorAndXSpot()
 	if(Game_mode==gameMode_Cursor)
 	{		
 		if(worldToScreen(&screenX, &screenY))
-		{							
-			const unsigned char* cursorOutlineSprite = (Game_currentWeaponState & strikeLeft) ? spr_CursorOutline : spr_CursorOutlineFlipped;
-			const unsigned char* cursorFillSprite = (Game_currentWeaponState & strikeLeft) ? spr_CursorFill : spr_CursorFillFlipped;
-			
-			GrayClipSprite8_AND_R(screenX, screenY, 12, cursorOutlineSprite, cursorOutlineSprite, lightPlane, darkPlane);
-			GrayClipSprite8_OR_R(screenX, screenY, 12, cursorFillSprite, cursorFillSprite, lightPlane, darkPlane);
+		{						
+
+			// if we're in girder mode, we should draw the rotated line representing the girder
+			if(Game_stateFlags &= gs_girderPlace)
+			{
+				short gx1 = 0, gy1 = 0, gx2 = 0, gy2 = 0;
+				getGirderCoords(screenX, screenY, &gx1, &gy1, &gx2, &gy2);
+
+				DrawThickLine(gx1, gy1, gx2, gy2, 3, lightPlane, darkPlane);
+
+			}
+			else
+			{
+				const unsigned char* cursorOutlineSprite = (Game_currentWeaponState & strikeLeft) ? spr_CursorOutline : spr_CursorOutlineFlipped;
+				const unsigned char* cursorFillSprite = (Game_currentWeaponState & strikeLeft) ? spr_CursorFill : spr_CursorFillFlipped;
+				
+				GrayClipSprite8_AND_R(screenX, screenY, 12, cursorOutlineSprite, cursorOutlineSprite, lightPlane, darkPlane);
+				GrayClipSprite8_OR_R(screenX, screenY, 12, cursorFillSprite, cursorFillSprite, lightPlane, darkPlane);
+			}
 		}
 	}
 	

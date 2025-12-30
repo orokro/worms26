@@ -17,6 +17,7 @@
 */
 char cursorFastMove=0;
 
+// 
 
 /**
 	Called on the first-frame when the Games state machine is set to Cursor mode.
@@ -92,6 +93,15 @@ static void Cursor_update()
 	else if(Game_cursorY>190)
 		Game_cursorY = 190;
 	
+	// for girder - inert if we are not in girder mode
+	// if we pressed plus or minus, rotate the girder
+	if(Keys_keyDown(keyPlus))		
+		Game_jetPackFuel = (Game_jetPackFuel+1)%8;
+	
+	else if(Keys_keyDown(keyMinus))
+		Game_jetPackFuel = (Game_jetPackFuel+7)%8;
+	
+
 	// if the user pressed ESCAPE we should just exit cursor mode
 	if(Keys_keyUp(keyEscape))
 	{

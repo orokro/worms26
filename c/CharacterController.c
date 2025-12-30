@@ -227,7 +227,18 @@ void wormWeapon()
 	{
 		Game_xMarkAllowedOverLand = !(Game_currentWeaponSelected==WTeleport);
 		if (Keys_keyUp(keyAction))
+		{
 			Game_changeMode(gameMode_Cursor);
+
+			// enable the girder place flag if needed
+			if(Game_currentWeaponSelected == WGirder || Game_currentWeaponSelected == WGirderPack)
+			{
+				// we'll hackishly re-use the jetpack fuel to determine the girder rotation
+				if(Game_jetPackFuel>7)
+					Game_jetPackFuel = 0;
+				Game_stateFlags |= gs_girderPlace;
+			}
+		}
 		return;
 	}
 

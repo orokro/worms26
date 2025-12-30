@@ -372,7 +372,7 @@ unsigned long Weapon_props[75] = {
         usesCursor | usesPhysics | spawnsSelf | usesAirStrike | usesWind | usesConstantGravity,
         
 		// girder
-        0,
+        usesCursor | holdsCustom,
         
 		// parachute
         isMeta,
@@ -454,7 +454,7 @@ unsigned long Weapon_props[75] = {
         usesCursor | spawnsSelf | usesAirStrike,
         
 		// girder pack
-        usesCursor | multiUse,
+        usesCursor | multiUse | doesntEndTurn | holdsCustom,
         
 		// scales of justice
         usesRoutine | holdsSelf,
