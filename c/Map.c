@@ -23,43 +23,9 @@
 #include "Worms.h"
 #include "OilDrums.h"
 #include "Mines.h"
+#include "Crates.h"
+#include "Game.h"
 #include "Camera.h"
-
-
-/*
-	Below, these array values will store eligible spawn points on the map.
-	
-	Everytime an object requests a spawn point we will pick from one of
-	these, then deactivate it.
-	
-	There can be a total of 8 Oil Drums, 10 Mines, and 16 worms
-	at the start of a game.
-	
-	Crates spawn later, so we don't have to worry about them
-	
-	We need a minimum of 8+10+16 spawn points, or 34 spawn points.
-	
-	But since the map generates these as it goes, it should generate
-	more than necessary so we can chose from them randomly, and not
-	have all the worms next to each other.
-	
-	The map is 320 pixels wide, and has an upper level and a lower level.
-	
-	Mines always need to be at least 10 pixels away from a worm, since
-	mines trigger at 10px.
-	
-	Thus, if we generate spawn points, every 12 pixels on both levels,
-	we would get: (320/12)*2 spawn points, or 53 spawn points.
-	
-	This will give us 19 extra. Some areas of land wont be spawnable,
-	if its an open hole to the level below, or to the water.
-	
-	We need to make sure that we don't generate more than 19*12 pixels
-	of open space.
-*/ 
-short spawnPoint_x[53];
-short spawnPoint_y[53];
-
 
 /*
 	the map will keep an array of 620 tiles, (32 x 20) which represent
@@ -247,27 +213,10 @@ void Map_makeMap()
 		
 		Since the buffer will be updated 1 unsigned short at a time, we will generate the pixels for one column at a time
 		then copy to the map.
-		
-		As we go, every 12 pixels we will add a spawn-point for the upper and lower levels.
-		
-		We need a minimum of 34 spawn-points, so we can spawn everything (16 worms, 8 oil drums, 10 mines)
-		
-		If we generate land that is 0 height, we cant spawn on there. We, therefore, can't spawn more than 19*12 0 height
-		land points. We will keep track of 0 height land and if we exceed 19*12 pixels worth, stop allowing 0 height land.
 	*/
-	
-	// initialize our spawn point buffers:
-	for(x=0; x<53; x++)
-	{
-		spawnPoint_x[x]=-1;
-		spawnPoint_y[x]=-1;
-	}
 	
 	// keep track of empty land:
 	unsigned char emptyLand=0;
-	
-	// keep track of current spawn-point index:
-	char spawnIndex=0;
 	
 	// the positions of the lines to draw:
 	char upperLineTop=0;
@@ -372,28 +321,6 @@ void Map_makeMap()
 				emptyLand++;
 		}
 		
-		// if its time to make spawn points..
-		// just generate them at our current x, and the tops of the current land
-		if(x%12==0 && spawnIndex<53)
-		{
-			// upper spawn point, if land isn't 0:
-			if(!(upperLineTop==0 && upperLineBottom==0))
-			{
-				spawnPoint_x[(short)spawnIndex]=x;
-				spawnPoint_y[(short)spawnIndex]=50-upperLineTop;
-				spawnIndex++;
-			}
-			
-			
-			// lower spawn point, if land isn't 0:
-			if(lowerLineTop<30)
-			{
-				spawnPoint_x[(short)spawnIndex]=x;
-				spawnPoint_y[(short)spawnIndex]=170+lowerLineTop;
-				spawnIndex++;
-			}
-		}
-		
 		// now we need to draw the lines on the map...
 		for(y=0; y<200; y++)
 		{
@@ -426,9 +353,10 @@ void Map_makeMap()
 	Map_traceEdges();
 
 	// part of generating the map will be generating the objects on it..
+	// Prioritize WORMS first, so they get the best spots
+	Worm_spawnWorms();
 	Mines_spawnMines();
 	OilDrums_spawnDrums();
-	Worm_spawnWorms();
 	
 }
 
@@ -478,33 +406,190 @@ char Map_testPoint(short x, short y)
 	return pixelOn;
 }
 
-
-
 /**
- * find a free point to spawn something, that doesn't overlap with something else existing
+ * Helper to check distance between two points squared
  */
-void Map_getSpawnPoint()
-{
-	// loop over our available spawn points till we find one:
-	while(TRUE)
-	{
-			char index = random(53);
-			if(spawnPoint_x[(short)index]!=-1)
-			{
-				// save the spawn point
-				Map_lastRequestedSpawnX=spawnPoint_x[(short)index];
-				Map_lastRequestedSpawnY=spawnPoint_y[(short)index];
-				
-				// deactivate it
-				spawnPoint_x[(short)index]=-1;
-				spawnPoint_y[(short)index]=-1;
-				
-				// gtfo
-				return;
-			}
-	}	
+static long distSq(short x1, short y1, short x2, short y2) {
+	long dx = (long)(x1 - x2);
+	long dy = (long)(y1 - y2);
+	return dx*dx + dy*dy;
 }
 
+/**
+ * Finds a valid spawn point for the given object type.
+ * Uses raycasting and proximity checks to ensure safety.
+ *
+ * @param type - The type of object (SPAWN_WORM, SPAWN_MINE, etc)
+ * @param outX - Pointer to store the result X
+ * @param outY - Pointer to store the result Y
+ * @return TRUE if found, FALSE if failed (should rarely fail)
+ */
+char Map_findSpawnPoint(char type, short *outX, short *outY)
+{
+	int i, j;
+	short startX, startY;
+	
+	// Configuration based on type
+	short radiusWorm = 0;
+	short radiusMine = 0;
+	short radiusDrum = 0;
+	short headroom = 0;
+	char checkWater = TRUE;
+	char checkHeadroom = FALSE;
+	char fromSky = FALSE;
+	
+	switch(type) {
+		case SPAWN_WORM:
+			radiusWorm = 15; // Don't stack worms
+			radiusMine = 25; // Far from mines
+			radiusDrum = 15; // Bit away from drums
+			headroom = 20;
+			checkHeadroom = TRUE;
+			break;
+		case SPAWN_MINE:
+			radiusWorm = 25; // Keep away from worms
+			radiusMine = 10; // Don't stack mines
+			radiusDrum = 10;
+			headroom = 5;
+			checkHeadroom = TRUE;
+			break;
+		case SPAWN_DRUM:
+			radiusWorm = 15;
+			radiusMine = 10;
+			radiusDrum = 15; // Don't stack drums
+			headroom = 15;
+			checkHeadroom = TRUE;
+			break;
+		case SPAWN_CRATE:
+			radiusWorm = 15; // Don't land ON a worm
+			radiusMine = 0;
+			radiusDrum = 0;
+			fromSky = TRUE;
+			break;
+	}
+	
+	short maxAttempts = 500;
+	
+	// Fallback logic: If we struggle to place items, reduce requirements
+	for(i=0; i<maxAttempts; i++) {
+		
+		// If we are struggling, relax constraints
+		if(i > 200) {
+			radiusWorm = (radiusWorm * 2) / 3;
+			radiusMine = (radiusMine * 2) / 3;
+			radiusDrum = (radiusDrum * 2) / 3;
+		}
+		if(i > 400) {
+			radiusWorm /= 2;
+			radiusMine /= 2;
+			radiusDrum /= 2;
+			headroom /= 2;
+		}
+		
+		// 1. Pick Random Location
+		startX = random(310) + 5; // Margin from edges
+		startY = fromSky ? -10 : random(180) + 10;
+		
+		// 2. Initial Validity Check
+		// If placing on ground, ensure we didn't pick a point INSIDE land
+		if(!fromSky && Map_testPoint(startX, startY))
+			continue;
+			
+		// 3. Raycast Down to find land
+		RaycastHit hit = Game_raycast(startX, startY, 0, 1, FALSE);
+		
+		// Must hit land
+		if(hit.hitType != RAY_HIT_LAND)
+			continue;
+			
+		// 4. Water Check
+		if(checkWater) {
+			if(hit.y > (196 - Game_waterLevel))
+				continue;
+		}
+		
+		// 5. Headroom Check (ensure not in a tiny cave)
+		if(checkHeadroom) {
+			// Raycast UP from ground
+			RaycastHit headHit = Game_raycast(hit.x, hit.y - 4, 0, -1, FALSE);
+			if(headHit.hitType == RAY_HIT_LAND) {
+				short gap = hit.y - headHit.y;
+				if(gap < headroom)
+					continue;
+			}
+		}
+		
+		// 6. Proximity Checks
+		char valid = TRUE;
+		
+		// Check Worms
+		if(radiusWorm > 0) {
+			long radSq = (long)radiusWorm * radiusWorm;
+			unsigned short mask;
+			for(j=0; j<MAX_WORMS; j++) {
+				mask = (unsigned short)1 << j;
+				if(Worm_active & mask) {
+					if(distSq(hit.x, hit.y, Worm_x[j], Worm_y[j]) < radSq) {
+						valid = FALSE; break;
+					}
+				}
+			}
+		}
+		if(!valid) continue;
+		
+		// Check Mines
+		if(radiusMine > 0) {
+			long radSq = (long)radiusMine * radiusMine;
+			for(j=0; j<MAX_MINES; j++) {
+				if(Mine_active & (unsigned short)1<<j) {
+					if(distSq(hit.x, hit.y, Mine_x[j], Mine_y[j]) < radSq) {
+						valid = FALSE; break;
+					}
+				}
+			}
+		}
+		if(!valid) continue;
+		
+		// Check Oil Drums
+		if(radiusDrum > 0) {
+			long radSq = (long)radiusDrum * radiusDrum;
+			for(j=0; j<MAX_OILDRUMS; j++) {
+				if(OilDrum_active & (unsigned short)1<<j) {
+					if(distSq(hit.x, hit.y, OilDrum_x[j], OilDrum_y[j]) < radSq) {
+						valid = FALSE; break;
+					}
+				}
+			}
+		}
+		if(!valid) continue;
+		
+		// Check Crates (Rare but possible)
+		if(Crate_active) {
+			long radSq = 20 * 20; // Default buffer
+			for(j=0; j<MAX_CRATES; j++) {
+				if(Crate_active & (unsigned short)1<<j) {
+					if(distSq(hit.x, hit.y, Crate_x[j], Crate_y[j]) < radSq) {
+						valid = FALSE; break;
+					}
+				}
+			}
+		}
+		if(!valid) continue;
+		
+		// 7. Found it!
+		if(fromSky) {
+			*outX = startX;
+			*outY = startY; // Sky position
+		} else {
+			*outX = hit.x;
+			*outY = hit.y; // Ground position
+		}
+		
+		return TRUE;
+	}
+	
+	return FALSE;
+}
 
 // draw the map.. but I can't call this, crashes
 void Map_draw()

@@ -105,9 +105,20 @@ void spawnWorm(short index)
 	mask = mask<<(index);
 	
 	// find a free place for it on the map
-	Map_getSpawnPoint();
-	Worm_x[index] = Map_lastRequestedSpawnX;
-	Worm_y[index] = Map_lastRequestedSpawnY;
+	short sx = 0;
+	short sy = 0;
+	
+	// This function handles retry logic internally, but always good to check
+	if(Map_findSpawnPoint(SPAWN_WORM, &sx, &sy)) {
+		Worm_x[index] = sx;
+		Worm_y[index] = sy;
+	} else {
+		// Fallback: This should ideally not happen if maxAttempts is high enough.
+		// We'll just dump them somewhere "safeish" or leave as is (which is bad).
+		// For now, let's just pick a random spot and pray.
+		Worm_x[index] = random(300) + 10;
+		Worm_y[index] = 10; 
+	}
 	
 	// set active
 	Worm_active |= mask;

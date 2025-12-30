@@ -74,11 +74,13 @@ PhysObj Mine_physObj[MAX_MINES];
 void spawnMine(char index)
 {
 	// find a free place for it on the map
-	Map_getSpawnPoint();
-	
-	// save the last requested point:
-	Mine_x[(short)index] = Map_lastRequestedSpawnX;
-	Mine_y[(short)index] = Map_lastRequestedSpawnY;
+	short sx, sy;
+	if(Map_findSpawnPoint(SPAWN_MINE, &sx, &sy)) {
+		Mine_x[(short)index] = sx;
+		Mine_y[(short)index] = sy;
+	} else {
+		return; // If we can't spawn, just don't spawn it.
+	}
 	
 	// make this mine active:
 	Mine_active |= (unsigned short)1<<(index);

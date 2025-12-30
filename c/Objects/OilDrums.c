@@ -61,11 +61,13 @@ char OilDrum_yVelo[MAX_OILDRUMS] = {0, 0, 0, 0, 0, 0};
 void spawnDrum(short index)
 {
 	// find a free place for it on the map
-	Map_getSpawnPoint();
-	
-	// save the last requested point:
-	OilDrum_x[index] = Map_lastRequestedSpawnX;
-	OilDrum_y[index] = Map_lastRequestedSpawnY;
+	short sx, sy;
+	if(Map_findSpawnPoint(SPAWN_DRUM, &sx, &sy)) {
+		OilDrum_x[index] = sx;
+		OilDrum_y[index] = sy;
+	} else {
+		return;
+	}
 	
 	// health is already set in the header file
 	// so let's just enable it:

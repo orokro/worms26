@@ -39,30 +39,29 @@ extern char Map_isOOB(short x, short y);
 extern void Map_traceEdges();
 
 
+// Spawn Types
+#define SPAWN_WORM 0
+#define SPAWN_MINE 1
+#define SPAWN_DRUM 2
+#define SPAWN_CRATE 3
+
 /**
- * Checks if a point on the map is land or not.
+ * Finds a valid spawn point for the given object type.
+ * Uses raycasting and proximity checks to ensure safety.
  *
- * The map is a large buffer, and this method will take an X/Y position,
- * with X==0/Y==0 being the top left.
- * It will return a char boolean TRUE/FALSE if the pixel is LAND/NOT LAND.
- *
- * @param x the x position to test
- * @param y the y position to test
- * @return a char boolean if the point is land or not.
-*/
+ * @param type - The type of object (SPAWN_WORM, SPAWN_MINE, etc)
+ * @param outX - Pointer to store the result X
+ * @param outY - Pointer to store the result Y
+ * @return TRUE if found, FALSE if failed (should rarely fail)
+ */
+extern char Map_findSpawnPoint(char type, short *outX, short *outY);
+
+/**
+ * tests a point on the map
+ * 
+ * @returns TRUE or FALSE if a point is on land
+ */
 extern char Map_testPoint(short, short);
-
-
-/**
- * Sets globals, Map_lastRequestedSpawnX and Map_lastRequestedSpawnY to a valid spawn point for an item on the map.
- *
- * When the map is being generated a number of valid spawn-points are also generated.
- * This doesn't exactly "return" a point, but it selects from one of the generated ones and makes
- * the aforementioned globals equal to the valid spawn point.
- *
- * This method will also nullify the spawn point from the pool so no other items can spawn there.
-*/
-extern void Map_getSpawnPoint();
 
 
 /**
