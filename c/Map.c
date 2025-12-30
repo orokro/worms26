@@ -462,69 +462,43 @@ char Map_findSpawnPoint(char type, short *outX, short *outY)
 	
 	for(i=0; i<maxAttempts; i++) {
 		
-		// Relax constraints over time
-		if(i > 200) {
-			radiusWorm = (radiusWorm * 2) / 3;
-			radiusMine = (radiusMine * 2) / 3;
-			radiusDrum = (radiusDrum * 2) / 3;
-		}
-		if(i > 400) {
-			radiusWorm /= 2;
-			radiusMine /= 2;
-			radiusDrum /= 2;
-			headroom /= 2;
-		}
-		
 		// 1. Pick Random X
 		startX = random(310) + 5;
 		
 		// 2. Determine Y scan start
 		// Alternating scan: Top (0) vs Mid (90)
 		if(fromSky) {
-			startY = 0; // Scanning from 0 is safe for sky
+			startY = 0; 
 		} else {
 			startY = (i % 2 == 0) ? 0 : 90;
 		}
 		
-		// 3. Find Land (Simple Vertical Raycast)
-		// We implement a fast inline loop instead of using Game_raycast
+		// 3. Find Land using Raycast
+		// Use Game_raycast to reduce code size
+		// startY is always >= 0, so no out-of-bounds bug
+		RaycastHit hit = Game_raycast(startX, startY, 0, 1, FALSE);
+		
 		short hitY = -1;
+		
 		if(fromSky) {
-			// For crates, "hitting land" means valid spawn is the Sky
-			// But we still need to check what it would eventually hit for safety
-			// So we scan down to find the eventual landing spot
-			for(j = 0; j < 200; j++) {
-				if(Map_testPoint(startX, j)) {
-					hitY = j;
-					break;
-				}
-			}
-			// If we didn't hit land (hole to water), that's fine for Crate logic below (water check)
-			// But the spawn point itself is in the sky
+			// For crates, if we hit nothing (water) or land, spawn in sky
 			*outX = startX;
-			*outY = -10; // Crate spawns in sky
+			*outY = -10;
+			
+			// But check eventual landing spot for validity
+			if(hit.hitType == RAY_HIT_LAND) hitY = hit.y;
+			else hitY = 200; // Hole
+			
 		} else {
-			// For ground objects, we need actual land
-			// Optimization: If we start at 90, we assume we want lower layer
-			// If we start at 0, we take first hit (upper)
-			for(j = startY; j < 200; j++) {
-				if(Map_testPoint(startX, j)) {
-					hitY = j;
-					break;
-				}
-			}
+			// For ground objects, must hit land
+			if(hit.hitType != RAY_HIT_LAND) continue;
 			
-			// If no land found, try again
-			if(hitY == -1) continue;
-			
-			// Found land
-			*outX = startX;
-			*outY = hitY;
+			hitY = hit.y;
+			*outX = hit.x;
+			*outY = hit.y;
 		}
 		
-		// 4. Validity Checks using hitY (the ground level)
-		// If hitY is -1 (water hole), checkWater handles it
-		if(hitY == -1) hitY = 200; // Treat hole as bottom
+		// 4. Validity Checks
 		
 		// Water Check
 		if(checkWater) {
@@ -535,71 +509,36 @@ char Map_findSpawnPoint(char type, short *outX, short *outY)
 		// Headroom Check
 		if(checkHeadroom) {
 			// Scan UP from ground
-			char hitCeiling = FALSE;
-			for(j = hitY - 4; j >= 0; j--) {
-				if(Map_testPoint(startX, j)) {
-					// Hit a ceiling!
-					short gap = hitY - j;
-					if(gap < headroom) hitCeiling = TRUE;
-					break; // Stop scanning up
-				}
+			RaycastHit headHit = Game_raycast(hit.x, hit.y - 4, 0, -1, FALSE);
+			if(headHit.hitType == RAY_HIT_LAND) {
+				short gap = hit.y - headHit.y;
+				if(gap < headroom) continue;
 			}
-			if(hitCeiling) continue;
 		}
 		
-		// Proximity Checks (Euclidean Distance Squared)
+		// Proximity Checks (Combined Loop)
 		char valid = TRUE;
-		
-		// Check Worms
-		if(radiusWorm > 0) {
-			long radSq = (long)radiusWorm * radiusWorm;
-			unsigned short mask;
-			for(j=0; j<MAX_WORMS; j++) {
-				mask = (unsigned short)1 << j;
-				if(Worm_active & mask) {
-					if(distSq(*outX, hitY, Worm_x[j], Worm_y[j]) < radSq) {
-						valid = FALSE; break;
-					}
-				}
+		long radSqWorm = (long)radiusWorm * radiusWorm;
+		long radSqMine = (long)radiusMine * radiusMine;
+		long radSqDrum = (long)radiusDrum * radiusDrum;
+		long radSqCrate = 400; // Fixed 20*20
+
+		for(j=0; j<MAX_WORMS; j++) {
+			// Worms (16)
+			if(radiusWorm > 0 && (Worm_active & ((unsigned short)1<<j))) {
+				if(distSq(*outX, hitY, Worm_x[j], Worm_y[j]) < radSqWorm) { valid = FALSE; break; }
 			}
-		}
-		if(!valid) continue;
-		
-		// Check Mines
-		if(radiusMine > 0) {
-			long radSq = (long)radiusMine * radiusMine;
-			for(j=0; j<MAX_MINES; j++) {
-				if(Mine_active & (unsigned short)1<<j) {
-					if(distSq(*outX, hitY, Mine_x[j], Mine_y[j]) < radSq) {
-						valid = FALSE; break;
-					}
-				}
+			// Mines (10)
+			if(j < MAX_MINES && radiusMine > 0 && (Mine_active & ((unsigned short)1<<j))) {
+				if(distSq(*outX, hitY, Mine_x[j], Mine_y[j]) < radSqMine) { valid = FALSE; break; }
 			}
-		}
-		if(!valid) continue;
-		
-		// Check Oil Drums
-		if(radiusDrum > 0) {
-			long radSq = (long)radiusDrum * radiusDrum;
-			for(j=0; j<MAX_OILDRUMS; j++) {
-				if(OilDrum_active & (unsigned short)1<<j) {
-					if(distSq(*outX, hitY, OilDrum_x[j], OilDrum_y[j]) < radSq) {
-						valid = FALSE; break;
-					}
-				}
+			// Drums (6)
+			if(j < MAX_OILDRUMS && radiusDrum > 0 && (OilDrum_active & ((unsigned short)1<<j))) {
+				if(distSq(*outX, hitY, OilDrum_x[j], OilDrum_y[j]) < radSqDrum) { valid = FALSE; break; }
 			}
-		}
-		if(!valid) continue;
-		
-		// Check Crates
-		if(Crate_active) {
-			long radSq = 20 * 20;
-			for(j=0; j<MAX_CRATES; j++) {
-				if(Crate_active & (unsigned short)1<<j) {
-					if(distSq(*outX, hitY, Crate_x[j], Crate_y[j]) < radSq) {
-						valid = FALSE; break;
-					}
-				}
+			// Crates (8)
+			if(j < MAX_CRATES && Crate_active && (Crate_active & ((unsigned short)1<<j))) {
+				if(distSq(*outX, hitY, Crate_x[j], Crate_y[j]) < radSqCrate) { valid = FALSE; break; }
 			}
 		}
 		if(!valid) continue;
