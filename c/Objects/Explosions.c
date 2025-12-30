@@ -56,53 +56,37 @@ unsigned short Explosion_firstFrame = 0;
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 
-
-
 /**
- * Erases the map for a given explosion
- *
- * @param index the index of the explosion to erase from the map
-*/
-void eraseMap(short index)
+ * Digs a hole in the map
+ * 
+ * @param x x position
+ * @param y y position
+ * @param s radius
+ * @param border if true, adds a dark border around the hole
+ */
+void Explosion_dig(short x, short y, short s, char border)
 {
-	/*
-		Fixed version with bounds checking and memory safety.
-	*/
-	
-	// get explosion details
-	short x = Explosion_x[index];
-	short y = Explosion_y[index];
-	short s = Explosion_size[index];
-
-	// determine the pixel edges of our explosion:
+	// determine the pixel edges:
 	short t = y-s;
 	short b = y+s;
 	short l = x-s;
 	short r = x+s;
 	
-	// determine the columns the left and right are in
+	// determine the columns
 	short lCol = (l-(l%32))/32;
 	short rCol = (r-(r%32))/32;
 	
-	// make virtual screen the size of our explosion
+	// make virtual screen
 	void *virtual=malloc(LCD_SIZE);
+	if(virtual == NULL) return;
 	
-	// SAFETY CHECK: If malloc fails (out of memory), abort to prevent crash
-	if(virtual == NULL)
-		return;
-	
-	// set it to be our virtual screen
 	PortSet(virtual, 239, 127);
-	
-	// clear our virtual screen
 	ClrScr();
 	
-	// convert the x and y position of the explosion to be relative to our mini buffer
-	// We save these to separate vars so we can reuse them for the second pass
 	short drawX = x - (lCol*32);
 	short drawY = y - t;
 	
-	// loop to draw a bunch of eclipses
+	// Pass 1: Draw inner hole
 	short e;
 	for(e=1; e<s; e++)
 	{
@@ -110,79 +94,63 @@ void eraseMap(short index)
 		DrawClipEllipse(drawX, drawY-1, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
 	}
 	
-	// references to our map buffers, and explosion buffer
 	unsigned long *light = (unsigned long*)mapLight;
 	unsigned long *dark = (unsigned long*)mapDark;
 	
-	// CLAMPING: Ensure we only loop over valid map bounds
 	short startRow = (t < 0) ? 0 : t;
 	short endRow = (b > 199) ? 199 : b;
 	short startCol = (lCol < 0) ? 0 : lCol;
 	short endCol = (rCol > 9) ? 9 : rCol;
 
-	// loop over our rows
 	short row, col;
 	for(row=startRow; row<=endRow; row++)
 	{
-		// loop over the columns in this row:
 		for(col=startCol; col<=endCol; col++)
 		{
-			// read the unsigned long from both our light and dark buffers
 			unsigned long ulLight = light[(col*200)+row];
 			unsigned long ulDark = dark[(col*200)+row];
 			
-			// move to the offset in the virtual:
-			// Note: We use the original 't' and 'lCol' for the virtual buffer math
-			// to ensure we align with the drawn ellipse, even if we are skipping map rows/cols
 			unsigned short *expShort = (unsigned short*)virtual;
 			unsigned long *expLong = (unsigned long*)(expShort+((15*(row-t))+((col-lCol)*2)));
 			
-			// read the corresponding unsigned long from the explosion buffer,
-			// and flip its bits, so that the explosion is 0 and everything else is 1
 			unsigned long ulExp = ~(*expLong);
 
-			// if we AND the inverted explosion bits, the map should be erased:
 			light[(col*200)+row] = ulLight & ulExp;
 			dark[(col*200)+row] = ulDark & ulExp;
-			
-		}// next col
-	}// next row
-	
-	// loop to draw extra eclipses to make a burned edge of the map
-	for(e=s; e<s+2; e++)
-	{
-		DrawClipEllipse(drawX, drawY, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
-		DrawClipEllipse(drawX, drawY-1, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
+		}
 	}
 	
-	// now we do another pass to add the burned edge
-	for(row=startRow; row<=endRow; row++)
+	if(border)
 	{
-		// loop over the columns in this row:
-		for(col=startCol; col<=endCol; col++)
+		// Pass 2: Draw border rings
+		for(e=s; e<s+2; e++)
 		{
-			// read the unsigned long from both our light and dark buffers,
-			// and combine them into one that represents the map at that line
-			unsigned long ulLight = light[(col*200)+row];
-			unsigned long ulDark = dark[(col*200)+row];
-			unsigned long ulMap = ulLight | ulDark;
+			DrawClipEllipse(drawX, drawY, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
+			DrawClipEllipse(drawX, drawY-1, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
+		}
 
-			// move to the offset in the virtual:
-			unsigned short *expShort = (unsigned short*)virtual;
-			unsigned long *expLong = (unsigned long*)(expShort+((15*(row-t))+((col-lCol)*2)));
-			
-			// read the corresponding unsigned long from the explosion buffer
-			unsigned long ulExp = (*expLong);
-			
-			// if we AND the explosion bits, the map should add 1s to both layers where
-			// it overlays, but it will erase the map elsewhere so we can OR the layer back on
-			light[(col*200)+row] = (ulMap & ulExp) | ulLight;
-			dark[(col*200)+row] = (ulMap & ulExp) | ulDark;
-			
-		}// next col
-	}// next row
+		for(row=startRow; row<=endRow; row++)
+		{
+			for(col=startCol; col<=endCol; col++)
+			{
+				unsigned long ulLight = light[(col*200)+row];
+				unsigned long ulDark = dark[(col*200)+row];
+				unsigned long ulMap = ulLight | ulDark;
+
+				unsigned short *expShort = (unsigned short*)virtual;
+				unsigned long *expLong = (unsigned long*)(expShort+((15*(row-t))+((col-lCol)*2)));
+				
+				// Read the newly expanded explosion mask (not inverted)
+				unsigned long ulExp = (*expLong);
+
+				// Add border (set both layers to 1 where mask is 1)
+				// Since we already erased the center, this only affects the rim
+				light[(col*200)+row] = (ulMap & ulExp) | ulLight;
+				dark[(col*200)+row] = (ulMap & ulExp) | ulDark;
+			}
+		}
+	}
 	
-	// clean up time
 	PortRestore();
 	free(virtual);
 }
@@ -207,7 +175,8 @@ void updateExplosion(short index)
 	// if the explosions time is up, destroy the map and set it inactive
 	if(Explosion_time[index]<0)
 	{
-		eraseMap(index);
+		// erase the map (dig with border)
+		Explosion_dig(Explosion_x[index], Explosion_y[index], Explosion_size[index], TRUE);
 		Explosion_active &= ~((unsigned short)1<<(index));
 		Camera_clearIf(&Explosion_x[index], &Explosion_y[index]);
 	}
@@ -372,71 +341,4 @@ char Explosion_getFirstActive()
 	}
 	
 	return -1;
-}
-
-
-/**
- * Digs a hole in the map
- * 
- * @param x x position
- * @param y y position
- * @param s radius
- */
-void Explosion_dig(short x, short y, short s)
-{
-	// determine the pixel edges:
-	short t = y-s;
-	short b = y+s;
-	short l = x-s;
-	short r = x+s;
-	
-	// determine the columns
-	short lCol = (l-(l%32))/32;
-	short rCol = (r-(r%32))/32;
-	
-	// make virtual screen
-	void *virtual=malloc(LCD_SIZE);
-	if(virtual == NULL) return;
-	
-	PortSet(virtual, 239, 127);
-	ClrScr();
-	
-	short drawX = x - (lCol*32);
-	short drawY = y - t;
-	
-	short e;
-	for(e=1; e<s; e++)
-	{
-		DrawClipEllipse(drawX, drawY, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
-		DrawClipEllipse(drawX, drawY-1, e, e, &(SCR_RECT){{0, 0, 239, 127}}, A_NORMAL);
-	}
-	
-	unsigned long *light = (unsigned long*)mapLight;
-	unsigned long *dark = (unsigned long*)mapDark;
-	
-	short startRow = (t < 0) ? 0 : t;
-	short endRow = (b > 199) ? 199 : b;
-	short startCol = (lCol < 0) ? 0 : lCol;
-	short endCol = (rCol > 9) ? 9 : rCol;
-
-	short row, col;
-	for(row=startRow; row<=endRow; row++)
-	{
-		for(col=startCol; col<=endCol; col++)
-		{
-			unsigned long ulLight = light[(col*200)+row];
-			unsigned long ulDark = dark[(col*200)+row];
-			
-			unsigned short *expShort = (unsigned short*)virtual;
-			unsigned long *expLong = (unsigned long*)(expShort+((15*(row-t))+((col-lCol)*2)));
-			
-			unsigned long ulExp = ~(*expLong);
-
-			light[(col*200)+row] = ulLight & ulExp;
-			dark[(col*200)+row] = ulDark & ulExp;
-		}
-	}
-	
-	PortRestore();
-	free(virtual);
 }

@@ -1461,7 +1461,7 @@ void Weapons_update()
 					
 					// dig
 					if(Map_testPoint(Weapon_x[i], Weapon_y[i]))
-						Explosion_dig(Weapon_x[i], Weapon_y[i], 5);
+						Explosion_dig(Weapon_x[i], Weapon_y[i], 5, FALSE);
 						
 					continue;
 				}

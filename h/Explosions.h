@@ -75,6 +75,6 @@ extern char Explosion_getFirstActive();
  * @param y y position
  * @param s radius
  */
-extern void Explosion_dig(short x, short y, short s);
+extern void Explosion_dig(short x, short y, short s, char border);
 
 #endif
