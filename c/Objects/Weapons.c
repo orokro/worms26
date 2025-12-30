@@ -454,7 +454,7 @@ unsigned long Weapon_props[75] = {
         usesCursor | spawnsSelf | usesAirStrike,
         
 		// girder pack
-        usesCursor | multiUse | doesntEndTurn | holdsCustom,
+        usesCursor | multiUse | holdsCustom,
         
 		// scales of justice
         usesRoutine | holdsSelf,
@@ -1326,6 +1326,24 @@ void Weapons_setTarget(short x, short y)
 
 		// un-set target picked, since girder instantly consumes the position
 		Game_currentWeaponState &= ~targetPicked;
+
+		// handle multi-use logic for Girder Pack
+		if(Game_currentWeaponSelected == WGirderPack)
+		{
+			// initialize if needed
+			if(Game_weaponUsesRemaining == -1)
+				Game_weaponUsesRemaining = 5;
+
+			// decrement
+			Game_weaponUsesRemaining--;
+
+			// if we still have uses left, don't consume the weapon yet
+			if(Game_weaponUsesRemaining > 0)
+				return;
+			
+			// reset for next time
+			Game_weaponUsesRemaining = -1;
+		}
 
 		// consume the weapon from players inventory
 		CharacterController_weaponConsumed(FALSE);
