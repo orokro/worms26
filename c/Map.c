@@ -470,7 +470,8 @@ char Map_findSpawnPoint(char type, short *outX, short *outY)
 		if(fromSky) {
 			startY = 0; 
 		} else {
-			startY = (i % 2 == 0) ? 0 : 90;
+			// Randomly pick Upper (0) or Lower (90) layer to start scan
+			startY = (random(2) == 0) ? 0 : 90;
 		}
 		
 		// 3. Find Land using Raycast
