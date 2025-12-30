@@ -45,6 +45,8 @@ extern const unsigned long spr_Donkey_Light[];
 
 extern const unsigned long spr_Donkey_Mask[];
 
+extern const unsigned char spr_Fuel[];
+
 extern const unsigned char spr_Grave[];
 
 extern const unsigned char spr_launcher[];

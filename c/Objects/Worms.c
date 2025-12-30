@@ -278,7 +278,7 @@ void Worm_update()
 				if(!(Worm_wasOnGround & wormMask) && (Worm_onGround & wormMask))
                 {
                     if (Game_wormAnimState != ANIM_DRILL && Game_wormAnimState != ANIM_TORCH)
-					    Game_wormAnimState = ANIM_NONE;
+						Game_wormAnimState = ANIM_NONE;
                 }
 			}
 			
@@ -546,6 +546,11 @@ void Worm_drawAll()
 				else if(isCurrentWorm &&((!isWalking && Game_currentWeaponSelected == WBlowTorch) || (Game_wormAnimState == ANIM_TORCH)))
 				{
 					spriteIdx = WORM_TORCH_MASK;
+					useFlipped = (Worm_dir & wormMask) > 0;
+				}
+				else if((isCurrentWorm && (Game_currentWeaponSelected == WJetPack)) || (isCurrentWorm && (Game_stateFlags & gs_jetpackMode)))
+				{
+					spriteIdx = WORM_JETPACK_MASK;
 					useFlipped = (Worm_dir & wormMask) > 0;
 				}
                 // Is this the Active Worm doing an Animation?

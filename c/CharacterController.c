@@ -181,6 +181,7 @@ void wormWeapon()
 
 			case WJetPack:
 				Game_stateFlags |= gs_jetpackMode;
+				Game_jetPackFuel = MAX_JETPACK_FUEL;
 				break;
 
 			case WBungeeCord:
@@ -434,6 +435,60 @@ void wormBungee()
 
 
 /**
+ * @brief Handles jetpack logic
+ */
+void wormJetpack()
+{
+	if(Game_stateFlags & gs_jetpackMode)
+    {
+		// unsettle worm
+        Worm_physObj[(short)Worm_currentWorm].staticFrames = 0;
+        Worm_settled &= ~wormMask;
+
+        if(Keys_keyState(keyLeft)) 
+		{
+            Worm_xVelo[(short)Worm_currentWorm] = -1;
+            Worm_dir |= wormMask; 
+        }
+		else if(Keys_keyState(keyRight))
+		{
+            Worm_xVelo[(short)Worm_currentWorm] = 1;
+            Worm_dir &= ~wormMask; 
+        }
+		
+		if (Keys_keyState(keyUp | keyDown))
+		{
+			Worm_yVelo[(short)Worm_currentWorm] = Keys_keyState(keyDown) ? 1 : -3;
+		}
+		else
+		{
+            // Worm_xVelo[(short)Worm_currentWorm] = 0;
+			Worm_yVelo[(short)Worm_currentWorm] = (Game_timer % 2 == 0) ? -1 : 0;
+        }
+
+		// exit early if action is pressed
+		if(Keys_keyDown(keyAction)) 
+		{
+			Game_stateFlags &= ~gs_jetpackMode; 
+			return;
+		}
+
+		if(Keys_keyState(keyUp | keyDown | keyLeft | keyRight)){
+			Game_jetPackFuel--;
+			if(Game_jetPackFuel <= 0){
+				Game_stateFlags &= ~gs_jetpackMode;
+				StatusBar_showMessage("Jet Pack Out of Fuel!");
+			}
+		}
+
+        if(Worm_xVelo[(short)Worm_currentWorm] == 0 && Game_wind != 0 && (Game_timer % 4 == 0)) {
+			Worm_xVelo[(short)Worm_currentWorm] += (Game_wind > 0) ? 1 : -1;
+        }
+    }
+}
+
+
+/**
  * @brief Initiates a backflip for the current worm
  */
 void CharacterController_doBackflip()
@@ -474,7 +529,8 @@ void CharacterController_update()
 
     wormParachute();
     wormBungee();
-    
+    wormJetpack();
+
 	if (Worm_onGround & wormMask)
 		wormWalk();
 

@@ -43,6 +43,9 @@ typedef struct {
 #define firstShotTaken  	0b00000100
 #define keepAimDuringUse	0b00001000
 
+// For max fuel allowed for jetback
+#define MAX_JETPACK_FUEL 200.0
+
 // Define Fixed Point precision (16.16)
 #define FP_SHIFT 16
 #define FP_ONE   (1L << FP_SHIFT)
@@ -94,6 +97,7 @@ extern unsigned short Game_currentWeaponCharge;
 extern char Game_aimAngle;
 extern unsigned short Game_stateFlags;
 extern char Game_debugFreeze;
+extern unsigned char Game_jetPackFuel;
 
 // game function prototypes
 

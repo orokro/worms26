@@ -216,6 +216,9 @@ unsigned short Game_currentWeaponCharge = 0;
 // the angle the current worm is aiming at
 char Game_aimAngle=10;
 
+// jet pack fuel
+unsigned char Game_jetPackFuel = MAX_JETPACK_FUEL;
+
 char Game_debugFreeze = FALSE;
 
 /* 
@@ -287,6 +290,7 @@ void Game_initRound(){
 	Game_stateFlags = 0;
 	Game_surrenderedTeam = -1;
 	Game_weaponUsesRemaining = -1;
+	Game_jetPackFuel = 0;
 
 	short i=0;
 	for(i=0; i<65; i++)

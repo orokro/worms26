@@ -196,6 +196,20 @@ void Draw_HUD()
 	// // draw the health for both teams:
 	GrayClipSprite32_OR_R(64, 94, 3, teamHealthSprites_light, teamHealthSprites_dark, lightPlane, darkPlane);
 
+	// if we're in jetpack mode, draw the fuel bar
+	if(Game_stateFlags & gs_jetpackMode)
+	{
+		GrayClipSprite8_OR_R(2, 2, 17, spr_Fuel, spr_Fuel, lightPlane, darkPlane);
+
+		const short fuelHeight = (short)((float)((float)(MAX_JETPACK_FUEL-(float)Game_jetPackFuel) / MAX_JETPACK_FUEL) * 15.0);
+
+		if(fuelHeight>0)
+		{
+			GrayDrawClipLine2B(3, 3, 3, 3+fuelHeight, 0, lightPlane, darkPlane);
+			GrayDrawClipLine2B(4, 3, 4, 3+fuelHeight, 0, lightPlane, darkPlane);
+		}
+	}
+
 	// draw the timer
 	Draw_timer();	
 }
