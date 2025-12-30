@@ -115,54 +115,40 @@ extern const unsigned char spr_XSpotMask[];
 
 /* --- Worms Data --- */
 
-extern const unsigned short worm_BACKFLIP1_Mask[];
 extern const unsigned short worm_BACKFLIP1_Outline[];
 
-extern const unsigned short worm_BACKFLIP2_Mask[];
 extern const unsigned short worm_BACKFLIP2_Outline[];
 
-extern const unsigned short worm_BACKFLIP3_Mask[];
 extern const unsigned short worm_BACKFLIP3_Outline[];
 
-extern const unsigned short worm_BACKFLIP4_Mask[];
 extern const unsigned short worm_BACKFLIP4_Outline[];
 
-extern const unsigned short worm_BUNGEE_Mask[];
 extern const unsigned short worm_BUNGEE_Outline[];
 
-extern const unsigned short worm_CHUTE_Mask[];
 extern const unsigned short worm_CHUTE_Outline[];
 
-extern const unsigned short worm_DRILL_Mask[];
 extern const unsigned short worm_DRILL_Outline[];
 
-extern const unsigned short worm_FROZEN_Mask[];
 extern const unsigned short worm_FROZEN_Light[];
 extern const unsigned short worm_FROZEN_Dark[];
 
-extern const unsigned short worm_IDLE_Mask[];
 extern const unsigned short worm_IDLE_Outline[];
 
-extern const unsigned short worm_IDLE2_Mask[];
 extern const unsigned short worm_IDLE2_Outline[];
 
-extern const unsigned short worm_JUMP_Mask[];
 extern const unsigned short worm_JUMP_Outline[];
 
-extern const unsigned short worm_TNT1_Mask[];
 extern const unsigned short worm_TNT1_Outline[];
 
-extern const unsigned short worm_TNT2_Mask[];
 extern const unsigned short worm_TNT2_Outline[];
 
-extern const unsigned short worm_TORCH_Mask[];
 extern const unsigned short worm_TORCH_Outline[];
 
 extern const unsigned short worm_WALK_Outline[];
 
 #define NUM_WORM_SPRITES 31
 #define WORM_FLIP_BUFFER_SIZE 443
-#define WORM_GENERATED_MASK_BUFFER_SIZE 13
+#define WORM_GENERATED_MASK_BUFFER_SIZE 215
 
 #define WORM_BACKFLIP1_MASK 0
 #define WORM_BACKFLIP1_LIGHT 1
