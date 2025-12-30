@@ -54,6 +54,7 @@ unsigned short spr_weapons_flipped[NUM_WEAPONS][11];
 // flipped worm sprites
 unsigned short* wormsSpritesFlipped[NUM_WORM_SPRITES];
 unsigned short wormFlipBuffer[WORM_FLIP_BUFFER_SIZE];
+unsigned short wormMaskBuffer[WORM_GENERATED_MASK_BUFFER_SIZE];
 
 // buffers for our weapons screen
 void *weaponsLight, *weaponsDark;

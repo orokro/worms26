@@ -158,11 +158,11 @@ extern const unsigned short worm_TNT2_Outline[];
 extern const unsigned short worm_TORCH_Mask[];
 extern const unsigned short worm_TORCH_Outline[];
 
-extern const unsigned short worm_WALK_Mask[];
 extern const unsigned short worm_WALK_Outline[];
 
 #define NUM_WORM_SPRITES 31
 #define WORM_FLIP_BUFFER_SIZE 443
+#define WORM_GENERATED_MASK_BUFFER_SIZE 13
 
 #define WORM_BACKFLIP1_MASK 0
 #define WORM_BACKFLIP1_LIGHT 1
@@ -209,7 +209,8 @@ extern const unsigned short worm_WALK_Outline[];
 #define WORM_WALK_MASK 29
 #define WORM_WALK_LIGHT 30
 #define WORM_WALK_DARK 30
-extern const unsigned short* wormsSprites[];
+extern unsigned short* wormsSprites[];
 extern const unsigned char wormSpriteHeights[];
+extern const unsigned char wormSpriteTypes[];
 
 #endif /* SPRITEDATA_H */

@@ -2825,22 +2825,6 @@ const unsigned short worm_TORCH_Outline[] = {
 	0b0000111011000000
 };
 
-const unsigned short worm_WALK_Mask[] = {
-	0b1111111100001111,
-	0b1111111000000111,
-	0b1111110000000011,
-	0b1111110000000011,
-	0b1111110000000011,
-	0b1111110000000011,
-	0b1111110000000111,
-	0b1111111000000011,
-	0b1111101000000111,
-	0b1111000000000111,
-	0b1100000000001111,
-	0b1000000000011111,
-	0b1100001000111111
-};
-
 const unsigned short worm_WALK_Outline[] = {
 	0b0000000011110000,
 	0b0000000100001000,
@@ -2857,41 +2841,45 @@ const unsigned short worm_WALK_Outline[] = {
 	0b0011110111000000
 };
 
-const unsigned short* wormsSprites[] = {
-	worm_BACKFLIP1_Mask,
-	worm_BACKFLIP1_Outline,
-	worm_BACKFLIP2_Mask,
-	worm_BACKFLIP2_Outline,
-	worm_BACKFLIP3_Mask,
-	worm_BACKFLIP3_Outline,
-	worm_BACKFLIP4_Mask,
-	worm_BACKFLIP4_Outline,
-	worm_BUNGEE_Mask,
-	worm_BUNGEE_Outline,
-	worm_CHUTE_Mask,
-	worm_CHUTE_Outline,
-	worm_DRILL_Mask,
-	worm_DRILL_Outline,
-	worm_FROZEN_Mask,
-	worm_FROZEN_Light,
-	worm_FROZEN_Dark,
-	worm_IDLE_Mask,
-	worm_IDLE_Outline,
-	worm_IDLE2_Mask,
-	worm_IDLE2_Outline,
-	worm_JUMP_Mask,
-	worm_JUMP_Outline,
-	worm_TNT1_Mask,
-	worm_TNT1_Outline,
-	worm_TNT2_Mask,
-	worm_TNT2_Outline,
-	worm_TORCH_Mask,
-	worm_TORCH_Outline,
-	worm_WALK_Mask,
-	worm_WALK_Outline
+unsigned short* wormsSprites[] = {
+	(unsigned short*)worm_BACKFLIP1_Mask,
+	(unsigned short*)worm_BACKFLIP1_Outline,
+	(unsigned short*)worm_BACKFLIP2_Mask,
+	(unsigned short*)worm_BACKFLIP2_Outline,
+	(unsigned short*)worm_BACKFLIP3_Mask,
+	(unsigned short*)worm_BACKFLIP3_Outline,
+	(unsigned short*)worm_BACKFLIP4_Mask,
+	(unsigned short*)worm_BACKFLIP4_Outline,
+	(unsigned short*)worm_BUNGEE_Mask,
+	(unsigned short*)worm_BUNGEE_Outline,
+	(unsigned short*)worm_CHUTE_Mask,
+	(unsigned short*)worm_CHUTE_Outline,
+	(unsigned short*)worm_DRILL_Mask,
+	(unsigned short*)worm_DRILL_Outline,
+	(unsigned short*)worm_FROZEN_Mask,
+	(unsigned short*)worm_FROZEN_Light,
+	(unsigned short*)worm_FROZEN_Dark,
+	(unsigned short*)worm_IDLE_Mask,
+	(unsigned short*)worm_IDLE_Outline,
+	(unsigned short*)worm_IDLE2_Mask,
+	(unsigned short*)worm_IDLE2_Outline,
+	(unsigned short*)worm_JUMP_Mask,
+	(unsigned short*)worm_JUMP_Outline,
+	(unsigned short*)worm_TNT1_Mask,
+	(unsigned short*)worm_TNT1_Outline,
+	(unsigned short*)worm_TNT2_Mask,
+	(unsigned short*)worm_TNT2_Outline,
+	(unsigned short*)worm_TORCH_Mask,
+	(unsigned short*)worm_TORCH_Outline,
+	(unsigned short*)0,
+	(unsigned short*)worm_WALK_Outline
 };
 
 const unsigned char wormSpriteHeights[] = {
-17, 17, 10, 10, 13, 13, 10, 10, 17, 17, 17, 17, 17, 17, 13, 13, 13, 13, 13, 13, 13, 15, 15, 17, 17, 17, 17, 13, 13, 13, 13
+17, 17, 10, 10, 13, 13, 10, 10, 17, 17, 17, 17, 17, 17, 13, 13, 13, 13, 13, 13, 13, 15, 15, 17, 17, 17, 17, 13, 13, 13
+};
+
+const unsigned char wormSpriteTypes[] = {
+0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1
 };
 

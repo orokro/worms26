@@ -45,6 +45,59 @@ unsigned short reverseBits16(unsigned short n)
 }
 
 
+// helper for mask generation
+unsigned short generateMaskRow(unsigned short outline) {
+    if (outline == 0) return 0xFFFF;
+    unsigned short left = 15, right = 0;
+    
+    // Find rightmost bit
+    unsigned short temp = outline;
+    while (!(temp & 1)) {
+        temp >>= 1;
+        right++;
+    }
+    // Find leftmost bit
+    temp = outline;
+    while (!(temp & 0x8000)) {
+        temp <<= 1;
+        left--;
+    }
+    
+    unsigned short mask = (0xFFFF >> (15 - left)) & (0xFFFF << right);
+    return ~mask;
+}
+
+
+// programmatically generate missing worm masks from their components
+void GenerateWormMasks() {
+    int w, r;
+    unsigned short* currentBufferPos = wormMaskBuffer;
+    
+    for (w = 0; w < NUM_WORM_SPRITES; w++) {
+        // Only generate if it's a mask (0) AND it's NULL (missing in ROM)
+        if (wormSpriteTypes[w] == 0 && wormsSprites[w] == NULL) {
+            unsigned char h = wormSpriteHeights[w];
+            wormsSprites[w] = currentBufferPos;
+            
+            for (r = 0; r < h; r++) {
+                // OR all components that follow this mask until we hit another mask or end of array
+                unsigned short shape = 0;
+                int c = w + 1;
+                while (c < NUM_WORM_SPRITES && wormSpriteTypes[c] == 1) {
+                    if (wormsSprites[c] != NULL) {
+                        shape |= wormsSprites[c][r];
+                    }
+                    c++;
+                }
+                
+                *currentBufferPos = generateMaskRow(shape);
+                currentBufferPos++;
+            }
+        }
+    }
+}
+
+
 // Call this ONCE in _main()
 void GenerateFlippedSprites() {
     int w, r;
@@ -64,12 +117,16 @@ void GenerateFlippedSprites() {
         wormsSpritesFlipped[w] = currentBufferPos;
 
         // get info about the original sprite
-        const unsigned short* src = wormsSprites[w];
+        unsigned short* src = wormsSprites[w];
         unsigned char h = wormSpriteHeights[w];
 
         // flip each row
         for(r = 0; r < h; r++) {
-            *currentBufferPos = reverseBits16(src[r]);
+            if (src != NULL) {
+                *currentBufferPos = reverseBits16(src[r]);
+            } else {
+                *currentBufferPos = 0;
+            }
             currentBufferPos++;
         }
     }
@@ -128,6 +185,9 @@ void _main(void)
 	
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	Game_changeMode(gameMode_WormSelect);
+
+	// generates masks for worms that are missing them in ROM
+	GenerateWormMasks();
 
 	// flips weapon sprites in ram so we can draw them facing left when needed
 	GenerateFlippedSprites();

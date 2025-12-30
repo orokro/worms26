@@ -152,66 +152,82 @@ try {
         const sortedPoses = Object.keys(poses).sort();
         const wormSpritePointers = [];
         const wormSpriteHeights = [];
+        const wormSpriteTypes = [];
         let wormDefines = "";
         let currentSpriteIndex = 0;
         let totalWordsNeeded = 0;
+        let generatedMaskWordsNeeded = 0;
 
         hOutput += `/* --- Worms Data --- */\n\n`;
         cOutput += `/* --- Worms Data --- */\n\n`;
 
         sortedPoses.forEach(pose => {
             const group = poses[pose];
-            if (!group['Mask']) return;
             const hasOutline = !!group['Outline'];
             const typesToProcess = hasOutline ? ['Mask', 'Outline'] : ['Mask', 'Light', 'Dark'];
 
-            const spriteInfo = {};
-            typesToProcess.forEach(type => {
-                const data = readBMP(path.join(WORMS_DIR, group[type]));
-                if (data.width !== 16) {
-                    console.warn(`Warning: Worm sprite ${group[type]} is ${data.width}px wide. Expected 16.`);
+            // Find height from any available image in this pose group
+            let poseHeight = 0;
+            for (const type of ['Mask', 'Outline', 'Light', 'Dark']) {
+                if (group[type]) {
+                    const data = readBMP(path.join(WORMS_DIR, group[type]));
+                    poseHeight = data.height;
+                    break;
                 }
-                const cVarName = `worm_${pose}_${type}`;
-                spriteInfo[type] = { name: cVarName, height: data.height };
-                totalWordsNeeded += data.height;
+            }
 
-                cOutput += `const unsigned short ${cVarName}[] = {\n`;
-                data.pixels.forEach((row, idx) => {
-                    cOutput += `\t0b${row.toString(2).padStart(16, '0')}${idx < data.pixels.length - 1 ? ',' : ''}\n`;
-                });
-                cOutput += `};\n\n`;
-                hOutput += `extern const unsigned short ${cVarName}[];\n`;
+            typesToProcess.forEach(type => {
+                totalWordsNeeded += poseHeight; // We need flip space for all sprites
+                
+                const cVarName = `worm_${pose}_${type}`;
+                if (group[type]) {
+                    const data = readBMP(path.join(WORMS_DIR, group[type]));
+                    if (data.width !== 16) {
+                        console.warn(`Warning: Worm sprite ${group[type]} is ${data.width}px wide. Expected 16.`);
+                    }
+
+                    cOutput += `const unsigned short ${cVarName}[] = {\n`;
+                    data.pixels.forEach((row, idx) => {
+                        cOutput += `\t0b${row.toString(2).padStart(16, '0')}${idx < data.pixels.length - 1 ? ',' : ''}\n`;
+                    });
+                    cOutput += `};\n\n`;
+                    hOutput += `extern const unsigned short ${cVarName}[];\n`;
+                    
+                    wormSpritePointers.push(cVarName);
+                    wormSpriteHeights.push(data.height);
+                } else {
+                    // Missing file, use 0 and inferred height
+                    wormSpritePointers.push("0");
+                    if (type === 'Mask') {
+                        generatedMaskWordsNeeded += poseHeight;
+                    }
+                }
+
+                if (type === 'Mask') {
+                    wormSpriteTypes.push(0); // 0 = Mask
+                    wormDefines += `#define WORM_${pose.toUpperCase()}_MASK ${currentSpriteIndex++}\n`;
+                } else {
+                    wormSpriteTypes.push(1); // 1 = Component
+                    if (type === 'Outline') {
+                        wormDefines += `#define WORM_${pose.toUpperCase()}_LIGHT ${currentSpriteIndex}\n`;
+                        wormDefines += `#define WORM_${pose.toUpperCase()}_DARK ${currentSpriteIndex++}\n`;
+                    } else if (type === 'Light') {
+                        wormDefines += `#define WORM_${pose.toUpperCase()}_LIGHT ${currentSpriteIndex++}\n`;
+                    } else if (type === 'Dark') {
+                        wormDefines += `#define WORM_${pose.toUpperCase()}_DARK ${currentSpriteIndex++}\n`;
+                    }
+                }
             });
             hOutput += "\n";
-
-            // Mask
-            wormSpritePointers.push(`worm_${pose}_Mask`);
-            wormSpriteHeights.push(spriteInfo['Mask'].height);
-            wormDefines += `#define WORM_${pose.toUpperCase()}_MASK ${currentSpriteIndex++}\n`;
-
-            if (hasOutline) {
-                wormSpritePointers.push(`worm_${pose}_Outline`);
-                wormSpriteHeights.push(spriteInfo['Outline'].height);
-                wormDefines += `#define WORM_${pose.toUpperCase()}_LIGHT ${currentSpriteIndex}
-`;
-                wormDefines += `#define WORM_${pose.toUpperCase()}_DARK ${currentSpriteIndex++}\n`;
-            } else {
-                wormSpritePointers.push(`worm_${pose}_Light`);
-                wormSpriteHeights.push(spriteInfo['Light'].height);
-                wormDefines += `#define WORM_${pose.toUpperCase()}_LIGHT ${currentSpriteIndex++}\n`;
-
-                wormSpritePointers.push(`worm_${pose}_Dark`);
-                wormSpriteHeights.push(spriteInfo['Dark'].height);
-                wormDefines += `#define WORM_${pose.toUpperCase()}_DARK ${currentSpriteIndex++}\n`;
-            }
         });
 
         hOutput += `#define NUM_WORM_SPRITES ${currentSpriteIndex}\n`;
-        hOutput += `#define WORM_FLIP_BUFFER_SIZE ${totalWordsNeeded}\n\n`;
+        hOutput += `#define WORM_FLIP_BUFFER_SIZE ${totalWordsNeeded}\n`;
+        hOutput += `#define WORM_GENERATED_MASK_BUFFER_SIZE ${generatedMaskWordsNeeded}\n\n`;
         hOutput += wormDefines;
 
-        cOutput += `const unsigned short* wormsSprites[] = {\n`;
-        cOutput += wormSpritePointers.map(ptr => `\t${ptr}`).join(',\n') + `\n};
+        cOutput += `unsigned short* wormsSprites[] = {\n`;
+        cOutput += wormSpritePointers.map(ptr => `\t(unsigned short*)${ptr}`).join(',\n') + `\n};
 
 `;
 
@@ -220,8 +236,14 @@ try {
 
 `;
 
-        hOutput += `extern const unsigned short* wormsSprites[];\n`;
+        cOutput += `const unsigned char wormSpriteTypes[] = {\n`;
+        cOutput += wormSpriteTypes.join(', ') + `\n};
+
+`;
+
+        hOutput += `extern unsigned short* wormsSprites[];\n`;
         hOutput += `extern const unsigned char wormSpriteHeights[];\n`;
+        hOutput += `extern const unsigned char wormSpriteTypes[];\n`;
     }
 
     hOutput += FOOTER_H;
