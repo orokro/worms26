@@ -15,6 +15,15 @@ static void TurnEnd_enter()
 {
 	Game_timer=-1;
 	cameraAutoFocus = TRUE;
+    
+    // For specific melee weapons that knock worms away, keep the camera focused on the victim
+    if(Game_lastWeaponSelected == WBaseballBat || 
+       Game_lastWeaponSelected == WFirePunch ||
+       Game_lastWeaponSelected == WProd)
+    {
+        cameraAutoFocus = FALSE;
+    }
+
 	Game_wormAnimState = ANIM_NONE;
 }
 
