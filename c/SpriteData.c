@@ -2507,6 +2507,26 @@ const unsigned short worm_IDLE2_Outline[] = {
 	0b0000111011000000
 };
 
+const unsigned short worm_JETPACK_Outline[] = {
+	0b0000001111000000,
+	0b0000010000100000,
+	0b0000100110010000,
+	0b0000100000010000,
+	0b0000100110110000,
+	0b0000100100010000,
+	0b0000100010100000,
+	0b0001110000010000,
+	0b0010001001100000,
+	0b0010001101100000,
+	0b0011111010110000,
+	0b0010001111110000,
+	0b0001110100100000,
+	0b0011010100100000,
+	0b0010101100100000,
+	0b0001010100100000,
+	0b0000100011000000
+};
+
 const unsigned short worm_JUMP_Outline[] = {
 	0b0000000111100000,
 	0b0000001000010000,
@@ -2620,6 +2640,8 @@ unsigned short* wormsSprites[] = {
 	(unsigned short*)0,
 	(unsigned short*)worm_IDLE2_Outline,
 	(unsigned short*)0,
+	(unsigned short*)worm_JETPACK_Outline,
+	(unsigned short*)0,
 	(unsigned short*)worm_JUMP_Outline,
 	(unsigned short*)0,
 	(unsigned short*)worm_TNT1_Outline,
@@ -2632,10 +2654,10 @@ unsigned short* wormsSprites[] = {
 };
 
 const unsigned char wormSpriteHeights[] = {
-17, 17, 10, 10, 13, 13, 10, 10, 17, 17, 17, 17, 17, 17, 13, 13, 13, 13, 13, 13, 13, 15, 15, 17, 17, 17, 17, 13, 13, 13, 13
+17, 17, 10, 10, 13, 13, 10, 10, 17, 17, 17, 17, 17, 17, 13, 13, 13, 13, 13, 13, 13, 17, 17, 15, 15, 17, 17, 17, 17, 13, 13, 13, 13
 };
 
 const unsigned char wormSpriteTypes[] = {
-0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1
+0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1
 };
 
