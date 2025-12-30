@@ -30,6 +30,7 @@
 #include "Map.h"
 #include "StatusBar.h"
 #include "Keys.h"
+#include "Weapons.h"
 
 
 // the X/Y position of all the worms
@@ -463,10 +464,16 @@ void Worm_drawAll()
     int spriteIdx = -1;
     char useFlipped = FALSE; // TRUE to use wormsSpritesFlipped
 
+	// Check if walking (Active worm, Turn mode, Keys pressed)
+	// Note: CharacterController handles movement, we just visualize it here
+	char isWalking = ((Keys_keyState(keyLeft) || Keys_keyState(keyRight)) && (Game_mode == gameMode_Turn));
+	char isCurrentWorm;
+
     // Loop over all worms
     for(i=0; i<MAX_WORMS; i++)
     {
 		wormMask = (unsigned short)1<<(i);
+		isCurrentWorm = (i == Worm_currentWorm);
 
         // Check active bitmask
         if(Worm_active & wormMask)
@@ -526,8 +533,20 @@ void Worm_drawAll()
                     }
                     useFlipped = (Worm_dir & wormMask) > 0;
                 }
+				// if the anim is drill or drill is equipped
+				else if(isCurrentWorm &&((!isWalking && Game_currentWeaponSelected == WDrill) || (Game_wormAnimState == ANIM_DRILL)))
+				{
+					spriteIdx = WORM_DRILL_MASK;
+					useFlipped = (Worm_dir & wormMask) > 0;
+				}
+				// if the anim is torch or torch is equipped
+				else if(isCurrentWorm &&((!isWalking && Game_currentWeaponSelected == WBlowTorch) || (Game_wormAnimState == ANIM_TORCH)))
+				{
+					spriteIdx = WORM_TORCH_MASK;
+					useFlipped = (Worm_dir & wormMask) > 0;
+				}
                 // Is this the Active Worm doing an Animation?
-                else if(i == Worm_currentWorm && Game_wormAnimState != ANIM_NONE)
+                else if(isCurrentWorm && Game_wormAnimState != ANIM_NONE)
                 {
                     // --- BACKFLIP ---
                     if(Game_wormAnimState == ANIM_BACKFLIP)
@@ -575,7 +594,7 @@ void Worm_drawAll()
                 // ============================================================
                 // PARACHUTE
                 // ============================================================
-                else if(i == Worm_currentWorm && (Game_stateFlags & gs_parachuteMode))
+                else if(isCurrentWorm && (Game_stateFlags & gs_parachuteMode))
                 {
                     spriteIdx = WORM_CHUTE_MASK;
                     useFlipped = (Worm_dir & wormMask) > 0;
@@ -584,7 +603,7 @@ void Worm_drawAll()
                 // ============================================================
                 // BUNGEE
                 // ============================================================
-                else if(i == Worm_currentWorm && (Game_stateFlags & gs_bungeeMode))
+                else if(isCurrentWorm && (Game_stateFlags & gs_bungeeMode))
                 {
                     spriteIdx = WORM_BUNGEE_MASK;
                     useFlipped = (Worm_dir & wormMask) > 0;
@@ -606,16 +625,7 @@ void Worm_drawAll()
                     
                     // -- ANIMATION LOGIC --
                     
-                    // Check if walking (Active worm, Turn mode, Keys pressed)
-                    // Note: CharacterController handles movement, we just visualize it here
-                    char isWalking = FALSE;
-                    if(i == Worm_currentWorm && Game_mode == gameMode_Turn) {
-                        if(Keys_keyState(keyLeft) || Keys_keyState(keyRight)) {
-                            isWalking = TRUE;
-                        }
-                    }
-
-                    if(isWalking) {
+                    if(isWalking && isCurrentWorm) {
                         // Walking Animation: Toggle WALK / IDLE fast
                         // 15FPS -> 8 frame cycle (approx 0.5s)
                         if((Game_timer & 0x07) < 4) {
@@ -694,7 +704,7 @@ void Worm_drawAll()
                     }
 
                     // 4. Parachute Canopy (Draw on top of worm)
-                    if(i == Worm_currentWorm && (Game_stateFlags & gs_parachuteMode))
+                    if(isCurrentWorm && (Game_stateFlags & gs_parachuteMode))
                     {
                         // Draw at screenX-8 (centered for 16px) and screenY-20 (above worm)
                         // Use 12px height canopy

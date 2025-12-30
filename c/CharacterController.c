@@ -461,6 +461,17 @@ void CharacterController_update()
 	if(Weapon_superSheepDir != SHEEP_INACTIVE)
 		return;
 
+	// if we're in the ANIM_TORCH mode, always move the direction it's facing as if its auto-walking
+	// if (Game_wormAnimState == ANIM_TORCH)
+	// {
+	// 	// save the worms new position:
+	// 	*wX += (Worm_dir & wormMask) ? -1 : 1;
+
+	// 	// unsettle worm
+	// 	Worm_physObj[(short)Worm_currentWorm].staticFrames = 0;
+	// 	Worm_settled &= ~wormMask;
+	// }
+
     wormParachute();
     wormBungee();
     

@@ -12,9 +12,11 @@
 #include "PhysCol.h"
 
 // Animation States
-#define ANIM_NONE     0
-#define ANIM_JUMP     1
-#define ANIM_BACKFLIP 2
+#define ANIM_NONE     	0
+#define ANIM_JUMP     	1
+#define ANIM_BACKFLIP 	2
+#define ANIM_DRILL    	3
+#define ANIM_TORCH		4
 
 // worm defines
 #define MAX_WORMS 16

@@ -593,6 +593,16 @@ short Physics_checkWeapons(short wormIndex, unsigned short wormMask, PhysObj *ob
 			totalDamage += 1;
 			Worm_poisoned |= wormMask;
 			// WSkunkGas lingers, so it is not detonated on impact.
+		}else if(Weapon_type[i] == WDrill)
+		{
+			totalDamage += 5;
+			Physics_setVelocity(&Worm_physObj[wormIndex], random(9) - 4, -4, TRUE, TRUE);
+		}
+		else if(Weapon_type[i] == WBlowTorch)
+		{
+			// default damage for other weapons
+			totalDamage += 8;
+			Physics_setVelocity(&Worm_physObj[wormIndex], Worm_xVelo[wormIndex], 4, TRUE, TRUE);
 		}
 
 		if((Weapon_props[(short)Weapon_type[i]] & usesDetonateOnImpact) != 0)

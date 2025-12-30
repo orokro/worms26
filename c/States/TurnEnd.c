@@ -15,6 +15,7 @@ static void TurnEnd_enter()
 {
 	Game_timer=-1;
 	cameraAutoFocus = TRUE;
+	Game_wormAnimState = ANIM_NONE;
 }
 
 

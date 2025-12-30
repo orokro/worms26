@@ -290,7 +290,7 @@ unsigned long Weapon_props[75] = {
         usesCursor | usesAirStrike | usesWind,
         
 		// blow torch
-        0,
+        usesRoutine | holdsCustom | noRender | doesntEndTurn,
         
 		// ninja rope
         doesntEndTurn,
@@ -331,7 +331,7 @@ unsigned long Weapon_props[75] = {
         usesCursor | usesAirStrike,
         
 		// pneumatic drill
-        holdsCustom | usesFuse,
+        holdsCustom | usesRoutine | noRender | doesntEndTurn,
         
 		// bungee
         isMeta | doesntEndTurn,
@@ -853,6 +853,63 @@ void doWeaponRoutine(short index, unsigned short props)
 			
 			break;
 
+		case WDrill:
+			// make the drill the same as the bottom of the worm
+			Weapon_x[index] = Worm_x[(short)Worm_currentWorm];
+			Weapon_y[index] = Worm_y[(short)Worm_currentWorm]+8;
+
+			// if action is pressed, delete the map using Explosion_dig at the place of the weapon
+			if(Keys_keyState(keyAction)){
+
+				// diggy dig dig
+				Explosion_dig(Weapon_x[index]-1, Weapon_y[index], 5, TRUE);
+				Explosion_dig(Weapon_x[index]-1, Weapon_y[index]-3, 5, TRUE);
+
+				// move worm down
+				Worm_y[(short)Worm_currentWorm] += 1;
+				Worm_physObj[(short)Worm_currentWorm].staticFrames = 0;
+				Worm_settled &= ~(unsigned short)1<<(Worm_currentWorm);
+
+				// we'll use the Weapon_time as a timer for how much drilling ability is left
+				Weapon_time[index]--;
+			}
+
+			// drills don't have a timer that decrements automatically,
+			// so if the turn ends, kill the weapon
+			if(Weapon_time[index]<=0 || Game_mode != gameMode_Turn){
+				Game_wormAnimState = ANIM_NONE;
+				Weapons_detonateWeapon(index);
+
+				if(Game_mode == gameMode_Turn)
+					Game_changeMode(gameMode_TurnEnd);
+			}
+			break;
+
+		case WBlowTorch:
+			// make the blow torch at the worms dirX/dirY
+			Weapon_x[index] = Worm_x[(short)Worm_currentWorm] + dirX/2;
+			Weapon_y[index] = Worm_y[(short)Worm_currentWorm] + dirY/2;
+
+			// if action is pressed, delete the map using Explosion_dig at the place of the weapon
+			if(Keys_keyState(keyLeft | keyRight | keyUp | keyDown)){
+
+				// diggy dig dig
+				Explosion_dig(Weapon_x[index], Weapon_y[index], 6, TRUE);
+
+				// we'll use the Weapon_time as a timer for how much drilling ability is left
+				Weapon_time[index]--;
+			}
+
+			if(Weapon_time[index]<=0 || Game_mode != gameMode_Turn){
+				Game_wormAnimState = ANIM_NONE;
+				Weapons_detonateWeapon(index);
+				Game_currentWeaponState &= ~keepAimDuringUse;
+				if(Game_mode == gameMode_Turn)
+					Game_changeMode(gameMode_TurnEnd);
+			}
+
+			break;
+
 		case WDragonBall:
 			Weapon_x[index] += (Weapon_facing & weaponMask) ? -5 : 5;
 			break;
@@ -1066,6 +1123,14 @@ void Weapons_detonateWeapon(short index)
 	{
 		Mines_spawnAt(Weapon_x[index], Weapon_y[index]);
 		Camera_focusOn(&Worm_x[(short)Worm_currentWorm], &Worm_y[(short)Worm_currentWorm]);
+		return;
+	}
+
+	// clear worm animation state for drilling/torching
+	if(weaponType == WDrill || weaponType == WBlowTorch)
+	{
+		// set the worms animation state for this duration
+		Game_wormAnimState = ANIM_NONE;
 		return;
 	}
 
@@ -1546,6 +1611,9 @@ char Weapons_fire(short charge)
 				case WGirderPack:
 					Game_weaponUsesRemaining = 5;
 					break;
+				default:
+					Game_weaponUsesRemaining = 900;
+					break;
 			}
 		}
 
@@ -1566,6 +1634,23 @@ char Weapons_fire(short charge)
 		Worm_setHealth(Worm_currentWorm, 0, FALSE);
 		Worm_isDead |= (unsigned short)1<<(Worm_currentWorm);
 		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], 0, 2, TRUE, TRUE);
+		return TRUE;
+	}
+
+	// if it's drill or blowtorch, set the timer
+	if(Game_currentWeaponSelected == WDrill)
+	{
+		// set the worms animation state for this duration
+		Game_wormAnimState = ANIM_DRILL;
+		Weapons_spawn(WDrill, 0, 0, 0, 0, 5);
+		return TRUE;
+	}
+
+	if(Game_currentWeaponSelected == WBlowTorch)
+	{
+		Game_wormAnimState = ANIM_TORCH;
+		Game_currentWeaponState |= keepAimDuringUse;
+		Weapons_spawn(WBlowTorch, 0, 0, 0, 0, 30);
 		return TRUE;
 	}
 
