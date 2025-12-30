@@ -43,8 +43,11 @@ typedef struct {
 #define firstShotTaken  	0b00000100
 #define keepAimDuringUse	0b00001000
 
-// For max fuel allowed for jetback
+// For max fuel allowed for jetpack
 #define MAX_JETPACK_FUEL 150.0
+
+// total ninja rope points allowed
+#define MAX_NINJA_ROPE_POINTS 32	
 
 // Define Fixed Point precision (16.16)
 #define FP_SHIFT 16
@@ -98,6 +101,9 @@ extern char Game_aimAngle;
 extern unsigned short Game_stateFlags;
 extern char Game_debugFreeze;
 extern unsigned char Game_jetPackFuel;
+extern short Game_ninjaRopeAnchors[32][3];
+extern short Game_ninjaRopeAnchorCount;
+extern short Game_ninjaRopeAngle;
 
 // game function prototypes
 

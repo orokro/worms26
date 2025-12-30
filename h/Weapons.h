@@ -51,7 +51,7 @@
 #define doesntEndTurn			0b00000100000000000000000000000000  // true if weapon doesn't end turn when used
 #define noRender				0b00001000000000000000000000000000  // true if weapon object shouldn't be rendered (e.g. weapons that spawn just to run a routine)
 #define customRender			0b00010000000000000000000000000000  // true if weapon object needs custom case to render itself
-
+#define usesPreAim				0b00100000000000000000000000000000  // added for NinjaRope - user should be able to aim before applying the rope
 
 /*
   enumerate our list of weapons, with matching index positions as described in the array above

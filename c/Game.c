@@ -179,6 +179,11 @@ char Game_wormAnimState = ANIM_NONE;
 int Game_wormAnimTimer = 0;
 char Game_wormFlipStartDir = 0; // 0 = right, 1 = left (matching wormMask)
 
+// list of points in the ninja-rope
+extern short Game_ninjaRopeAnchors[32][3];
+extern short Game_ninjaRopeAnchorCount = 0;
+extern short Game_ninjaRopeAngle = 0;
+
 // game state flags
 unsigned short Game_stateFlags;
 

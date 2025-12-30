@@ -183,6 +183,27 @@ void drawSelectArrow()
 
 
 /**
+ * @brief Draws the line segments for the ninja rope
+ */
+void drawNinjaRope(){
+
+	// loop over Game_ninjaRopeAnchors and draw a screen space line between each point
+	short prevX = Worm_x[(short)Worm_currentWorm];
+	short prevY = Worm_y[(short)Worm_currentWorm]+4;
+	short i;
+	for(i=0; i<Game_ninjaRopeAnchorCount; i++){
+		short screenX = Game_ninjaRopeAnchorsX[i];
+		short screenY = Game_ninjaRopeAnchorsY[i];
+		if(worldToScreen(&screenX, &screenY)){
+			drawThiGrayDrawClipLine2BckLine(prevX, prevY, screenX, screenY, 3, lightPlane, darkPlane);
+		}
+		prevX = screenX;
+		prevY = screenY;
+	}
+}
+
+
+/**
  * Draws the games timer
 */
 void Draw_timer()
@@ -286,7 +307,11 @@ void Draw_HUD()
 	}
 
 	// draw the timer
-	Draw_timer();	
+	Draw_timer();
+
+	// draw ninja rope if we're in that mode
+	if(Game_stateFlags & gs_ninjaRopeMode)
+		drawNinjaRope();
 }
 
 
@@ -342,6 +367,8 @@ void drawWeaponDetails()
 		(Game_currentWeaponProperties & usesCharge)
 		||
 		(Game_currentWeaponState & keepAimDuringUse)
+		||
+		Weapon_props[(short)Game_currentWeaponSelected] & usesPreAim
 		)
 	{
 	

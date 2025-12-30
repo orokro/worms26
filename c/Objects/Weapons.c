@@ -290,10 +290,10 @@ unsigned long Weapon_props[75] = {
         usesCursor | usesAirStrike | usesWind,
         
 		// blow torch
-        usesRoutine | holdsCustom | noRender | doesntEndTurn,
+        usesRoutine | holdsCustom | noRender | doesntEndTurn | usesPreAim,
         
 		// ninja rope
-        doesntEndTurn,
+        doesntEndTurn | usesRaycast | holdsCustom | usesAim | usesPreAim,
         
 		// super banana bomb
         usesAim | usesFuse | usesCharge | usesPhysics | usesDetonation | isCluster | spawnsSelf | holdsSelf,
@@ -793,6 +793,39 @@ void doRayCastShot(short dirX, short dirY)
 		worldToScreen(&sx, &sy);
 		worldToScreen(&ex, &ey);
 		Draw_setRayLine(sx, sy, ex, ey);
+	}
+}
+
+
+/**
+ * @brief Performs a raycast shot to check if ninja-rope anchoring is possible
+ * 
+ * @param dirX - direction x
+ * @param dirY - direction y 	
+ * @return char - TRUE if we hit something, FALSE if we didn't
+ */
+char doNinjaRopeRayCast(short dirX, short dirY)
+{
+	// perform a raycast to see what we hit
+	short spawnX = Worm_x[(short)Worm_currentWorm];
+	short spawnY = Worm_y[(short)Worm_currentWorm]+4;
+	RaycastHit hit = Game_raycast(spawnX, spawnY, dirX, dirY, FALSE);
+	
+	if(hit.hitType != RAY_HIT_NOTHING)
+	{
+		Game_ninjaRopeAnchorCount = 1;
+		Game_ninjaRopeAnchorX[0] = hit.x;
+		Game_ninjaRopeAnchorY[0] = hit.y;
+		return TRUE;
+		
+	}else{
+		// draw fire ray
+		short sx=spawnX, sy=spawnY, ex=dirX*100, ey=dirY*100;
+		worldToScreen(&sx, &sy);
+		worldToScreen(&ex, &ey);
+		Draw_setRayLine(sx, sy, ex, ey);
+
+		return FALSE;
 	}
 }
 
@@ -1800,6 +1833,20 @@ char Weapons_fire(short charge)
 	// if it has uses raycast, it must be a gun-type weapon. Handle it now
 	if(Game_currentWeaponProperties & usesRaycast)
 	{
+		// if it's the NinjaRope, do a raycast to see if we hit land
+		if(Game_currentWeaponSelected == WNinjaRope)
+		{
+			// do the raycast for the rope
+			if(doNinjaRopeRayCast(dirX, dirY))
+			{
+				// rope attached successfully
+				Game_stateFlags |= gs_ninjaRopeMode;
+				return FALSE;
+			}else{
+				return FALSE;
+			}
+		}
+
 		// if it's a shot gun, just do a shot right now
 		if(Game_currentWeaponSelected == WShotGun)
 		{

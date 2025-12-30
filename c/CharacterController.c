@@ -500,6 +500,100 @@ void wormJetpack()
 
 
 /**
+ * @brief Get the Ninja Rope angles based on a int value between 0-360
+ * 
+ * @param angle - angle in degrees
+ * @param outX - output X component
+ * @param outY - output Y component
+ */
+void getNinjaRopeAngles(short angle, short *outX, short *outY)
+{
+	// get the direction vector from the angle
+	// TODO: optimize with a lookup table
+
+	// *outX = 
+	// *outY = 
+}
+
+
+/**
+ * @brief Handles the logic for the NinjaRope
+ */
+void wormNinjaRope(){
+
+	// gtfo if we're not in ninja rope mode
+	if(!(Game_stateFlags & gs_ninjaRopeMode))
+		return;
+
+	// unsettle worm
+	Worm_physObj[(short)Worm_currentWorm].staticFrames = 0;
+	Worm_settled &= ~wormMask;
+
+	// if action key is pressed, exit mode
+	if(Keys_keyState(keyAction))
+	{
+		Game_stateFlags &= ~gs_ninjaRopeMode;
+		return;
+	}
+
+	// if the up key is pressed, we should get closer to the current / last ninja rope point
+	if(Keys_keyState(keyUp))
+	{
+		NinjaRope_moveCloser();
+	}
+	else if(Keys_keyState(keyDown))
+	{
+		NinjaRope_moveAway();
+	}
+
+	// if left or right are pushed, we should swing the rope
+	if(Keys_keyState(keyLeft))
+	{
+		NinjaRope_swingLeft();
+		Worm_dir |= wormMask;
+	}
+	else if(Keys_keyState(keyRight))
+	{
+		NinjaRope_swingRight();
+		Worm_dir &= ~wormMask;
+	}
+
+	// we should ray cast to see if we need to add a new ninja rope point
+	short spawnX = Worm_x[(short)Worm_currentWorm];
+	short spawnY = Worm_y[(short)Worm_currentWorm]+4;
+
+	short dirX=0, dirY=0; 
+	getNinjaRopeAngles(Game_ninjaRopeAngle[0], &dirX, &dirY);
+
+	return;
+	
+	RaycastHit hit = Game_raycast(spawnX, spawnY, dirX, dirY, FALSE);
+	
+	if(hit.hitType != RAY_HIT_NOTHING)
+	{
+		// Game_ninjaRopeAnchorCount = 1;
+		// Game_ninjaRopeAnchorX[0] = hit.x;
+		// Game_ninjaRopeAnchorY[0] = hit.y;
+
+		// check if the hit point is far enough from the last point
+		short lastX = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount-1][0];
+		short lastY = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount-1][1];
+		long dx = (long)hit.x - (long)lastX;
+		long dy = (long)hit.y - (long)lastY;
+		long distSq = dx*dx + dy*dy;
+		if(distSq >= (16L*16L) && Game_ninjaRopeAnchorCount < MAX_NINJA_ROPE_POINTS)
+		{
+			// add a new point
+			Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][0] = hit.x;
+			Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][1] = hit.y;
+			Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][2] = Game_ninjaRopeAngle;
+			Game_ninjaRopeAnchorCount++;
+		}
+	}
+}
+
+
+/**
  * @brief Initiates a backflip for the current worm
  */
 void CharacterController_doBackflip()
@@ -541,6 +635,7 @@ void CharacterController_update()
     wormParachute();
     wormBungee();
     wormJetpack();
+	wormNinjaRope();
 
 	if (Worm_onGround & wormMask)
 		wormWalk();
@@ -548,7 +643,13 @@ void CharacterController_update()
 	if (Game_currentWeaponSelected != -1)
 		wormWeapon();
 
-	if ((Game_currentWeaponProperties & usesAim) || (Game_currentWeaponState & keepAimDuringUse))
+	if (
+		(Game_currentWeaponProperties & usesAim)
+		||
+		(Game_currentWeaponState & keepAimDuringUse)
+		||
+		Weapon_props[(short)Game_currentWeaponSelected] & usesPreAim
+	)
 		adjustAim();
 }
 
