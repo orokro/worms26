@@ -132,4 +132,14 @@ extern void Draw_renderTeamHealth();
  */
 extern void Draw_setRayLine(short sx, short sy, short ex, short ey);
 
+
+/**
+ * @brief Draws girder line at given world coords
+ * 
+ * @param x - world x
+ * @param y - world y
+ * @param onMap - is this being drawn on the map?
+ */
+extern void Draw_girder(short x, short y, char onMap);
+
 #endif

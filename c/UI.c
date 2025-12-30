@@ -56,15 +56,32 @@ extern void Draw_setRayLine(short sx, short sy, short ex, short ey)
  */
 void getGirderCoords(short x, short y, short* outX1, short* outY1, short* outX2, short* outY2)
 {
-	const short xPos[] = {-5, -4, 0, -4, -5, -4, 0, -4};
-	const short yPos[] = {0, -4, -5, -4, 0, -4, -5, -4};
-	const char multipler = (Game_jetPackFuel > 3) ? 2 : 1;
+	const short xPos[] = {-5, -3, 0, -3, -8, -6, 0, -6};
+	const short yPos[] = {0, -3, -5,  3, 0, -6, -8,  6};
 
-	*outX1 = x + xPos[(short)Game_jetPackFuel] * multipler;
-	*outY1 = y + yPos[(short)Game_jetPackFuel] * multipler;
-	*outX2 = x - xPos[(short)Game_jetPackFuel] * multipler;
-	*outY2 = x - yPos[(short)Game_jetPackFuel] * multipler;
+	*outX1 = x + xPos[(short)Game_jetPackFuel];
+	*outY1 = y + yPos[(short)Game_jetPackFuel];
+	*outX2 = x - xPos[(short)Game_jetPackFuel];
+	*outY2 = y - yPos[(short)Game_jetPackFuel];
 }	
+
+
+/**
+ * @brief Draws a target line either on the map or on screen
+ * 
+ * @param x1 - starting x
+ * @param y1 - starting y
+ * @param x2 - ending x
+ * @param y2 - ending y
+ * @param onMap - is this being drawn on the map?
+ */
+void drawTargetLine(short x1, short y1, short x2, short y2, char onMap)
+{
+	if(onMap==TRUE)
+		Map_addTerrainLine(x1, y1, x2, y2);
+	else
+		GrayDrawClipLine2B(x1, y1, x2, y2, 3, lightPlane, darkPlane);
+}
 
 
 /**
@@ -77,23 +94,42 @@ void getGirderCoords(short x, short y, short* outX1, short* outY1, short* outX2,
  * @param color - color to draw with
  * @param lightPlane - light plane
  * @param darkPlane - dark plane
+ * @param onMap - is this being drawn on the map?
  */
-void DrawThickLine(short x1, short y1, short x2, short y2, short color, void* lightPlane, void* darkPlane) {
+void drawThickLine(short x1, short y1, short x2, short y2, char onMap) {
 
     // 1. Draw the center line
-    GrayDrawClipLine2B(x1, y1, x2, y2, color, lightPlane, darkPlane);
+    drawTargetLine(x1, y1, x2, y2, onMap);
 
     // 2. Determine direction to expand based on slope
     // If width (dx) is greater than height (dy), it's a horizontal-ish line.
     if (abs(x2 - x1) >= abs(y2 - y1)) {
         // Expand Vertically (Up and Down)
-        GrayDrawClipLine2B(x1, y1 - 1, x2, y2 - 1, color, lightPlane, darkPlane);
-        GrayDrawClipLine2B(x1, y1 + 1, x2, y2 + 1, color, lightPlane, darkPlane);
+        drawTargetLine(x1, y1 - 1, x2, y2 - 1, onMap);
+        drawTargetLine(x1, y1 + 1, x2, y2 + 1, onMap);
     } else {
         // Expand Horizontally (Left and Right)
-        GrayDrawClipLine2B(x1 - 1, y1, x2 - 1, y2, color, lightPlane, darkPlane);
-        GrayDrawClipLine2B(x1 + 1, y1, x2 + 1, y2, color, lightPlane, darkPlane);
+        drawTargetLine(x1 - 1, y1, x2 - 1, y2, onMap);
+        drawTargetLine(x1 + 1, y1, x2 + 1, y2, onMap);
     }
+}
+
+
+/**
+ * @brief Draws girder line at given world coords
+ * 
+ * @param x - world x
+ * @param y - world y
+ * @param onMap - is this being drawn on the map?
+ */
+void Draw_girder(short x, short y, char onMap)
+{
+	if(onMap==FALSE)
+		worldToScreen(&x, &y);
+	
+	short gx1 = 0, gy1 = 0, gx2 = 0, gy2 = 0;
+	getGirderCoords(x, y, &gx1, &gy1, &gx2, &gy2);
+	drawThickLine(gx1, gy1, gx2, gy2, onMap);
 }
 
 
@@ -113,16 +149,11 @@ void drawCursorAndXSpot()
 	if(Game_mode==gameMode_Cursor)
 	{		
 		if(worldToScreen(&screenX, &screenY))
-		{						
-
+		{				
 			// if we're in girder mode, we should draw the rotated line representing the girder
-			if(Game_stateFlags &= gs_girderPlace)
+			if(Game_stateFlags & gs_girderPlace)
 			{
-				short gx1 = 0, gy1 = 0, gx2 = 0, gy2 = 0;
-				getGirderCoords(screenX, screenY, &gx1, &gy1, &gx2, &gy2);
-
-				DrawThickLine(gx1, gy1, gx2, gy2, 3, lightPlane, darkPlane);
-
+				Draw_girder(Game_cursorX, Game_cursorY, FALSE);
 			}
 			else
 			{
