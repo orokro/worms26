@@ -150,4 +150,16 @@ extern char Game_allSettled();
  */
 extern char Game_checkWinConditions();
 
+/**
+ * @brief Get the Girder Coords object
+ * 
+ * @param x - center x to rotate around
+ * @param y - center y to rotate around
+ * @param outX1 - output x1
+ * @param outY1 - output y1
+ * @param outX2 - output x2
+ * @param outY2 - output y2
+ */
+extern void Cursor_getGirderCoords(short x, short y, short* outX1, short* outY1, short* outX2, short* outY2);
+
 #endif

@@ -45,28 +45,6 @@ extern void Draw_setRayLine(short sx, short sy, short ex, short ey)
 
 
 /**
- * @brief Get the Girder Coords object
- * 
- * @param x - center x to rotate around
- * @param y - center y to rotate around
- * @param outX1 - output x1
- * @param outY1 - output y1
- * @param outX2 - output x2
- * @param outY2 - output y2
- */
-void getGirderCoords(short x, short y, short* outX1, short* outY1, short* outX2, short* outY2)
-{
-	const short xPos[] = {-5, -3, 0, -3, -8, -6, 0, -6};
-	const short yPos[] = {0, -3, -5,  3, 0, -6, -8,  6};
-
-	*outX1 = x + xPos[(short)Game_jetPackFuel];
-	*outY1 = y + yPos[(short)Game_jetPackFuel];
-	*outX2 = x - xPos[(short)Game_jetPackFuel];
-	*outY2 = y - yPos[(short)Game_jetPackFuel];
-}	
-
-
-/**
  * @brief Draws a target line either on the map or on screen
  * 
  * @param x1 - starting x
@@ -128,7 +106,7 @@ void Draw_girder(short x, short y, char onMap)
 		worldToScreen(&x, &y);
 	
 	short gx1 = 0, gy1 = 0, gx2 = 0, gy2 = 0;
-	getGirderCoords(x, y, &gx1, &gy1, &gx2, &gy2);
+	Cursor_getGirderCoords(x, y, &gx1, &gy1, &gx2, &gy2);
 	drawThickLine(gx1, gy1, gx2, gy2, onMap);
 }
 
