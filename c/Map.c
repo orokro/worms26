@@ -26,16 +26,6 @@
 #include "Crates.h"
 #include "Game.h"
 #include "Camera.h"
-
-/*
-	the map will keep an array of 620 tiles, (32 x 20) which represent
-	10x10 tiles on the map. When mines or crates spawn or move, they
-	will set their id in the tile they're in.
-	
-	This way, we can only check the crates and mines the tiles are in
-	for this worm.
-*/
-unsigned char mapTiles[640];
 	
 	
 // when a spawn point is requested of the map, it will find one
@@ -417,12 +407,12 @@ static long distSq(short x1, short y1, short x2, short y2) {
 
 /**
  * Finds a valid spawn point for the given object type.
- * Uses raycasting and proximity checks to ensure safety.
+ * Uses simplified vertical scanning and proximity checks.
  *
  * @param type - The type of object (SPAWN_WORM, SPAWN_MINE, etc)
  * @param outX - Pointer to store the result X
  * @param outY - Pointer to store the result Y
- * @return TRUE if found, FALSE if failed (should rarely fail)
+ * @return TRUE if found, FALSE if failed
  */
 char Map_findSpawnPoint(char type, short *outX, short *outY)
 {
@@ -440,15 +430,15 @@ char Map_findSpawnPoint(char type, short *outX, short *outY)
 	
 	switch(type) {
 		case SPAWN_WORM:
-			radiusWorm = 15; // Don't stack worms
-			radiusMine = 25; // Far from mines
-			radiusDrum = 15; // Bit away from drums
+			radiusWorm = 15;
+			radiusMine = 25;
+			radiusDrum = 15;
 			headroom = 20;
 			checkHeadroom = TRUE;
 			break;
 		case SPAWN_MINE:
-			radiusWorm = 25; // Keep away from worms
-			radiusMine = 10; // Don't stack mines
+			radiusWorm = 25;
+			radiusMine = 10;
 			radiusDrum = 10;
 			headroom = 5;
 			checkHeadroom = TRUE;
@@ -456,12 +446,12 @@ char Map_findSpawnPoint(char type, short *outX, short *outY)
 		case SPAWN_DRUM:
 			radiusWorm = 15;
 			radiusMine = 10;
-			radiusDrum = 15; // Don't stack drums
+			radiusDrum = 15;
 			headroom = 15;
 			checkHeadroom = TRUE;
 			break;
 		case SPAWN_CRATE:
-			radiusWorm = 15; // Don't land ON a worm
+			radiusWorm = 15;
 			radiusMine = 0;
 			radiusDrum = 0;
 			fromSky = TRUE;
@@ -470,10 +460,9 @@ char Map_findSpawnPoint(char type, short *outX, short *outY)
 	
 	short maxAttempts = 500;
 	
-	// Fallback logic: If we struggle to place items, reduce requirements
 	for(i=0; i<maxAttempts; i++) {
 		
-		// If we are struggling, relax constraints
+		// Relax constraints over time
 		if(i > 200) {
 			radiusWorm = (radiusWorm * 2) / 3;
 			radiusMine = (radiusMine * 2) / 3;
@@ -486,40 +475,79 @@ char Map_findSpawnPoint(char type, short *outX, short *outY)
 			headroom /= 2;
 		}
 		
-		// 1. Pick Random Location
-		startX = random(310) + 5; // Margin from edges
-		startY = fromSky ? -10 : random(180) + 10;
+		// 1. Pick Random X
+		startX = random(310) + 5;
 		
-		// 2. Initial Validity Check
-		// If placing on ground, ensure we didn't pick a point INSIDE land
-		if(!fromSky && Map_testPoint(startX, startY))
-			continue;
-			
-		// 3. Raycast Down to find land
-		RaycastHit hit = Game_raycast(startX, startY, 0, 1, FALSE);
+		// 2. Determine Y scan start
+		// Alternating scan: Top (0) vs Mid (90)
+		if(fromSky) {
+			startY = 0; // Scanning from 0 is safe for sky
+		} else {
+			startY = (i % 2 == 0) ? 0 : 90;
+		}
 		
-		// Must hit land
-		if(hit.hitType != RAY_HIT_LAND)
-			continue;
+		// 3. Find Land (Simple Vertical Raycast)
+		// We implement a fast inline loop instead of using Game_raycast
+		short hitY = -1;
+		if(fromSky) {
+			// For crates, "hitting land" means valid spawn is the Sky
+			// But we still need to check what it would eventually hit for safety
+			// So we scan down to find the eventual landing spot
+			for(j = 0; j < 200; j++) {
+				if(Map_testPoint(startX, j)) {
+					hitY = j;
+					break;
+				}
+			}
+			// If we didn't hit land (hole to water), that's fine for Crate logic below (water check)
+			// But the spawn point itself is in the sky
+			*outX = startX;
+			*outY = -10; // Crate spawns in sky
+		} else {
+			// For ground objects, we need actual land
+			// Optimization: If we start at 90, we assume we want lower layer
+			// If we start at 0, we take first hit (upper)
+			for(j = startY; j < 200; j++) {
+				if(Map_testPoint(startX, j)) {
+					hitY = j;
+					break;
+				}
+			}
 			
-		// 4. Water Check
+			// If no land found, try again
+			if(hitY == -1) continue;
+			
+			// Found land
+			*outX = startX;
+			*outY = hitY;
+		}
+		
+		// 4. Validity Checks using hitY (the ground level)
+		// If hitY is -1 (water hole), checkWater handles it
+		if(hitY == -1) hitY = 200; // Treat hole as bottom
+		
+		// Water Check
 		if(checkWater) {
-			if(hit.y > (196 - Game_waterLevel))
+			if(hitY > (196 - Game_waterLevel))
 				continue;
 		}
 		
-		// 5. Headroom Check (ensure not in a tiny cave)
+		// Headroom Check
 		if(checkHeadroom) {
-			// Raycast UP from ground
-			RaycastHit headHit = Game_raycast(hit.x, hit.y - 4, 0, -1, FALSE);
-			if(headHit.hitType == RAY_HIT_LAND) {
-				short gap = hit.y - headHit.y;
-				if(gap < headroom)
-					continue;
+			// Scan UP from ground
+			char hitCeiling = FALSE;
+			for(j = hitY - 4; j >= 0; j--) {
+				if(Map_testPoint(startX, j)) {
+					// Hit a ceiling!
+					short gap = hitY - j;
+					if(gap < headroom) hitCeiling = TRUE;
+					break; // Stop scanning up
+				}
 			}
+			if(hitCeiling) continue;
 		}
 		
-		// 6. Proximity Checks
+		// Proximity Checks (Euclidean Distance Squared)
 		char valid = TRUE;
 		
 		// Check Worms
@@ -529,7 +557,7 @@ char Map_findSpawnPoint(char type, short *outX, short *outY)
 			for(j=0; j<MAX_WORMS; j++) {
 				mask = (unsigned short)1 << j;
 				if(Worm_active & mask) {
-					if(distSq(hit.x, hit.y, Worm_x[j], Worm_y[j]) < radSq) {
+					if(distSq(*outX, hitY, Worm_x[j], Worm_y[j]) < radSq) {
 						valid = FALSE; break;
 					}
 				}
@@ -542,7 +570,7 @@ char Map_findSpawnPoint(char type, short *outX, short *outY)
 			long radSq = (long)radiusMine * radiusMine;
 			for(j=0; j<MAX_MINES; j++) {
 				if(Mine_active & (unsigned short)1<<j) {
-					if(distSq(hit.x, hit.y, Mine_x[j], Mine_y[j]) < radSq) {
+					if(distSq(*outX, hitY, Mine_x[j], Mine_y[j]) < radSq) {
 						valid = FALSE; break;
 					}
 				}
@@ -555,7 +583,7 @@ char Map_findSpawnPoint(char type, short *outX, short *outY)
 			long radSq = (long)radiusDrum * radiusDrum;
 			for(j=0; j<MAX_OILDRUMS; j++) {
 				if(OilDrum_active & (unsigned short)1<<j) {
-					if(distSq(hit.x, hit.y, OilDrum_x[j], OilDrum_y[j]) < radSq) {
+					if(distSq(*outX, hitY, OilDrum_x[j], OilDrum_y[j]) < radSq) {
 						valid = FALSE; break;
 					}
 				}
@@ -563,27 +591,18 @@ char Map_findSpawnPoint(char type, short *outX, short *outY)
 		}
 		if(!valid) continue;
 		
-		// Check Crates (Rare but possible)
+		// Check Crates
 		if(Crate_active) {
-			long radSq = 20 * 20; // Default buffer
+			long radSq = 20 * 20;
 			for(j=0; j<MAX_CRATES; j++) {
 				if(Crate_active & (unsigned short)1<<j) {
-					if(distSq(hit.x, hit.y, Crate_x[j], Crate_y[j]) < radSq) {
+					if(distSq(*outX, hitY, Crate_x[j], Crate_y[j]) < radSq) {
 						valid = FALSE; break;
 					}
 				}
 			}
 		}
 		if(!valid) continue;
-		
-		// 7. Found it!
-		if(fromSky) {
-			*outX = startX;
-			*outY = startY; // Sky position
-		} else {
-			*outX = hit.x;
-			*outY = hit.y; // Ground position
-		}
 		
 		return TRUE;
 	}
