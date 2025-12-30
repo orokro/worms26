@@ -1318,6 +1318,20 @@ void Weapons_setTarget(short x, short y)
 	Weapon_targetX = x;
 	Weapon_targetY = y;
 	
+	// if it's girder or girder pack, just place the girder now
+	if(Game_currentWeaponSelected == WGirder || Game_currentWeaponSelected == WGirderPack)
+	{
+		// place the girder at the target location
+		Draw_girder(Game_cursorX, Game_cursorY, TRUE);
+
+		// un-set target picked, since girder instantly consumes the position
+		Game_currentWeaponState &= ~targetPicked;
+
+		// consume the weapon from players inventory
+		CharacterController_weaponConsumed(FALSE);
+		return;
+	}
+
 	// for teleport, just set the worm pos immediately
 	if(Game_currentWeaponSelected == WTeleport)
 	{
