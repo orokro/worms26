@@ -479,10 +479,16 @@ void CharacterController_update()
  * @brief handles clean up after weapon has been decidedly used
  */
 void CharacterController_weaponConsumed(char noEndTurn){
+
+	// decrement weapon count
 	Match_teamWeapons[(short)Game_currentTeam][(short)Game_currentWeaponSelected]--;
+
+	// reset weapon selection, save last weapon selected
 	if(Game_currentWeaponSelected!=-1)
 		Game_lastWeaponSelected = Game_currentWeaponSelected;
 	Game_currentWeaponSelected = -1;
+
+	// end turn if necessary
 	if(noEndTurn || (Game_currentWeaponProperties & doesntEndTurn))
 		return;
 	Game_changeMode(gameMode_TurnEnd);

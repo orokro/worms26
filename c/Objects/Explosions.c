@@ -351,9 +351,10 @@ void Explosion_drawAll()
 					DrawClipEllipse(x, y, e, e, &(SCR_RECT){{0, 0, 159, 99}}, A_XOR);
 				}
 			}
+			
 		}// end if active
+
 	}// next i
-	
 }
 
 

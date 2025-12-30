@@ -1440,13 +1440,7 @@ void Weapons_update()
 				}
 
 			}//end if uses homing
-			
-			// if a weapon needs user input to control it, read that now:
-			if(currentProps & usesController)
-			{
-				// TO-DO: implement controller logic	
-			}
-				
+							
 			// if this weapon uses physics, lets update that shit
 			if(currentProps & usesPhysics)
 			{
