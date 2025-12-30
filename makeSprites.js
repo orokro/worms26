@@ -198,6 +198,7 @@ try {
                 } else {
                     // Missing file, use 0 and inferred height
                     wormSpritePointers.push("0");
+                    wormSpriteHeights.push(poseHeight);
                     if (type === 'Mask') {
                         generatedMaskWordsNeeded += poseHeight;
                     }
