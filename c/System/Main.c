@@ -72,26 +72,37 @@ unsigned short generateMaskRow(unsigned short outline) {
 void GenerateWormMasks() {
     int w, r;
     unsigned short* currentBufferPos = wormMaskBuffer;
+    unsigned short* bufferEnd = wormMaskBuffer + WORM_GENERATED_MASK_BUFFER_SIZE;
     
     for (w = 0; w < NUM_WORM_SPRITES; w++) {
-        // Only generate if it's a mask (0) AND it's NULL (missing in ROM)
-        if (wormSpriteTypes[w] == 0 && wormsSprites[w] == NULL) {
-            unsigned char h = wormSpriteHeights[w];
-            wormsSprites[w] = currentBufferPos;
-            
-            for (r = 0; r < h; r++) {
-                // OR all components that follow this mask until we hit another mask or end of array
-                unsigned short shape = 0;
-                int c = w + 1;
-                while (c < NUM_WORM_SPRITES && wormSpriteTypes[c] == 1) {
-                    if (wormsSprites[c] != NULL) {
-                        shape |= wormsSprites[c][r];
-                    }
-                    c++;
-                }
+        // Only generate if it's a mask (0)
+        if (wormSpriteTypes[w] == 0) {
+            // Check if it's missing (0) OR if it points to our RAM buffer (from a previous run)
+            int needsGeneration = 0;
+            if (wormsSprites[w] == (unsigned short*)0) {
+                needsGeneration = 1;
+            } else if (wormsSprites[w] >= wormMaskBuffer && wormsSprites[w] < bufferEnd) {
+                needsGeneration = 1;
+            }
+
+            if (needsGeneration) {
+                unsigned char h = wormSpriteHeights[w];
+                wormsSprites[w] = currentBufferPos;
                 
-                *currentBufferPos = generateMaskRow(shape);
-                currentBufferPos++;
+                for (r = 0; r < h; r++) {
+                    // OR all components that follow this mask until we hit another mask or end of array
+                    unsigned short shape = 0;
+                    int c = w + 1;
+                    while (c < NUM_WORM_SPRITES && wormSpriteTypes[c] == 1) {
+                        if (wormsSprites[c] != NULL) {
+                            shape |= wormsSprites[c][r];
+                        }
+                        c++;
+                    }
+                    
+                    *currentBufferPos = generateMaskRow(shape);
+                    currentBufferPos++;
+                }
             }
         }
     }
