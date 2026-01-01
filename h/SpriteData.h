@@ -142,6 +142,10 @@ extern const unsigned short worm_JETPACK_Outline[];
 
 extern const unsigned short worm_JUMP_Outline[];
 
+extern const unsigned short worm_ROPE135_Outline[];
+
+extern const unsigned short worm_ROPE45_Outline[];
+
 extern const unsigned short worm_TNT1_Outline[];
 
 extern const unsigned short worm_TNT2_Outline[];
@@ -150,9 +154,9 @@ extern const unsigned short worm_TORCH_Outline[];
 
 extern const unsigned short worm_WALK_Outline[];
 
-#define NUM_WORM_SPRITES 33
-#define WORM_FLIP_BUFFER_SIZE 477
-#define WORM_GENERATED_MASK_BUFFER_SIZE 232
+#define NUM_WORM_SPRITES 37
+#define WORM_FLIP_BUFFER_SIZE 537
+#define WORM_GENERATED_MASK_BUFFER_SIZE 262
 
 #define WORM_BACKFLIP1_MASK 0
 #define WORM_BACKFLIP1_LIGHT 1
@@ -190,18 +194,24 @@ extern const unsigned short worm_WALK_Outline[];
 #define WORM_JUMP_MASK 23
 #define WORM_JUMP_LIGHT 24
 #define WORM_JUMP_DARK 24
-#define WORM_TNT1_MASK 25
-#define WORM_TNT1_LIGHT 26
-#define WORM_TNT1_DARK 26
-#define WORM_TNT2_MASK 27
-#define WORM_TNT2_LIGHT 28
-#define WORM_TNT2_DARK 28
-#define WORM_TORCH_MASK 29
-#define WORM_TORCH_LIGHT 30
-#define WORM_TORCH_DARK 30
-#define WORM_WALK_MASK 31
-#define WORM_WALK_LIGHT 32
-#define WORM_WALK_DARK 32
+#define WORM_ROPE135_MASK 25
+#define WORM_ROPE135_LIGHT 26
+#define WORM_ROPE135_DARK 26
+#define WORM_ROPE45_MASK 27
+#define WORM_ROPE45_LIGHT 28
+#define WORM_ROPE45_DARK 28
+#define WORM_TNT1_MASK 29
+#define WORM_TNT1_LIGHT 30
+#define WORM_TNT1_DARK 30
+#define WORM_TNT2_MASK 31
+#define WORM_TNT2_LIGHT 32
+#define WORM_TNT2_DARK 32
+#define WORM_TORCH_MASK 33
+#define WORM_TORCH_LIGHT 34
+#define WORM_TORCH_DARK 34
+#define WORM_WALK_MASK 35
+#define WORM_WALK_LIGHT 36
+#define WORM_WALK_DARK 36
 extern unsigned short* wormsSprites[];
 extern const unsigned char wormSpriteHeights[];
 extern const unsigned char wormSpriteTypes[];
