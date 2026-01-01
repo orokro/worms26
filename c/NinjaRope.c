@@ -18,8 +18,6 @@
 
 #define SIN_SCALE 8192
 
-static const short SineTable[91] = { 0, 143, 286, 429, 571, 714, 856, 998, 1140, 1282, 1423, 1563, 1703, 1843, 1982, 2120, 2258, 2395, 2531, 2667, 2802, 2936, 3069, 3201, 3332, 3462, 3591, 3719, 3846, 3972, 4096, 4219, 4341, 4462, 4581, 4699, 4815, 4930, 5043, 5155, 5266, 5374, 5482, 5587, 5691, 5793, 5893, 5991, 6088, 6183, 6275, 6366, 6455, 6542, 6627, 6710, 6791, 6870, 6947, 7022, 7094, 7165, 7233, 7299, 7363, 7424, 7484, 7541, 7595, 7648, 7698, 7746, 7791, 7834, 7875, 7913, 7949, 7982, 8013, 8041, 8068, 8091, 8112, 8131, 8147, 8161, 8172, 8181, 8187, 8191, 8192 };
-
 /**
  * @brief computes fast sine from degrees
  * 
@@ -31,10 +29,10 @@ float fastSin(short thetaInDegrees)
 	short deg = thetaInDegrees % 360;
 	if (deg < 0) deg += 360;
 	
-	if (deg <= 90) return (float)SineTable[deg] / 8192.0f;
-	if (deg <= 180) return (float)SineTable[180 - deg] / 8192.0f;
-	if (deg <= 270) return -(float)SineTable[deg - 180] / 8192.0f;
-	return -(float)SineTable[360 - deg] / 8192.0f;
+	if (deg <= 90) return (float)RS_sin8192tab[deg] / 8192.0f;
+	if (deg <= 180) return (float)RS_sin8192tab[180 - deg] / 8192.0f;
+	if (deg <= 270) return -(float)RS_sin8192tab[deg - 180] / 8192.0f;
+	return -(float)RS_sin8192tab[360 - deg] / 8192.0f;
 }
 
 /**
@@ -51,10 +49,10 @@ float fasCos(short thetaInDegrees)
 short fixedSin(short degrees) {
     degrees %= 360;
     if (degrees < 0) degrees += 360;
-    if (degrees <= 90) return SineTable[degrees];
-    if (degrees <= 180) return SineTable[180 - degrees];
-    if (degrees <= 270) return -SineTable[degrees - 180];
-    return -SineTable[360 - degrees];
+    if (degrees <= 90) return RS_sin8192tab[degrees];
+    if (degrees <= 180) return RS_sin8192tab[180 - degrees];
+    if (degrees <= 270) return -(short)RS_sin8192tab[degrees - 180];
+    return -(short)RS_sin8192tab[360 - degrees];
 }
 
 short fixedCos(short degrees) {
@@ -193,7 +191,7 @@ char checkToRemoveOldHitPoint()
     short lastAngle = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][2];
     short lastDir = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][3];
     
-    if (lastDir == 1) {
+    if (lastDir==1) {
         if (Game_ninjaRopeAngle < lastAngle) {
             Game_ninjaRopeAnchorCount--;
             return TRUE;

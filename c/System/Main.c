@@ -93,7 +93,7 @@ void GenerateWormMasks() {
                     // OR all components that follow this mask until we hit another mask or end of array
                     unsigned short shape = 0;
                     int c = w + 1;
-                    while (c < NUM_WORM_SPRITES && wormSpriteTypes[c] == 1) {
+                    while (c < NUM_WORM_SPRITES && wormSpriteTypes[c]==1) {
                         if (wormsSprites[c] != NULL) {
                             shape |= wormsSprites[c][r];
                         }

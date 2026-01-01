@@ -184,7 +184,7 @@ void Camera_focusOn(short *targetX, short *targetY)
 void Camera_clearIf(short *targetX, short *targetY)
 {
 	// only clear if the current target matches the given target
-	if(cameraIsFocused==TRUE && cameraTargetX==targetX && cameraTargetY==targetY)
+	if(cameraIsFocused && cameraTargetX==targetX && cameraTargetY==targetY)
 	{
 		Camera_clearFocus();
 	}
@@ -200,7 +200,7 @@ void Camera_clearIf(short *targetX, short *targetY)
 void Camera_clearUnless(short *targetX, short *targetY)
 {
 	// only clear if the current target does NOT match the given target
-	if(cameraIsFocused==TRUE && (cameraTargetX!=targetX || cameraTargetY!=targetY))
+	if(cameraIsFocused && (cameraTargetX!=targetX || cameraTargetY!=targetY))
 	{
 		Camera_clearFocus();
 	}

@@ -55,7 +55,7 @@ extern void Draw_setRayLine(short sx, short sy, short ex, short ey)
  */
 void drawTargetLine(short x1, short y1, short x2, short y2, char onMap)
 {
-	if(onMap==TRUE)
+	if(onMap)
 		Map_addTerrainLine(x1, y1, x2, y2);
 	else
 		GrayDrawClipLine2B(x1, y1, x2, y2, 3, lightPlane, darkPlane);

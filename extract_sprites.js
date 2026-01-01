@@ -33,7 +33,7 @@ function createBMP(width, height, data) {
         for (let x = 0; x < width; x++) {
             // Logic: 1 = Black, 0 = White (Inverse of typical brightness)
             // This matches the logic in generate_sprites_c.js
-            const isBlack = data[y][x] === 1;
+            const isBlack = data[y][x];
             const color = isBlack ? 0x00 : 0xFF;
             
             // BGR format
