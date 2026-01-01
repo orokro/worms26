@@ -149,11 +149,11 @@ void GenerateFlippedSprites() {
 // maybe I'll move this into a math file one day
 short dist(short x1, short y1, short x2, short y2)
 {
-	short a = abs(x2-x1);
-	short b = abs(y2-y1);
-	short aSquared = a*a;
-	short bSquared = b*b;
-	short cSquared = aSquared+bSquared;
+	long a = (long)abs(x2-x1);
+	long b = (long)abs(y2-y1);
+	long aSquared = a*a;
+	long bSquared = b*b;
+	long cSquared = aSquared+bSquared;
 	short c = (short)sqrt((float)cSquared);
 	return c;
 }

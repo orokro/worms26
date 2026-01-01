@@ -106,45 +106,51 @@ void updateNinjaRopeCurrentAngle()
 }
 
 /**
+ * @brief Updates the worm's position based on the current anchor, length, and angle
+ */
+void updateWormPosFromRope()
+{
+	short ax = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][0];
+    short ay = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][1];
+	
+	// X = Center + Radius * Sin(theta)
+	// Y = Center - Radius * Cos(theta)
+	
+	Worm_x[(short)Worm_currentWorm] = ax + (short)((long)Game_ninjaRopeLength * fixedSin(Game_ninjaRopeAngle) / SIN_SCALE);
+    Worm_y[(short)Worm_currentWorm] = ay - (short)((long)Game_ninjaRopeLength * fixedCos(Game_ninjaRopeAngle) / SIN_SCALE);
+}
+
+/**
  * @brief Moves the worm along the ninja rope in or out
  * 
  * @param direction - -1 to move in, 1 to move out
  */
 void NinjaRope_moveInOut(short direction)
 {
-	short ax = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][0];
-    short ay = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][1];
-    short *wx = &Worm_x[(short)Worm_currentWorm];
-    short *wy = &Worm_y[(short)Worm_currentWorm];
-
-    short d = dist(*wx, *wy, ax, ay);
-    
-    if (direction < 0) { // Move in
-        if (d <= 3) {
-            if (Game_ninjaRopeAnchorCount > 1) {
-                Game_ninjaRopeAnchorCount--;
-				updateNinjaRopeCurrentAngle();
-            } else {
-                // At first hook point, don't move past it.
-                *wx = ax;
-                *wy = ay;
-            }
-        } else {
-            // LERP 3 pixels in
-            *wx += (short)(((long)(ax - *wx) * 3) / d);
-            *wy += (short)(((long)(ay - *wy) * 3) / d);
-        }
-    } else { // Move out
-        if (d == 0) {
-            // can't lerp away if we are at the point, use Game_ninjaRopeAngle
-            *wx += (short)((long)3 * fixedSin(Game_ninjaRopeAngle) / SIN_SCALE);
-            *wy -= (short)((long)3 * fixedCos(Game_ninjaRopeAngle) / SIN_SCALE);
-        } else {
-            // LERP 3 pixels out
-            *wx -= (short)(((long)(ax - *wx) * 3) / d);
-            *wy -= (short)(((long)(ay - *wy) * 3) / d);
-        }
-    }
+	// Adjust length
+	Game_ninjaRopeLength += (direction * 3);
+	
+	// Bound check min length
+	if(Game_ninjaRopeLength <= 3) {
+		// If we are super close, check if we can remove an anchor
+		if(Game_ninjaRopeAnchorCount > 1) {
+			Game_ninjaRopeAnchorCount--;
+			
+			// Recalculate properties for the previous anchor
+			updateNinjaRopeCurrentAngle();
+			
+			// New length is distance to the *new* current anchor
+			short nax = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][0];
+			short nay = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][1];
+			Game_ninjaRopeLength = dist(Worm_x[(short)Worm_currentWorm], Worm_y[(short)Worm_currentWorm], nax, nay);
+		} else {
+			// Cap at min length
+			Game_ninjaRopeLength = 3;
+		}
+	}
+	
+	// Apply new position
+	updateWormPosFromRope();
 }
 
 /**
@@ -167,13 +173,8 @@ char doNinjaRopeRotation()
 
     Game_ninjaRopeAngle += Game_ninjaRopeRotationSpeed;
 
-    // Update worm position based on new angle and fixed radius
-    short ax = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][0];
-    short ay = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][1];
-    short d = dist(Worm_x[(short)Worm_currentWorm], Worm_y[(short)Worm_currentWorm], ax, ay);
-
-    Worm_x[(short)Worm_currentWorm] = ax + (short)((long)d * fixedSin(Game_ninjaRopeAngle) / SIN_SCALE);
-    Worm_y[(short)Worm_currentWorm] = ay - (short)((long)d * fixedCos(Game_ninjaRopeAngle) / SIN_SCALE);
+    // Update worm position based on new angle and FIXED radius
+	updateWormPosFromRope();
 
     return TRUE;
 }
@@ -191,17 +192,22 @@ char checkToRemoveOldHitPoint()
     short lastAngle = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][2];
     short lastDir = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][3];
     
-    if (lastDir==1) {
-        if (Game_ninjaRopeAngle < lastAngle) {
-            Game_ninjaRopeAnchorCount--;
-            return TRUE;
-        }
-    } else if (lastDir == -1) {
-        if (Game_ninjaRopeAngle > lastAngle) {
-            Game_ninjaRopeAnchorCount--;
-            return TRUE;
-        }
-    }
+    if ((lastDir == 1 && Game_ninjaRopeAngle < lastAngle) || 
+	    (lastDir == -1 && Game_ninjaRopeAngle > lastAngle)) 
+	{
+		Game_ninjaRopeAnchorCount--;
+		
+		// We have unwrapped!
+		// Update Angle relative to the *new* anchor
+		updateNinjaRopeCurrentAngle();
+		
+		// Update Length relative to the *new* anchor
+		short ax = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][0];
+		short ay = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][1];
+		Game_ninjaRopeLength = dist(Worm_x[(short)Worm_currentWorm], Worm_y[(short)Worm_currentWorm], ax, ay);
+		
+		return TRUE;
+	}
     return FALSE;
 }
 
@@ -224,8 +230,9 @@ char raycastForNewHitPoint()
 
     short dx = ax - wx;
     short dy = ay - wy;
-    short d_val = dist(wx, wy, ax, ay);
+    short d_val = Game_ninjaRopeLength; // Use our trusted length
     if (d_val == 0) return FALSE;
+	
     short rayDirX = (short)((long)dx * 10 / d_val);
     short rayDirY = (short)((long)dy * 10 / d_val);
 
@@ -247,6 +254,10 @@ char raycastForNewHitPoint()
 			
 			// increment our counter
 			Game_ninjaRopeAnchorCount++;
+			
+			// Update Length to be distance from *new* anchor to worm
+			// Mathematically, this should be distFromWorm
+			Game_ninjaRopeLength = distFromWorm;
 
 			return TRUE;
 		}
@@ -292,6 +303,9 @@ char CharacterController_doInitialNinjaRopeShot(short dirX, short dirY)
 		updateNinjaRopeCurrentAngle();
 		Game_ninjaRopeAnchors[0][2] = Game_ninjaRopeAngle;
 		Game_ninjaRopeAnchors[0][3] = 0; // always 0 for the first one
+		
+		// Set initial Length
+		Game_ninjaRopeLength = dist(wx, wy, hit.x, hit.y);
 
 		// enable the ninja rope mode
 		Game_stateFlags |= gs_ninjaRopeMode;
@@ -325,8 +339,6 @@ void wormNinjaRope(){
 		
 		// Apply a little "hop" or momentum conservation
 		Worm_yVelo[(short)Worm_currentWorm] = -2; 
-		// Calculate X velocity based on rope angle/rotation? 
-		// For simplicity, just a small hop up.
 		return;
 	}
 

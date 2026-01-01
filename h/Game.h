@@ -106,6 +106,7 @@ extern short Game_ninjaRopeAnchorCount;
 extern short Game_ninjaRopeAngle;
 extern short Game_ninjaRopeRotationDir;
 extern short Game_ninjaRopeRotationSpeed;
+extern short Game_ninjaRopeLength;
 
 // game function prototypes
 

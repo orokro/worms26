@@ -185,6 +185,7 @@ short Game_ninjaRopeAnchorCount;
 short Game_ninjaRopeAngle;
 short Game_ninjaRopeRotationDir = 0;
 short Game_ninjaRopeRotationSpeed = 0;
+short Game_ninjaRopeLength = 0;
 
 // game state flags
 unsigned short Game_stateFlags;
