@@ -619,6 +619,42 @@ void Worm_drawAll()
                     useFlipped = (Worm_dir & wormMask) > 0;
                 }
 
+				// ============================================================
+				// NINJA ROPE
+				// ============================================================
+				// else if(isCurrentWorm && (Game_stateFlags & gs_ninjaRopeMode))
+				// {
+				// 	// Normalize angle to 0-359
+				// 	short angle = Game_ninjaRopeRotationDir % 360;
+				// 	if(angle < 0) angle += 360;
+
+				// 	if(angle >= 338 || angle < 22) {
+				// 		spriteIdx = WORM_BACKFLIP4_MASK; // Up
+				// 		useFlipped = (angle >= 338); // Normal for 0-22 (Right), Flipped for 338-360 (Left)
+				// 	} else if (angle >= 22 && angle < 44) {
+				// 		spriteIdx = WORM_ROPE45_MASK;
+				// 		useFlipped = FALSE;
+				// 	} else if (angle >= 44 && angle < 112) {
+				// 		spriteIdx = WORM_IDLE_MASK;
+				// 		useFlipped = FALSE;
+				// 	} else if (angle >= 112 && angle < 158) {
+				// 		spriteIdx = WORM_ROPE135_MASK;
+				// 		useFlipped = FALSE;
+				// 	} else if (angle >= 158 && angle < 202) {
+				// 		spriteIdx = WORM_BACKFLIP2_MASK; // Down
+				// 		useFlipped = (angle >= 180);
+				// 	} else if (angle >= 202 && angle < 248) {
+				// 		spriteIdx = WORM_ROPE135_MASK;
+				// 		useFlipped = TRUE;
+				// 	} else if (angle >= 248 && angle < 292) {
+				// 		spriteIdx = WORM_IDLE_MASK;
+				// 		useFlipped = TRUE;
+				// 	} else { // 292 - 338
+				// 		spriteIdx = WORM_ROPE45_MASK;
+				// 		useFlipped = TRUE;
+				// 	}
+				// }
+
                 // ============================================================
                 // STANDARD WALKING / STANDING
                 // ============================================================
