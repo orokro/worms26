@@ -551,7 +551,7 @@ void CharacterController_update()
     wormJetpack();
 	wormNinjaRope();
 
-	if (Worm_onGround & wormMask)
+	if ((Worm_onGround & wormMask) && !(Game_stateFlags & gs_ninjaRopeMode))
 		wormWalk();
 
 	if (Game_currentWeaponSelected != -1)
