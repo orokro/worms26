@@ -585,7 +585,7 @@ void CharacterController_weaponConsumed(char noEndTurn){
 	Game_currentWeaponSelected = -1;
 
 	// reselect ninja rope if needed
-	if(isNinjaRope && Match_teamWeapons[Game_currentTeam][WNinjaRope]>0)
+	if(isNinjaRope && Match_teamWeapons[(short)Game_currentTeam][WNinjaRope]>0)
 		Game_currentWeaponSelected = WNinjaRope;
 
 	// end turn if necessary
