@@ -13,14 +13,15 @@
 /**
  * @brief Get the Ninja Rope angles based on a int value between 0-360
  * 
- * @param angle - angle in degrees
  * @param outX - output X component
  * @param outY - output Y component
  */
-void getNinjaRopeAngles(short angle, short *outX, short *outY)
+void getNinjaRopeAngles(short *outX, short *outY)
 {
 	// get the direction vector from the angle
 	// TODO: optimize with a lookup table
+
+	// use Game_ninjaRopeAngle to determine
 
 	// *outX = 
 	// *outY = 
@@ -97,6 +98,10 @@ char doNinjaRopeRotation()
 		y = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount-1][0];
 		radius = fastDistance()
 
+		this method should also apply the Game_ninjaRopeRotationSpeed velocity to the angle,
+		and decrement it over time. It should probably use modulo to frame skip so that
+		momentum isn't too aggressive.
+		
 		return TRUE if the Game_ninjaRopeAngle changed
 	*/
 }
@@ -120,19 +125,34 @@ char checkToRemoveOldHitPoint()
  */
 char raycastForNewHitPoint()
 {
-	// TODO: implement
+	// TODO: implement the rest
+
+	// if we're at maximum hit points already, gtfo
+	if(Game_ninjaRopeAnchorCount >= MAX_NINJA_ROPE_ANCHORS)
+		return FALSE;
 
 	// even if we git a hit, don't add it if it's closer to the last point than this
 	const minDistanceForNewPoint = 5;
 
 	// TODO: compute dirX/dirY from Game_ninjaRopeAngle
 	// short dirX=0, dirY=0;
+	// possibly use getNinjaRopeAngles?
 
 	RaycastHit hit = Game_raycast(Worm_x[Worm_currentWorm], Worm_x[Worm_currentWorm], dirX, dirY, FALSE);
 	
 	if(hit.hitType != RAY_HIT_NOTHING)
 	{
-		// ...
+		// add the new hit point:
+		// save the first anchor point data
+		Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][0] = hit.x;
+		Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][1] = hit.y;
+		Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][2] = Game_ninjaRopeAngle;
+		Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][3] = Game_ninjaRopeRotationDir;
+		
+		// increment our counter
+		Game_ninjaRopeAnchorCount++;
+
+		return TRUE;
 	}
 	else
 	{
