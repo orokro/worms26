@@ -104,6 +104,8 @@ extern unsigned char Game_jetPackFuel;
 extern short Game_ninjaRopeAnchors[32][3];
 extern short Game_ninjaRopeAnchorCount;
 extern short Game_ninjaRopeAngle;
+extern short Game_ninjaRopeRotationDir;
+extern short Game_ninjaRopeRotationSpeed;
 
 // game function prototypes
 

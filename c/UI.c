@@ -192,10 +192,10 @@ void drawNinjaRope(){
 	short prevY = Worm_y[(short)Worm_currentWorm]+4;
 	short i;
 	for(i=0; i<Game_ninjaRopeAnchorCount; i++){
-		short screenX = Game_ninjaRopeAnchorsX[i];
-		short screenY = Game_ninjaRopeAnchorsY[i];
+		short screenX = Game_ninjaRopeAnchors[i][0];
+		short screenY = Game_ninjaRopeAnchors[i][1];
 		if(worldToScreen(&screenX, &screenY)){
-			drawThiGrayDrawClipLine2BckLine(prevX, prevY, screenX, screenY, 3, lightPlane, darkPlane);
+			GrayDrawClipLine2B(prevX, prevY, screenX, screenY, 3, lightPlane, darkPlane);
 		}
 		prevX = screenX;
 		prevY = screenY;

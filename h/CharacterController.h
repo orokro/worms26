@@ -32,4 +32,14 @@ extern void CharacterController_update();
  */
 extern void CharacterController_weaponConsumed(char noEndTurn);
 
+
+/**
+ * @brief Does the initial ninja rope shot raycast
+ * 
+ * @param dirX - direction X
+ * @param dirY - direction Y
+ * @return char - TRUE if we hit something, FALSE otherwise
+ */
+extern char CharacterController_doInitialNinjaRopeShot(short dirX, short dirY);
+
 #endif // CHARCTRL_H
