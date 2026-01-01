@@ -217,9 +217,6 @@ char raycastForNewHitPoint()
 	if(Game_ninjaRopeAnchorCount >= MAX_NINJA_ROPE_POINTS)
 		return FALSE;
 
-	// even if we git a hit, don't add it if it's closer to the last point than this
-	const short minDistanceForNewPoint = 5;
-
 	short wx = Worm_x[(short)Worm_currentWorm];
     short wy = Worm_y[(short)Worm_currentWorm];
     short ax = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][0];
@@ -238,7 +235,10 @@ char raycastForNewHitPoint()
 	{
 		// Distance from current anchor to hit point
         short d = dist(hit.x, hit.y, ax, ay);
-        if (d > minDistanceForNewPoint) {
+		short distFromWorm = dist(hit.x, hit.y, wx, wy);
+
+		// Must be significantly far from the current anchor AND not hitting the worm itself/pixels next to worm
+        if (d > 5 && distFromWorm > 8) {
 			// add the new hit point:
 			Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][0] = hit.x;
 			Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][1] = hit.y;
@@ -322,6 +322,11 @@ void wormNinjaRope(){
 	if(Keys_keyState(keyAction))
 	{
 		Game_stateFlags &= ~gs_ninjaRopeMode;
+		
+		// Apply a little "hop" or momentum conservation
+		Worm_yVelo[(short)Worm_currentWorm] = -2; 
+		// Calculate X velocity based on rope angle/rotation? 
+		// For simplicity, just a small hop up.
 		return;
 	}
 
@@ -348,7 +353,12 @@ void wormNinjaRope(){
 	{
 		if(!rotationLatch) {
 			rotationLatch = 1;
-			invertLatch = (angle>90 && angle<270) ? -1 : 1;
+			// At 180 (Down), we want Right Key to Decrease Angle (Move Right). 
+            // My engine: Right Key -> Game_ninjaRopeRotationDir = -1 * invertLatch.
+            // We want Dir = -1. So invertLatch must be 1.
+            // At 0 (Up), we want Right Key to Increase Angle (Move Right).
+            // We want Dir = 1. So invertLatch must be -1.
+			invertLatch = (angle>90 && angle<270) ? 1 : -1;
 		}
 
 		if(Keys_keyState(keyLeft))

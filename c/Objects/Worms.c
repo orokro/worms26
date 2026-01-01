@@ -75,9 +75,6 @@ unsigned short Worm_settled = 0;
 // this is important for detecting falling for parachute or for walking
 unsigned short Worm_onGround = 0;
 
-// the current worms 10x10 tile. we don't need to store both X and Y, just the tile index
-short Worm_tile[MAX_WORMS] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-
 // these sprites will be generated at the beginning and when health changes.
 unsigned long healthSprites[16][18];
 unsigned long healthMasks[16][18];
@@ -255,36 +252,41 @@ void Worm_update()
 			// if the worm is considered "settled" no need for physics
 			if(!(Worm_settled & wormMask))
 			{
-				// add gravity to the worm
-				Worm_yVelo[i]++;
-				
-				// if the worm is dead, it's gravestone can only have vertical velocity, no X
-				if(Worm_isDead & wormMask)
-					Worm_xVelo[i]=0;
-
-				// do physics and collision for worm
-				Physics_apply(&Worm_physObj[i]);				
-				
-				// if we collided with the ground on the last frame, assume the worm is grounded.
-				// (it should collide with the ground ever frame its grounded, due to gravity.
-				// if the worm was settled on this frame, we won't get here on the next frame
-				// so we can just mark it as settled and it will stay that way till moved again
-				if(Worm_physObj[i].col.collisions & COL_DOWN || (Worm_settled & wormMask))
-					Worm_onGround |= wormMask;
+				// Disable physics/gravity if this is the current worm and we are in Ninja Rope mode
+				if(i == Worm_currentWorm && (Game_stateFlags & gs_ninjaRopeMode))
+				{
+					// Do nothing for physics/gravity
+				}
 				else
-					Worm_onGround &= ~wormMask;
-
-				// reset jump animation if any
-				if(!(Worm_wasOnGround & wormMask) && (Worm_onGround & wormMask))
-                {
-                    if (Game_wormAnimState != ANIM_DRILL && Game_wormAnimState != ANIM_TORCH)
-						Game_wormAnimState = ANIM_NONE;
-                }
+				{
+					// add gravity to the worm
+					Worm_yVelo[i]++;
+					
+					// if the worm is dead, it's gravestone can only have vertical velocity, no X
+					if(Worm_isDead & wormMask)
+						Worm_xVelo[i]=0;
+	
+					// do physics and collision for worm
+					Physics_apply(&Worm_physObj[i]);				
+					
+					// if we collided with the ground on the last frame, assume the worm is grounded.
+					// (it should collide with the ground ever frame its grounded, due to gravity.
+					// if the worm was settled on this frame, we won't get here on the next frame
+					// so we can just mark it as settled and it will stay that way till moved again
+					if(Worm_physObj[i].col.collisions & COL_DOWN || (Worm_settled & wormMask))
+						Worm_onGround |= wormMask;
+					else
+						Worm_onGround &= ~wormMask;
+	
+					// reset jump animation if any
+					if(!(Worm_wasOnGround & wormMask) && (Worm_onGround & wormMask))
+					{
+						if (Game_wormAnimState != ANIM_DRILL && Game_wormAnimState != ANIM_TORCH)
+							Game_wormAnimState = ANIM_NONE;
+					}
+				}
 			}
 			
-			// calculate the worms tile, and if it changed, we need to check for mine and crate updates
-			Worm_tile[i] = (Worm_x[i]/10) * (Worm_y[i]/10);
-		
 			//check if a worm triggered a crate or a mine
 			if(i == Worm_currentWorm)
 				checkCratesAndMines(i);
