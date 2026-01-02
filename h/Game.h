@@ -53,7 +53,7 @@ typedef struct {
 #define STALE 4
 
 // For max fuel allowed for jetpack
-#define MAX_JETPACK_FUEL 150.0
+#define MAX_JETPACK_FUEL 150
 
 // total ninja rope points allowed
 #define MAX_NINJA_ROPE_POINTS 32	
