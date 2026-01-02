@@ -65,7 +65,14 @@ extern void Camera_clearUnless(short *targetX, short *targetY);
  *
  * After calling, the Camera will be static until moved by the user,
  * or a new target is set with Camera_focusOn(*x, *y)
-*/
-extern void Camera_clearFocus();
+ * @brief stops the camera from focusing on anything in particular
+ */
+static inline void Camera_clearFocus()
+{
+	extern char cameraIsFocused;
+	// just disable the focus mode, no need to clear pointers
+	// since they won't be used until set again
+	cameraIsFocused=FALSE;
+}
 
 #endif

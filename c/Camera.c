@@ -205,14 +205,3 @@ void Camera_clearUnless(short *targetX, short *targetY)
 		Camera_clearFocus();
 	}
 }
-
-
-/**
- * @brief stops the camera from focusing on anything in particular
- */
-void Camera_clearFocus()
-{
-	// just disable the focus mode, no need to clear pointers
-	// since they won't be used until set again
-	cameraIsFocused=FALSE;
-}
