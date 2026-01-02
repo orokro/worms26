@@ -86,8 +86,8 @@ void spawnMine(char index)
 	Mine_active |= (unsigned short)1<<(index);
 	
 	// make a new collider and physics object for this mine
-	Collider col = new_Collider(COL_UDLR, 2, 2, 3, 3);
-	Mine_physObj[(short)index] = new_PhysObj(&Mine_x[(short)index], &Mine_y[(short)index], &Mine_xVelo[(short)index], &Mine_yVelo[(short)index], 0.65f, 1.0f, (char)index, &Mine_settled, col);
+	new_Collider(&(Mine_physObj[(short)index].col), COL_UDLR, 2, 2, 3, 3);
+	new_PhysObj(&Mine_physObj[(short)index], &Mine_x[(short)index], &Mine_y[(short)index], &Mine_xVelo[(short)index], &Mine_yVelo[(short)index], 0.65f, 1.0f, (char)index, &Mine_settled);
 }
 
 
@@ -288,8 +288,8 @@ void Mines_spawnAt(short x, short y)
 			Mine_triggered &= ~((unsigned short)1<<i);
 			Mine_settled &= ~((unsigned short)1<<i); // Assume unsettled initially
 
-			Collider col = new_Collider(COL_UDLR, 2, 2, 3, 3);
-			Mine_physObj[i] = new_PhysObj(&Mine_x[i], &Mine_y[i], &Mine_xVelo[i], &Mine_yVelo[i], 0.65f, 1.0f, (char)i, &Mine_settled, col);
+			new_Collider(&(Mine_physObj[i].col), COL_UDLR, 2, 2, 3, 3);
+			new_PhysObj(&Mine_physObj[i], &Mine_x[i], &Mine_y[i], &Mine_xVelo[i], &Mine_yVelo[i], 0.65f, 1.0f, (char)i, &Mine_settled);
 			return;
 		}
 	}
