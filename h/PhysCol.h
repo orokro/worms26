@@ -119,7 +119,7 @@ extern void new_Collider(Collider *obj, unsigned char type, char up, char down, 
  * @param settled the value that should be bit-masked if the object is considered settled (e.g. hasn't moved in multiple frames)
  * @param c the objects Collider struct to test collisions with
 */
-extern void new_PhysObj(PhysObj *obj, short *x, short *y, char *xVelo, char *yVelo, float bounciness, float smoothness, char objIndex, unsigned short *settled);
+extern void new_PhysObj(PhysObj *obj, short *x, short *y, char *xVelo, char *yVelo, char bounciness, char smoothness, char objIndex, unsigned short *settled);
 
 
 /**

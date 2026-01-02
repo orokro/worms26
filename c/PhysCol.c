@@ -57,15 +57,15 @@ void new_Collider(Collider *obj, unsigned char type, char up, char down, char le
  * @param c - the collider to test for
  * @returns - the new PhysObj
  */	
-void new_PhysObj(PhysObj *obj, short *x, short *y, char *xVelo, char *yVelo, float bounciness, float smoothness, char objIndex, unsigned short *settled)
+void new_PhysObj(PhysObj *obj, short *x, short *y, char *xVelo, char *yVelo, char bounciness, char smoothness, char objIndex, unsigned short *settled)
 {
 	obj->x = x;
 	obj->y = y;
 	obj->xVelo = xVelo;
 	obj->yVelo = yVelo;
-	obj->bouncinessX = bounciness;
-	obj->bouncinessY = bounciness;
-	obj->smoothness = (char)(smoothness*100);
+	obj->bouncinessX = ((float)bounciness)/100;
+	obj->bouncinessY = obj->bouncinessX;
+	obj->smoothness = smoothness;
 	obj->settled = settled;
 	obj->index = objIndex;
 	obj->lastX = 0;

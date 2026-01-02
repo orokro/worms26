@@ -1295,7 +1295,7 @@ char Weapons_spawn(char type, short x, short y, char xVelocity, char yVelocity, 
 	{
 		// make a new collider and physics object for this weapon
 		new_Collider(&(Weapon_physObj[slot].col), COL_UDLR, 2, 2, 2, 2);
-		new_PhysObj(&Weapon_physObj[slot], &Weapon_x[slot], &Weapon_y[slot], &Weapon_xVelo[slot], &Weapon_yVelo[slot], 0.7f, 1.0f, (char)slot, &Weapon_settled);
+		new_PhysObj(&Weapon_physObj[slot], &Weapon_x[slot], &Weapon_y[slot], &Weapon_xVelo[slot], &Weapon_yVelo[slot], 70, 100, (char)slot, &Weapon_settled);
 		
 		// set initial velocity
 		Physics_setVelocity(&Weapon_physObj[slot], xVelocity, yVelocity, FALSE, TRUE);
