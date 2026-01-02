@@ -17,6 +17,14 @@ extern const unsigned char spr_chargeMed[];
 
 extern const unsigned char spr_chargeSmall[];
 
+extern const unsigned short spr_Check_Fill[];
+
+extern const unsigned short spr_Check_Outline[];
+
+extern const unsigned short spr_Close_Fill[];
+
+extern const unsigned short spr_Close_Outline[];
+
 extern const unsigned long spr_Cloud_Dark[];
 
 extern const unsigned long spr_Cloud_Light[];
@@ -39,6 +47,10 @@ extern const unsigned char spr_CursorOutline[];
 
 extern const unsigned char spr_CursorOutlineFlipped[];
 
+extern const unsigned short spr_Disabled_Mask[];
+
+extern const unsigned short spr_Disabled_Outline[];
+
 extern const unsigned long spr_Donkey_Dark[];
 
 extern const unsigned long spr_Donkey_Light[];
@@ -48,6 +60,10 @@ extern const unsigned long spr_Donkey_Mask[];
 extern const unsigned char spr_Fuel[];
 
 extern const unsigned char spr_Grave[];
+
+extern const unsigned char spr_Grave2[];
+
+extern const unsigned char spr_Grave3[];
 
 extern const unsigned char spr_launcher[];
 
@@ -59,6 +75,14 @@ extern const unsigned long spr_MB_Light[];
 
 extern const unsigned long spr_MB_Mask[];
 
+extern const unsigned long spr_MenuGame[];
+
+extern const unsigned long spr_MenuMatch[];
+
+extern const unsigned long spr_MenuTeams[];
+
+extern const unsigned long spr_MenuWeapons[];
+
 extern const unsigned char spr_Mine_Dark[];
 
 extern const unsigned char spr_Mine_Light[];
@@ -66,13 +90,25 @@ extern const unsigned char spr_Mine_Light[];
 #define NUM_MOUNTAIN 5
 extern const unsigned long spr_Mountain[][38];
 
-extern const unsigned short spr_OilDark[];
+extern const unsigned char spr_NoSelectArrow[];
 
-extern const unsigned char spr_OilDrum[];
+extern const unsigned short spr_OilDark[];
 
 extern const unsigned short spr_OilLight[];
 
 extern const unsigned short spr_OilMask[];
+
+extern const unsigned short spr_Option_Artillery[];
+
+extern const unsigned char spr_Option_DudSmoke[];
+
+extern const unsigned short spr_Option_HealthHead[];
+
+extern const unsigned short spr_Option_HealthValues[];
+
+extern const unsigned short spr_Option_Mine[];
+
+extern const unsigned short spr_Option_Timer[];
 
 extern const unsigned short spr_Parachute[];
 
@@ -114,6 +150,8 @@ extern const unsigned long spr_WindMeter_Mask[];
 extern const unsigned char spr_XSpot[];
 
 extern const unsigned char spr_XSpotMask[];
+
+extern const unsigned long tex_Ground2[];
 
 /* --- Worms Data --- */
 
