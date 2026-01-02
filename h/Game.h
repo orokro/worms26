@@ -25,6 +25,7 @@ enum GameModes {
 	gameMode_WeaponsSettings,
 	gameMode_MatchSettings,
 	gameMode_TeamSettings,
+	gameMode_Loading,
 };
 
 // Enum for what the ray hit

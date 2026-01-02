@@ -180,15 +180,6 @@ void _main(void)
 	// allocate space for double-buffering
 	void *dbuffer=malloc(GRAYDBUFFER_SIZE);
 
-	// init state related to starting match
-	Game_initRound();
-	
-	// show the cake loading screen
-	Draw_cake(0, 100);
-	
-	// render the map and spawn items on the map (worms, oil drums, etc)
-	Map_makeMap();
-	
 	// enable double-buffering
 	GrayDBufInit(dbuffer);
 	GblDBuffer=dbuffer;
@@ -199,6 +190,8 @@ void _main(void)
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	// Game_changeMode(gameMode_WormSelect);
 	Game_changeMode(gameMode_MainMenu);
+	
+	Draw_cake(0,1);
 	
 	// generates masks for worms that are missing them in ROM
 	GenerateWormMasks();

@@ -280,6 +280,7 @@ void gameUpdates();
 #include "States/WeaponSettings.c"
 #include "States/MatchSettings.c"
 #include "States/TeamSettings.c"
+#include "States/Loading.c"
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -379,7 +380,10 @@ void Game_update()
 			break;
 		case gameMode_TeamSettings:
 			TeamSettings_update();
-			break;		
+			break;
+		case gameMode_Loading:
+			Loading_update();
+			break;
 	}	
 }
 
@@ -436,6 +440,9 @@ void Game_changeMode(char newMode)
 		case gameMode_TeamSettings:
 			TeamSettings_exit();
 			break;
+		case gameMode_Loading:
+			Loading_exit();
+			break;
 	}	
 	
 	// save our current mode as our previous mode
@@ -488,6 +495,9 @@ void Game_changeMode(char newMode)
 			break;
 		case gameMode_TeamSettings:
 			TeamSettings_enter();
+			break;
+		case gameMode_Loading:
+			Loading_enter();
 			break;
 	}	
 }

@@ -50,7 +50,7 @@ Use Return Value=0
 Enable Error Return=0
 Save Screen=1
 [File Editing]
-Open File=C:\Users\geem4\Desktop\worms17\c\States\TeamSettings.c
+Open File=C:\Users\geem4\Desktop\worms17\c\States\Loading.c
 [Included Files]
 C File 1=c\PhysCol.c
 C File 2=c\Match.c
@@ -124,3 +124,5 @@ Header File 36=c\States\MatchMenu.c
 Header File 36 Folder=States
 Header File 37=c\States\MainMenu.c
 Header File 37 Folder=States
+Header File 38=c\States\Loading.c
+Header File 38 Folder=States

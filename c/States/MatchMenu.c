@@ -61,7 +61,7 @@ static void MatchMenu_update()
 	
 	// F5 starts game (WormSelect for now)
 	if(Keys_keyUp(keyF5))
-		Game_changeMode(gameMode_WormSelect);
+		Game_changeMode(gameMode_Loading);
 }
 
 
