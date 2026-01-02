@@ -12,6 +12,9 @@
 #include "SpriteData.h"
 
 // Draw defines
+#define BTN_CHECK  0b00000001
+#define BTN_ACCEPT 0b00000001
+#define BTN_CLOSE  0b00000010
 
 
 // Draw globals
@@ -55,6 +58,12 @@ extern char worldToScreen(short *x, short *y);
  * @param total amount of progress to be completed
 */
 extern void Draw_cake(short amount, short total);
+
+
+/**
+ * @brief Clears both the light and dark drawing buffers
+ */
+extern void Draw_clearBuffers();
 
 
 /**
@@ -141,5 +150,25 @@ extern void Draw_setRayLine(short sx, short sy, short ex, short ey);
  * @param onMap - is this being drawn on the map?
  */
 extern void Draw_girder(short x, short y, char onMap);
+
+
+/**
+ * @brief Draws a rectangle outline in the specified color
+ * 
+ * @param x - x
+ * @param y - y
+ * @param w - width
+ * @param h - height
+ * @param color - color code (0-3)
+ */
+void Draw_RectOutlineColor(short x, short y, short w, short h, short color);
+
+
+/**
+ * @brief Draws the F1 X and F5 check mark for menus
+ * 
+ * @param flags - which icons to draw
+ */
+void Draw_XandCheck(char flags);
 
 #endif

@@ -13,9 +13,25 @@
  * 
  * @param menuItem - which menu item to be selected
  */
-void Draw_renderWeaponSettingsMenu(char menuItem)
+void Draw_renderWeaponSettingsMenu()
 {
+	// gtfo if nothing has changed
+	if(screenIsStale==0)
+		return;
 
+	// start fresh
+	Draw_clearBuffers();
+
+	// draw title, with big font and shadow just on light plane
+	FontSetSys(F_8x10);
+	GrayDrawStr2B(1, 3, "Weapons Settings", A_NORMAL, lightPlane, lightPlane);
+	GrayDrawStr2B(0, 2, "Weapons Settings", A_XOR, lightPlane, darkPlane);
+
+	// draw the x close & check accept buttons
+	Draw_XandCheck(BTN_ACCEPT);
+
+	// we're done drawing
+	screenIsStale--;
 
 }
 
@@ -25,7 +41,11 @@ void Draw_renderWeaponSettingsMenu(char menuItem)
 */
 static void WeaponSettings_enter()
 {
+	// unlike other states, we'll only draw when there's changes, so let's draw once on start
+	screenIsStale = STALE;
 
+	// start with first menu item selected
+	menuItem = 0;
 }
 
 
@@ -34,7 +54,7 @@ static void WeaponSettings_enter()
 */
 static void WeaponSettings_update()
 {
-
+	Draw_renderWeaponSettingsMenu();
 
 }
 

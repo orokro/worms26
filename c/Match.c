@@ -82,7 +82,7 @@ short Match_teamWeapons[2][65] = {
 };
 																		
 // the names of each team
-const char *Match_teamNames[2] = {"GMILLER", "LDEBROUX"};
+char Match_teamNames[2][10] = {"GMILLER\0", "LDEBROUX\0"};
 
 // the names of each worm
-const char *Match_wormNames[MAX_WORMS] = {"MCGUYVER", "SLINKYFISH", "BUB", "STUMPY", "MISTER CHEF", "GERTIE", "KOWALSKI", "MURPHY", "ZULU", "JEAN STAINS", "TITCHY", "MUSCLES", "THE VERT", "DARKNET", "SMOKESTACK", "ROPESY"};
+char Match_wormNames[MAX_WORMS][12] = {"MCGUYVER\0", "SLINKYFISH\0", "BUB\0", "STUMPY\0", "MISTER CHEF\0", "GERTIE\0", "KOWALSKI\0", "MURPHY\0", "ZULU\0", "JEAN STAINS\0", "TITCHY\0", "MUSCLES\0", "THE VERT\0", "DARKNET\0", "SMOKESTACK\0", "ROPESY\0"};

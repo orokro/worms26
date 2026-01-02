@@ -25,7 +25,7 @@ extern char Match_healthCratesEnabled;
 extern char Match_weaponCratesEnabled;
 extern const short Match_defaultWeapons[65];
 extern short Match_teamWeapons[2][65];
-extern const char *Match_teamNames[2];
-extern const char *Match_wormNames[16];
+extern char Match_teamNames[2][10];
+extern char Match_wormNames[16][12];
 
 #endif

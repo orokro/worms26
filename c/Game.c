@@ -132,6 +132,7 @@
 
 const SCR_RECT fullScreen = {{0, 0, 159, 99}};
  
+
 // vars
 
 // current game mode!
@@ -228,6 +229,10 @@ char Game_aimAngle=10;
 unsigned char Game_jetPackFuel = MAX_JETPACK_FUEL;
 
 char Game_debugFreeze = FALSE;
+
+// reusable vars for our main menu system
+char screenIsStale = TRUE;
+char menuItem =  0;
 
 /* 
 	For reference, Game modes:

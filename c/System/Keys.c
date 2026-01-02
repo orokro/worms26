@@ -156,6 +156,7 @@ void Keys_update()
 	keysState += _keytest(RR_5) * key5;
 	keysState += _keytest(RR_CLEAR) * keyExit;
 	keysState += _keytest(RR_F1) * keyF1;
+	keysState += _keytest(RR_F2) * keyF2;
 	keysState += _keytest(RR_F5) * keyF5;
 	keysState += _keytest(RR_PLUS) * keyPlus;
 	keysState += _keytest(RR_MINUS) * keyMinus;

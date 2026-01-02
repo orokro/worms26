@@ -197,8 +197,9 @@ void _main(void)
 	darkPlane = GrayDBufGetHiddenPlane(DARK_PLANE);
 	
 	// before we can do the main game update loop, we need to change the state machine into the first state
-	Game_changeMode(gameMode_WormSelect);
-
+	// Game_changeMode(gameMode_WormSelect);
+	Game_changeMode(gameMode_MainMenu);
+	
 	// generates masks for worms that are missing them in ROM
 	GenerateWormMasks();
 
