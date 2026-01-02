@@ -124,6 +124,8 @@ extern const unsigned short spr_SelectionArrowFrame1[];
 
 extern const unsigned short spr_SelectionArrowFrame2[];
 
+extern const unsigned long spr_TeamTab[];
+
 extern const unsigned short spr_timerBlink[];
 
 extern const unsigned short spr_timerBorder[];

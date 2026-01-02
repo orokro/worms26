@@ -270,7 +270,11 @@ void gameUpdates();
 #include "States/Death.c"
 #include "States/AfterTurn.c"
 #include "States/GameOver.c"
-
+#include "States/MainMenu.c"
+#include "States/MatchMenu.c"
+#include "States/WeaponSettings.c"
+#include "States/MatchSettings.c"
+#include "States/TeamSettings.c"
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -356,6 +360,21 @@ void Game_update()
 		case gameMode_GameOver:
 			GameOver_update();
 			break;
+		case gameMode_MainMenu:
+			MainMenu_update();
+			break;
+		case gameMode_MatchMenu:
+			MatchMenu_update();
+			break;
+		case gameMode_WeaponsSettings:
+			WeaponSettings_update();
+			break;
+		case gameMode_MatchSettings:
+			MatchSettings_update();
+			break;
+		case gameMode_TeamSettings:
+			TeamSettings_update();
+			break;		
 	}	
 }
 
@@ -397,6 +416,21 @@ void Game_changeMode(char newMode)
 		case gameMode_GameOver:
 			GameOver_exit();
 			break;
+		case gameMode_MainMenu:
+			MainMenu_exit();
+			break;
+		case gameMode_MatchMenu:
+			MatchMenu_exit();
+			break;
+		case gameMode_WeaponsSettings:
+			WeaponSettings_exit();
+			break;
+		case gameMode_MatchSettings:
+			MatchSettings_exit();
+			break;
+		case gameMode_TeamSettings:
+			TeamSettings_exit();
+			break;
 	}	
 	
 	// save our current mode as our previous mode
@@ -434,6 +468,21 @@ void Game_changeMode(char newMode)
 			break;
 		case gameMode_GameOver:
 			GameOver_enter();
+			break;
+		case gameMode_MainMenu:
+			MainMenu_enter();
+			break;
+		case gameMode_MatchMenu:
+			MatchMenu_enter();
+			break;
+		case gameMode_WeaponsSettings:
+			WeaponSettings_enter();
+			break;
+		case gameMode_MatchSettings:
+			MatchSettings_enter();
+			break;
+		case gameMode_TeamSettings:
+			TeamSettings_enter();
 			break;
 	}	
 }
