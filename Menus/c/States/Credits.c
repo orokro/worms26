@@ -11,6 +11,7 @@
 // scroll position counter
 short creditsScrollPos = 0;
 
+// credits raw text
 const char *creditsText[] = {
 	"Idea Inspiration From:",
 	"Jean-Christophe Budin",
@@ -46,9 +47,11 @@ const char *creditsText[] = {
 	"2026"
 };
 
+// layout defines
 #define CREDITS_LINE_HEIGHT 8
 #define CREDITS_START_Y 100
 #define CREDITS_COUNT (sizeof(creditsText) / sizeof(creditsText[0]))
+
 
 /**
  * @brief Draws the actual credits text
@@ -56,34 +59,39 @@ const char *creditsText[] = {
 void drawCreditsState()
 {
 	FontSetSys(F_4x6);
+	
+	// draw only to dark plane to be lightweight (shows as dark gray)
+	PortSet(darkPlane, 239, 127);
+
 	short i;
+	// calculate y position (speed: divided by 2 to slow it down)
+	short y = CREDITS_START_Y - (creditsScrollPos/2);
 	
-	// total height of the scrolling block
-	short totalHeight = CREDITS_COUNT * CREDITS_LINE_HEIGHT;
-	
-	// loop through each line
-	for(i=0; i<CREDITS_COUNT; i++)
+	for(i=0; i<(short)CREDITS_COUNT; i++)
 	{
-		// calculate y position
-		// speed: divided by 2 to slow it down (updates every frame is fast)
-		short y = CREDITS_START_Y + (i * CREDITS_LINE_HEIGHT) - (creditsScrollPos/2);
-		
-		// simple culling/clipping
-		if(y < 16 || y > 100)
-			continue;
+		// if line is empty, add extra space (reduces simultaneous draw calls)
+		if (creditsText[i][0] == '\0') {
+
+			y += CREDITS_LINE_HEIGHT * 6;
+
+		} else {
 			
-		// center text
-		short w = strlen(creditsText[i]) * 4;
-		short x = (160 - w) / 2;
-		
-		// draw black on both planes
-		GrayDrawStr2B(x, y, creditsText[i], A_NORMAL, lightPlane, darkPlane);
+			// clip text at y=16 to avoid overlapping title
+			if(y >= 16 && y < 100) {
+				short w = (short)strlen(creditsText[i]) * 4;
+				DrawStr((160 - w) / 2, y, creditsText[i], A_NORMAL);
+			}
+			y += CREDITS_LINE_HEIGHT;
+		}
 	}
 	
-	// reset if we've scrolled past
-	if( (CREDITS_START_Y + totalHeight - (creditsScrollPos/2)) < 16 )
+	// reset if we've scrolled past the last line
+	if (y < 16) 
 		creditsScrollPos = 0;
+
+	PortRestore();
 }
+
 
 /**
  * main drawing routine for the Credits menu
