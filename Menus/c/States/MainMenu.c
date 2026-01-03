@@ -34,7 +34,7 @@ char main_menuItem = 0;
 void Draw_renderMainMenu()
 {
 	// gtfo if nothing has changed
-	if(screenIsStale==0)
+	if(screenIsStale==0 && State_transitionTime==0)
 		return;
 
 	// start fresh
@@ -91,19 +91,23 @@ static void MainMenu_update()
 
 	// F1 always exits game on this screen
 	if(Keys_keyUp(keyF1|keyEscape))
-		GameRunning=FALSE;
-
+	{
+		App_exitRequested = TRUE;
+		State_transitionButton = BTN_CLOSE;
+		State_changeMode(menuMode_SaveAndExit, 3);
+	}
+	
 	// action will change game mode based on menu item
 	if(Keys_keyUp(keyAction))
 	{
 		if(main_menuItem==MENU_ITEM_PLAY_GAME)
-			State_changeMode(menuMode_MatchMenu);
+			State_changeMode(menuMode_MatchMenu, 0);
 		else if(main_menuItem==MENU_ITEM_TEAM_SETTINGS)
-			State_changeMode(menuMode_TeamSettings);
+			State_changeMode(menuMode_TeamSettings, 0);
 		else if(main_menuItem==MENU_ITEM_GAME_SETTINGS)
-			State_changeMode(menuMode_HelpAndSettings);
+			State_changeMode(menuMode_HelpAndSettings, 0);
 		else
-			State_changeMode(menuMode_Credits);
+			State_changeMode(menuMode_Credits, 0);
 	}
 
 	// redraw for any keypress

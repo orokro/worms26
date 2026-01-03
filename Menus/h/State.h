@@ -27,6 +27,10 @@ enum MenuModes {
 // for making menu screens scale (minimum 4 redraws for safety)
 #define STALE 3
 
+// external vars
+extern char State_transitionButton;
+extern char State_transitionTime;
+extern char App_exitRequested;
 
 // state function prototypes
 
@@ -42,8 +46,9 @@ extern void State_init();
  * Changes the State machines mode to a new mode.
  *
  * @param newMode a char representing a main state machine mode as defined in the MenuModes enum.
+ * @param timer - transition timer for button animations
 */
-extern void State_changeMode(char);
+extern void State_changeMode(char newMode, char timer);
 
 
 /**

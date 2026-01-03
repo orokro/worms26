@@ -201,7 +201,10 @@ static void WeaponSettings_update()
 
 	// this only has check, so F5 returns to MatchMenu
 	if(Keys_keyUp(keyF5|keyEscape))
-		State_changeMode(menuMode_MatchMenu);
+	{
+		State_transitionButton = BTN_ACCEPT;
+		State_changeMode(menuMode_MatchMenu, 3);
+	}		
 
 	// use arrow keys to change the weapon select cursor
 	if(Keys_keyDown(keyLeft))

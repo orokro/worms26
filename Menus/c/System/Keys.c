@@ -75,7 +75,7 @@ void Keys_update()
 	// each bit-mask is a binary place, so we can just multiply its values and sum them
 	// by the truthiness of those keys
 	keysState = 0;
-	keysState += (_keytest(RR_2ND) || _keytest(RR_ENTER)) * keyAction;
+	keysState += _keytest(RR_2ND) * keyAction;
 	keysState += _keytest(RR_ESC) * keyEscape;
 	keysState += _keytest(RR_LEFT) * keyLeft;
 	keysState += _keytest(RR_RIGHT) * keyRight;

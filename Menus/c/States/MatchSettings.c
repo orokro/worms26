@@ -233,7 +233,10 @@ static void MatchSettings_update()
 
 	// this menu only has accept, so F5 returns to MatchMenu
 	if(Keys_keyUp(keyF5|keyEscape))
-		State_changeMode(menuMode_MatchMenu);
+	{
+		State_transitionButton = BTN_ACCEPT;
+		State_changeMode(menuMode_MatchMenu, 3);
+	}
 
 	// left/right simply increment and decrement the menu item:
 	if(Keys_keyDown(keyLeft))
@@ -253,13 +256,13 @@ static void MatchSettings_update()
 	// if up is pushed and exactly 11, it should go to 4
 	if(Keys_keyDown(keyDown))
 	{
-		if(matchSettings_menuItem<7)
-			matchSettings_menuItem+=5;
+		if(matchSettings_menuItem<5)
+			matchSettings_menuItem+=6;
 	}
 	else if(Keys_keyDown(keyUp))
 	{
-		if(matchSettings_menuItem>6 && matchSettings_menuItem<12)
-			matchSettings_menuItem-=5;
+		if(matchSettings_menuItem>5 && matchSettings_menuItem<11)
+			matchSettings_menuItem-=6;
 		else if(matchSettings_menuItem==5)
 			matchSettings_menuItem=0;
 		else if(matchSettings_menuItem==11)

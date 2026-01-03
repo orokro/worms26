@@ -136,8 +136,11 @@ static void TeamSettings_update()
 
 	// this only has check, so F5 returns to MatchMenu
 	if(Keys_keyUp(keyF5|keyEscape))
-		State_changeMode(menuMode_MainMenu);
-
+	{
+		State_transitionButton = BTN_ACCEPT;
+		State_changeMode(menuMode_MainMenu, 3);
+	}
+		
 	// increase / decrease menu item with left/right
 	if(Keys_keyDown(keyLeft))
 	{

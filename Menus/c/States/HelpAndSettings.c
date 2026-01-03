@@ -98,8 +98,11 @@ static void HelpAndSettings_update()
 	Draw_renderHelpAndSettings();
 
 	// this menu only has accept, so F5 returns to MatchMenu
-	if(Keys_keyUp(keyAction|keyF1|keyF5|keyEscape))
-		State_changeMode(menuMode_MainMenu);
+	if(Keys_keyUp(keyF1|keyF5|keyEscape))
+	{
+		State_transitionButton = BTN_ACCEPT;
+		State_changeMode(menuMode_MainMenu, 3);
+	}		
 
 	// up and down to change menu item
 	if(Keys_keyDown(keyUp))
@@ -135,6 +138,17 @@ static void HelpAndSettings_update()
 			Match_drawingFlags &= ~DRAW_MOUNTAINS;
 	}
 
+	// action button should just toggle the setting
+	if(Keys_keyUp(keyAction))
+	{
+		if(help_menuItem==MENU_ITEM_DRAW_CLOUDS)
+			Match_drawingFlags ^= DRAW_CLOUDS;
+		else if(help_menuItem==MENU_ITEM_DRAW_LEAVES)
+			Match_drawingFlags ^= DRAW_LEAVES;
+		else if(help_menuItem==MENU_ITEM_DRAW_MOUNTAINS)
+			Match_drawingFlags ^= DRAW_MOUNTAINS;
+	}
+	
 	// redraw for any keypress
 	if(Keys_keyState(keyAny))
 		screenIsStale = STALE;

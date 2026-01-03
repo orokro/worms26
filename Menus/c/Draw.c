@@ -11,6 +11,7 @@
 #include "Main.h"
 #include "Draw.h"
 #include "SpriteData.h"
+#include "State.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -83,16 +84,18 @@ void Draw_XandCheck(char flags)
 {
 	// draw close X on left
 	if(flags & BTN_CLOSE)
-	{		
-		ClipSprite16_OR_R(4, 80, 16, spr_Close_Fill, lightPlane);
-		GrayClipSprite16_OR_R(4, 80, 16, spr_Close_Outline, spr_Close_Outline, lightPlane, darkPlane);
+	{	
+		const char offset = ((State_transitionTime>0) && (State_transitionButton & BTN_CLOSE)) ? 2 : 0;
+		ClipSprite16_OR_R(4+offset, 80+offset, 16, spr_Close_Fill, lightPlane);
+		GrayClipSprite16_OR_R(4+offset, 80+offset, 16, spr_Close_Outline, spr_Close_Outline, lightPlane, darkPlane);
 	}
 
 	// draw accept check on right
-	if(flags & BTN_CHECK)
+	if(flags & BTN_ACCEPT)
 	{
-		ClipSprite16_OR_R(140, 76, 20, spr_Check_Fill, lightPlane);
-		GrayClipSprite16_OR_R(140, 76, 20, spr_Check_Outline, spr_Check_Outline, lightPlane, darkPlane);
+		const char offset = ((State_transitionTime>0) && (State_transitionButton & BTN_ACCEPT)) ? 2 : 0;
+		ClipSprite16_OR_R(140+offset, 76+offset, 20, spr_Check_Fill, lightPlane);
+		GrayClipSprite16_OR_R(140+offset, 76+offset, 20, spr_Check_Outline, spr_Check_Outline, lightPlane, darkPlane);
 	}
 }
 

@@ -52,7 +52,7 @@ static void TitleScreen_update()
 
 	// this menu only has accept, so F5 returns to MatchMenu
 	if(Keys_keyUp(keyAction|keyF1|keyF5|keyEscape))
-		State_changeMode(menuMode_MainMenu);
+		State_changeMode(menuMode_MainMenu, 0);
 }
 
 
