@@ -17,6 +17,7 @@
 #include "Draw.h"
 #include "SpriteData.h"
 #include "State.h"
+#include "FileData.h"
 
 
 // vars
@@ -63,7 +64,6 @@ char App_exitRequested = FALSE;
 */
 void State_init()
 {
-
 
 }
 

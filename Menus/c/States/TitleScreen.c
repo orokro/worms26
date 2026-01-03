@@ -33,7 +33,8 @@ void Draw_renderTitleScreen()
 */
 static void TitleScreen_enter()
 {
-
+	// attempt to load our settings from the wormsdat file
+	FileData_loadData();
 }
 
 
