@@ -113,37 +113,37 @@ void FileData_loadData()
 
 	// Read variables in the exact same order they are saved
 	// We check the result of fread to ensure the file isn't corrupt
-	size_t result = 1;
+	size_t result = 0;
 	
-	result &= fread(Match_wormCount, sizeof(char), 2, f);
-	result &= fread(Match_gravestones, sizeof(char), 2, f);
+	result += fread(Match_wormCount, sizeof(char), 2, f);
+	result += fread(Match_gravestones, sizeof(char), 2, f);
 	
-	result &= fread(&Match_wormStartHealth, sizeof(unsigned char), 1, f);
-	result &= fread(&Match_allowWormSelection, sizeof(char), 1, f);
-	result &= fread(&Match_artilleryMode, sizeof(char), 1, f);
-	result &= fread(&Match_turnTime, sizeof(char), 1, f);
-	result &= fread(&Match_strategicPlacement, sizeof(char), 1, f);
+	result += fread(&Match_wormStartHealth, sizeof(unsigned char), 1, f);
+	result += fread(&Match_allowWormSelection, sizeof(char), 1, f);
+	result += fread(&Match_artilleryMode, sizeof(char), 1, f);
+	result += fread(&Match_turnTime, sizeof(char), 1, f);
+	result += fread(&Match_strategicPlacement, sizeof(char), 1, f);
 	
-	result &= fread(&Match_minesEnabled, sizeof(char), 1, f);
-	result &= fread(&Match_mineFuseLength, sizeof(char), 1, f);
-	result &= fread(&Match_dudMines, sizeof(char), 1, f);
-	result &= fread(&Match_oilDrumsEnabled, sizeof(char), 1, f);
+	result += fread(&Match_minesEnabled, sizeof(char), 1, f);
+	result += fread(&Match_mineFuseLength, sizeof(char), 1, f);
+	result += fread(&Match_dudMines, sizeof(char), 1, f);
+	result += fread(&Match_oilDrumsEnabled, sizeof(char), 1, f);
 	
-	result &= fread(&Match_toolCratesEnabled, sizeof(char), 1, f);
-	result &= fread(&Match_healthCratesEnabled, sizeof(char), 1, f);
-	result &= fread(&Match_weaponCratesEnabled, sizeof(char), 1, f);
+	result += fread(&Match_toolCratesEnabled, sizeof(char), 1, f);
+	result += fread(&Match_healthCratesEnabled, sizeof(char), 1, f);
+	result += fread(&Match_weaponCratesEnabled, sizeof(char), 1, f);
 	
-	result &= fread(&Match_mapType, sizeof(char), 1, f);
-	result &= fread(&Match_drawingFlags, sizeof(char), 1, f);
+	result += fread(&Match_mapType, sizeof(char), 1, f);
+	result += fread(&Match_drawingFlags, sizeof(char), 1, f);
 	
-	result &= fread(Match_defaultWeapons, sizeof(short), 65, f);
-	result &= fread(Match_teamNames, sizeof(char) * 10, 2, f);
-	result &= fread(Match_wormNames, sizeof(char) * 12, MAX_WORMS, f);
+	result += fread(Match_defaultWeapons, sizeof(short), 65, f);
+	result += fread(Match_teamNames, sizeof(char) * 10, 2, f);
+	result += fread(Match_wormNames, sizeof(char) * 12, MAX_WORMS, f);
 
 	fclose(f);
 
 	// If reading failed (corrupt or short file), force defaults
-	if (!result) {
+	if (result != 101) {
 		FileData_setGameDefaults();
 		FileData_saveData();
 	}
