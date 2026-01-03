@@ -69,7 +69,7 @@ void handleTextEdit(char* buffer, short maxLen)
     // Check keys
     char currentAlpha = Keys_getAlphaChar();
     char backspaceDown = Keys_keyDown(keyBackspace);
-    char clearDown = Keys_keyDown(keyExit);
+    char clearDown = Keys_keyDown(keyClear);
 
     // 1. Check for entering edit mode
     if (!teamSettings_isEditing) {

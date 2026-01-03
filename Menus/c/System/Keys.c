@@ -81,13 +81,14 @@ void Keys_update()
 	keysState += _keytest(RR_RIGHT) * keyRight;
 	keysState += _keytest(RR_UP) * keyUp;
 	keysState += _keytest(RR_DOWN) * keyDown;
-	keysState += _keytest(RR_CLEAR) * keyExit;
+	keysState += _keytest(RR_CLEAR) * keyClear;
 	keysState += _keytest(RR_F1) * keyF1;
 	keysState += _keytest(RR_F2) * keyF2;
 	keysState += _keytest(RR_F5) * keyF5;
 	keysState += _keytest(RR_PLUS) * keyPlus;
 	keysState += _keytest(RR_MINUS) * keyMinus;
 	keysState += _keytest(RR_BCKSPC) * keyBackspace;
+	keysState += _keytest(RR_SHIFT) * keyShift;
 
 	// if we XOR our current state (keysState) and our previous state (lastKeysState)
 	// we will get just the keys that changed ON or OFF from the last frame

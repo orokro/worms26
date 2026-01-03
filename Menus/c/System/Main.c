@@ -62,7 +62,7 @@ void _main(void)
 		// (the pause menu also provides a method to exit the game)
 		//if(Keys_keyState(keyAction) && Keys_keyDown(keyEscape))
 		//	GameRunning=FALSE;
-		if(Keys_keyDown(keyEscape))
+		if(Keys_keyDown(keyEscape) && Keys_keyState(keyShift))
 		{
 			App_exitRequested = TRUE;
 			State_changeMode(menuMode_SaveAndExit, 3);
