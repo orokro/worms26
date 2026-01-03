@@ -41,13 +41,19 @@ extern const unsigned char spr_Grave2[];
 
 extern const unsigned char spr_Grave3[];
 
+extern const unsigned long spr_MenuCredits[];
+
 extern const unsigned long spr_MenuGame[];
 
 extern const unsigned long spr_MenuMatch[];
 
+extern const unsigned long spr_MenuSettingsAndHelp[];
+
 extern const unsigned long spr_MenuTeams[];
 
 extern const unsigned long spr_MenuWeapons[];
+
+extern const unsigned long spr_Menu_Mask[];
 
 extern const unsigned char spr_NoSelectArrow[];
 

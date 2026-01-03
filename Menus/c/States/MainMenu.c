@@ -15,6 +15,8 @@ const char *mainMenuText[4] = {
 	"Credits"
 };
 
+char row = 0;
+char col = 0;
 
 /**
  * main drawing routine for the MainMenu menu
@@ -40,18 +42,32 @@ void Draw_renderMainMenu()
 	Draw_XandCheck(BTN_CLOSE);
 
 	// draw menu item sprites, with a shadow for the selected one
-	GrayClipSprite32_OR_R(40, 30, 21, spr_MenuGame, spr_MenuGame, lightPlane, darkPlane);
+	GrayClipSprite32_OR_R(40, 25, 21, spr_MenuGame, spr_MenuGame, lightPlane, darkPlane);
 	if(menuItem==0)
 	{
-		ClipSprite32_OR_R(40, 31, 21, spr_MenuGame, lightPlane);
-		ClipSprite32_OR_R(41, 31, 21, spr_MenuGame, lightPlane);
+		ClipSprite32_OR_R(40, 26, 21, spr_MenuGame, lightPlane);
+		ClipSprite32_OR_R(41, 26, 21, spr_MenuGame, lightPlane);
 	}
 
-	GrayClipSprite32_OR_R(88, 30, 21, spr_MenuTeams, spr_MenuTeams, lightPlane, darkPlane);
+	GrayClipSprite32_OR_R(88, 25, 21, spr_MenuTeams, spr_MenuTeams, lightPlane, darkPlane);
 	if(menuItem==1)
 	{
-		ClipSprite32_OR_R(88, 31, 21, spr_MenuTeams, lightPlane);
-		ClipSprite32_OR_R(89, 31, 21, spr_MenuTeams, lightPlane);
+		ClipSprite32_OR_R(88, 26, 21, spr_MenuTeams, lightPlane);
+		ClipSprite32_OR_R(89, 26, 21, spr_MenuTeams, lightPlane);
+	}
+		
+	GrayClipSprite32_OR_R(40, 55, 21, spr_MenuSettingsAndHelp, spr_MenuSettingsAndHelp, lightPlane, darkPlane);
+	if(menuItem==2)
+	{
+		ClipSprite32_OR_R(40, 56, 21, spr_MenuSettingsAndHelp, lightPlane);
+		ClipSprite32_OR_R(41, 56, 21, spr_MenuSettingsAndHelp, lightPlane);
+	}
+
+	GrayClipSprite32_OR_R(88, 55, 21, spr_MenuCredits, spr_MenuCredits, lightPlane, darkPlane);
+	if(menuItem==3)
+	{
+		ClipSprite32_OR_R(88, 56, 21, spr_MenuCredits, lightPlane);
+		ClipSprite32_OR_R(89, 56, 21, spr_MenuCredits, lightPlane);
 	}
 		
 	// we're done drawing
@@ -79,10 +95,17 @@ static void MainMenu_update()
 {
 	Draw_renderMainMenu();
 
-	// either key will toggle menu item
+	// use arrow keys to move selection
 	if(Keys_keyDown(keyLeft | keyRight))
 	{
-		menuItem = (menuItem==0) ? 1 : 0;
+		col = (col==0) ? 1 : 0;
+		menuItem = row * 2 + col;
+		screenIsStale = STALE;
+	}
+	else if(Keys_keyDown(keyUp | keyDown))
+	{
+		row = (row==0) ? 1 : 0;
+		menuItem = row * 2 + col;
 		screenIsStale = STALE;
 	}
 
@@ -95,8 +118,12 @@ static void MainMenu_update()
 	{
 		if(menuItem==0)
 			State_changeMode(menuMode_MatchMenu);
-		else
+		else if(menuItem==1)
 			State_changeMode(menuMode_TeamSettings);
+		else if(menuItem==2)
+			State_changeMode(menuMode_HelpAndSettings);
+		else
+			State_changeMode(menuMode_Credits);
 	}
 }
 

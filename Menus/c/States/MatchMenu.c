@@ -8,6 +8,14 @@
 */
 
 
+const char *matchMenuText[4] = {
+	"Start Match",
+	"Team Settings",
+	"Game Settings",
+	"Credits"
+};
+
+
 /**
  * main drawing routine for the MatchMenu menu
  */

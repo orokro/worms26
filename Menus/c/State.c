@@ -43,7 +43,7 @@ char menuItem =  0;
 #include "States/TeamSettings.c"
 #include "States/Credits.c"
 #include "States/SaveAndExit.c"
-
+#include "States/HelpAndSettings.c"
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -95,6 +95,9 @@ void State_update()
 		case menuMode_SaveAndExit:
 			SaveAndExit_update();
 			break;
+		case menuMode_HelpAndSettings:
+			HelpAndSettings_update();
+			break;
 	}	
 }
 
@@ -133,6 +136,9 @@ void State_changeMode(char newMode)
 		case menuMode_SaveAndExit:
 			SaveAndExit_exit();
 			break;
+		case menuMode_HelpAndSettings:
+			HelpAndSettings_exit();
+			break;
 	}	
 	
 	// save our current mode as our previous mode
@@ -167,6 +173,9 @@ void State_changeMode(char newMode)
 			break;
 		case menuMode_SaveAndExit:
 			SaveAndExit_enter();
+			break;
+		case menuMode_HelpAndSettings:
+			HelpAndSettings_enter();
 			break;
 	}	
 }
