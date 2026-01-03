@@ -35,7 +35,7 @@ char Match_artilleryMode = FALSE;
 char Match_turnTime = 45;
 
 // allow users to strategically place their worms (with teleport) before the match starts?
-char Match_strategicPlacement = TRUE;
+char Match_strategicPlacement = FALSE;
 
 // mine settings: enabled? fuse length? duds enabled?
 char Match_minesEnabled = TRUE;

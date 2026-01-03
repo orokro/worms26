@@ -53,6 +53,7 @@ char matchSettings_menuItem = 0;
 #define CRATE_FRAME_LEFT 92
 #define CRATE_FRAME_WIDTH 64
 
+
 /**
  * @brief Draws the settings frame
  * 
@@ -90,10 +91,11 @@ void drawSettingsFrame(char x, char y, char width, const char *title)
  * @param isSelected - true if selected
  * @param isDisabled - true if disabled setting
  * @param optionSpriteHeight - height of option sprite
+ * @param spriteOffsetY - y offset to draw sprite at
  * @param optionSpriteLight - light plane sprite to draw inside box
  * @param optionSpriteDark - dark plane sprite to draw inside box
  */
-void drawOptionsBox(char x, char y, char isSelected, char isDisabled, char optionSpriteHeight, const unsigned short* optionSpriteLight, const unsigned short* optionSpriteDark)
+void drawOptionsBox(short x, short y, char isSelected, char isDisabled, char optionSpriteHeight, char spriteOffsetY, const unsigned short* optionSpriteLight, const unsigned short* optionSpriteDark)
 {
 	// draw the box
 	if(isSelected)
@@ -102,13 +104,13 @@ void drawOptionsBox(char x, char y, char isSelected, char isDisabled, char optio
 		GrayClipSprite32_OR_R(x, y, 16, settingsIconBox, settingsIconBox, lightPlane, lightPlane);
 
 	// draw the sprite inside the box, of set to +1, +1
-	GrayClipSprite16_OR_R(x+1, y+1, optionSpriteHeight, optionSpriteLight, optionSpriteDark, lightPlane, darkPlane);
+	GrayClipSprite16_OR_R(x+1, y+1+spriteOffsetY, optionSpriteHeight, optionSpriteLight, optionSpriteDark, lightPlane, darkPlane);
 
 	// if it's disabled, draw an x on top of the sprite
 	if(isDisabled)
 	{
-		GrayClipSprite16_AND_R(x+1, y+3, 12, spr_Disabled_Mask, spr_Disabled_Mask, lightPlane, darkPlane);
-		GrayClipSprite16_OR_R(x+1, y+3, 12, spr_Disabled_Outline, spr_Disabled_Outline, lightPlane, darkPlane);
+		GrayClipSprite16_AND_R(x+1, y+2, 12, spr_Disabled_Mask, spr_Disabled_Mask, lightPlane, darkPlane);
+		GrayClipSprite16_OR_R(x+1, y+2, 12, spr_Disabled_Outline, spr_Disabled_Outline, lightPlane, darkPlane);
 	}
 }
 
@@ -146,26 +148,28 @@ void Draw_renderMatchSettingsMenu()
 	// draw the row of 5 general options in the general frame
 
 	// Worm Starting Health
+	const unsigned short* healthSprite = Match_wormStartHealth==50 ? spr_Option_Health[0] : (Match_wormStartHealth==100 ? spr_Option_Health[1] : spr_Option_Health[2]);
 	drawOptionsBox(GENERAL_FRAME_LEFT+3, GENERAL_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_WORM_HEALTH,
-		FALSE, 14, spr_Option_Health[(short)((Match_wormStartHealth/50)-2)], spr_Option_Health[(short)((Match_wormStartHealth/50)-2)]);
+		FALSE, 14, 0, healthSprite, healthSprite);
 	
 	// Select Worms On Turn Start
 	const unsigned short* selectionSprite = Match_allowWormSelection ? spr_SelectionArrowFrame1 : spr_NoSelectArrow;
+	const char offset = (Match_allowWormSelection ? 1 : 0);
 	drawOptionsBox(GENERAL_FRAME_LEFT+23, GENERAL_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_SELECT_WORMS,
-		!Match_allowWormSelection, 14, selectionSprite+1, selectionSprite+1);
+		FALSE, 14, 0, selectionSprite+offset, selectionSprite+offset);
 
 	// Place Worms on Game Start
 	drawOptionsBox(GENERAL_FRAME_LEFT+43, GENERAL_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_PLACE_WORMS,
-		!Match_strategicPlacement, 13, spr_Option_PlaceWorms, spr_Option_PlaceWorms);
+		!Match_strategicPlacement, 13, 0, spr_Option_PlaceWorms, spr_Option_PlaceWorms);
 
 	// Turn Time
 	const unsigned short* turnTimeSprite = (Match_turnTime==30 ? spr_Option_Timer[0] : (Match_turnTime==45 ? spr_Option_Timer[1] : spr_Option_Timer[2]));
 	drawOptionsBox(GENERAL_FRAME_LEFT+63, GENERAL_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_TURN_TIME,
-		FALSE, 14, turnTimeSprite, turnTimeSprite);
+		FALSE, 14, 0, turnTimeSprite, turnTimeSprite);
 
 	// Artillery Mode
 	drawOptionsBox(GENERAL_FRAME_LEFT+83, GENERAL_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_ARTILLERY_MODE,
-		!Match_artilleryMode, 12, spr_Option_Artillery, spr_Option_Artillery);
+		!Match_artilleryMode, 12, 1, spr_Option_Artillery, spr_Option_Artillery);
 
 	// -----------------
 
@@ -173,21 +177,19 @@ void Draw_renderMatchSettingsMenu()
 
 	// Enable Mines
 	drawOptionsBox(OBJECT_FRAME_LEFT+3, OBJECT_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_ENABLE_MINES,
-		FALSE, 14, spr_Option_MineLight[(short)((Match_mineFuseLength-3)/2)],
-		spr_Option_MineDark[(short)((Match_mineFuseLength-3)/2)]);
+		!Match_minesEnabled, 11, 0, spr_Option_MineBlank_Light, spr_Option_MineBlank_Dark);
 	
 	// Mine Fuse Length
 	drawOptionsBox(OBJECT_FRAME_LEFT+23, OBJECT_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_MINE_FUSE_LENGTH,
-		FALSE, 14, spr_Option_MineLight[(short)((Match_mineFuseLength-3)/2)],
-		spr_Option_MineDark[(short)((Match_mineFuseLength-3)/2)]);
+		FALSE, 14, 0, spr_Option_MineLight[(short)Match_mineFuseLength], spr_Option_MineDark[(short)Match_mineFuseLength]);
 
 	// Enable Dud Mines
 	drawOptionsBox(OBJECT_FRAME_LEFT+43, OBJECT_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_ENABLE_DUD_MINES,
-		!Match_dudMines, 14, spr_Option_DudSmoke_Light, spr_Option_DudSmoke_Dark);
+		!Match_dudMines, 14, 0, spr_Option_DudSmoke_Light, spr_Option_DudSmoke_Dark);
 
 	// Enable Oil Drums
 	drawOptionsBox(OBJECT_FRAME_LEFT+63, OBJECT_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_ENABLE_OIL_DRUMS,
-		!Match_oilDrumsEnabled, 12, spr_OilLight, spr_OilDark);
+		!Match_oilDrumsEnabled, 12, 1, spr_OilLight, spr_OilDark);
 
 	// -----------------
 
@@ -195,15 +197,15 @@ void Draw_renderMatchSettingsMenu()
 
 	// Enable Tool Crates
 	drawOptionsBox(CRATE_FRAME_LEFT+3, CRATE_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_ENABLE_TOOL_CRATES,
-		!Match_toolCratesEnabled, 12, spr_CrateTool+12, spr_CrateTool+24);
+		!Match_toolCratesEnabled, 12, 1, spr_CrateTool+12, spr_CrateTool+24);
 
 	// Enable Health Crates
 	drawOptionsBox(CRATE_FRAME_LEFT+23, CRATE_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_ENABLE_HEALTH_CRATES,
-		!Match_healthCratesEnabled, 12, spr_CrateHealth+12, spr_CrateHealth+24);
+		!Match_healthCratesEnabled, 12, 1, spr_CrateHealth+12, spr_CrateHealth+24);
 
 	// Enable Weapon Crates
 	drawOptionsBox(CRATE_FRAME_LEFT+43, CRATE_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_ENABLE_WEAPON_CRATES,
-		!Match_weaponCratesEnabled, 12, spr_CrateWeapon+12, spr_CrateWeapon+24);			
+		!Match_weaponCratesEnabled, 12, 1, spr_CrateWeapon+12, spr_CrateWeapon+24);			
 
 	// -----------------
 
@@ -270,12 +272,12 @@ static void MatchSettings_update()
 		switch(matchSettings_menuItem)
 		{
 			case 0: // Worm Starting Health
-				if(Match_wormStartHealth==100)
-					Match_wormStartHealth=150;
-				else if(Match_wormStartHealth==150)
+				if(Match_wormStartHealth==50)
+					Match_wormStartHealth=100;
+				else if(Match_wormStartHealth==100)
 					Match_wormStartHealth=200;
 				else
-					Match_wormStartHealth=100;
+					Match_wormStartHealth=50;
 				break;
 
 			case 1: // Select Worms On Turn Start
@@ -304,12 +306,9 @@ static void MatchSettings_update()
 				break;
 
 			case 6: // Mine Fuse Length
-				if(Match_mineFuseLength==3)
-					Match_mineFuseLength=5;
-				else if(Match_mineFuseLength==5)
-					Match_mineFuseLength=7;
-				else
-					Match_mineFuseLength=3;
+				Match_mineFuseLength++;
+				if(Match_mineFuseLength>4)
+					Match_mineFuseLength=0;
 				break;
 
 			case 7: // Enable Dud Mines
