@@ -58,7 +58,7 @@ char OilDrum_yVelo[MAX_OILDRUMS] = {0, 0, 0, 0, 0, 0};
  *
  * @param the index of the OilDrum to spawn
 */
-void spawnDrum(short index)
+static void spawnDrum(short index)
 {
 	// find a free place for it on the map
 	short sx, sy;
@@ -74,8 +74,8 @@ void spawnDrum(short index)
 	OilDrum_active |= (unsigned short)1<<(index);
 	
 	// make a new collider and physics object for this oil drum
-	Collider col = new_Collider(COL_DOWN, 0, 5, 0, 0);
-	OilDrum_physObj[index] = new_PhysObj(&OilDrum_x[index], &OilDrum_y[index], &OilDrum_xVelo[index], &OilDrum_yVelo[index], 0.0f, 1.0f, (char)index, &OilDrum_settled, col);
+	new_Collider(&(OilDrum_physObj[index].col), COL_DOWN, 0, 5, 0, 0);
+	new_PhysObj(&OilDrum_physObj[index], &OilDrum_x[index], &OilDrum_y[index], &OilDrum_xVelo[index], &OilDrum_yVelo[index], 0, 100, (char)index, &OilDrum_settled);
 	
 }
 

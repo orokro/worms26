@@ -49,6 +49,8 @@
 #define keyCursors (long)1920			//00000000000000000000011110000000
 
 
+extern long keysDown, keysState, keysUp;
+
 // keys function prototypes
 
 /**
@@ -69,7 +71,11 @@ extern void Keys_update();
  * @param keyCode the bitmask for our logical key
  * @return a boolean char set to 0 or 1 if the key is down
 */
-extern char Keys_keyDown(long);
+static inline char Keys_keyDown(long keyCode)
+{
+	// return if the key is down on this frame:
+	return (char)((keysDown & keyCode)>0);
+}
 
 
 /**
@@ -78,7 +84,11 @@ extern char Keys_keyDown(long);
  * @param keyCode the bitmask for our logical key
  * @return a boolean char set to 0 or 1 if the key is pressed
 */
-extern char Keys_keyState(long);
+static inline char Keys_keyState(long keyCode)
+{
+	// return if key is currently down on this frame
+	return (char)((keysState & keyCode)>0);
+}
 
 
 /**
@@ -87,6 +97,10 @@ extern char Keys_keyState(long);
  * @param keyCode the bitmask for our logical key
  * @return a boolean char set to 0 or 1 if the key is let up
 */
-extern char Keys_keyUp(long);
+static inline char Keys_keyUp(long keyCode)
+{
+	// return if the key is let up on this frame:
+	return (char)((keysUp & keyCode)>0);
+}
 
 #endif

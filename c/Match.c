@@ -48,7 +48,7 @@ char Match_toolCratesEnabled = TRUE;
 char Match_healthCratesEnabled = TRUE;
 char Match_weaponCratesEnabled = TRUE;
 
-const short Match_defaultWeapons[65] = {
+const char Match_defaultWeapons[65] = {
 	1,9,9,9,9,1,1,3,5,1,2,1,9,
 	1,1,3,9,9,2,1,3,2,1,1,1,9,
 	1,5,1,9,1,1,1,3,2,1,1,1,3,

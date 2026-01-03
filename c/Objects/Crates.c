@@ -152,8 +152,8 @@ static char spawnCrate()
 	Crate_settled &= ~((unsigned short)1<<(index));
 	
 	// make a new collider and physics object for this crate
-	Collider coll = new_Collider(COL_DOWN, 0, 5, 0, 0);
-	Crate_physObj[index] = new_PhysObj(&Crate_x[index], &Crate_y[index], &Crate_xVelo[index], &Crate_yVelo[index], 0.55f, 1.0f, (char)index, &Crate_settled, coll);
+	new_Collider(&(Crate_physObj[index].col), COL_DOWN, 0, 5, 0, 0);
+	new_PhysObj(&Crate_physObj[index], &Crate_x[index], &Crate_y[index], &Crate_xVelo[index], &Crate_yVelo[index], 55, 100, (char)index, &Crate_settled);
 	Crate_physObj[index].bouncinessX=-1.0f;
 	
 	// crates spawn with a parachute

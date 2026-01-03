@@ -104,7 +104,7 @@ typedef struct{
  * @param right the right amount to check, if its COL_RIGHT, COL_LR, or COL_UDLR
  * @return a new Collider struct preinitialized with these params.
 */
-extern Collider new_Collider(unsigned char type, char up, char down, char left, char right);
+extern void new_Collider(Collider *obj, unsigned char type, char up, char down, char left, char right);
 
 
 /**
@@ -119,7 +119,7 @@ extern Collider new_Collider(unsigned char type, char up, char down, char left, 
  * @param settled the value that should be bit-masked if the object is considered settled (e.g. hasn't moved in multiple frames)
  * @param c the objects Collider struct to test collisions with
 */
-extern PhysObj new_PhysObj(short *x, short *y, char *xVelo, char *yVelo, float bounciness, float smoothness, char objIndex, unsigned short *settled, Collider c);
+extern void new_PhysObj(PhysObj *obj, short *x, short *y, char *xVelo, char *yVelo, char bounciness, char smoothness, char objIndex, unsigned short *settled);
 
 
 /**
