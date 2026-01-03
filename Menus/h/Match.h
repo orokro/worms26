@@ -25,7 +25,7 @@ extern char Match_mapType;
 // match globals
 extern char Match_wormCount[2];
 extern char Match_gravestones[2];
-extern char Match_wormStartHealth;
+extern unsigned char Match_wormStartHealth;
 extern char Match_allowWormSelection;
 extern char Match_artilleryMode;
 extern char Match_turnTime;

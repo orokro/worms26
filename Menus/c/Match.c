@@ -23,7 +23,7 @@ char Match_wormCount[2] = {6, 8};
 char Match_gravestones[2] = {0, 1};
 
 // the heath worms should start at:
-char Match_wormStartHealth = 100;
+unsigned char Match_wormStartHealth = 100;
 
 // is worm selection enabled?
 char Match_allowWormSelection = TRUE;
