@@ -44,6 +44,7 @@ char teamSettings_isEditing = 0;
 char teamSettings_lastAlpha = 0;
 char teamSettings_lastBackspace = 0;
 
+
 /**
  * Handles text input for the given string buffer
  */
@@ -54,14 +55,18 @@ void handleTextEdit(char* buffer, short maxLen)
 
     // Handle alpha input
     if (currentAlpha) {
+
         if (currentAlpha != teamSettings_lastAlpha) {
+
             // New key press
             if (!teamSettings_isEditing) {
                 // First press: Start editing, overwrite content
                 teamSettings_isEditing = 1;
                 buffer[0] = currentAlpha;
                 buffer[1] = '\0';
+
             } else {
+
                 // Already editing: Append
                 short len = (short)strlen(buffer);
                 if (len < maxLen) {
@@ -76,6 +81,7 @@ void handleTextEdit(char* buffer, short maxLen)
 
     // Handle Backspace
     if (teamSettings_isEditing && Keys_keyDown(keyBackspace)) {
+
         short len = (short)strlen(buffer);
         if (len > 0) {
             buffer[len - 1] = '\0';
@@ -83,6 +89,7 @@ void handleTextEdit(char* buffer, short maxLen)
         }
     }
 }
+
 
 /**
  * main drawing routine for the TeamSettings menu
@@ -294,5 +301,5 @@ static void TeamSettings_update()
 */
 static void TeamSettings_exit()
 {
-
+	teamSettings_isEditing = 0;
 }
