@@ -82,13 +82,11 @@ static void MainMenu_update()
 	{
 		col = (col==0) ? 1 : 0;
 		main_menuItem = row * 2 + col;
-		screenIsStale = STALE;
 	}
 	else if(Keys_keyDown(keyUp | keyDown))
 	{
 		row = (row==0) ? 1 : 0;
 		main_menuItem = row * 2 + col;
-		screenIsStale = STALE;
 	}
 
 	// F1 always exits game on this screen
@@ -107,6 +105,10 @@ static void MainMenu_update()
 		else
 			State_changeMode(menuMode_Credits);
 	}
+
+	// redraw for any keypress
+	if(Keys_keyDown(keyAny))
+		screenIsStale = STALE;
 }
 
 

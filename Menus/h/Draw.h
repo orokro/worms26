@@ -86,4 +86,13 @@ void Draw_bigMenuButton(short x, short y, char itemId, char currentItem, const u
 void Draw_textBox(char x, char y, char width, char isSelected, const char* text);
 
 
+/**
+ * @brief Draws a toggle switch
+ * 
+ * @param x - x
+ * @param y - y
+ * @param enabled - true if enabled
+ */
+extern void Draw_toggle(char x, char y, char enabled);
+
 #endif

@@ -87,6 +87,8 @@ extern const unsigned short spr_SelectionArrowFrame2[];
 
 extern const unsigned long spr_TeamTab[];
 
+extern const unsigned short spr_Toggle[];
+
 extern const unsigned short spr_weaponSelect[];
 
 #define NUM_WEAPONS 76

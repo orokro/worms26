@@ -175,3 +175,20 @@ void Draw_textBox(char x, char y, char width, char isSelected, const char* text)
 		FastFilledRect_Invert_R(darkPlane, (short)x+2, (short)y+2, (short)(x+3+nameLen), (short)(y+8));
 	}
 }
+
+
+/**
+ * @brief Draws a toggle switch
+ * 
+ * @param x - x
+ * @param y - y
+ * @param enabled - true if enabled
+ */
+void Draw_toggle(char x, char y, char enabled)
+{	
+	// draw black if selected
+	if(enabled)
+		GrayClipSprite16_OR_R(x, y, 8, spr_Toggle, spr_Toggle, lightPlane, darkPlane);
+	else
+		GrayClipSprite16_OR_R(x, y, 8, spr_Toggle+8, spr_Toggle+8, lightPlane, lightPlane);
+}

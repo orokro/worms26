@@ -53,6 +53,9 @@ char Match_weaponCratesEnabled = TRUE;
 // kind of map texture
 char Match_mapType = MAP_SAND;
 
+// what things to draw
+char Match_drawingFlags = DRAW_CLOUDS | DRAW_LEAVES | DRAW_MOUNTAINS;
+
 // the default weapons for each worm in the match
 short Match_defaultWeapons[65] = {
 	1,9,9,9,9,1,1,3,5,1,2,1,9,

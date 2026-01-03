@@ -192,9 +192,8 @@ static void MatchMenu_update()
 	}
 
 	// redraw for any keypress
-	if(Keys_keyState(keyAny))
+	if(Keys_keyUp(keyAny))
 		screenIsStale = STALE;
-
 }
 
 
