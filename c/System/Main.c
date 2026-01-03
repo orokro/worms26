@@ -17,6 +17,7 @@
 #include "Map.h"
 #include "Keys.h"
 #include "Draw.h"
+#include "FileData.h"
 
 
 // the main buffer for the map
@@ -144,7 +145,6 @@ void GenerateFlippedSprites() {
 }
 
 
-
 // global method to calculate distance between two points
 // maybe I'll move this into a math file one day
 short dist(short x1, short y1, short x2, short y2)
@@ -179,6 +179,9 @@ void _main(void)
 
 	// allocate space for double-buffering
 	void *dbuffer=malloc(GRAYDBUFFER_SIZE);
+
+	// load our settings file to get match settings from the menu executable
+	FileData_loadData();
 
 	// init state related to starting match
 	Game_initRound();

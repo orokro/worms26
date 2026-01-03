@@ -8,12 +8,12 @@
 // includes
 #include "Main.h"
 #include "FileData.h"
-#include "State.h"
 #include "Match.h"
+#include "Worms.h"
 #include <stdio.h>
 #include <string.h>
-#include <statline.h> // Required for ST_helpMsg
-#include <kbd.h>      // Required for ngetchx
+#include <statline.h>
+#include <kbd.h>
 
 
 /**
@@ -155,56 +155,5 @@ void FileData_loadData()
  */
 void FileData_saveData()
 {
-	FILE *f = fopen("wormsdat", "wb");
-
-	if (!f)
-	{
-		ST_helpMsg("Err: Could not create save file.");
-		ngetchx();
-		exit(0);
-	}
-
-	// 1. Write the Status Byte
-	// 1 if Exit Requested (Proper Quit), 0 otherwise
-	unsigned char statusByte = (App_exitRequested == TRUE) ? 1 : 0;
-	fwrite(&statusByte, sizeof(unsigned char), 1, f);
-
-	// 2. Write all Game Settings
-	// Note: We ignore return values here for brevity, but we check ferror/feof implicitly
-	// by assuming if fopen worked, we have space.
-	
-	fwrite(Match_wormCount, sizeof(char), 2, f);
-	fwrite(Match_gravestones, sizeof(char), 2, f);
-	
-	fwrite(&Match_wormStartHealth, sizeof(unsigned char), 1, f);
-	fwrite(&Match_allowWormSelection, sizeof(char), 1, f);
-	fwrite(&Match_artilleryMode, sizeof(char), 1, f);
-	fwrite(&Match_turnTime, sizeof(char), 1, f);
-	fwrite(&Match_strategicPlacement, sizeof(char), 1, f);
-	
-	fwrite(&Match_minesEnabled, sizeof(char), 1, f);
-	fwrite(&Match_mineFuseLength, sizeof(char), 1, f);
-	fwrite(&Match_dudMines, sizeof(char), 1, f);
-	fwrite(&Match_oilDrumsEnabled, sizeof(char), 1, f);
-	
-	fwrite(&Match_toolCratesEnabled, sizeof(char), 1, f);
-	fwrite(&Match_healthCratesEnabled, sizeof(char), 1, f);
-	fwrite(&Match_weaponCratesEnabled, sizeof(char), 1, f);
-	
-	fwrite(&Match_mapType, sizeof(char), 1, f);
-	fwrite(&Match_drawingFlags, sizeof(char), 1, f);
-	
-	fwrite(Match_defaultWeapons, sizeof(char), 65, f);
-	fwrite(Match_teamNames, sizeof(char) * 10, 2, f);
-	fwrite(Match_wormNames, sizeof(char) * 12, MAX_WORMS, f);
-
-	// Check for write errors (like full memory)
-	if (ferror(f)) {
-		fclose(f);
-		ST_helpMsg("Err: Memory Full / Save Failed");
-		ngetchx();
-		exit(0);
-	}
-
-	fclose(f);
+	// game executabe cannot write to the data file
 }

@@ -26,6 +26,7 @@ extern unsigned char Match_wormStartHealth;
 extern char Match_allowWormSelection;
 extern char Match_artilleryMode;
 extern char Match_turnTime;
+extern char Match_strategicPlacement;
 extern char Match_minesEnabled;
 extern char Match_mineFuseLength;
 extern char Match_dudMines;

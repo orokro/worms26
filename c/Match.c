@@ -40,6 +40,9 @@ char Match_minesEnabled = TRUE;
 char Match_mineFuseLength = 3;
 char Match_dudMines = TRUE;
 
+// allow worms to be strategically placed on the map at the game start
+char Match_strategicPlacement = FALSE;
+
 // playing with oil barrels?
 char Match_oilDrumsEnabled = TRUE;
 
