@@ -165,14 +165,25 @@ void drawCursorAndXSpot()
 */
 void drawSelectArrow()
 {
+
+	// get arrows pos
+	short x=Worm_x[(short)Worm_currentWorm]-9;
+	short y=Worm_y[(short)Worm_currentWorm]-32;
+
+	// if we don't have worm select enabled, just draw the static arow
+	if(Match_allowWormSelection==FALSE)
+	{
+		ClipSprite8_XOR_R(x+4, y+4, 10, spr_NoSelectArrow, darkPlane);
+		ClipSprite8_XOR_R(x+4, y+4, 10, spr_NoSelectArrow, lightPlane);
+		return;
+	}
+	
+	// animate frame counter
 	static char frame=0;
 	frame++;
 	if(frame>7)
 		frame=0;
-	
-	short x=Worm_x[(short)Worm_currentWorm]-9;
-	short y=Worm_y[(short)Worm_currentWorm]-32;
-	
+
 	if(worldToScreen(&x, &y))
 	{
 		// take advantage of extgrah's sprite method to handle bit shifting and mem copying in one swoop!

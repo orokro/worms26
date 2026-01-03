@@ -57,7 +57,7 @@ char Match_mapType = MAP_SAND;
 char Match_drawingFlags = DRAW_CLOUDS | DRAW_LEAVES | DRAW_MOUNTAINS;
 
 // the default weapons for each worm in the match
-short Match_defaultWeapons[65] = {
+char Match_defaultWeapons[65] = {
 	1,9,9,9,9,1,1,3,5,1,2,1,9,
 	1,1,3,9,9,2,1,3,2,1,1,1,9,
 	1,5,1,9,1,1,1,3,2,1,1,1,3,

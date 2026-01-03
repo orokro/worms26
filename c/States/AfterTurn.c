@@ -73,9 +73,13 @@ static void AfterTurn_update()
 		{	
 			crateLogicDone = TRUE;
 
-			// randomly spawn a crate
-			if(Crates_spawnCrate())
-				afterCrateFrames=11;
+			// pick random number 1 in 3 chance to spawn a crate
+			if(random(3)==0)
+			{
+				// randomly spawn a crate
+				if(Crates_spawnCrate())
+					afterCrateFrames=11;
+			}
 		}
 		
 		// but not until we waited a bit

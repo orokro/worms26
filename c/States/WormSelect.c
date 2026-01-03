@@ -141,7 +141,6 @@ static void WormSelect_enter()
 */
 static void WormSelect_update()
 {
-	
 	// if the current match allows worm-selection, and the user pressed
 	// the worm select button, we can goto the next-available worm, if any
 	if(Match_allowWormSelection && Keys_keyDown(keyWormSelect))

@@ -476,7 +476,8 @@ const unsigned char spr_Fuel[] = {
 	0b01100000
 };
 
-const unsigned char spr_Grave[] = {
+const unsigned char spr_Grave[][12] = {
+	{
 	0b00011000,
 	0b00011000,
 	0b00011000,
@@ -489,9 +490,8 @@ const unsigned char spr_Grave[] = {
 	0b00011000,
 	0b00011000,
 	0b00011000
-};
-
-const unsigned char spr_Grave2[] = {
+	},
+	{
 	0b00111100,
 	0b01100110,
 	0b01001011,
@@ -504,9 +504,8 @@ const unsigned char spr_Grave2[] = {
 	0b11010111,
 	0b11111111,
 	0b11111111
-};
-
-const unsigned char spr_Grave3[] = {
+	},
+	{
 	0b00011100,
 	0b00111110,
 	0b01111110,
@@ -519,6 +518,7 @@ const unsigned char spr_Grave3[] = {
 	0b01111110,
 	0b10000011,
 	0b11111111
+	}
 };
 
 const unsigned char spr_launcher[] = {

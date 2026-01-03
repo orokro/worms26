@@ -57,6 +57,9 @@ unsigned short Mine_triggered=0;
 // is the mine settled on the map?
 unsigned short Mine_settled=0;
 
+// dude mines
+unsigned short Mine_dud=0;
+
 // local vars
 PhysObj Mine_physObj[MAX_MINES];
 
@@ -85,6 +88,9 @@ void spawnMine(char index)
 	// make this mine active:
 	Mine_active |= (unsigned short)1<<(index);
 	
+	// make sure not dud (yet)
+	Mine_dud &= ~((unsigned short)1<<(index));
+
 	// make a new collider and physics object for this mine
 	new_Collider(&(Mine_physObj[(short)index].col), COL_UDLR, 2, 2, 3, 3);
 	new_PhysObj(&Mine_physObj[(short)index], &Mine_x[(short)index], &Mine_y[(short)index], &Mine_xVelo[(short)index], &Mine_yVelo[(short)index], 65, 100, (char)index, &Mine_settled);
@@ -110,8 +116,9 @@ void updateMine(short index)
 			Mine_active &= ~((unsigned short)1<<(index));
 			Mine_triggered &= ~((unsigned short)1<<(index));
 
-			// boom
-			Explosion_spawn(Mine_x[index], Mine_y[index], 14, 14, TRUE);
+			// explode, unless it's a dud
+			if((Mine_dud & (unsigned short)1<<(index))==FALSE)
+				Explosion_spawn(Mine_x[index], Mine_y[index], 14, 14, TRUE);
 				
 		}// end if 
 		
@@ -142,15 +149,11 @@ void updateMine(short index)
  */
 void Mines_spawnMines()
 {
-
-	if(Match_minesEnabled)
-	{
-		char i=0;
-		
-		// only spawn 6 mines, leaving 4 free slots for user placeable mines
-		for(i=0; i<3; i++)
-			spawnMine(i);
-	}
+	char i=0;
+	
+	// only spawn 6 mines, leaving 4 free slots for user placeable mines
+	for(i=0; i<3; i++)
+		spawnMine(i);
 }
 
 
@@ -214,7 +217,18 @@ void Mines_trigger(short index)
 	Mine_triggered |= (unsigned short)1<<(index);
 	
 	// set fuse
-	Mine_fuse[index] = ((Match_mineFuseLength<6) ? (Match_mineFuseLength*TIME_MULTIPLIER) : (random(5)*TIME_MULTIPLIER));
+	Mine_fuse[index] = ((Match_mineFuseLength<4) ? (Match_mineFuseLength*TIME_MULTIPLIER) : (random(5)*TIME_MULTIPLIER));
+
+	// if dudes are enabled, pick a number 1-4 and if it's 1, make this mine a dud
+	if(Match_dudMines)
+	{
+		if(random(4)==0)
+		{
+			// make dud
+			Mine_fuse[index] = 4;
+			Mine_dud |= (unsigned short)1<<(index);
+		}
+	}
 }
 
 
@@ -244,8 +258,14 @@ void Mines_drawAll()
 				// if the mine has an active fuse, draw that too
 				if(Mine_fuse[i]>0)
 				{
-					sprintf(fuseStr, "%d", (Mine_fuse[i]/TIME_MULTIPLIER));
-					GrayDrawStr2B(screenX-4, screenY-16, fuseStr, A_NORMAL, lightPlane, darkPlane);
+					if((Mine_dud & (unsigned short)1<<(i))==FALSE)
+					{
+						sprintf(fuseStr, "%d", (Mine_fuse[i]/TIME_MULTIPLIER));
+						GrayDrawStr2B(screenX-4, screenY-16, fuseStr, A_NORMAL, lightPlane, darkPlane);
+					}else
+					{
+						ClipSprite8_OR_R(screenX-3, screenY-7, 4, sprDudSmoke, darkPlane);
+					}
 				}// end if fuse
 				
 				// if the oil drum is "settled" draw an arrow above it, for debug

@@ -117,16 +117,23 @@ extern short Game_ninjaRopeLength;
 // game function prototypes
 
 
-// Prototype
+/**
+ * @brief Raycast from an origin point in a direction to see what it hits
+ * 
+ * @param originX - starting x position
+ * @param originY - starting y position
+ * @param dirX - direction x component
+ * @param dirY - direction y component
+ * @param testWorms - if TRUE, test for worms in the raycast
+ * @return RaycastHit - the result of the raycast
+ */
 extern RaycastHit Game_raycast(short originX, short originY, short dirX, short dirY, short testWorms);
-
 
 
 /**
  * Resets all necessary variables to begin a new round in the game.
 */
 extern void Game_initRound();
-
 
 
 /**

@@ -24,7 +24,7 @@ char Match_wormCount[2] = {6, 6};
 char Match_gravestones[2] = {0, 1};
 
 // the heath worms should start at:
-char Match_wormStartHealth = 100;
+unsigned char Match_wormStartHealth = 100;
 
 // is worm selection enabled?
 char Match_allowWormSelection = TRUE;
@@ -48,7 +48,14 @@ char Match_toolCratesEnabled = TRUE;
 char Match_healthCratesEnabled = TRUE;
 char Match_weaponCratesEnabled = TRUE;
 
-const char Match_defaultWeapons[65] = {
+// kind of map texture
+char Match_mapType = MAP_SAND;
+
+// what things to draw
+char Match_drawingFlags = DRAW_CLOUDS | DRAW_LEAVES | DRAW_MOUNTAINS;
+
+// the default weapons for each worm in the match
+char Match_defaultWeapons[65] = {
 	1,9,9,9,9,1,1,3,5,1,2,1,9,
 	1,1,3,9,9,2,1,3,2,1,1,1,9,
 	1,5,1,9,1,1,1,3,2,1,1,1,3,

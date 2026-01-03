@@ -90,12 +90,9 @@ static void spawnDrum(short index)
  */
 void OilDrums_spawnDrums()
 {
-	if(Match_oilDrumsEnabled)
-	{
-		short i=0;
-		for(i=0; i<MAX_OILDRUMS; i++)
-			spawnDrum(i);
-	}
+	short i=0;
+	for(i=0; i<MAX_OILDRUMS; i++)
+		spawnDrum(i);
 }
 
 

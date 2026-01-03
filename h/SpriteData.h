@@ -49,11 +49,8 @@ extern const unsigned long spr_Donkey_Mask[];
 
 extern const unsigned char spr_Fuel[];
 
-extern const unsigned char spr_Grave[];
-
-extern const unsigned char spr_Grave2[];
-
-extern const unsigned char spr_Grave3[];
+#define NUM_GRAVE 3
+extern const unsigned char spr_Grave[][12];
 
 extern const unsigned char spr_launcher[];
 

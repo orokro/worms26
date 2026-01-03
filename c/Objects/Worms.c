@@ -214,12 +214,6 @@ void Worm_update()
 		// only update worms in the game
 		if(Worm_active & wormMask)
 		{
-			
-			//if(i == Worm_currentWorm){
-			//	Camera_focusOn(&Worm_x[i], &Worm_y[i]);
-				
-			//}
-
 			// if the worm is below water, insta-kill it
 			if((Worm_isDead & wormMask)==0 && Worm_y[i]>(196-Game_waterLevel)){
 				
@@ -457,7 +451,7 @@ void renderHealthSprite(short index)
 */
 void Worm_drawAll()
 {
-    short screenX, screenY, i;
+    short screenX, screenY, i, teamIdx;
     unsigned short wormMask;
 
     // Pointers for the sprite data to draw this frame
@@ -479,6 +473,7 @@ void Worm_drawAll()
     {
 		wormMask = (unsigned short)1<<(i);
 		isCurrentWorm = (i == Worm_currentWorm);
+		teamIdx = (i < 8) ? 0 : 1;
 
         // Check active bitmask
         if(Worm_active & wormMask)
@@ -505,7 +500,7 @@ void Worm_drawAll()
 				// if the worm is dead, draw gravestone (Legacy sprite, not in new system yet?)
                 // Assuming spr_Grave still exists in standard sprites.
 				if(Worm_isDead & wormMask){
-					GrayClipSprite8_OR_R(x+4, y, 12, spr_Grave, spr_Grave, lightPlane, darkPlane);
+					GrayClipSprite8_OR_R(x+4, y, 12, spr_Grave[(short)Match_gravestones[teamIdx]], spr_Grave[(short)Match_gravestones[teamIdx]], lightPlane, darkPlane);
 					continue;
 				}
 

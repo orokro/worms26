@@ -101,6 +101,9 @@ void showInfo(const char *txt)
 */
 static char spawnCrate()
 {
+	// if no crates are enabled, GTFO early
+	if(Match_healthCratesEnabled==FALSE && Match_weaponCratesEnabled==FALSE && Match_toolCratesEnabled==FALSE)
+		return FALSE;
 
 	// find a free spot in our array of crates to spawn one, 
 	// we will assume that crates with less than 0 health are unactive
@@ -140,10 +143,9 @@ static char spawnCrate()
 	while(enabledCrateTypes[(short)type]<0)
 		type = random(7);
 		
+	// select the random type
 	Crate_type[index] = enabledCrateTypes[(short)type];
-	
-	Crate_type[index] = Game_turn%3;
-	
+		
 	// reset health:
 	Crate_health[index] = 30;
 
