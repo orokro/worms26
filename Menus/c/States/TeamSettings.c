@@ -144,13 +144,55 @@ static void TeamSettings_update()
 	// increase / decrease menu item with left/right
 	if(Keys_keyDown(keyLeft))
 	{
-		if(teamSettings_menuItem>0)
-			teamSettings_menuItem--;
+		switch (teamSettings_menuItem)
+		{
+			case MENU_ITEM_TEAM_MEMBER_2:
+			case MENU_ITEM_TEAM_MEMBER_4:
+			case MENU_ITEM_TEAM_MEMBER_6:
+			case MENU_ITEM_TEAM_MEMBER_8:
+				teamSettings_menuItem--;
+				break;
+			case MENU_ITEM_TEAM_MEMBER_1:
+				teamSettings_menuItem = MENU_ITEM_TEAM_NAME;
+				break;
+			case MENU_ITEM_TEAM_MEMBER_3:
+			case MENU_ITEM_TEAM_MEMBER_5:
+			case MENU_ITEM_TEAM_MEMBER_7:
+				teamSettings_menuItem = MENU_ITEM_GRAVESTONE;
+				break;
+		}
+
 	}
 	else if(Keys_keyDown(keyRight))
 	{
-		if(teamSettings_menuItem<9)
-			teamSettings_menuItem++;
+		switch(teamSettings_menuItem)
+		{
+			case MENU_ITEM_TEAM_NAME:
+				teamSettings_menuItem = MENU_ITEM_TEAM_MEMBER_1;
+				break;
+			case MENU_ITEM_GRAVESTONE:
+				teamSettings_menuItem = MENU_ITEM_TEAM_MEMBER_3;
+				break;
+			case MENU_ITEM_TEAM_MEMBER_1:
+			case MENU_ITEM_TEAM_MEMBER_3:
+			case MENU_ITEM_TEAM_MEMBER_5:
+			case MENU_ITEM_TEAM_MEMBER_7:
+				teamSettings_menuItem++;
+				break;
+		}
+	}else if(Keys_keyDown(keyDown))
+	{
+		if(teamSettings_menuItem==MENU_ITEM_TEAM_NAME)
+			teamSettings_menuItem = MENU_ITEM_GRAVESTONE;
+		else if(teamSettings_menuItem>=MENU_ITEM_TEAM_MEMBER_1 && teamSettings_menuItem<=MENU_ITEM_TEAM_MEMBER_6)
+			teamSettings_menuItem+=2;
+	}
+	else if(Keys_keyDown(keyUp))
+	{
+		if(teamSettings_menuItem==MENU_ITEM_GRAVESTONE)
+			teamSettings_menuItem = MENU_ITEM_TEAM_NAME;
+		else if(teamSettings_menuItem>=MENU_ITEM_TEAM_MEMBER_3 && teamSettings_menuItem<=MENU_ITEM_TEAM_MEMBER_8)
+			teamSettings_menuItem-=2;
 	}
 
 	// f1 and f1 select team 0 and 1 respectively
