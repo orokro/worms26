@@ -31,9 +31,7 @@ void Draw_renderTeamSettingsMenu()
 	Draw_clearBuffers();
 
 	// draw title, with big font and shadow just on light plane
-	FontSetSys(F_8x10);
-	GrayDrawStr2B(37, 3, "Team Config", A_NORMAL, lightPlane, lightPlane);
-	GrayDrawStr2B(36, 2, "Team Config", A_XOR, lightPlane, darkPlane);
+	Draw_titleText("Team Settings");
 
 	// draw the x close & check accept buttons
 	Draw_XandCheck(BTN_ACCEPT);
@@ -66,7 +64,7 @@ void Draw_renderTeamSettingsMenu()
 
 	// draw the text box rectangles
 	// team name
-	Draw_RectOutlineColor(5, 26, 47, 11, menuItem==0 ? 3 : 1);
+	Draw_textBox(5, 26, 47, menuItem==0, Match_teamNames[(short)tab]);
 
 	// square box for grave stone
 	Draw_RectOutlineColor(17, 46, 18, 18, menuItem==1 ? 3 : 1);
@@ -79,55 +77,15 @@ void Draw_renderTeamSettingsMenu()
 	short i;
 	for(i=0; i<8; i++)
 	{
-		short x = 55 + ((i%2) * 49);
-		short y = 26 + ((i/2) * 10);
+		char x = 55 + ((i%2) * 49);
+		char y = 26 + ((i/2) * 10);
+		Draw_textBox(x, y, 50, (menuItem-2)==i, Match_wormNames[(short)(tab*8)+i]);
+
 		Draw_RectOutlineColor(x, y, 50, 11, 1);
-	}
-
-	// draw selected box last in black
-	short selectedBox = menuItem-2;
-	if(selectedBox>=0 && selectedBox<8)
-	{
-		short x = 55 + ((selectedBox%2) * 49);
-		short y = 26 + ((selectedBox/2) * 10);
-		Draw_RectOutlineColor(x, y, 50, 11, 3);
-	}
-
-	// draw the current team name text
-	GrayDrawStr2B(7, 29, Match_teamNames[(short)tab], A_NORMAL, lightPlane, darkPlane);
-
-	// draw the team member names
-	for(i=0; i<8; i++)
-	{
-		short x = 57 + ((i%2) * 49);
-		short y = 29 + ((i/2) * 10);
-		GrayDrawStr2B(x, y, Match_wormNames[(short)(tab*8)+i], A_NORMAL, lightPlane, darkPlane);
 	}
 
 	// draw the gravestone sprite in the box
 	GrayClipSprite8_OR_R(22, 49, 12, graves[(short)Match_gravestones[(short)tab]], graves[(short)Match_gravestones[(short)tab]], lightPlane, darkPlane);
-
-	// if we're over a text box (0, or 2-9), draw inverted box on both planes,
-	// using strlen for either team name or worm name
-	if(menuItem==0)
-	{
-		// team name box
-		short nameLen = (short)strlen(Match_teamNames[(short)tab]);
-		FastFilledRect_Invert_R(lightPlane, 7, 28, 8 + (nameLen * 4), 34);
-		FastFilledRect_Invert_R(darkPlane, 7, 28, 8 + (nameLen * 4), 34);
-		
-
-	}
-	else if(menuItem>=2 && menuItem<=9)
-	{
-		// worm name box
-		short wormIndex = (short)(tab*8 + (menuItem-2));
-		short nameLen = (short)strlen(Match_wormNames[wormIndex]);
-		short x = 57 + (((menuItem-2)%2) * 49);
-		short y = 28 + (((menuItem-2)/2) * 10);
-		FastFilledRect_Invert_R(lightPlane, x, y, x + (nameLen * 4) + 3, y + 6);
-		FastFilledRect_Invert_R(darkPlane, x, y, x + (nameLen * 4) + 3, y + 6);
-	}
 
 	// we're done drawing
 	screenIsStale--;

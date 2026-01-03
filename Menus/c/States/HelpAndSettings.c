@@ -21,9 +21,7 @@ void Draw_renderHelpAndSettings()
 	Draw_clearBuffers();
 
 	// draw title, with big font and shadow just on light plane
-	FontSetSys(F_8x10);
-	GrayDrawStr2B(21, 3, "Help & Settings", A_NORMAL, lightPlane, lightPlane);
-	GrayDrawStr2B(20, 2, "Help & Settings", A_XOR, lightPlane, darkPlane);
+	Draw_titleText("Help & Settings");
 
 	// draw the x close & check accept buttons
 	Draw_XandCheck(BTN_ACCEPT);

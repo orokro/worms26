@@ -54,4 +54,36 @@ extern void Draw_XandCheck(char flags);
 extern void Draw_helpText(const char* text);
 
 
+/**
+ * @brief Draws title text centered at top of screen
+ * 
+ * @param text - text to draw
+ */
+extern void Draw_titleText(const char* text);
+
+
+/**
+ * @brief Draws one big menu button, with shadow if selected
+ * 
+ * @param x - x
+ * @param y - y
+ * @param itemId - item id 
+ * @param currentItem - currently selected item id
+ * @param sprite - sprite data pointer
+ */
+void Draw_bigMenuButton(short x, short y, char itemId, char currentItem, const unsigned long* sprite);
+
+
+/**
+ * @brief Draws text box
+ * 
+ * @param x - x
+ * @param y - y
+ * @param width - width 
+ * @param isSelected - is selected
+ * @param text - text to draw
+ */
+void Draw_textBox(char x, char y, char width, char isSelected, const char* text);
+
+
 #endif

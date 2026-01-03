@@ -21,9 +21,7 @@ void Draw_renderMatchSettingsMenu()
 	Draw_clearBuffers();
 
 	// draw title, with big font and shadow just on light plane
-	FontSetSys(F_8x10);
-	GrayDrawStr2B(15, 3, "Match Settings", A_NORMAL, lightPlane, lightPlane);
-	GrayDrawStr2B(24, 2, "Match Settings", A_XOR, lightPlane, darkPlane);
+	Draw_titleText("Match Settings");
 
 	// draw the x close & check accept buttons
 	Draw_XandCheck(BTN_ACCEPT);

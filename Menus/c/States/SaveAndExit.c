@@ -21,9 +21,7 @@ void Draw_renderSaveAndExit()
 	Draw_clearBuffers();
 
 	// draw title, with big font and shadow just on light plane
-	FontSetSys(F_8x10);
-	GrayDrawStr2B(21, 3, "Saving Settings", A_NORMAL, lightPlane, lightPlane);
-	GrayDrawStr2B(20, 2, "Saving Settings", A_XOR, lightPlane, darkPlane);
+	Draw_titleText("Saving Settings");
 
 	// we're done drawing
 	screenIsStale--;

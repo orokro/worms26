@@ -8,11 +8,12 @@
 */
 
 
-const char *matchMenuText[4] = {
-	"Start Match",
-	"Team Settings",
-	"Game Settings",
-	"Credits"
+const char *matchMenuText[5] = {
+	"+/- To Adjust Map Type",
+	"Adjust Weapons Stock",
+	"Adjust Match Settings",
+	"+/- To Change Team 1 Size",
+	"+/- To Change Team 2 Size"
 };
 
 
@@ -29,9 +30,7 @@ void Draw_renderMatchMenuMenu()
 	Draw_clearBuffers();
 
 	// draw title, with big font and shadow just on light plane
-	FontSetSys(F_8x10);
-	GrayDrawStr2B(41, 3, "Game Setup", A_NORMAL, lightPlane, lightPlane);
-	GrayDrawStr2B(40, 2, "Game Setup", A_XOR, lightPlane, darkPlane);
+	Draw_titleText("Game Setup");
 
 	// draw the x close & check accept buttons
 	Draw_XandCheck(BTN_CLOSE | BTN_ACCEPT);

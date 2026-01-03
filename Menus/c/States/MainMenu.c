@@ -34,41 +34,16 @@ void Draw_renderMainMenu()
 	Draw_helpText(mainMenuText[(short)menuItem]);
 
 	// draw title, with big font and shadow just on light plane
-	FontSetSys(F_8x10);
-	GrayDrawStr2B(18, 3, "Worms 68k Party", A_NORMAL, lightPlane, lightPlane);
-	GrayDrawStr2B(17, 2, "Worms 68k Party", A_XOR, lightPlane, darkPlane);
+	Draw_titleText("Worms 68k Party");
 
 	// draw the x close & check accept buttoons
 	Draw_XandCheck(BTN_CLOSE);
 
-	// draw menu item sprites, with a shadow for the selected one
-	GrayClipSprite32_OR_R(40, 25, 21, spr_MenuGame, spr_MenuGame, lightPlane, darkPlane);
-	if(menuItem==0)
-	{
-		ClipSprite32_OR_R(40, 26, 21, spr_MenuGame, lightPlane);
-		ClipSprite32_OR_R(41, 26, 21, spr_MenuGame, lightPlane);
-	}
-
-	GrayClipSprite32_OR_R(88, 25, 21, spr_MenuTeams, spr_MenuTeams, lightPlane, darkPlane);
-	if(menuItem==1)
-	{
-		ClipSprite32_OR_R(88, 26, 21, spr_MenuTeams, lightPlane);
-		ClipSprite32_OR_R(89, 26, 21, spr_MenuTeams, lightPlane);
-	}
-		
-	GrayClipSprite32_OR_R(40, 55, 21, spr_MenuSettingsAndHelp, spr_MenuSettingsAndHelp, lightPlane, darkPlane);
-	if(menuItem==2)
-	{
-		ClipSprite32_OR_R(40, 56, 21, spr_MenuSettingsAndHelp, lightPlane);
-		ClipSprite32_OR_R(41, 56, 21, spr_MenuSettingsAndHelp, lightPlane);
-	}
-
-	GrayClipSprite32_OR_R(88, 55, 21, spr_MenuCredits, spr_MenuCredits, lightPlane, darkPlane);
-	if(menuItem==3)
-	{
-		ClipSprite32_OR_R(88, 56, 21, spr_MenuCredits, lightPlane);
-		ClipSprite32_OR_R(89, 56, 21, spr_MenuCredits, lightPlane);
-	}
+	// draw the big menu buttons
+	Draw_bigMenuButton(40, 25, 0, menuItem, spr_MenuGame);
+	Draw_bigMenuButton(88, 25, 1, menuItem, spr_MenuTeams);
+	Draw_bigMenuButton(40, 55, 2, menuItem, spr_MenuSettingsAndHelp);
+	Draw_bigMenuButton(88, 55, 3, menuItem, spr_MenuCredits);
 		
 	// we're done drawing
 	screenIsStale--;

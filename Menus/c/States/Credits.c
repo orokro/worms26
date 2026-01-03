@@ -21,9 +21,7 @@ void Draw_renderCreditsRoll()
 	Draw_clearBuffers();
 
 	// draw title, with big font and shadow just on light plane
-	FontSetSys(F_8x10);
-	GrayDrawStr2B(53, 3, "Credits", A_NORMAL, lightPlane, lightPlane);
-	GrayDrawStr2B(52, 2, "Credits", A_XOR, lightPlane, darkPlane);
+	Draw_titleText("Credits");
 
 	// draw the x close & check accept buttons
 	Draw_XandCheck(BTN_ACCEPT);

@@ -109,3 +109,68 @@ void Draw_helpText(const char* text)
 	const short left = (160 - (strlen(text) * 4)) / 2;
 	GrayDrawStr2B(left, 86, text, A_NORMAL, lightPlane, darkPlane);
 }
+
+
+/**
+ * @brief Draws title text centered at top of screen
+ * 
+ * @param text - text to draw
+ */
+void Draw_titleText(const char* text)
+{
+	// draw title text centered at top of screen
+	FontSetSys(F_8x10);
+	const short left = (160 - (strlen(text) * 8)) / 2;
+	GrayDrawStr2B(left, 3, text, A_NORMAL, lightPlane, lightPlane);
+	GrayDrawStr2B(left-1, 2, text, A_XOR, lightPlane, darkPlane);
+	FontSetSys(F_4x6);
+}
+
+
+/**
+ * @brief Draws one big menu button, with shadow if selected
+ * 
+ * @param x - x
+ * @param y - y
+ * @param itemId - item id 
+ * @param currentItem - currently selected item id
+ * @param sprite - sprite data pointer
+ */
+void Draw_bigMenuButton(short x, short y, char itemId, char currentItem, const unsigned long* sprite)
+{
+	// draw menu item sprites, with a shadow for the selected one
+	GrayClipSprite32_OR_R(x, y, 21, sprite, sprite, lightPlane, darkPlane);
+	if(currentItem == itemId)
+	{
+		ClipSprite32_OR_R(x, y+1, 21, sprite, lightPlane);
+		ClipSprite32_OR_R(x+1, y+1, 21, sprite, lightPlane);
+	}
+}
+
+
+/**
+ * @brief Draws text box
+ * 
+ * @param x - x
+ * @param y - y
+ * @param width - width 
+ * @param isSelected - is selected
+ * @param text - text to draw
+ */
+void Draw_textBox(char x, char y, char width, char isSelected, const char* text)
+{
+
+	// draw a box for the text box
+	Draw_RectOutlineColor((short)x, (short)y, width, 11, isSelected ? 3 : 1);
+
+	// draw the text in the box
+	GrayDrawStr2B((short)x+2, (short)y+3, text, A_NORMAL, lightPlane, darkPlane);
+
+	// if we're selected, also draw the inverted box on both planes
+	if(isSelected)
+	{
+		short nameLen = (short)strlen(text) * 4;
+		FastFilledRect_Invert_R(lightPlane, (short)x+2, (short)y+2, (short)(x+3+nameLen), (short)(y+8));
+		FastFilledRect_Invert_R(darkPlane, (short)x+2, (short)y+2, (short)(x+3+nameLen), (short)(y+8));
+	}
+}

@@ -21,9 +21,7 @@ void Draw_renderWeaponSettingsMenu()
 	Draw_clearBuffers();
 
 	// draw title, with big font and shadow just on light plane
-	FontSetSys(F_8x10);
-	GrayDrawStr2B(1, 3, "Weapons Settings", A_NORMAL, lightPlane, lightPlane);
-	GrayDrawStr2B(0, 2, "Weapons Settings", A_XOR, lightPlane, darkPlane);
+	Draw_titleText("Weapon Stock");
 
 	// draw the x close & check accept buttons
 	Draw_XandCheck(BTN_ACCEPT);
