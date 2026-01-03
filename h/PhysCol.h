@@ -81,6 +81,9 @@ typedef struct{
 	// when this reaches 3, it will be considered "settled"
 	char staticFrames;
 	
+	// Explicit padding to ensure 'settled' pointer is 2-byte aligned
+	char _pad;
+	
 	// references to the settled bit wise long for this object
 	unsigned short *settled;
 	

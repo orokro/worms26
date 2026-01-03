@@ -77,7 +77,9 @@ void Explosion_dig(short x, short y, short s, char border)
 	short rCol = (r-(r%32))/32;
 	
 	// make virtual screen
-	void *virtual=malloc(LCD_SIZE);
+	// FIX: Must allocate 3840 bytes (240x128/8) because PortSet below uses 239,127.
+	// LCD_SIZE is only 2000 on TI-89, which causes a buffer overflow!
+	void *virtual=malloc(3840);
 	if(virtual == NULL) return;
 	
 	PortSet(virtual, 239, 127);

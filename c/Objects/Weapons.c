@@ -773,7 +773,8 @@ void doRayCastShot(short dirX, short dirY)
 	// perform a raycast to see what we hit
 	short spawnX = Worm_x[(short)Worm_currentWorm];
 	short spawnY = Worm_y[(short)Worm_currentWorm]+4;
-	RaycastHit hit = Game_raycast(spawnX, spawnY, dirX, dirY, TRUE);
+	RaycastHit hit;
+	Game_raycast(spawnX, spawnY, dirX, dirY, TRUE, &hit);
 
 	if(hit.hitType != RAY_HIT_NOTHING)
 	{

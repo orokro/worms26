@@ -125,9 +125,9 @@ extern short Game_ninjaRopeLength;
  * @param dirX - direction x component
  * @param dirY - direction y component
  * @param testWorms - if TRUE, test for worms in the raycast
- * @return RaycastHit - the result of the raycast
+ * @param result - pointer to store the result
  */
-extern RaycastHit Game_raycast(short originX, short originY, short dirX, short dirY, short testWorms);
+extern void Game_raycast(short originX, short originY, short dirX, short dirY, short testWorms, RaycastHit* result);
 
 
 /**

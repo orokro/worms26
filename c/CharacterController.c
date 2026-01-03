@@ -349,7 +349,8 @@ void wormBungee()
             if(ungroundedTimer >= 3) 
             {
                 // Raycast straight down from center of worm
-                RaycastHit hit = Game_raycast(*wX, *wY, 0, 1, FALSE);
+                RaycastHit hit;
+				Game_raycast(*wX, *wY, 0, 1, FALSE, &hit);
                 short dist = hit.y - *wY;
                 
                 // Activation Condition: falling over a gap or water

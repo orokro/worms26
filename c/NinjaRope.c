@@ -10,13 +10,35 @@
 	This file will be in-line included in CharacterController.c
 */
 
-#include <math.h>
+// #include <math.h> // Caused FPU Privilege Violation
 
 #ifndef PI
 #define PI 3.14159265358979323846
 #endif
 
 #define SIN_SCALE 8192
+
+/**
+ * @brief Integer atan2 approximation to avoid FPU usage
+ * Returns angle 0-360
+ */
+short fastAtan2(short y, short x)
+{
+    short absX = x < 0 ? -x : x;
+    short absY = y < 0 ? -y : y;
+    short angle;
+
+    if (x == 0 && y == 0) return 0;
+
+    if (absY == 0) angle = 0;
+    else if (absX == 0) angle = 90;
+    else if (absY <= absX) angle = (45 * absY) / absX;
+    else angle = 90 - ((45 * absX) / absY);
+
+    if (x < 0) angle = 180 - angle;
+    if (y < 0) angle = 360 - angle;
+    return angle;
+}
 
 /**
  * @brief computes fast sine from degrees
@@ -93,10 +115,23 @@ void updateNinjaRopeCurrentAngle()
     short wx = Worm_x[(short)Worm_currentWorm];
     short wy = Worm_y[(short)Worm_currentWorm];
 
-    // standard atan2(y, x)
-    // we want 0=Up, 90=Right, so atan2(dx, -dy)
-    double angle_rad = atan2((double)(wx - ax), (double)(ay - wy));
-    short newAngle = (short)(angle_rad * 180.0 / PI);
+    // FIX: Use integer math to avoid FPU usage (Privilege Violation)
+    short dx = wx - ax;
+    short dy = ay - wy;
+    
+    // We want 0=Up, 90=Right.
+    // fastAtan2 returns 0=Right (1,0), 90=Up (0,1).
+    // dx is Right. -dy is Up (since Y grows down).
+    // So fastAtan2(-dy, dx) -> 0=Right, 90=Up.
+    // We want 0=Up (which is 90 in math), 90=Right (which is 0 in math).
+    // So targetAngle = 90 - mathAngle.
+    
+    short mathAngle = fastAtan2(-dy, dx);
+    short newAngle = 90 - mathAngle;
+    
+    // Normalize newAngle to 0-360
+    while(newAngle < 0) newAngle += 360;
+    while(newAngle >= 360) newAngle -= 360;
 
 	// Make newAngle continuous with Game_ninjaRopeAngle
 	short diff = (newAngle - Game_ninjaRopeAngle) % 360;
@@ -236,7 +271,8 @@ char raycastForNewHitPoint()
     short rayDirX = (short)((long)dx * 10 / d_val);
     short rayDirY = (short)((long)dy * 10 / d_val);
 
-    RaycastHit hit = Game_raycast(wx, wy, rayDirX, rayDirY, FALSE);
+    RaycastHit hit;
+    Game_raycast(wx, wy, rayDirX, rayDirY, FALSE, &hit);
 	
 	if(hit.hitType != RAY_HIT_NOTHING)
 	{
@@ -279,7 +315,8 @@ char CharacterController_doInitialNinjaRopeShot(short dirX, short dirY)
 	const short wx = Worm_x[(short)Worm_currentWorm];
 	const short wy = Worm_y[(short)Worm_currentWorm];
 
-	RaycastHit hit = Game_raycast(wx, wy, dirX, dirY, FALSE);
+	RaycastHit hit;
+	Game_raycast(wx, wy, dirX, dirY, FALSE, &hit);
 
 	// draw a ray, regardless of whether we hit or not
 	short sx = wx, sy = wy, ex = (wx+(dirX*30)), ey = (wy+(dirY*30));

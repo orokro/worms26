@@ -447,7 +447,8 @@ char Map_findSpawnPoint(char type, short *outX, short *outY)
 		// 3. Find Land using Raycast
 		// Use Game_raycast to reduce code size
 		// startY is always >= 0, so no out-of-bounds bug
-		RaycastHit hit = Game_raycast(startX, startY, 0, 1, FALSE);
+		RaycastHit hit;
+		Game_raycast(startX, startY, 0, 1, FALSE, &hit);
 		
 		short hitY = -1;
 		
@@ -480,7 +481,8 @@ char Map_findSpawnPoint(char type, short *outX, short *outY)
 		// Headroom Check
 		if(checkHeadroom) {
 			// Scan UP from ground
-			RaycastHit headHit = Game_raycast(hit.x, hit.y - 4, 0, -1, FALSE);
+			RaycastHit headHit;
+			Game_raycast(hit.x, hit.y - 4, 0, -1, FALSE, &headHit);
 			if(headHit.hitType == RAY_HIT_LAND) {
 				short gap = hit.y - headHit.y;
 				if(gap < headroom) continue;

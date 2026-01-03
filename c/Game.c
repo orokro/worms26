@@ -644,20 +644,18 @@ char Game_checkWinConditions(){
  * @param dirX - direction x component
  * @param dirY - direction y component
  * @param testWorms - if TRUE, test for worms in the raycast
- * @return RaycastHit - the result of the raycast
+ * @param result - pointer to store the result
  */
-RaycastHit Game_raycast(short originX, short originY, short dirX, short dirY, short testWorms)
+void Game_raycast(short originX, short originY, short dirX, short dirY, short testWorms, RaycastHit* result)
 {
-    RaycastHit result;
-    
     // Default result: Hit nothing, end at the edge of the map/screen
-    result.hitType = RAY_HIT_NOTHING;
-    result.hitIndex = -1;
-    result.x = originX;
-    result.y = originY;
+    result->hitType = RAY_HIT_NOTHING;
+    result->hitIndex = -1;
+    result->x = originX;
+    result->y = originY;
 
     // 1. Safety check: prevent infinite loop if direction is 0
-    if(dirX == 0 && dirY == 0) return result;
+    if(dirX == 0 && dirY == 0) return;
 
     // 2. Setup Fixed Point Variables
     long curX = (long)originX << FP_SHIFT;
@@ -709,8 +707,8 @@ RaycastHit Game_raycast(short originX, short originY, short dirX, short dirY, sh
         // A. Check Bounds
         if(ix < 0 || ix >= 320 || iy < 0 || iy >= 200) 
 		{
-			result.x = ix;
-			result.y = iy;
+			result->x = ix;
+			result->y = iy;
 			break;
 		}
 
@@ -719,10 +717,10 @@ RaycastHit Game_raycast(short originX, short originY, short dirX, short dirY, sh
         // Assuming GetPixel returns TRUE if a pixel is set (land)
         if(Map_testPoint(ix, iy)) 
         {
-            result.x = ix;
-            result.y = iy;
-            result.hitType = RAY_HIT_LAND;
-            return result;
+            result->x = ix;
+            result->y = iy;
+            result->hitType = RAY_HIT_LAND;
+            return;
         }
 
         // C. Check Worms (Optional)
@@ -746,11 +744,11 @@ RaycastHit Game_raycast(short originX, short originY, short dirX, short dirY, sh
                 if(ix >= Worm_x[w] - 4 && ix <= Worm_x[w] + 4 &&
                    iy >= Worm_y[w] - 6 && iy <= Worm_y[w] + 5)
                 {
-                    result.x = ix;
-                    result.y = iy;
-                    result.hitType = RAY_HIT_WORM;
-                    result.hitIndex = w;
-                    return result;
+                    result->x = ix;
+                    result->y = iy;
+                    result->hitType = RAY_HIT_WORM;
+                    result->hitIndex = w;
+                    return;
                 }
             }
         }
@@ -762,7 +760,6 @@ RaycastHit Game_raycast(short originX, short originY, short dirX, short dirY, sh
     }
 
     // If we ran out of loops, return the last known position
-    result.x = (short)(curX >> FP_SHIFT);
-    result.y = (short)(curY >> FP_SHIFT);
-    return result;
+    result->x = (short)(curX >> FP_SHIFT);
+    result->y = (short)(curY >> FP_SHIFT);
 }
