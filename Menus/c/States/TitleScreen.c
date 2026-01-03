@@ -13,23 +13,18 @@
  */
 void Draw_renderTitleScreen()
 {
-	// gtfo if nothing has changed
-	if(screenIsStale==0)
-		return;
-
 	// start fresh
 	Draw_clearBuffers();
 
-	// draw title, with big font and shadow just on light plane
-	FontSetSys(F_8x10);
-	GrayDrawStr2B(18, 3, "Worms 68K Party", A_NORMAL, lightPlane, lightPlane);
-	GrayDrawStr2B(17, 2, "Worms 68K Party", A_XOR, lightPlane, darkPlane);
-
-	// draw the x close & check accept buttons
-	Draw_XandCheck(BTN_ACCEPT);
-
-	// we're done drawing
-	screenIsStale--;
+	short i=0;
+	for(i=0; i<5; i++)
+		GrayClipSprite32_OR_R(i*32, 0, 100, spr_TitleLight[i], spr_TitleDark[i], lightPlane, darkPlane);
+	
+	// hackishly draw mask for the button
+	const char offset = ((State_transitionTime>0) && (State_transitionButton & BTN_ACCEPT)) ? 2 : 0;
+	GrayClipSprite16_OR_R(140+offset, 76+offset, 20, spr_Check_Fill, spr_Check_Fill, lightPlane, darkPlane);
+	GrayClipSprite16_XOR_R(140+offset, 76+offset, 20, spr_Check_Fill, spr_Check_Fill, lightPlane, darkPlane);
+	GrayClipSprite16_OR_R(140+offset, 76+offset, 20, spr_Check_Outline, spr_Check_Outline, lightPlane, darkPlane);
 }
 
 
@@ -38,8 +33,7 @@ void Draw_renderTitleScreen()
 */
 static void TitleScreen_enter()
 {
-	// unlike other states, we'll only draw when there's changes, so let's draw once on start
-	screenIsStale = STALE;
+
 }
 
 
@@ -52,7 +46,11 @@ static void TitleScreen_update()
 
 	// this menu only has accept, so F5 returns to MatchMenu
 	if(Keys_keyUp(keyAction|keyF1|keyF5|keyEscape))
-		State_changeMode(menuMode_MainMenu, 0);
+	{
+		State_transitionButton = BTN_ACCEPT;
+		State_changeMode(menuMode_MainMenu, 3);
+	}
+		
 }
 
 

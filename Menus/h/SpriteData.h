@@ -97,6 +97,12 @@ extern const unsigned short spr_SelectionArrowFrame2[];
 
 extern const unsigned long spr_TeamTab[];
 
+#define NUM_TITLEDARK 5
+extern const unsigned long spr_TitleDark[][100];
+
+#define NUM_TITLELIGHT 5
+extern const unsigned long spr_TitleLight[][100];
+
 extern const unsigned short spr_Toggle[];
 
 extern const unsigned short spr_weaponSelect[];

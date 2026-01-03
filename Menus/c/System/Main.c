@@ -52,7 +52,7 @@ void _main(void)
 	
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	// Game_changeMode(menuMode_WormSelect);
-	State_changeMode(menuMode_MainMenu, 0);
+	State_changeMode(menuMode_TitleScreen, 0);
 	
 	// main loop!
 	GameRunning = TRUE;
