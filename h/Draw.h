@@ -61,12 +61,6 @@ extern void Draw_cake(short amount, short total);
 
 
 /**
- * @brief Clears both the light and dark drawing buffers
- */
-extern void Draw_clearBuffers();
-
-
-/**
  * Renders the map, items on it, and all game elements in general.
  *
  * Renders what is essential for the Game play, including:
@@ -151,24 +145,5 @@ extern void Draw_setRayLine(short sx, short sy, short ex, short ey);
  */
 extern void Draw_girder(short x, short y, char onMap);
 
-
-/**
- * @brief Draws a rectangle outline in the specified color
- * 
- * @param x - x
- * @param y - y
- * @param w - width
- * @param h - height
- * @param color - color code (0-3)
- */
-void Draw_RectOutlineColor(short x, short y, short w, short h, short color);
-
-
-/**
- * @brief Draws the F1 X and F5 check mark for menus
- * 
- * @param flags - which icons to draw
- */
-void Draw_XandCheck(char flags);
 
 #endif

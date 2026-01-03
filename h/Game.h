@@ -49,9 +49,6 @@ typedef struct {
 #define firstShotTaken  	0b00000100
 #define keepAimDuringUse	0b00001000
 
-// for making menu screens scale (minimum 4 redraws for safety)
-#define STALE 4
-
 // For max fuel allowed for jetpack
 #define MAX_JETPACK_FUEL 150
 

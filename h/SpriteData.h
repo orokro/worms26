@@ -11,19 +11,13 @@ extern const unsigned long spi_CandleCake_Dark[];
 
 extern const unsigned long spi_CandleCake_Light[];
 
+extern const unsigned char sprDudSmoke[];
+
 extern const unsigned char spr_chargeLarge[];
 
 extern const unsigned char spr_chargeMed[];
 
 extern const unsigned char spr_chargeSmall[];
-
-extern const unsigned short spr_Check_Fill[];
-
-extern const unsigned short spr_Check_Outline[];
-
-extern const unsigned short spr_Close_Fill[];
-
-extern const unsigned short spr_Close_Outline[];
 
 extern const unsigned long spr_Cloud_Dark[];
 
@@ -46,10 +40,6 @@ extern const unsigned char spr_CursorFillFlipped[];
 extern const unsigned char spr_CursorOutline[];
 
 extern const unsigned char spr_CursorOutlineFlipped[];
-
-extern const unsigned short spr_Disabled_Mask[];
-
-extern const unsigned short spr_Disabled_Outline[];
 
 extern const unsigned long spr_Donkey_Dark[];
 
@@ -75,14 +65,6 @@ extern const unsigned long spr_MB_Light[];
 
 extern const unsigned long spr_MB_Mask[];
 
-extern const unsigned long spr_MenuGame[];
-
-extern const unsigned long spr_MenuMatch[];
-
-extern const unsigned long spr_MenuTeams[];
-
-extern const unsigned long spr_MenuWeapons[];
-
 extern const unsigned char spr_Mine_Dark[];
 
 extern const unsigned char spr_Mine_Light[];
@@ -98,18 +80,6 @@ extern const unsigned short spr_OilLight[];
 
 extern const unsigned short spr_OilMask[];
 
-extern const unsigned short spr_Option_Artillery[];
-
-extern const unsigned char spr_Option_DudSmoke[];
-
-extern const unsigned short spr_Option_HealthHead[];
-
-extern const unsigned short spr_Option_HealthValues[];
-
-extern const unsigned short spr_Option_Mine[];
-
-extern const unsigned short spr_Option_Timer[];
-
 extern const unsigned short spr_Parachute[];
 
 extern const unsigned char spr_remote[];
@@ -123,8 +93,6 @@ extern const unsigned short spr_selectedWeaponBoxMask[];
 extern const unsigned short spr_SelectionArrowFrame1[];
 
 extern const unsigned short spr_SelectionArrowFrame2[];
-
-extern const unsigned long spr_TeamTab[];
 
 extern const unsigned short spr_timerBlink[];
 
@@ -153,7 +121,11 @@ extern const unsigned char spr_XSpot[];
 
 extern const unsigned char spr_XSpotMask[];
 
+extern const unsigned long tex_Ground1[];
+
 extern const unsigned long tex_Ground2[];
+
+extern const unsigned long tex_Ground3[];
 
 /* --- Worms Data --- */
 

@@ -120,24 +120,15 @@ char worldToScreen(short *x, short *y)
 
 
 /**
- * @brief Clears both drawing buffers
- */
-void Draw_clearBuffers()
-{
-	GrayDBufSetHiddenAMSPlane(DARK_PLANE);
-	ClrScr();
-	GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
-	ClrScr();
-}
-
-
-/**
  * main drawing routine for the game, e.g. map, worms, weapons, etc
  */
 void Draw_renderGame()
 {
 	// start fresh
-	Draw_clearBuffers();	
+	GrayDBufSetHiddenAMSPlane(DARK_PLANE);
+	ClrScr();
+	GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
+	ClrScr();
 	
 	// small fonts used in game, pause menu different
 	FontSetSys(F_4x6);

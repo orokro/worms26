@@ -228,11 +228,9 @@ char Game_aimAngle=10;
 // jet pack fuel
 unsigned char Game_jetPackFuel = MAX_JETPACK_FUEL;
 
+// free game for debugging
 char Game_debugFreeze = FALSE;
 
-// reusable vars for our main menu system
-char screenIsStale = TRUE;
-char menuItem =  0;
 
 /* 
 	For reference, Game modes:
@@ -275,12 +273,6 @@ void gameUpdates();
 #include "States/Death.c"
 #include "States/AfterTurn.c"
 #include "States/GameOver.c"
-#include "States/MainMenu.c"
-#include "States/MatchMenu.c"
-#include "States/WeaponSettings.c"
-#include "States/MatchSettings.c"
-#include "States/TeamSettings.c"
-#include "States/Loading.c"
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -366,24 +358,6 @@ void Game_update()
 		case gameMode_GameOver:
 			GameOver_update();
 			break;
-		case gameMode_MainMenu:
-			MainMenu_update();
-			break;
-		case gameMode_MatchMenu:
-			MatchMenu_update();
-			break;
-		case gameMode_WeaponsSettings:
-			WeaponSettings_update();
-			break;
-		case gameMode_MatchSettings:
-			MatchSettings_update();
-			break;
-		case gameMode_TeamSettings:
-			TeamSettings_update();
-			break;
-		case gameMode_Loading:
-			Loading_update();
-			break;
 	}	
 }
 
@@ -425,24 +399,6 @@ void Game_changeMode(char newMode)
 		case gameMode_GameOver:
 			GameOver_exit();
 			break;
-		case gameMode_MainMenu:
-			MainMenu_exit();
-			break;
-		case gameMode_MatchMenu:
-			MatchMenu_exit();
-			break;
-		case gameMode_WeaponsSettings:
-			WeaponSettings_exit();
-			break;
-		case gameMode_MatchSettings:
-			MatchSettings_exit();
-			break;
-		case gameMode_TeamSettings:
-			TeamSettings_exit();
-			break;
-		case gameMode_Loading:
-			Loading_exit();
-			break;
 	}	
 	
 	// save our current mode as our previous mode
@@ -480,24 +436,6 @@ void Game_changeMode(char newMode)
 			break;
 		case gameMode_GameOver:
 			GameOver_enter();
-			break;
-		case gameMode_MainMenu:
-			MainMenu_enter();
-			break;
-		case gameMode_MatchMenu:
-			MatchMenu_enter();
-			break;
-		case gameMode_WeaponsSettings:
-			WeaponSettings_enter();
-			break;
-		case gameMode_MatchSettings:
-			MatchSettings_enter();
-			break;
-		case gameMode_TeamSettings:
-			TeamSettings_enter();
-			break;
-		case gameMode_Loading:
-			Loading_enter();
 			break;
 	}	
 }
