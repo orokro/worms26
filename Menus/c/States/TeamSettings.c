@@ -99,10 +99,8 @@ void handleTextEdit(char* buffer, short maxLen)
     // Handle Alpha Input (while editing)
     if (currentAlpha)
 	{
-
         if (currentAlpha != teamSettings_lastAlpha)
 		{
-
             // Append char
             short len = (short)strlen(buffer);
 
@@ -248,7 +246,6 @@ static void TeamSettings_update()
 	if (editBuffer) {
 		handleTextEdit(editBuffer, editMaxLen);
 	}
-
 
 	// this only has check, so F5 returns to MatchMenu
 	if(Keys_keyUp(keyF5|keyEscape))
