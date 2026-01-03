@@ -145,6 +145,7 @@ static void MatchMenu_update()
 	if(Keys_keyUp(keyF5))
 	{
 		State_transitionButton = BTN_ACCEPT;
+		App_exitRequested = FALSE;
 		State_changeMode(menuMode_SaveAndExit, 3);
 	}
 		

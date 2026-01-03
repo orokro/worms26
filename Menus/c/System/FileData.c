@@ -10,6 +10,10 @@
 #include "FileData.h"
 #include "State.h"
 #include "Match.h"
+#include <stdio.h>
+#include <string.h>
+#include <statline.h> // Required for ST_helpMsg
+#include <kbd.h>      // Required for ngetchx
 
 
 /**
@@ -94,15 +98,55 @@ void FileData_setGameDefaults()
  */
 void FileData_loadData()
 {	
-	FileData_setGameDefaults();
+	FILE *f = fopen("wormsdat", "rb");
 
-	// gemini here
-	// load data from "wormsdat" file & populate variables variables, like in FileData_setGameDefaults
-	// but from the file instead.
-	// if the file doesn't exist, call FileData_setGameDefaults() to set defaults
-	// and then attempt to save the file with the new defaults
-	// if save fails, exit the app with an error message on status bar
-	// note: we don't need to load in the first byte, which is only for the other program that reads this file.
+	// If file does not exist, set defaults and try to create it
+	if (!f)
+	{
+		FileData_setGameDefaults();
+		FileData_saveData();
+		return;
+	}
+
+	// Skip the first byte (Status byte for the wrapper program)
+	fseek(f, 1, SEEK_SET);
+
+	// Read variables in the exact same order they are saved
+	// We check the result of fread to ensure the file isn't corrupt
+	size_t result = 1;
+	
+	result &= fread(Match_wormCount, sizeof(char), 2, f);
+	result &= fread(Match_gravestones, sizeof(char), 2, f);
+	
+	result &= fread(&Match_wormStartHealth, sizeof(unsigned char), 1, f);
+	result &= fread(&Match_allowWormSelection, sizeof(char), 1, f);
+	result &= fread(&Match_artilleryMode, sizeof(char), 1, f);
+	result &= fread(&Match_turnTime, sizeof(char), 1, f);
+	result &= fread(&Match_strategicPlacement, sizeof(char), 1, f);
+	
+	result &= fread(&Match_minesEnabled, sizeof(char), 1, f);
+	result &= fread(&Match_mineFuseLength, sizeof(char), 1, f);
+	result &= fread(&Match_dudMines, sizeof(char), 1, f);
+	result &= fread(&Match_oilDrumsEnabled, sizeof(char), 1, f);
+	
+	result &= fread(&Match_toolCratesEnabled, sizeof(char), 1, f);
+	result &= fread(&Match_healthCratesEnabled, sizeof(char), 1, f);
+	result &= fread(&Match_weaponCratesEnabled, sizeof(char), 1, f);
+	
+	result &= fread(&Match_mapType, sizeof(char), 1, f);
+	result &= fread(&Match_drawingFlags, sizeof(char), 1, f);
+	
+	result &= fread(Match_defaultWeapons, sizeof(short), 65, f);
+	result &= fread(Match_teamNames, sizeof(char) * 10, 2, f);
+	result &= fread(Match_wormNames, sizeof(char) * 12, MAX_WORMS, f);
+
+	fclose(f);
+
+	// If reading failed (corrupt or short file), force defaults
+	if (!result) {
+		FileData_setGameDefaults();
+		FileData_saveData();
+	}
 }
 
 
@@ -111,10 +155,56 @@ void FileData_loadData()
  */
 void FileData_saveData()
 {
-	// gemini here
-	// save current data to "wormsdat" file
-	// NOTE: the first byte must be 1 if App_exitRequested==TRUE
-	// so that WWP knows the game was exited properly
-	// if App_exitRequested==FALSE, first byte must be 0
-	// if save fails, exit the app with an error message on status bar
+	FILE *f = fopen("wormsdat", "wb");
+
+	if (!f)
+	{
+		ST_helpMsg("Err: Could not create save file.");
+		ngetchx();
+		exit(0);
+	}
+
+	// 1. Write the Status Byte
+	// 1 if Exit Requested (Proper Quit), 0 otherwise
+	unsigned char statusByte = (App_exitRequested == TRUE) ? 1 : 0;
+	fwrite(&statusByte, sizeof(unsigned char), 1, f);
+
+	// 2. Write all Game Settings
+	// Note: We ignore return values here for brevity, but we check ferror/feof implicitly
+	// by assuming if fopen worked, we have space.
+	
+	fwrite(Match_wormCount, sizeof(char), 2, f);
+	fwrite(Match_gravestones, sizeof(char), 2, f);
+	
+	fwrite(&Match_wormStartHealth, sizeof(unsigned char), 1, f);
+	fwrite(&Match_allowWormSelection, sizeof(char), 1, f);
+	fwrite(&Match_artilleryMode, sizeof(char), 1, f);
+	fwrite(&Match_turnTime, sizeof(char), 1, f);
+	fwrite(&Match_strategicPlacement, sizeof(char), 1, f);
+	
+	fwrite(&Match_minesEnabled, sizeof(char), 1, f);
+	fwrite(&Match_mineFuseLength, sizeof(char), 1, f);
+	fwrite(&Match_dudMines, sizeof(char), 1, f);
+	fwrite(&Match_oilDrumsEnabled, sizeof(char), 1, f);
+	
+	fwrite(&Match_toolCratesEnabled, sizeof(char), 1, f);
+	fwrite(&Match_healthCratesEnabled, sizeof(char), 1, f);
+	fwrite(&Match_weaponCratesEnabled, sizeof(char), 1, f);
+	
+	fwrite(&Match_mapType, sizeof(char), 1, f);
+	fwrite(&Match_drawingFlags, sizeof(char), 1, f);
+	
+	fwrite(Match_defaultWeapons, sizeof(short), 65, f);
+	fwrite(Match_teamNames, sizeof(char) * 10, 2, f);
+	fwrite(Match_wormNames, sizeof(char) * 12, MAX_WORMS, f);
+
+	// Check for write errors (like full memory)
+	if (ferror(f)) {
+		fclose(f);
+		ST_helpMsg("Err: Memory Full / Save Failed");
+		ngetchx();
+		exit(0);
+	}
+
+	fclose(f);
 }

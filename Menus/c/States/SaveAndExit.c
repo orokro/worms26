@@ -11,6 +11,24 @@
 
 
 /**
+ * @brief Writes a string file "wormrun" with the exit status for the wrapper program.
+ * 
+ * @param App_exitRequested 
+ */
+void write_wormrun(int App_exitRequested)
+{
+	FILE *f = fopen("wormrun", "wb");	// BINARY, not "w"
+	if (!f) return;
+
+	fputc(0, f);						// leading 0 byte
+	fputc(App_exitRequested ? '1' : '0', f);
+	fputc(0, f);						// terminating 0 byte
+	fputc(STR_TAG, f);					// 0x2D
+	fclose(f);
+}
+
+
+/**
 	Called on the first-frame when the Games state machine is set to SaveAndExit mode.
 */
 static void SaveAndExit_enter()
@@ -20,6 +38,9 @@ static void SaveAndExit_enter()
 
 	// attempt to save our settings to the wormsdat file
 	FileData_saveData();
+
+	// write the wormrun file for the wrapper program
+	write_wormrun(App_exitRequested);
 
 	// gtfo of the game after saving settings
 	GameRunning = FALSE;
