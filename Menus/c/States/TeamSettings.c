@@ -7,6 +7,13 @@
 	This handles the TeamSettings state machine specific code.
 */
 
+// help strings
+const char *teamMenuText[5] = {
+	"Edit Team Name",
+	"+/- To Change Grave Stone",
+	"Edit Worm Name",	
+};
+
 // which team tab is currently focused
 char tab = 0;
 
@@ -16,6 +23,21 @@ const unsigned char* graves[] = {
 	spr_Grave2,
 	spr_Grave3
 };
+
+// local var now that we have a new app
+char teamSettings_menuItem = 0;
+
+// define menu item ids
+#define MENU_ITEM_TEAM_NAME        0
+#define MENU_ITEM_GRAVESTONE       1
+#define MENU_ITEM_TEAM_MEMBER_1    2
+#define MENU_ITEM_TEAM_MEMBER_2    3
+#define MENU_ITEM_TEAM_MEMBER_3    4
+#define MENU_ITEM_TEAM_MEMBER_4    5
+#define MENU_ITEM_TEAM_MEMBER_5    6
+#define MENU_ITEM_TEAM_MEMBER_6    7
+#define MENU_ITEM_TEAM_MEMBER_7    8
+#define MENU_ITEM_TEAM_MEMBER_8    9
 
 
 /**
@@ -32,6 +54,9 @@ void Draw_renderTeamSettingsMenu()
 
 	// draw title, with big font and shadow just on light plane
 	Draw_titleText("Team Settings");
+
+	// draw help text based on menu item
+	Draw_helpText(76, teamSettings_menuItem<2 ? teamMenuText[(short)teamSettings_menuItem] : teamMenuText[2]);
 
 	// draw the x close & check accept buttons
 	Draw_XandCheck(BTN_ACCEPT);
@@ -64,10 +89,11 @@ void Draw_renderTeamSettingsMenu()
 
 	// draw the text box rectangles
 	// team name
-	Draw_textBox(5, 26, 47, menuItem==0, Match_teamNames[(short)tab]);
+	Draw_textBox(5, 26, 47, teamSettings_menuItem==MENU_ITEM_TEAM_NAME, Match_teamNames[(short)tab]);
 
-	// square box for grave stone
-	Draw_RectOutlineColor(17, 46, 18, 18, menuItem==1 ? 3 : 1);
+	// square box for grave stone with sprite inside
+	Draw_RectOutlineColor(17, 46, 18, 18, teamSettings_menuItem==MENU_ITEM_GRAVESTONE ? 3 : 1);
+	GrayClipSprite8_OR_R(22, 49, 12, graves[(short)Match_gravestones[(short)tab]], graves[(short)Match_gravestones[(short)tab]], lightPlane, darkPlane);
 
 	// draw text for minus and + on both sides of the gravestone box
 	GrayDrawStr2B(11, 52, "-", A_NORMAL, lightPlane, darkPlane);
@@ -79,13 +105,10 @@ void Draw_renderTeamSettingsMenu()
 	{
 		char x = 55 + ((i%2) * 49);
 		char y = 26 + ((i/2) * 10);
-		Draw_textBox(x, y, 50, (menuItem-2)==i, Match_wormNames[(short)(tab*8)+i]);
+		Draw_textBox(x, y, 50, (teamSettings_menuItem-2)==i, Match_wormNames[(short)(tab*8)+i]);
 
-		Draw_RectOutlineColor(x, y, 50, 11, 1);
+		Draw_RectOutlineColor(x, y, 50, 11, (teamSettings_menuItem-2)==i ? 3 : 1);
 	}
-
-	// draw the gravestone sprite in the box
-	GrayClipSprite8_OR_R(22, 49, 12, graves[(short)Match_gravestones[(short)tab]], graves[(short)Match_gravestones[(short)tab]], lightPlane, darkPlane);
 
 	// we're done drawing
 	screenIsStale--;
@@ -100,8 +123,7 @@ static void TeamSettings_enter()
 	// unlike other states, we'll only draw when there's changes, so let's draw once on start
 	screenIsStale = STALE;
 
-	// start with first menu item selected
-	menuItem = 0;
+	teamSettings_menuItem = 0;
 }
 
 
@@ -113,19 +135,19 @@ static void TeamSettings_update()
 	Draw_renderTeamSettingsMenu();
 
 	// this only has check, so F5 returns to MatchMenu
-	if(Keys_keyUp(keyF5))
+	if(Keys_keyUp(keyF5|keyEscape))
 		State_changeMode(menuMode_MainMenu);
 
 	// increase / decrease menu item with left/right
 	if(Keys_keyDown(keyLeft))
 	{
-		if(menuItem>0)
-			menuItem--;
+		if(teamSettings_menuItem>0)
+			teamSettings_menuItem--;
 	}
 	else if(Keys_keyDown(keyRight))
 	{
-		if(menuItem<9)
-			menuItem++;
+		if(teamSettings_menuItem<9)
+			teamSettings_menuItem++;
 	}
 
 	// f1 and f1 select team 0 and 1 respectively
@@ -135,7 +157,7 @@ static void TeamSettings_update()
 		tab = 1;
 
 	// if plus or minus pressed while gravestone selected, change it
-	if(menuItem==1)
+	if(teamSettings_menuItem==1)
 	{
 		if(Keys_keyUp(keyMinus) && Match_gravestones[(short)tab]>0)
 			Match_gravestones[(short)tab]--;

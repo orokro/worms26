@@ -51,7 +51,7 @@ extern void Draw_XandCheck(char flags);
  * 
  * @param text - text to draw
  */
-extern void Draw_helpText(const char* text);
+extern void Draw_helpText(char y, const char* text);
 
 
 /**

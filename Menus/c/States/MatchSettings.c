@@ -8,6 +8,9 @@
 */
 
 
+// local var now that we have a new app
+char matchSettings_menuItem = 0;
+
 /**
  * main drawing routine for the MatchSettings menu
  */
@@ -22,7 +25,7 @@ void Draw_renderMatchSettingsMenu()
 
 	// draw title, with big font and shadow just on light plane
 	Draw_titleText("Match Settings");
-
+	
 	// draw the x close & check accept buttons
 	Draw_XandCheck(BTN_ACCEPT);
 
@@ -38,9 +41,6 @@ static void MatchSettings_enter()
 {
 	// unlike other states, we'll only draw when there's changes, so let's draw once on start
 	screenIsStale = STALE;
-
-	// start with first menu item selected
-	menuItem = 0;
 }
 
 
@@ -52,7 +52,7 @@ static void MatchSettings_update()
 	Draw_renderMatchSettingsMenu();
 
 	// this menu only has accept, so F5 returns to MatchMenu
-	if(Keys_keyUp(keyF5))
+	if(Keys_keyUp(keyF5|keyEscape))
 		State_changeMode(menuMode_MatchMenu);
 }
 

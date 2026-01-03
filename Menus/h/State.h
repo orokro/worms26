@@ -25,7 +25,7 @@ enum MenuModes {
 };
 
 // for making menu screens scale (minimum 4 redraws for safety)
-#define STALE 4
+#define STALE 3
 
 
 // state function prototypes

@@ -92,9 +92,13 @@ extern const unsigned short spr_weaponSelect[];
 #define NUM_WEAPONS 76
 extern const unsigned short spr_weapons[][11];
 
+extern const unsigned long tex_Ground1[];
+
 extern const unsigned long tex_Ground2[];
 
 extern const unsigned long tex_Ground3[];
+
+extern const unsigned short worm_IDLE_Mask[];
 
 extern const unsigned short worm_IDLE_Outline[];
 

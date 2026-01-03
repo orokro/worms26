@@ -100,14 +100,15 @@ void Draw_XandCheck(char flags)
 /**
  * @brief draws help text at bottom of screen	
  * 
- * @param text - text to draw
+ * @param y - y position
+ * @param text - text to dra
  */
-void Draw_helpText(const char* text)
+void Draw_helpText(char y, const char* text)
 {
 	// draw help text at bottom of screen
 	FontSetSys(F_4x6);
 	const short left = (160 - (strlen(text) * 4)) / 2;
-	GrayDrawStr2B(left, 86, text, A_NORMAL, lightPlane, darkPlane);
+	GrayDrawStr2B(left, y, text, A_NORMAL, lightPlane, darkPlane);
 }
 
 

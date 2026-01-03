@@ -8,6 +8,9 @@
 */
 
 
+// local var now that we have a new app
+char weaponSettings_menuItem = 0;
+
 /**
  * main drawing routine for the WeaponSettings menu
  */
@@ -38,9 +41,6 @@ static void WeaponSettings_enter()
 {
 	// unlike other states, we'll only draw when there's changes, so let's draw once on start
 	screenIsStale = STALE;
-
-	// start with first menu item selected
-	menuItem = 0;
 }
 
 
@@ -50,6 +50,10 @@ static void WeaponSettings_enter()
 static void WeaponSettings_update()
 {
 	Draw_renderWeaponSettingsMenu();
+
+	// this only has check, so F5 returns to MatchMenu
+	if(Keys_keyUp(keyF5|keyEscape))
+		State_changeMode(menuMode_MatchMenu);
 }
 
 
