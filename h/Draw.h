@@ -12,6 +12,9 @@
 #include "SpriteData.h"
 
 // Draw defines
+#define BTN_CHECK  0b00000001
+#define BTN_ACCEPT 0b00000001
+#define BTN_CLOSE  0b00000010
 
 
 // Draw globals
@@ -141,5 +144,6 @@ extern void Draw_setRayLine(short sx, short sy, short ex, short ey);
  * @param onMap - is this being drawn on the map?
  */
 extern void Draw_girder(short x, short y, char onMap);
+
 
 #endif

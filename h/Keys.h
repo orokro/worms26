@@ -35,18 +35,21 @@
 #define keyAction2 (long)262144		//00000000000001000000000000000000
 #define keyExit (long)524288		//00000000000010000000000000000000
 #define keyF1 (long)1048576			//00000000000100000000000000000000
-#define keyF5 (long)2097152			//00000000001000000000000000000000
-#define keyPlus (long)4194304		//00000000010000000000000000000000
-#define keyMinus (long)8388608		//00000000100000000000000000000000
+#define keyF2 (long)2097152			//00000000001000000000000000000000
+#define keyF5 (long)4194304			//00000000010000000000000000000000
+#define keyPlus (long)8388608		//00000000100000000000000000000000
+#define keyMinus (long)16777216		//00000001000000000000000000000000
 
 
 // note this key: because it's all 1's, it will always return true when & on any other int,
 // so long as at least ONE bit is set. This way, we can test for any-key
-#define keyAny (long)262143				//00000000000001111111111111111111
+#define keyAny (long)67108863		//00000000000001111111111111111111
 
 // this works similar to keyAny, except just for the direction keys
 #define keyCursors (long)1920			//00000000000000000000011110000000
 
+
+extern long keysDown, keysState, keysUp;
 
 // keys function prototypes
 
@@ -68,7 +71,11 @@ extern void Keys_update();
  * @param keyCode the bitmask for our logical key
  * @return a boolean char set to 0 or 1 if the key is down
 */
-extern char Keys_keyDown(long);
+static inline char Keys_keyDown(long keyCode)
+{
+	// return if the key is down on this frame:
+	return (char)((keysDown & keyCode)>0);
+}
 
 
 /**
@@ -77,7 +84,11 @@ extern char Keys_keyDown(long);
  * @param keyCode the bitmask for our logical key
  * @return a boolean char set to 0 or 1 if the key is pressed
 */
-extern char Keys_keyState(long);
+static inline char Keys_keyState(long keyCode)
+{
+	// return if key is currently down on this frame
+	return (char)((keysState & keyCode)>0);
+}
 
 
 /**
@@ -86,6 +97,10 @@ extern char Keys_keyState(long);
  * @param keyCode the bitmask for our logical key
  * @return a boolean char set to 0 or 1 if the key is let up
 */
-extern char Keys_keyUp(long);
+static inline char Keys_keyUp(long keyCode)
+{
+	// return if the key is let up on this frame:
+	return (char)((keysUp & keyCode)>0);
+}
 
 #endif

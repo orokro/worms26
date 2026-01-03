@@ -119,14 +119,12 @@ char worldToScreen(short *x, short *y)
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 
-
 /**
  * main drawing routine for the game, e.g. map, worms, weapons, etc
  */
 void Draw_renderGame()
 {
-	// maindraw
-
+	// start fresh
 	GrayDBufSetHiddenAMSPlane(DARK_PLANE);
 	ClrScr();
 	GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);

@@ -188,7 +188,7 @@ void _main(void)
 	
 	// render the map and spawn items on the map (worms, oil drums, etc)
 	Map_makeMap();
-	
+
 	// enable double-buffering
 	GrayDBufInit(dbuffer);
 	GblDBuffer=dbuffer;
@@ -198,7 +198,9 @@ void _main(void)
 	
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	Game_changeMode(gameMode_WormSelect);
-
+	
+	Draw_cake(0,1);
+	
 	// generates masks for worms that are missing them in ROM
 	GenerateWormMasks();
 

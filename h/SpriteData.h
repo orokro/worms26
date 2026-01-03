@@ -11,6 +11,8 @@ extern const unsigned long spi_CandleCake_Dark[];
 
 extern const unsigned long spi_CandleCake_Light[];
 
+extern const unsigned char sprDudSmoke[];
+
 extern const unsigned char spr_chargeLarge[];
 
 extern const unsigned char spr_chargeMed[];
@@ -49,6 +51,10 @@ extern const unsigned char spr_Fuel[];
 
 extern const unsigned char spr_Grave[];
 
+extern const unsigned char spr_Grave2[];
+
+extern const unsigned char spr_Grave3[];
+
 extern const unsigned char spr_launcher[];
 
 extern const unsigned short spr_Leaf[];
@@ -66,9 +72,9 @@ extern const unsigned char spr_Mine_Light[];
 #define NUM_MOUNTAIN 5
 extern const unsigned long spr_Mountain[][38];
 
-extern const unsigned short spr_OilDark[];
+extern const unsigned char spr_NoSelectArrow[];
 
-extern const unsigned char spr_OilDrum[];
+extern const unsigned short spr_OilDark[];
 
 extern const unsigned short spr_OilLight[];
 
@@ -114,6 +120,12 @@ extern const unsigned long spr_WindMeter_Mask[];
 extern const unsigned char spr_XSpot[];
 
 extern const unsigned char spr_XSpotMask[];
+
+extern const unsigned long tex_Ground1[];
+
+extern const unsigned long tex_Ground2[];
+
+extern const unsigned long tex_Ground3[];
 
 /* --- Worms Data --- */
 

@@ -132,6 +132,7 @@
 
 const SCR_RECT fullScreen = {{0, 0, 159, 99}};
  
+
 // vars
 
 // current game mode!
@@ -227,7 +228,9 @@ char Game_aimAngle=10;
 // jet pack fuel
 unsigned char Game_jetPackFuel = MAX_JETPACK_FUEL;
 
+// free game for debugging
 char Game_debugFreeze = FALSE;
+
 
 /* 
 	For reference, Game modes:
@@ -270,7 +273,6 @@ void gameUpdates();
 #include "States/Death.c"
 #include "States/AfterTurn.c"
 #include "States/GameOver.c"
-
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------

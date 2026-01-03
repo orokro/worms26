@@ -32,16 +32,14 @@
  * @param right - how far right to test
  * @returns - the new Collider object
  */
-Collider new_Collider(unsigned char type, char up, char down, char left, char right)
+void new_Collider(Collider *obj, unsigned char type, char up, char down, char left, char right)
 {
-	Collider new;
-	new.type = type;
-	new.u = up;
-	new.d = down;
-	new.l = left;
-	new.r = right;
-	new.collisions = 0;
-	return new; 
+	obj->type = type;
+	obj->u = up;
+	obj->d = down;
+	obj->l = left;
+	obj->r = right;
+	obj->collisions = 0;
 }
 
 
@@ -59,23 +57,20 @@ Collider new_Collider(unsigned char type, char up, char down, char left, char ri
  * @param c - the collider to test for
  * @returns - the new PhysObj
  */	
-PhysObj new_PhysObj(short *x, short *y, char *xVelo, char *yVelo, float bounciness, float smoothness, char objIndex, unsigned short *settled, Collider c)
+void new_PhysObj(PhysObj *obj, short *x, short *y, char *xVelo, char *yVelo, char bounciness, char smoothness, char objIndex, unsigned short *settled)
 {
-	PhysObj new;
-	new.x = x;
-	new.y = y;
-	new.xVelo = xVelo;
-	new.yVelo = yVelo;
-	new.bouncinessX = bounciness;
-	new.bouncinessY = bounciness;
-	new.smoothness = (char)(smoothness*100);
-	new.settled = settled;
-	new.col = c;
-	new.index = objIndex;
-	new.lastX = 0;
-	new.lastY = 0;
-	new.staticFrames = 0;
-	return new;
+	obj->x = x;
+	obj->y = y;
+	obj->xVelo = xVelo;
+	obj->yVelo = yVelo;
+	obj->bouncinessX = ((float)bounciness)/100;
+	obj->bouncinessY = obj->bouncinessX;
+	obj->smoothness = smoothness;
+	obj->settled = settled;
+	obj->index = objIndex;
+	obj->lastX = 0;
+	obj->lastY = 0;
+	obj->staticFrames = 0;
 }
 
 

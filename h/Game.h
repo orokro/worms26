@@ -19,7 +19,13 @@ enum GameModes {
 	gameMode_TurnEnd,
 	gameMode_Death,
 	gameMode_AfterTurn,
-	gameMode_GameOver
+	gameMode_GameOver,
+	gameMode_MainMenu,
+	gameMode_MatchMenu,
+	gameMode_WeaponsSettings,
+	gameMode_MatchSettings,
+	gameMode_TeamSettings,
+	gameMode_Loading,
 };
 
 // Enum for what the ray hit
@@ -44,7 +50,7 @@ typedef struct {
 #define keepAimDuringUse	0b00001000
 
 // For max fuel allowed for jetpack
-#define MAX_JETPACK_FUEL 150.0
+#define MAX_JETPACK_FUEL 150
 
 // total ninja rope points allowed
 #define MAX_NINJA_ROPE_POINTS 32	

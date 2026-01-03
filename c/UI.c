@@ -304,7 +304,7 @@ void Draw_HUD()
 	{
 		GrayClipSprite8_OR_R(2, 2, 17, spr_Fuel, spr_Fuel, lightPlane, darkPlane);
 
-		const short fuelHeight = (short)((float)((float)(MAX_JETPACK_FUEL-(float)Game_jetPackFuel) / MAX_JETPACK_FUEL) * 15.0);
+		const short fuelHeight = 15 * (MAX_JETPACK_FUEL - Game_jetPackFuel) / MAX_JETPACK_FUEL;
 
 		if(fuelHeight>0)
 		{
@@ -338,7 +338,7 @@ void Draw_cake(short amount, short total)
 	ClipSprite32_OR_R(64, 38, 23, spi_CandleCake_Light, lightPlane);	
 	
 	char progStr[40];
-	sprintf(progStr, "Loading... %d%%", (short)((float)((float)amount/(float)total)*100));
+	sprintf(progStr, "Loading... %d%%", 100*amount/total);
 	DrawStr(40,70, progStr, A_NORMAL);	
 
 	// now flip the planes
@@ -529,4 +529,3 @@ void drawWeaponDetails()
 					
 	}
 }
-

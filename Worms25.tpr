@@ -9,8 +9,8 @@ Copy Data Variable if Archived=1
 Pack=0
 Packed Variable=wdata
 Project Name=Worms25
-GCC Switches=-Os -Wall -W -Wwrite-strings -ffunction-sections -fdata-sections -Ih -I..\h -I..\..\h
-GNU Assembler Switches=
+GCC Switches=-Os -mregparm=5 -fomit-frame-pointer -Wall -W -Wwrite-strings -ffunction-sections -fdata-sections -Ih -I..\h -I..\..\h
+GNU Assembler Switches=--all-relocs
 Assembler Switches=-g -t
 Debug Info=0
 Standard Library=1
@@ -38,10 +38,10 @@ Use PreOS=0
 Minimum AMS Version Defined=1
 Minimum AMS Version=1.00
 Unofficial OS Support=0
-Reloc Format=AMS
+Reloc Format=Compressed
 ROM Call Format=Direct
-BSS Ref Format=Kernel
-Data Ref Format=Kernel
+BSS Ref Format=Compressed
+Data Ref Format=Compressed
 Use F-Line Jumps=0
 Use 4-Byte F-Line Jumps=0
 Optimize ROM Calls=0
@@ -50,7 +50,7 @@ Use Return Value=0
 Enable Error Return=0
 Save Screen=1
 [File Editing]
-Open File=C:\Users\geem4\Desktop\worms17\c\States\MatchMenu.c
+Open File=C:\Users\geem4\Desktop\worms17\c\States\WormSelect.c
 [Included Files]
 C File 1=c\PhysCol.c
 C File 2=c\Match.c
