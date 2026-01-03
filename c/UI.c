@@ -338,6 +338,7 @@ void Draw_cake(short amount, short total)
 	ClipSprite32_OR_R(64, 38, 23, spi_CandleCake_Light, lightPlane);	
 	
 	char progStr[40];
+	FontSetSys(F_6x8);
 	sprintf(progStr, "Loading... %d%%", 100*amount/total);
 	DrawStr(40,70, progStr, A_NORMAL);	
 
