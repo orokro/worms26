@@ -52,7 +52,7 @@ void _main(void)
 	
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	// Game_changeMode(menuMode_WormSelect);
-	State_changeMode(menuMode_MainMenu);
+	State_changeMode(menuMode_TitleScreen, 0);
 	
 	// main loop!
 	GameRunning = TRUE;
@@ -62,8 +62,11 @@ void _main(void)
 		// (the pause menu also provides a method to exit the game)
 		//if(Keys_keyState(keyAction) && Keys_keyDown(keyEscape))
 		//	GameRunning=FALSE;
-		if(Keys_keyDown(keyExit))
-			GameRunning=FALSE;
+		if(Keys_keyDown(keyEscape) && Keys_keyState(keyShift))
+		{
+			App_exitRequested = TRUE;
+			State_changeMode(menuMode_SaveAndExit, 3);
+		}
 
 		// update game logic
 		State_update();

@@ -136,22 +136,53 @@ static void MatchMenu_update()
 
 	// F1 returns to main menu
 	if(Keys_keyUp(keyF1|keyEscape))
-		State_changeMode(menuMode_MainMenu);
+	{
+		State_transitionButton = BTN_CLOSE;
+		State_changeMode(menuMode_MainMenu, 3);
+	}
 	
 	// F5 starts game (WormSelect for now)
 	if(Keys_keyUp(keyF5))
-		State_changeMode(menuMode_SaveAndExit);
-
-	// increase / decrease menu item with left/right
+	{
+		State_transitionButton = BTN_ACCEPT;
+		App_exitRequested = FALSE;
+		State_changeMode(menuMode_SaveAndExit, 3);
+	}
+		
+	// left and right navigation
 	if(Keys_keyDown(keyLeft))
 	{
-		if(match_menuItem>0)
-			match_menuItem--;
+		if(match_menuItem==MENU_ITEM_TEAM_1 || match_menuItem==MENU_ITEM_TEAM_2)
+			match_menuItem=MENU_ITEM_MAP_TYPE;
+		else if(match_menuItem==MENU_ITEM_MATCH)
+			match_menuItem=MENU_ITEM_WEAPONS;
 	}
 	else if(Keys_keyDown(keyRight))
 	{
-		if(match_menuItem<4)
-			match_menuItem++;
+		if(match_menuItem==MENU_ITEM_MAP_TYPE)
+			match_menuItem=MENU_ITEM_TEAM_1;
+		else if(match_menuItem==MENU_ITEM_WEAPONS)
+			match_menuItem=MENU_ITEM_MATCH;
+	}
+
+	// up and down navigation
+	if(Keys_keyDown(keyUp))
+	{	
+		if(match_menuItem==MENU_ITEM_WEAPONS)
+			match_menuItem=MENU_ITEM_MAP_TYPE;
+		else if(match_menuItem==MENU_ITEM_TEAM_2)
+			match_menuItem=MENU_ITEM_TEAM_1;
+		else if(match_menuItem==MENU_ITEM_MATCH)
+			match_menuItem=MENU_ITEM_TEAM_2;
+	}
+	else if(Keys_keyDown(keyDown))
+	{
+		if(match_menuItem==MENU_ITEM_MAP_TYPE)
+			match_menuItem=MENU_ITEM_WEAPONS;
+		else if(match_menuItem==MENU_ITEM_TEAM_1)
+			match_menuItem=MENU_ITEM_TEAM_2;
+		else if(match_menuItem==MENU_ITEM_TEAM_2)
+			match_menuItem=MENU_ITEM_MATCH;
 	}
 
 	// if we're on map type, +/- changes it
@@ -186,9 +217,9 @@ static void MatchMenu_update()
 	if(Keys_keyUp(keyAction))
 	{
 		if(match_menuItem==MENU_ITEM_WEAPONS)
-			State_changeMode(menuMode_WeaponsSettings);
+			State_changeMode(menuMode_WeaponsSettings, 0);
 		else if(match_menuItem==MENU_ITEM_MATCH)
-			State_changeMode(menuMode_MatchSettings);
+			State_changeMode(menuMode_MatchSettings, 0);
 	}
 
 	// redraw for any keypress

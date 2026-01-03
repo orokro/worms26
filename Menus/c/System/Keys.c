@@ -75,18 +75,20 @@ void Keys_update()
 	// each bit-mask is a binary place, so we can just multiply its values and sum them
 	// by the truthiness of those keys
 	keysState = 0;
-	keysState += (_keytest(RR_2ND) || _keytest(RR_ENTER)) * keyAction;
+	keysState += _keytest(RR_2ND) * keyAction;
 	keysState += _keytest(RR_ESC) * keyEscape;
 	keysState += _keytest(RR_LEFT) * keyLeft;
 	keysState += _keytest(RR_RIGHT) * keyRight;
 	keysState += _keytest(RR_UP) * keyUp;
 	keysState += _keytest(RR_DOWN) * keyDown;
-	keysState += _keytest(RR_CLEAR) * keyExit;
+	keysState += _keytest(RR_CLEAR) * keyClear;
 	keysState += _keytest(RR_F1) * keyF1;
 	keysState += _keytest(RR_F2) * keyF2;
 	keysState += _keytest(RR_F5) * keyF5;
 	keysState += _keytest(RR_PLUS) * keyPlus;
 	keysState += _keytest(RR_MINUS) * keyMinus;
+	keysState += _keytest(RR_BCKSPC) * keyBackspace;
+	keysState += _keytest(RR_SHIFT) * keyShift;
 
 	// if we XOR our current state (keysState) and our previous state (lastKeysState)
 	// we will get just the keys that changed ON or OFF from the last frame
@@ -130,10 +132,50 @@ char Keys_keyState(long keyCode)
  * Checks if a key is LET up ON THIS FRAME using it's bitmask.
  *
  * @param keyCode the bitmask for our logical key
- * @ret
- */
+ * @return a boolean char set to 0 or 1 if the key is let up
+*/
 char Keys_keyUp(long keyCode)
 {
 	// return if the key is let up on this frame:
 	return (char)((keysUp & keyCode)>0);
+}
+
+
+/**
+ * @brief Returns the character of the currently pressed alphabet key (A-Z), or 0 if none.
+ * 
+ * @return char - 'A'-'Z' or 0
+ */
+char Keys_getAlphaChar()
+{
+	// Check physical keys mapped to letters
+	if(_keytest(RR_EQUALS)) return 'A';
+	if(_keytest(RR_PAREN_OPEN)) return 'B';
+	if(_keytest(RR_PAREN_CLOSE)) return 'C';
+	if(_keytest(RR_COMMA)) return 'D';
+	if(_keytest(RR_DIVIDE)) return 'E';
+	if(_keytest(RR_WITH)) return 'F';
+	if(_keytest(RR_7)) return 'G';
+	if(_keytest(RR_8)) return 'H';
+	if(_keytest(RR_9)) return 'I';
+	if(_keytest(RR_MULTIPLY)) return 'J';
+	if(_keytest(RR_EE)) return 'K';
+	if(_keytest(RR_4)) return 'L';
+	if(_keytest(RR_5)) return 'M';
+	if(_keytest(RR_6)) return 'N';
+	if(_keytest(RR_MINUS)) return 'O';
+	if(_keytest(RR_STORE)) return 'P';
+	if(_keytest(RR_1)) return 'Q';
+	if(_keytest(RR_2)) return 'R';
+	if(_keytest(RR_3)) return 'S';
+	if(_keytest(RR_T)) return 'T';
+	if(_keytest(RR_PLUS)) return 'U';
+	if(_keytest(RR_0)) return 'V';
+	if(_keytest(RR_DOT)) return 'W';
+	if(_keytest(RR_X)) return 'X';
+	if(_keytest(RR_Y)) return 'Y';
+	if(_keytest(RR_Z)) return 'Z';
+	if(_keytest(RR_NEGATE)) return ' ';
+
+	return 0;
 }

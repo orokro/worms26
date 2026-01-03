@@ -135,7 +135,10 @@ static void Credits_update()
 
 	// this menu only has accept, so F5 returns to MatchMenu
 	if(Keys_keyUp(keyAction|keyF1|keyF5|keyEscape))
-		State_changeMode(menuMode_MainMenu);
+	{
+		State_transitionButton = BTN_ACCEPT;
+		State_changeMode(menuMode_MainMenu, 3);
+	}
 }
 
 

@@ -17,6 +17,7 @@
 #include "Draw.h"
 #include "SpriteData.h"
 #include "State.h"
+#include "FileData.h"
 
 
 // vars
@@ -30,6 +31,14 @@ char Menu_previousMode = menuMode_TitleScreen;
 // reusable vars for our main menu system
 char screenIsStale = TRUE;
 char menuItem =  0;
+
+// for button animations we'll allow a transition timer
+char newModeAfterTime = 0;
+char State_transitionTime = 0;
+char State_transitionButton = BTN_ACCEPT;
+
+// true if the TI-Basic loop should exit
+char App_exitRequested = FALSE;
 
 
 /*
@@ -56,7 +65,6 @@ char menuItem =  0;
 void State_init()
 {
 
-
 }
 
 
@@ -67,6 +75,17 @@ void State_update()
 {
 	// before we do anything else, we should update the states of the keys
 	Keys_update();
+
+	// if there's transition time on the clock decrement it, and possible change state
+	if(State_transitionTime>0)
+	{
+		State_transitionTime--;
+		if(State_transitionTime==0)
+		{
+			// call change mode with 0 timer to actually change the mode now
+			State_changeMode(newModeAfterTime, 0);
+		}
+	}
 	
 	// depending on the current menu mode, different logic will be present for each mode
 	switch(Menu_mode)
@@ -106,9 +125,22 @@ void State_update()
  * Changes the State machines mode to a new mode.
  *
  * @param newMode a char representing a main state machine mode as defined in the MenuModes enum.
+ * @param timer - transition timer for button animations
 */
-void State_changeMode(char newMode)
+void State_changeMode(char newMode, char timer)
 {
+	// don't allow further changes if we're already in transition
+	if(State_transitionTime>0)
+		return;
+
+	// if timer is not 0, set the transition time and gtfo
+	if(timer>0)
+	{
+		newModeAfterTime = newMode;
+		State_transitionTime = timer;
+		return;
+	}
+
 	// call the exit method for the current mode
 	switch(Menu_mode)
 	{

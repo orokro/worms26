@@ -7,6 +7,8 @@
 #ifndef SPRITEDATA_H
 #define SPRITEDATA_H
 
+extern const unsigned long settingsIconBox[];
+
 extern const unsigned short spr_Check_Fill[];
 
 extern const unsigned short spr_Check_Outline[];
@@ -57,7 +59,7 @@ extern const unsigned long spr_MenuWeapons[];
 
 extern const unsigned long spr_Menu_Mask[];
 
-extern const unsigned char spr_NoSelectArrow[];
+extern const unsigned short spr_NoSelectArrow[];
 
 extern const unsigned short spr_OilDark[];
 
@@ -67,21 +69,27 @@ extern const unsigned short spr_OilMask[];
 
 extern const unsigned short spr_Option_Artillery[];
 
-extern const unsigned char spr_Option_DudSmoke[];
+extern const unsigned short spr_Option_DudSmoke_Dark[];
 
-extern const unsigned short spr_Option_HealthHead[];
+extern const unsigned short spr_Option_DudSmoke_Light[];
 
-extern const unsigned short spr_Option_HealthValues[];
+#define NUM_OPTION_HEALTH 3
+extern const unsigned short spr_Option_Health[][14];
 
-extern const unsigned short spr_Option_Mine[];
+extern const unsigned short spr_Option_MineBlank_Dark[];
 
-extern const unsigned short spr_Option_Timer[];
+extern const unsigned short spr_Option_MineBlank_Light[];
 
-extern const unsigned short spr_Parachute[];
+#define NUM_OPTION_MINEDARK 5
+extern const unsigned short spr_Option_MineDark[][14];
 
-extern const unsigned char spr_remote[];
+#define NUM_OPTION_MINELIGHT 5
+extern const unsigned short spr_Option_MineLight[][14];
 
-extern const unsigned char spr_remoteMask[];
+extern const unsigned short spr_Option_PlaceWorms[];
+
+#define NUM_OPTION_TIMER 3
+extern const unsigned short spr_Option_Timer[][14];
 
 extern const unsigned short spr_SelectionArrowFrame1[];
 
@@ -89,11 +97,17 @@ extern const unsigned short spr_SelectionArrowFrame2[];
 
 extern const unsigned long spr_TeamTab[];
 
+#define NUM_TITLEDARK 5
+extern const unsigned long spr_TitleDark[][100];
+
+#define NUM_TITLELIGHT 5
+extern const unsigned long spr_TitleLight[][100];
+
 extern const unsigned short spr_Toggle[];
 
 extern const unsigned short spr_weaponSelect[];
 
-#define NUM_WEAPONS 76
+#define NUM_WEAPONS 65
 extern const unsigned short spr_weapons[][11];
 
 extern const unsigned long tex_Ground1[];

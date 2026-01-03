@@ -12,7 +12,6 @@
 // Draw defines
 
 // which buttons to show in the menus (the x or check/accept)
-#define BTN_CHECK  0b00000001
 #define BTN_ACCEPT 0b00000001
 #define BTN_CLOSE  0b00000010
 

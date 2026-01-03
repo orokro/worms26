@@ -11,6 +11,7 @@
 #include "Main.h"
 #include "Draw.h"
 #include "SpriteData.h"
+#include "State.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -83,16 +84,18 @@ void Draw_XandCheck(char flags)
 {
 	// draw close X on left
 	if(flags & BTN_CLOSE)
-	{		
-		ClipSprite16_OR_R(4, 80, 16, spr_Close_Fill, lightPlane);
-		GrayClipSprite16_OR_R(4, 80, 16, spr_Close_Outline, spr_Close_Outline, lightPlane, darkPlane);
+	{	
+		const char offset = ((State_transitionTime>0) && (State_transitionButton & BTN_CLOSE)) ? 2 : 0;
+		ClipSprite16_OR_R(4+offset, 80+offset, 16, spr_Close_Fill, lightPlane);
+		GrayClipSprite16_OR_R(4+offset, 80+offset, 16, spr_Close_Outline, spr_Close_Outline, lightPlane, darkPlane);
 	}
 
 	// draw accept check on right
-	if(flags & BTN_CHECK)
+	if(flags & BTN_ACCEPT)
 	{
-		ClipSprite16_OR_R(140, 76, 20, spr_Check_Fill, lightPlane);
-		GrayClipSprite16_OR_R(140, 76, 20, spr_Check_Outline, spr_Check_Outline, lightPlane, darkPlane);
+		const char offset = ((State_transitionTime>0) && (State_transitionButton & BTN_ACCEPT)) ? 2 : 0;
+		ClipSprite16_OR_R(140+offset, 76+offset, 20, spr_Check_Fill, lightPlane);
+		GrayClipSprite16_OR_R(140+offset, 76+offset, 20, spr_Check_Outline, spr_Check_Outline, lightPlane, darkPlane);
 	}
 }
 
@@ -107,7 +110,7 @@ void Draw_helpText(char y, const char* text)
 {
 	// draw help text at bottom of screen
 	FontSetSys(F_4x6);
-	const short left = (160 - (strlen(text) * 4)) / 2;
+	const short left = (160 - DrawStrWidth(text, F_4x6)) / 2;
 	GrayDrawStr2B(left, y, text, A_NORMAL, lightPlane, darkPlane);
 }
 
@@ -160,7 +163,6 @@ void Draw_bigMenuButton(short x, short y, char itemId, char currentItem, const u
  */
 void Draw_textBox(char x, char y, char width, char isSelected, const char* text)
 {
-
 	// draw a box for the text box
 	Draw_RectOutlineColor((short)x, (short)y, width, 11, isSelected ? 3 : 1);
 
@@ -170,9 +172,9 @@ void Draw_textBox(char x, char y, char width, char isSelected, const char* text)
 	// if we're selected, also draw the inverted box on both planes
 	if(isSelected)
 	{
-		short nameLen = (short)strlen(text) * 4;
-		FastFilledRect_Invert_R(lightPlane, (short)x+2, (short)y+2, (short)(x+3+nameLen), (short)(y+8));
-		FastFilledRect_Invert_R(darkPlane, (short)x+2, (short)y+2, (short)(x+3+nameLen), (short)(y+8));
+		short nameLen = DrawStrWidth(text, F_4x6);
+		FastFilledRect_Invert_R(lightPlane, (short)x+2, (short)y+2, (short)(x+2+nameLen), (short)(y+8));
+		FastFilledRect_Invert_R(darkPlane, (short)x+2, (short)y+2, (short)(x+2+nameLen), (short)(y+8));
 	}
 }
 
