@@ -40,293 +40,105 @@ char teamSettings_menuItem = 0;
 #define MENU_ITEM_TEAM_MEMBER_8    9
 
 // editing state
-
 char teamSettings_isEditing = 0;
-
 char teamSettings_lastAlpha = 0;
-
 char teamSettings_lastBackspace = 0;
 
 
 
 /**
-
  * Stop editing text and fill in default if empty
-
  */
-
 void stopTextEdit(char* buffer)
-
 {
-
 	teamSettings_isEditing = 0;
 
 	if (buffer && buffer[0] == '\0') {
 
 		strcpy(buffer, "UNNAMED");
-
 		screenIsStale = STALE;
-
 	}
-
 }
 
 
-
 /**
-
-
-
  * Handles text input for the given string buffer
-
-
-
  */
-
-
-
 void handleTextEdit(char* buffer, short maxLen)
-
-
-
 {
-
-
-
     // Check keys
-
-
-
     char currentAlpha = Keys_getAlphaChar();
-
-
-
     char backspaceDown = Keys_keyDown(keyBackspace);
-
-
-
     char clearDown = Keys_keyDown(keyExit);
 
-
-
-
-
-
-
     // 1. Check for entering edit mode
-
-
-
     if (!teamSettings_isEditing) {
-
-
 
         if (currentAlpha || backspaceDown || clearDown) {
 
-
-
             // Enter edit mode
-
-
-
             teamSettings_isEditing = 1;
 
-
-
-            
-
-
-
             // Always start fresh
-
-
-
             buffer[0] = '\0';
-
-
-
-            
-
-
-
+      
             // If it was an alpha key, add it
-
-
-
             if (currentAlpha) {
-
-
-
                 buffer[0] = currentAlpha;
-
-
-
                 buffer[1] = '\0';
-
-
-
             }
-
-
-
-            
-
-
-
             screenIsStale = STALE;
 
-
-
-            
-
-
-
             // Update latches
-
-
-
             teamSettings_lastAlpha = currentAlpha;
 
-
-
             return;
-
-
-
         }
-
-
-
     }
 
+    // Handle Alpha Input (while editing)
+    if (currentAlpha)
+	{
 
-
-
-
-
-
-    // 2. Handle Alpha Input (while editing)
-
-
-
-    if (currentAlpha) {
-
-
-
-        if (currentAlpha != teamSettings_lastAlpha) {
-
-
+        if (currentAlpha != teamSettings_lastAlpha)
+		{
 
             // Append char
-
-
-
             short len = (short)strlen(buffer);
-
-
 
             if (len < maxLen) {
 
-
-
                 buffer[len] = currentAlpha;
-
-
-
                 buffer[len+1] = '\0';
-
-
-
                 screenIsStale = STALE;
-
-
-
             }
-
-
-
         }
-
-
-
     }
-
-
 
     teamSettings_lastAlpha = currentAlpha;
 
-
-
-
-
-
-
-    // 3. Handle Backspace (while editing)
-
-
-
-    if (backspaceDown) {
-
-
-
+    // Handle Backspace (while editing)
+    if (backspaceDown)
+	{
         short len = (short)strlen(buffer);
 
-
-
-        if (len > 0) {
-
-
-
+        if (len > 0) 
+		{
             buffer[len - 1] = '\0';
-
-
-
             screenIsStale = STALE;
-
-
-
         }
-
-
-
     }
 
-
-
-
-
-
-
 	// 4. Handle Clear (while editing)
-
-
-
 	if (clearDown) {
-
-
-
 		buffer[0] = '\0';
-
-
-
 		screenIsStale = STALE;
-
-
-
 	}
-
-
-
 }
 
 
-
-
-
 /**
-
  * main drawing routine for the TeamSettings menu
-
  */
 void Draw_renderTeamSettingsMenu()
 {
