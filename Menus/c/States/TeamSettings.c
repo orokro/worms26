@@ -40,59 +40,293 @@ char teamSettings_menuItem = 0;
 #define MENU_ITEM_TEAM_MEMBER_8    9
 
 // editing state
+
 char teamSettings_isEditing = 0;
+
 char teamSettings_lastAlpha = 0;
+
 char teamSettings_lastBackspace = 0;
 
 
+
 /**
- * Handles text input for the given string buffer
+
+ * Stop editing text and fill in default if empty
+
  */
-void handleTextEdit(char* buffer, short maxLen)
+
+void stopTextEdit(char* buffer)
+
 {
-    // Check alpha keys
-    char currentAlpha = Keys_getAlphaChar();
 
-    // Handle alpha input
-    if (currentAlpha) {
+	teamSettings_isEditing = 0;
 
-        if (currentAlpha != teamSettings_lastAlpha) {
+	if (buffer && buffer[0] == '\0') {
 
-            // New key press
-            if (!teamSettings_isEditing) {
-                // First press: Start editing, overwrite content
-                teamSettings_isEditing = 1;
-                buffer[0] = currentAlpha;
-                buffer[1] = '\0';
+		strcpy(buffer, "UNNAMED");
 
-            } else {
+		screenIsStale = STALE;
 
-                // Already editing: Append
-                short len = (short)strlen(buffer);
-                if (len < maxLen) {
-                    buffer[len] = currentAlpha;
-                    buffer[len+1] = '\0';
-                }
-            }
-            screenIsStale = STALE;
-        }
-    }
-    teamSettings_lastAlpha = currentAlpha;
+	}
 
-    // Handle Backspace
-    if (teamSettings_isEditing && Keys_keyDown(keyBackspace)) {
-
-        short len = (short)strlen(buffer);
-        if (len > 0) {
-            buffer[len - 1] = '\0';
-            screenIsStale = STALE;
-        }
-    }
 }
 
 
+
 /**
+
+
+
+ * Handles text input for the given string buffer
+
+
+
+ */
+
+
+
+void handleTextEdit(char* buffer, short maxLen)
+
+
+
+{
+
+
+
+    // Check keys
+
+
+
+    char currentAlpha = Keys_getAlphaChar();
+
+
+
+    char backspaceDown = Keys_keyDown(keyBackspace);
+
+
+
+    char clearDown = Keys_keyDown(keyExit);
+
+
+
+
+
+
+
+    // 1. Check for entering edit mode
+
+
+
+    if (!teamSettings_isEditing) {
+
+
+
+        if (currentAlpha || backspaceDown || clearDown) {
+
+
+
+            // Enter edit mode
+
+
+
+            teamSettings_isEditing = 1;
+
+
+
+            
+
+
+
+            // Always start fresh
+
+
+
+            buffer[0] = '\0';
+
+
+
+            
+
+
+
+            // If it was an alpha key, add it
+
+
+
+            if (currentAlpha) {
+
+
+
+                buffer[0] = currentAlpha;
+
+
+
+                buffer[1] = '\0';
+
+
+
+            }
+
+
+
+            
+
+
+
+            screenIsStale = STALE;
+
+
+
+            
+
+
+
+            // Update latches
+
+
+
+            teamSettings_lastAlpha = currentAlpha;
+
+
+
+            return;
+
+
+
+        }
+
+
+
+    }
+
+
+
+
+
+
+
+    // 2. Handle Alpha Input (while editing)
+
+
+
+    if (currentAlpha) {
+
+
+
+        if (currentAlpha != teamSettings_lastAlpha) {
+
+
+
+            // Append char
+
+
+
+            short len = (short)strlen(buffer);
+
+
+
+            if (len < maxLen) {
+
+
+
+                buffer[len] = currentAlpha;
+
+
+
+                buffer[len+1] = '\0';
+
+
+
+                screenIsStale = STALE;
+
+
+
+            }
+
+
+
+        }
+
+
+
+    }
+
+
+
+    teamSettings_lastAlpha = currentAlpha;
+
+
+
+
+
+
+
+    // 3. Handle Backspace (while editing)
+
+
+
+    if (backspaceDown) {
+
+
+
+        short len = (short)strlen(buffer);
+
+
+
+        if (len > 0) {
+
+
+
+            buffer[len - 1] = '\0';
+
+
+
+            screenIsStale = STALE;
+
+
+
+        }
+
+
+
+    }
+
+
+
+
+
+
+
+	// 4. Handle Clear (while editing)
+
+
+
+	if (clearDown) {
+
+
+
+		buffer[0] = '\0';
+
+
+
+		screenIsStale = STALE;
+
+
+
+	}
+
+
+
+}
+
+
+
+
+
+/**
+
  * main drawing routine for the TeamSettings menu
+
  */
 void Draw_renderTeamSettingsMenu()
 {
@@ -207,7 +441,7 @@ static void TeamSettings_update()
 	// this only has check, so F5 returns to MatchMenu
 	if(Keys_keyUp(keyF5|keyEscape))
 	{
-		teamSettings_isEditing = 0;
+		stopTextEdit(editBuffer);
 		State_transitionButton = BTN_ACCEPT;
 		State_changeMode(menuMode_MainMenu, 3);
 	}
@@ -215,7 +449,7 @@ static void TeamSettings_update()
 	// increase / decrease menu item with left/right
 	if(Keys_keyDown(keyLeft))
 	{
-		teamSettings_isEditing = 0;
+		stopTextEdit(editBuffer);
 		switch (teamSettings_menuItem)
 		{
 			case MENU_ITEM_TEAM_MEMBER_2:
@@ -237,7 +471,7 @@ static void TeamSettings_update()
 	}
 	else if(Keys_keyDown(keyRight))
 	{
-		teamSettings_isEditing = 0;
+		stopTextEdit(editBuffer);
 		switch(teamSettings_menuItem)
 		{
 			case MENU_ITEM_TEAM_NAME:
@@ -255,7 +489,7 @@ static void TeamSettings_update()
 		}
 	}else if(Keys_keyDown(keyDown))
 	{
-		teamSettings_isEditing = 0;
+		stopTextEdit(editBuffer);
 		if(teamSettings_menuItem==MENU_ITEM_TEAM_NAME)
 			teamSettings_menuItem = MENU_ITEM_GRAVESTONE;
 		else if(teamSettings_menuItem>=MENU_ITEM_TEAM_MEMBER_1 && teamSettings_menuItem<=MENU_ITEM_TEAM_MEMBER_6)
@@ -263,7 +497,7 @@ static void TeamSettings_update()
 	}
 	else if(Keys_keyDown(keyUp))
 	{
-		teamSettings_isEditing = 0;
+		stopTextEdit(editBuffer);
 		if(teamSettings_menuItem==MENU_ITEM_GRAVESTONE)
 			teamSettings_menuItem = MENU_ITEM_TEAM_NAME;
 		else if(teamSettings_menuItem>=MENU_ITEM_TEAM_MEMBER_3 && teamSettings_menuItem<=MENU_ITEM_TEAM_MEMBER_8)
@@ -273,11 +507,11 @@ static void TeamSettings_update()
 	// f1 and f1 select team 0 and 1 respectively
 	if(Keys_keyUp(keyF1)) {
 		tab = 0;
-		teamSettings_isEditing = 0;
+		stopTextEdit(editBuffer);
 	}
 	else if(Keys_keyUp(keyF2)) {
 		tab = 1;
-		teamSettings_isEditing = 0;
+		stopTextEdit(editBuffer);
 	}
 
 	// if plus or minus pressed while gravestone selected, change it

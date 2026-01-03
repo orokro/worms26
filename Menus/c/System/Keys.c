@@ -153,7 +153,6 @@ char Keys_getAlphaChar()
 	if(_keytest(RR_PAREN_CLOSE)) return 'C';
 	if(_keytest(RR_COMMA)) return 'D';
 	if(_keytest(RR_DIVIDE)) return 'E';
-	// RR_PIPE is standard TIGCC, assuming availability
 	if(_keytest(RR_WITH)) return 'F';
 	if(_keytest(RR_7)) return 'G';
 	if(_keytest(RR_8)) return 'H';
@@ -170,7 +169,7 @@ char Keys_getAlphaChar()
 	if(_keytest(RR_3)) return 'S';
 	if(_keytest(RR_T)) return 'T';
 	if(_keytest(RR_PLUS)) return 'U';
-	if(_keytest(RR_0)) return 'U';
+	if(_keytest(RR_0)) return 'V';
 	if(_keytest(RR_DOT)) return 'W';
 	if(_keytest(RR_X)) return 'X';
 	if(_keytest(RR_Y)) return 'Y';
