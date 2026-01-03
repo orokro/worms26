@@ -17,7 +17,6 @@
 */
 char cursorFastMove=0;
 
-// 
 
 /**
  * @brief Get the Girder Coords object
@@ -39,6 +38,7 @@ void Cursor_getGirderCoords(short x, short y, short* outX1, short* outY1, short*
 	*outX2 = x - xPos[(short)Game_jetPackFuel];
 	*outY2 = y - yPos[(short)Game_jetPackFuel];
 }
+
 
 /**
  * @brief Checks if the girder at the given position and rotation is within map bounds
@@ -63,6 +63,7 @@ short checkGirderBounds(short cx, short cy, unsigned char rotation) {
 
     return 1;
 }
+
 
 /**
 	Called on the first-frame when the Games state machine is set to Cursor mode.
@@ -142,9 +143,11 @@ static void Cursor_update()
 
 	// Special check for Girder Placement
     if(Game_stateFlags & gs_girderPlace) {
+
         if(checkGirderBounds(nextX, nextY, Game_jetPackFuel)) {
             Game_cursorX = nextX;
             Game_cursorY = nextY;
+
         } else {
 			// If moving failed, try to clamp it to valid bounds? 
             // For now, just don't move if it puts us OOB.
@@ -154,6 +157,7 @@ static void Cursor_update()
 			else if(checkGirderBounds(Game_cursorX, Game_cursorY + moveY, Game_jetPackFuel))
 				Game_cursorY += moveY;
 		}
+
     } else {
         Game_cursorX = nextX;
         Game_cursorY = nextY;
@@ -176,9 +180,11 @@ static void Cursor_update()
         }
 
         if(rotChanged) {
+
             // Check if new rotation fits at current position
             if(checkGirderBounds(Game_cursorX, Game_cursorY, nextRot)) {
                 Game_jetPackFuel = nextRot;
+				
             } else {
                 // If it doesn't fit, try to push the cursor back in bounds
 				// Spiral search or simple axis checks? Simple for now.

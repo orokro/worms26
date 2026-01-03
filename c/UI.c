@@ -165,7 +165,6 @@ void drawCursorAndXSpot()
 */
 void drawSelectArrow()
 {
-
 	// get arrows pos
 	short x=Worm_x[(short)Worm_currentWorm]-9;
 	short y=Worm_y[(short)Worm_currentWorm]-32;

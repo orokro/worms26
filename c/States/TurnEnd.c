@@ -16,7 +16,8 @@ static void TurnEnd_enter()
 	Game_timer=-1;
 	cameraAutoFocus = TRUE;
 	Game_stateFlags &= ~gs_ninjaRopeMode;
-    
+    Game_stateFlags &= ~gs_girderPlace;
+
     // For specific melee weapons that knock worms away, keep the camera focused on the victim
     if(Game_lastWeaponSelected == WBaseballBat || 
        Game_lastWeaponSelected == WFirePunch ||
