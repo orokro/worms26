@@ -363,6 +363,14 @@ const unsigned char spr_Grave3[] = {
 	0b11111111
 };
 
+const unsigned char spr_Infinite[] = {
+	0b01100011,
+	0b10010101,
+	0b10011001,
+	0b10101001,
+	0b11000110
+};
+
 const unsigned long spr_MenuCredits[] = {
 	0b01111111111111111111111111111110,
 	0b10000000000000000000000000000001,

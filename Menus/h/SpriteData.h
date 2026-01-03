@@ -41,6 +41,8 @@ extern const unsigned char spr_Grave2[];
 
 extern const unsigned char spr_Grave3[];
 
+extern const unsigned char spr_Infinite[];
+
 extern const unsigned long spr_MenuCredits[];
 
 extern const unsigned long spr_MenuGame[];
