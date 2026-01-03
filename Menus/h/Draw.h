@@ -45,4 +45,13 @@ void Draw_RectOutlineColor(short x, short y, short w, short h, short color);
  */
 extern void Draw_XandCheck(char flags);
 
+
+/**
+ * @brief draws help text at bottom of screen	
+ * 
+ * @param text - text to draw
+ */
+extern void Draw_helpText(const char* text);
+
+
 #endif

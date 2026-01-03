@@ -8,6 +8,14 @@
 */
 
 
+const char *mainMenuText[4] = {
+	"Start Match",
+	"Team Settings",
+	"Game Settings",
+	"Credits"
+};
+
+
 /**
  * main drawing routine for the MainMenu menu
  */
@@ -20,10 +28,13 @@ void Draw_renderMainMenu()
 	// start fresh
 	Draw_clearBuffers();
 
+	// draw help text based on menu item
+	Draw_helpText(mainMenuText[(short)menuItem]);
+
 	// draw title, with big font and shadow just on light plane
 	FontSetSys(F_8x10);
-	GrayDrawStr2B(18, 3, "Worms 68K Party", A_NORMAL, lightPlane, lightPlane);
-	GrayDrawStr2B(17, 2, "Worms 68K Party", A_XOR, lightPlane, darkPlane);
+	GrayDrawStr2B(18, 3, "Worms 68k Party", A_NORMAL, lightPlane, lightPlane);
+	GrayDrawStr2B(17, 2, "Worms 68k Party", A_XOR, lightPlane, darkPlane);
 
 	// draw the x close & check accept buttoons
 	Draw_XandCheck(BTN_CLOSE);
@@ -76,7 +87,7 @@ static void MainMenu_update()
 	}
 
 	// F1 always exits game on this screen
-	if(Keys_keyUp(keyF1))
+	if(Keys_keyUp(keyF1|keyEscape))
 		GameRunning=FALSE;
 
 	// action will change game mode based on menu item

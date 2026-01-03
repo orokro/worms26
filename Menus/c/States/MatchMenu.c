@@ -54,7 +54,7 @@ static void MatchMenu_update()
 	Draw_renderMatchMenuMenu();
 
 	// F1 returns to main menu
-	if(Keys_keyUp(keyF1))
+	if(Keys_keyUp(keyF1|keyEscape))
 		State_changeMode(menuMode_MainMenu);
 	
 	// F5 starts game (WormSelect for now)
