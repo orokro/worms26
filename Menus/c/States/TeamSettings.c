@@ -39,6 +39,50 @@ char teamSettings_menuItem = 0;
 #define MENU_ITEM_TEAM_MEMBER_7    8
 #define MENU_ITEM_TEAM_MEMBER_8    9
 
+// editing state
+char teamSettings_isEditing = 0;
+char teamSettings_lastAlpha = 0;
+char teamSettings_lastBackspace = 0;
+
+/**
+ * Handles text input for the given string buffer
+ */
+void handleTextEdit(char* buffer, short maxLen)
+{
+    // Check alpha keys
+    char currentAlpha = Keys_getAlphaChar();
+
+    // Handle alpha input
+    if (currentAlpha) {
+        if (currentAlpha != teamSettings_lastAlpha) {
+            // New key press
+            if (!teamSettings_isEditing) {
+                // First press: Start editing, overwrite content
+                teamSettings_isEditing = 1;
+                buffer[0] = currentAlpha;
+                buffer[1] = '\0';
+            } else {
+                // Already editing: Append
+                short len = (short)strlen(buffer);
+                if (len < maxLen) {
+                    buffer[len] = currentAlpha;
+                    buffer[len+1] = '\0';
+                }
+            }
+            screenIsStale = STALE;
+        }
+    }
+    teamSettings_lastAlpha = currentAlpha;
+
+    // Handle Backspace
+    if (teamSettings_isEditing && Keys_keyDown(keyBackspace)) {
+        short len = (short)strlen(buffer);
+        if (len > 0) {
+            buffer[len - 1] = '\0';
+            screenIsStale = STALE;
+        }
+    }
+}
 
 /**
  * main drawing routine for the TeamSettings menu
@@ -124,6 +168,8 @@ static void TeamSettings_enter()
 	screenIsStale = STALE;
 
 	teamSettings_menuItem = 0;
+	teamSettings_isEditing = 0;
+	teamSettings_lastAlpha = 0;
 }
 
 
@@ -134,9 +180,27 @@ static void TeamSettings_update()
 {
 	Draw_renderTeamSettingsMenu();
 
+	// Text Editing Logic
+	char* editBuffer = NULL;
+	short editMaxLen = 0;
+
+	if (teamSettings_menuItem == MENU_ITEM_TEAM_NAME) {
+		editBuffer = Match_teamNames[(short)tab];
+		editMaxLen = 8;
+	} else if (teamSettings_menuItem >= MENU_ITEM_TEAM_MEMBER_1 && teamSettings_menuItem <= MENU_ITEM_TEAM_MEMBER_8) {
+		editBuffer = Match_wormNames[(short)(tab * 8) + (teamSettings_menuItem - MENU_ITEM_TEAM_MEMBER_1)];
+		editMaxLen = 11;
+	}
+
+	if (editBuffer) {
+		handleTextEdit(editBuffer, editMaxLen);
+	}
+
+
 	// this only has check, so F5 returns to MatchMenu
 	if(Keys_keyUp(keyF5|keyEscape))
 	{
+		teamSettings_isEditing = 0;
 		State_transitionButton = BTN_ACCEPT;
 		State_changeMode(menuMode_MainMenu, 3);
 	}
@@ -144,6 +208,7 @@ static void TeamSettings_update()
 	// increase / decrease menu item with left/right
 	if(Keys_keyDown(keyLeft))
 	{
+		teamSettings_isEditing = 0;
 		switch (teamSettings_menuItem)
 		{
 			case MENU_ITEM_TEAM_MEMBER_2:
@@ -165,6 +230,7 @@ static void TeamSettings_update()
 	}
 	else if(Keys_keyDown(keyRight))
 	{
+		teamSettings_isEditing = 0;
 		switch(teamSettings_menuItem)
 		{
 			case MENU_ITEM_TEAM_NAME:
@@ -182,6 +248,7 @@ static void TeamSettings_update()
 		}
 	}else if(Keys_keyDown(keyDown))
 	{
+		teamSettings_isEditing = 0;
 		if(teamSettings_menuItem==MENU_ITEM_TEAM_NAME)
 			teamSettings_menuItem = MENU_ITEM_GRAVESTONE;
 		else if(teamSettings_menuItem>=MENU_ITEM_TEAM_MEMBER_1 && teamSettings_menuItem<=MENU_ITEM_TEAM_MEMBER_6)
@@ -189,6 +256,7 @@ static void TeamSettings_update()
 	}
 	else if(Keys_keyDown(keyUp))
 	{
+		teamSettings_isEditing = 0;
 		if(teamSettings_menuItem==MENU_ITEM_GRAVESTONE)
 			teamSettings_menuItem = MENU_ITEM_TEAM_NAME;
 		else if(teamSettings_menuItem>=MENU_ITEM_TEAM_MEMBER_3 && teamSettings_menuItem<=MENU_ITEM_TEAM_MEMBER_8)
@@ -196,10 +264,14 @@ static void TeamSettings_update()
 	}
 
 	// f1 and f1 select team 0 and 1 respectively
-	if(Keys_keyUp(keyF1))
+	if(Keys_keyUp(keyF1)) {
 		tab = 0;
-	else if(Keys_keyUp(keyF2))
+		teamSettings_isEditing = 0;
+	}
+	else if(Keys_keyUp(keyF2)) {
 		tab = 1;
+		teamSettings_isEditing = 0;
+	}
 
 	// if plus or minus pressed while gravestone selected, change it
 	if(teamSettings_menuItem==1)

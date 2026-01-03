@@ -27,6 +27,7 @@
 #define keyF5 (long)1024			//00000000000000000000010000000000
 #define keyPlus (long)2048			//00000000000000000000100000000000
 #define keyMinus (long)4096			//00000000000000000001000000000000
+#define keyBackspace (long)8192		//00000000000000000010000000000000
 
 // so long as at least ONE bit is set. This way, we can test for any-key
 #define keyAny (long)67108863		//00000000000001111111111111111111
@@ -71,8 +72,16 @@ extern char Keys_keyState(long);
  * Checks if a key is LET up ON THIS FRAME using it's bitmask.
  *
  * @param keyCode the bitmask for our logical key
- * @return a boolean char set to 0 or 1 if the key is let up
-*/
-extern char Keys_keyUp(long);
+ * @ret
+ */
+extern char Keys_keyUp(long keyCode);
+
+
+/**
+ * @brief Returns the character of the currently pressed alphabet key (A-Z), or 0 if none.
+ * 
+ * @return char - 'A'-'Z' or 0
+ */
+extern char Keys_getAlphaChar();
 
 #endif

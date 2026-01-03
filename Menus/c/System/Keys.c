@@ -87,6 +87,7 @@ void Keys_update()
 	keysState += _keytest(RR_F5) * keyF5;
 	keysState += _keytest(RR_PLUS) * keyPlus;
 	keysState += _keytest(RR_MINUS) * keyMinus;
+	keysState += _keytest(RR_BACKSPACE) * keyBackspace;
 
 	// if we XOR our current state (keysState) and our previous state (lastKeysState)
 	// we will get just the keys that changed ON or OFF from the last frame
@@ -136,4 +137,42 @@ char Keys_keyUp(long keyCode)
 {
 	// return if the key is let up on this frame:
 	return (char)((keysUp & keyCode)>0);
+}
+
+
+/**
+ * @brief Returns the character of the currently pressed alphabet key (A-Z), or 0 if none.
+ * 
+ * @return char - 'A'-'Z' or 0
+ */
+char Keys_getAlphaChar()
+{
+	if(_keytest(RR_A)) return 'A';
+	if(_keytest(RR_B)) return 'B';
+	if(_keytest(RR_C)) return 'C';
+	if(_keytest(RR_D)) return 'D';
+	if(_keytest(RR_E)) return 'E';
+	if(_keytest(RR_F)) return 'F';
+	if(_keytest(RR_G)) return 'G';
+	if(_keytest(RR_H)) return 'H';
+	if(_keytest(RR_I)) return 'I';
+	if(_keytest(RR_J)) return 'J';
+	if(_keytest(RR_K)) return 'K';
+	if(_keytest(RR_L)) return 'L';
+	if(_keytest(RR_M)) return 'M';
+	if(_keytest(RR_N)) return 'N';
+	if(_keytest(RR_O)) return 'O';
+	if(_keytest(RR_P)) return 'P';
+	if(_keytest(RR_Q)) return 'Q';
+	if(_keytest(RR_R)) return 'R';
+	if(_keytest(RR_S)) return 'S';
+	if(_keytest(RR_T)) return 'T';
+	if(_keytest(RR_U)) return 'U';
+	if(_keytest(RR_V)) return 'V';
+	if(_keytest(RR_W)) return 'W';
+	if(_keytest(RR_X)) return 'X';
+	if(_keytest(RR_Y)) return 'Y';
+	if(_keytest(RR_Z)) return 'Z';
+	
+	return 0;
 }
