@@ -563,8 +563,7 @@ void CharacterController_update()
 		||
 		(Game_currentWeaponState & keepAimDuringUse)
 		||
-		Weapon_props[(short)Game_currentWeaponSelected] & usesPreAim
-	)
+		Weapon_props[(short)Game_currentWeaponSelected] & usesPreAim	)
 		adjustAim();
 }
 
@@ -577,6 +576,10 @@ void CharacterController_weaponConsumed(char noEndTurn){
 	// decrement weapon count
 	Match_teamWeapons[(short)Game_currentTeam][(short)Game_currentWeaponSelected]--;
 
+	// if it's less than 0, clamp at -1, for infinite uses
+	if(Match_teamWeapons[(short)Game_currentTeam][(short)Game_currentWeaponSelected]<0)
+		Match_teamWeapons[(short)Game_currentTeam][(short)Game_currentWeaponSelected]=-1;
+		
 	// special case for ninja rope: if it is, we should reselect it after
 	char isNinjaRope = (Game_currentWeaponSelected == WNinjaRope);
 

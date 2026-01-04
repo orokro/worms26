@@ -55,16 +55,21 @@ void Draw_renderWeaponsMenu(char wx, char wy)
 	short weapID = Game_weapInventory[(short)wy][(short)wx];
 	
 	// if we have the weapon in our inventory...
-	if(weapID!=-1)
+	if(weapID!=0)
 	{
 		// copy name to buffer with extra bit for null termination
 		char nameBuffer[32] = "";
 		memcpy(nameBuffer, weaponNames[weapID], 15);
 		nameBuffer[16] = 0;
 		
-		// the amount of the weapon
+		// the amount of the weapon (NOTE: "¾" prints as "∞" on the TI-89)
 		char countStr[8];
-		sprintf(countStr, " (x%d)", Match_teamWeapons[(short)Game_currentTeam][weapID]);
+		const char weapCount = Match_teamWeapons[(short)Game_currentTeam][weapID];
+		if(weapCount==-1)
+			strcat(countStr, "(x\xBE)");
+		else
+			sprintf(countStr, "(x%d)", weapCount);
+
 		strcat(nameBuffer, countStr);
 		
 		// draw the name of the currently selected weapon and its stock count
@@ -87,8 +92,8 @@ void Draw_renderWeaponsMenu(char wx, char wy)
 			}
 			else
 				ClipSprite16_OR_R(2+(x*12), 14+(y*12), 11, spr_weaponSelect, lightPlane);
-
 		}// next y
+
 	}// next x
 			
 	// draw the current cursor location
@@ -123,7 +128,8 @@ void calcWeapInventory()
 		for(row=0; row<5; row++)
 		{
 			// is there stock?
-			if(Match_teamWeapons[(short)Game_currentTeam][(row*13)+col]>0)
+			// note: we use !=0 becaus there's stock if it's more than 0, or infinity if -1
+			if(Match_teamWeapons[(short)Game_currentTeam][(row*13)+col]!=0)
 			{
 				// store the ID of this weapon in our current inventory row/col
 				// note: we can also use flat ID's!
@@ -135,7 +141,7 @@ void calcWeapInventory()
 		}// next row	
 		
 		// if stockRow is 5 that means the user had every weapon in this row
-		// but if its less than 5, we need to fill the rest of the slots with -1 (code for no weapon ID)
+		// but if its less than 5, we need to fill the rest of the slots with 0 (code for no weapon ID)
 		for(row=stockRow; row<5; row++)
 			Game_weapInventory[row][col] = -1;
 			
