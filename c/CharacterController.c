@@ -201,8 +201,16 @@ void wormWeapon()
 				break;
 
 			case WSelectWorm:
+
+				// decrement / flip this, because going into the worm select state
+				// will increment it back / flip it again.
 				Game_turn--;
 				Game_currentTeam = (Game_currentTeam==1 ? 0 : 1);
+				
+				// temporarily allow worm selection even if it's normally off
+				Game_stateFlags |= gs_allowSelectWorm;
+
+				// switch to worm select mode
 				Game_changeMode(gameMode_WormSelect);
 				CharacterController_weaponConsumed(TRUE);
 				return;
@@ -579,7 +587,7 @@ void CharacterController_weaponConsumed(char noEndTurn){
 	// if it's less than 0, clamp at -1, for infinite uses
 	if(Match_teamWeapons[(short)Game_currentTeam][(short)Game_currentWeaponSelected]<0)
 		Match_teamWeapons[(short)Game_currentTeam][(short)Game_currentWeaponSelected]=-1;
-		
+
 	// special case for ninja rope: if it is, we should reselect it after
 	char isNinjaRope = (Game_currentWeaponSelected == WNinjaRope);
 

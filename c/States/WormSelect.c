@@ -143,7 +143,7 @@ static void WormSelect_update()
 {
 	// if the current match allows worm-selection, and the user pressed
 	// the worm select button, we can goto the next-available worm, if any
-	if(Match_allowWormSelection && Keys_keyDown(keyWormSelect))
+	if((Match_allowWormSelection || (Game_stateFlags & gs_allowSelectWorm)) && Keys_keyDown(keyWormSelect))
 		nextWorm();
 		
 	// if any key was pressed other than the worm-select key, we exit this mode
@@ -165,4 +165,7 @@ static void WormSelect_exit()
 {
 	// clear the grace timer, if there was any
 	Game_graceTimer = 0;
+
+	// if worm selection was only temporarily allowed, disable it again
+	Game_stateFlags &= ~gs_allowSelectWorm;
 }

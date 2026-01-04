@@ -225,9 +225,18 @@ void Mines_trigger(short index)
 		if(random(4)==0)
 		{
 			// make dud
-			Mine_fuse[index] = 4;
+			Mine_fuse[index] = 10;
 			Mine_dud |= (unsigned short)1<<(index);
+			return;
 		}
+	}
+
+	// if fuse length is 0, just immediately detonate
+	if(Mine_fuse[index]==0)
+	{
+		Mine_fuse[index] = 1;
+		updateMine(index);
+		return;
 	}
 }
 
@@ -261,23 +270,12 @@ void Mines_drawAll()
 					if((Mine_dud & (unsigned short)1<<(i))==FALSE)
 					{
 						sprintf(fuseStr, "%d", (Mine_fuse[i]/TIME_MULTIPLIER));
-						GrayDrawStr2B(screenX-4, screenY-16, fuseStr, A_NORMAL, lightPlane, darkPlane);
+						GrayDrawStr2B(screenX-2, screenY-8, fuseStr, A_NORMAL, lightPlane, darkPlane);
 					}else
 					{
 						ClipSprite8_OR_R(screenX-3, screenY-7, 4, sprDudSmoke, darkPlane);
 					}
-				}// end if fuse
-				
-				// if the oil drum is "settled" draw an arrow above it, for debug
-				//char foo = (Mine_settled & (unsigned short)1<<(i));
-				//DrawChar(screenX, screenY-8, (foo ? (char)20 : 'X'), A_NORMAL);
-				
-				/*
-				char txt[4];
-				sprintf(txt, "%d", (short)Mine_yVelo[i]);
-				DrawStr(screenX-3, screenY-8, txt, A_NORMAL);
-				*/
-			
+				}// end if fuse			
 			}
 		}
 	}// next i

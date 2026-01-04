@@ -52,8 +52,6 @@ extern const unsigned char spr_Fuel[];
 #define NUM_GRAVE 3
 extern const unsigned char spr_Grave[][12];
 
-extern const unsigned char spr_Infinite[];
-
 extern const unsigned char spr_launcher[];
 
 extern const unsigned short spr_Leaf[];

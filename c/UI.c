@@ -169,14 +169,6 @@ void drawSelectArrow()
 	short x=Worm_x[(short)Worm_currentWorm]-9;
 	short y=Worm_y[(short)Worm_currentWorm]-32;
 
-	// if we don't have worm select enabled, just draw the static arow
-	if(Match_allowWormSelection==FALSE)
-	{
-		ClipSprite8_XOR_R(x+4, y+4, 10, spr_NoSelectArrow, darkPlane);
-		ClipSprite8_XOR_R(x+4, y+4, 10, spr_NoSelectArrow, lightPlane);
-		return;
-	}
-	
 	// animate frame counter
 	static char frame=0;
 	frame++;
@@ -185,9 +177,19 @@ void drawSelectArrow()
 
 	if(worldToScreen(&x, &y))
 	{
+		// if we don't have worm select enabled, just draw the static arow
+		if(Match_allowWormSelection==FALSE && (Game_stateFlags & gs_allowSelectWorm)==FALSE)
+		{
+			const char yOffset = ((frame<4) ? 0 : 2);
+			GrayClipSprite8_AND_R(x+5, y+5-yOffset, 10, spr_NoSelectArrow+10, spr_NoSelectArrow+10, lightPlane, darkPlane);
+			GrayClipSprite8_OR_R(x+5, y+5-yOffset, 10, spr_NoSelectArrow, spr_NoSelectArrow, lightPlane, darkPlane);
+			return;
+		}
+	
 		// take advantage of extgrah's sprite method to handle bit shifting and mem copying in one swoop!
-		ClipSprite16_XOR_R(x, y, 16, ((frame<4) ? spr_SelectionArrowFrame1 : spr_SelectionArrowFrame2), darkPlane);
-		ClipSprite16_XOR_R(x, y, 16, ((frame<4) ? spr_SelectionArrowFrame1 : spr_SelectionArrowFrame2), lightPlane);	
+		const unsigned short* spr_Frame = ((frame<4) ? spr_SelectionArrowFrame1 : spr_SelectionArrowFrame2);
+		ClipSprite16_MASK_R(x, y, 16, spr_Frame, spr_Frame+16, darkPlane);
+		ClipSprite16_MASK_R(x, y, 16, spr_Frame, spr_Frame+16, lightPlane);	
 	}
 }
 
