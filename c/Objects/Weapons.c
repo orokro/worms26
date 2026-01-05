@@ -278,7 +278,7 @@ unsigned long Weapon_props[77] = {
         usesAim | usesCharge | usesPhysics | usesWind | usesDetonateOnImpact | holdsLauncher | usesWind,
         
 		// grenade
-        usesAim | usesCharge | usesPhysics | usesWind | usesFuse | holdsSelf | spawnsSelf,
+        usesAim | usesCharge | usesPhysics | usesFuse | holdsSelf | spawnsSelf,
         
 		// shotgun
         usesAim | multiUse | holdsSelf | usesRaycast,
@@ -319,7 +319,7 @@ unsigned long Weapon_props[77] = {
         usesAim | usesCursor | usesCharge | usesPhysics | usesHoming | usesDetonateOnImpact | holdsLauncher,
         
 		// cluster bomb
-        usesAim | usesCharge| usesFuse | usesPhysics | usesWind | isCluster | holdsSelf | spawnsSelf,
+        usesAim | usesCharge| usesFuse | usesPhysics | isCluster | holdsSelf | spawnsSelf,
         
 		// hand gun
         usesAim | holdsSelf | usesRaycast | usesRoutine | noRender | usesFuse,
@@ -603,6 +603,8 @@ const char weaponNames[65][16] = {
  */
 short findFreeWeaponSlot()
 {
+	static short weaponReuseSlot = 0;
+
 	// loop till an active slot is found:
 	short i=0;
 	for(i=0; i<MAX_WEAPONS; i++)
@@ -611,8 +613,11 @@ short findFreeWeaponSlot()
 			return i;
 	}
 	
-	// nothing found, return error code
-	return -1;
+	// if nothing found, reuse a slot
+	weaponReuseSlot++;
+	if(weaponReuseSlot>=MAX_WEAPONS)
+		weaponReuseSlot=0;
+	return weaponReuseSlot;
 }
 
 
@@ -1200,9 +1205,17 @@ void Weapons_detonateWeapon(short index)
 		return; // Concrete Donkey handles its own deactivation (when OOB)
 	}
 
-	if(weaponType == WMBBomb)
+	// big booms
+	if(weaponType == WMBBomb || weaponType == WHolyHandGrenade)
 	{
 		Explosion_spawn(Weapon_x[index], Weapon_y[index]+1, 15, 10, FALSE);
+		return;
+	}
+
+	// slightly smaller big booms
+	if(weaponType == WDynamite)
+	{
+		Explosion_spawn(Weapon_x[index], Weapon_y[index], 14, 14, FALSE);
 		return;
 	}
 
@@ -1227,7 +1240,6 @@ void Weapons_detonateWeapon(short index)
 	Explosion_spawn(Weapon_x[index], Weapon_y[index], 10, 10, FALSE);
 
 	// if this is a cluster weapon, spawn some cluster items
-	char clusterXMultiplier = 1;
 	char clusterYValue = 1;
 	short clusterFuse = 6*TIME_MULTIPLIER;
 	if(Weapon_props[weaponType] & isCluster)
@@ -1238,24 +1250,21 @@ void Weapons_detonateWeapon(short index)
 			case WSuperBanana:
 				spawnType = WBanana;
 				clusterYValue = 5;
-				clusterXMultiplier = 1;
 				break;
 			case WPetrolBomb:
 				spawnType = WFakeFire;
 				clusterYValue = 4;
-				clusterXMultiplier = 1;
 				clusterFuse = 60*TIME_MULTIPLIER;
 				break;				
 			default:
 				spawnType = WFragment;
 				clusterYValue = 5;
-				clusterXMultiplier = 2;
 				break;
 		}// swatch 
 		
 		short i;
 		for(i=0; i<5; i++)
-			Weapons_spawn(spawnType, Weapon_x[index], Weapon_y[index], ((-2+i)/2.0)*clusterXMultiplier, -clusterYValue, clusterFuse);
+			Weapons_spawn(spawnType, Weapon_x[index], Weapon_y[index], (-2+i), -clusterYValue, clusterFuse);
 	}
 	
 	// focus back on current worm
@@ -1289,8 +1298,6 @@ char Weapons_spawn(char type, short x, short y, char xVelocity, char yVelocity, 
 {
 	// find a free slot, if none are available, we are unable to spawn this weapon (should never happen)
 	short slot = findFreeWeaponSlot();
-	if(slot==-1)
-		return slot;
 
 	// set it's various properties
 	Weapon_type[slot] = type;

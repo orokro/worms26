@@ -118,7 +118,7 @@ void updateMine(short index)
 
 			// explode, unless it's a dud
 			if((Mine_dud & (unsigned short)1<<(index))==FALSE)
-				Explosion_spawn(Mine_x[index], Mine_y[index], 14, 14, FALSE);
+				Explosion_spawn(Mine_x[index], Mine_y[index], 12, 14, FALSE);
 				
 		}// end if 
 		
