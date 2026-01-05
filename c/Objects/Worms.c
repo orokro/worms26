@@ -235,13 +235,10 @@ void Worm_update()
 			if(damage!=0)
 				Worm_setHealth(i, -damage*6, TRUE);
 
-			// check active weapons to see if one hit and its not the current worm
-			if(Worm_currentWorm!=i)
-			{
-				damage = Physics_checkWeapons(i, wormMask, &Worm_physObj[i]);
-				if(damage!=0)
-					Worm_setHealth(i, -damage, TRUE);
-			}
+			// check active weapons to see if one hit
+			damage = Physics_checkWeapons(i, wormMask, &Worm_physObj[i]);
+			if(damage!=0)
+				Worm_setHealth(i, -damage, TRUE);		
 				
 			// if the worm is considered "settled" no need for physics
 			if(!(Worm_settled & wormMask))

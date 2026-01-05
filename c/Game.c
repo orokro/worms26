@@ -594,6 +594,7 @@ char Game_allSettled()
 	*/
 	
 	// if this value is NOT 0, something somewhere is active, exploding, or is a triggered mine
+	// also note, we don't count fire particles in active state, as they can last more than one turn
 	unsigned short unsettled =
 		(Crate_active & (~Crate_settled))
 		|
@@ -603,7 +604,7 @@ char Game_allSettled()
 		|
 		(Mine_active & (~Mine_settled))
 		|
-		(Weapon_active>0)
+		((Weapon_active & ~Weapon_isFire)>0)
 		|
 		Explosion_active | Mine_triggered;
 	if(unsettled)

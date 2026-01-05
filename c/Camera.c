@@ -116,8 +116,7 @@ void Camera_update()
     // 3. Auto-Focus Target Selection
     if(cameraAutoFocus == TRUE)
     {
-        
-        if(Weapon_active)
+        if(Weapon_active & ~Weapon_isFire)
         {
             i = Weapons_getFirstActive();
             cameraTargetX = &Weapon_x[i];

@@ -9,7 +9,7 @@
 #define WEAPONS_H
 
 // Weapons defines
-#define MAX_WEAPONS 10
+#define MAX_WEAPONS 16
 
 #import "PhysCol.h"
 
@@ -71,7 +71,7 @@ enum Weapons {
 	WFastWalk,			WMortar, 			WBanana, 	WUzi,		WKamikaze, 		WSheep, 		WMailStrike, 	WGirder, 		WParachute,			WFlameThrower, 		WMingVase, 		WConcreteDonkey, 	WSelectWorm,
 	WLaserSight, 		WHomingPigeon, 		WAxe,		WMiniGun,	WSuicideBomb, 	WSuperSheep, 	WMineStrike, 	WBaseballBat, 	WTeleport, 			WSalvationArmy, 	WSheepStrike,	WNuclearTest, 		WFreeze,
 	WInvisibility,		WSheepLauncher,		WQuake, 	WLongbow,  	WProd, 			WMole, 			WMoleSquadron, 	WGirderPack, 	WScalesOfJustice,	WMBBomb, 			WCarpetBomb, 	WArmageddon, 		WMagicBullet,
-	WFragment, 			WFire,				WSkunkGas,	WComet, 	WMail, 			WCarpet, 		WFakeMine,		WCowController, WSuperSheep2,		WAirMole
+	WFragment, 			WFire,				WSkunkGas,	WComet, 	WMail, 			WCarpet, 		WFakeMine,		WCowController, WSuperSheep2,		WAirMole, 			WFakeFire
 };
 
 
@@ -88,6 +88,7 @@ extern char Weapon_yVelo[MAX_WEAPONS];
 extern unsigned short Weapon_time[MAX_WEAPONS];
 extern unsigned short Weapon_active;
 extern unsigned short Weapon_settled;
+extern unsigned short Weapon_isFire;
 extern short Weapon_targetX;
 extern short Weapon_targetY;
 extern char Weapon_aimPosList[10][2];
@@ -108,7 +109,7 @@ extern char Weapon_superSheepDir;
 	Below is an array of 16 bit shorts we will use to bitwise store the properties of
 	each weapon type, so we can optimize the weapon routines to reuse code
 */
-extern unsigned long Weapon_props[75];
+extern unsigned long Weapon_props[76];
 
 
 // weapons function prototypes

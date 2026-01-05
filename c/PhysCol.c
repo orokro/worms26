@@ -529,7 +529,7 @@ short Physics_checkExplosions(PhysObj *obj)
 short Physics_checkWeapons(short wormIndex, unsigned short wormMask, PhysObj *obj)
 {
 	// gtfo early if no active weapons or if it's the current worm
-	if(Weapon_active==0 || wormIndex == Worm_currentWorm)
+	if(Weapon_active==0)
 		return 0;
 
 	short i;
@@ -573,7 +573,19 @@ short Physics_checkWeapons(short wormIndex, unsigned short wormMask, PhysObj *ob
 
 		// collision!
 
-		// example (you’ll replace these with your own rules):
+		// only fire-type weapons can hurt the current worm, so we'll test that first
+		if(Weapon_type[i] == WFire || Weapon_type[i] == WFakeFire)
+		{
+			totalDamage = 3;
+			const short randomXVelocity = (random(5) - 2); // -3 to +3
+			Physics_setVelocity(&Worm_physObj[wormIndex], randomXVelocity, -2, TRUE, TRUE);
+		}
+
+		// if we're the current worm, skip the rest of the checks
+		if(wormIndex == Worm_currentWorm)
+			continue;
+
+		// handle different kinds of weapon collisions
 		if(Weapon_type[i] == WDragonBall || Weapon_type[i] == WKamikaze)
 		{
 			totalDamage += 12;
@@ -588,7 +600,8 @@ short Physics_checkWeapons(short wormIndex, unsigned short wormMask, PhysObj *ob
 			totalDamage += 1;
 			Worm_poisoned |= wormMask;
 			// WSkunkGas lingers, so it is not detonated on impact.
-		}else if(Weapon_type[i] == WDrill)
+		}
+		else if(Weapon_type[i] == WDrill)
 		{
 			totalDamage += 5;
 			Physics_setVelocity(&Worm_physObj[wormIndex], random(9) - 4, -4, TRUE, TRUE);
@@ -599,7 +612,7 @@ short Physics_checkWeapons(short wormIndex, unsigned short wormMask, PhysObj *ob
 			totalDamage += 8;
 			Physics_setVelocity(&Worm_physObj[wormIndex], Worm_xVelo[wormIndex], 4, TRUE, TRUE);
 		}
-
+		
 		if((Weapon_props[(short)Weapon_type[i]] & usesDetonateOnImpact) != 0)
 			Weapons_detonateWeapon(i);
 	}

@@ -89,28 +89,31 @@
 
 
 // the type of the weapon!
-char Weapon_type[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Weapon_type[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // x/y positions of our weapons
-short Weapon_x[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-short Weapon_y[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+short Weapon_x[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+short Weapon_y[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // physics objects and velocities of weapons
 PhysObj Weapon_physObj[MAX_WEAPONS];
-char Weapon_xVelo[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-char Weapon_yVelo[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Weapon_xVelo[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char Weapon_yVelo[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // timer: various weapons can make use of a fuse timer, or timers for other reasons
-unsigned short Weapon_time[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+unsigned short Weapon_time[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // bit mask if the weapon is active in this slot
 unsigned short Weapon_active = 0;
 
 // is the weapon settled on land?
-unsigned short Weapon_settled=0;
+unsigned short Weapon_settled = 0;
 
 // which way is the weapon facing
-unsigned short Weapon_facing=0;
+unsigned short Weapon_facing = 0;
+
+// keep track of active fire separately
+unsigned short Weapon_isFire = 0;
 
 // because Weapons are defined BEFORE the Game header file, we cant access the cursor target
 // thus, wherever a target is set, it will have to update our weapon target
@@ -264,7 +267,7 @@ char Weapon_aimPosList[10][2] = {
 	
 	This way, I can avoid the OPs and save space. For debug, it will remain.
 */
-unsigned long Weapon_props[75] = {
+unsigned long Weapon_props[76] = {
 
     // row 1
 
@@ -474,10 +477,10 @@ unsigned long Weapon_props[75] = {
     // sub weapons (ones you cannot directly use, but can spawn as a result of other weapons)
     
         // cluster/mortar/salvation army/ming vase fragment
-        usesPhysics | usesDetonateOnImpact | usesFuse | spawnsSelf | usesWind,
+        usesPhysics | usesDetonateOnImpact | usesFuse | spawnsSelf,
         
 		// napalm / fire
-        usesPhysics | usesDetonateOnImpact | usesFuse | spawnsSelf | usesWind | usesConstantGravity,
+        usesPhysics | usesFuse | usesConstantGravity | customRender,
         
 		// skunk gas
         isParticle | usesFuse | spawnsSelf | usesDetonateOnImpact | usesRoutine,
@@ -502,6 +505,10 @@ unsigned long Weapon_props[75] = {
 
 		// air mole - the mole that drops from the mole squadron or second stage of the mole weapon
 		usesRoutine | usesFuse | customRender | usesPhysics | usesDetonateOnImpact,
+
+		// normal fire has constant gravity & wind. Fake fire will render the same, but turn
+		// into normal WFire upon impact, used for flame thrower an fire clusters (like barrels exploding)
+		usesPhysics | usesDetonateOnImpact | usesFuse | usesWind | customRender
 };
     
     
@@ -651,33 +658,6 @@ void doMele(char facingLeft, short dirX, short dirY){
 			affectedCount++;
 		}
 	}
-
-	// short x1 = xMin;
-	// short y1 = yMin;
-	// short x2 = xMax;
-	// short y2 = yMax;
-	// worldToScreen(&x1, &y1);
-	// worldToScreen(&x2, &y2);
-
-	// // draw the water rectangle to fill in below the waterline
-	// SCR_RECT waterRect = {{x1, y1, x2, y2}};
-	// const SCR_RECT fullScreen = {{0, 0, 159, 99}};
-
-	// // Draw Light Gray: LightPlane = 1 (Black), DarkPlane = 0 (White)
-	// PortSet(lightPlane, 239, 127);
-	// ScrRectFill(&waterRect, &fullScreen, A_NORMAL);  // Force 1s
-	// PortRestore();
-	// PortSet(darkPlane, 239, 127);
-	// ScrRectFill(&waterRect, &fullScreen, A_NORMAL);  // Force 0s
-	// PortRestore();
-
-	// const char debugBuffer[32];
-	// // sprintf((char*)debugBuffer, "Mele Hitbox: %d,%d to %d,%d", xMin, yMin, xMax, yMax);
-	// sprintf((char*)debugBuffer, "Affected Worms: %d", affectedCount);
-	// FontSetSys(F_4x6);
-	// GrayDrawStr2B(1, 20, debugBuffer, A_NORMAL, lightPlane, darkPlane);
-
-	// Game_debugFreeze = TRUE;
 
 	// force to apply based on weapon type
 	short forceX = facingLeft ? -1 : 1;
@@ -982,10 +962,10 @@ void doWeaponRoutine(short index, unsigned short props)
 		}
 
 		case WFlameThrower:
-			if (Weapon_time[index] % 6 == 0){
+			if (Weapon_time[index] % 3 == 0){
 				const short startX = Worm_x[(short)Worm_currentWorm] + dirX;
 				const short startY = Worm_y[(short)Worm_currentWorm] + dirY;
-				Weapons_spawn(WFire, startX, startY, dirX*0.3, dirY*0.3, 30);
+				Weapons_spawn(WFakeFire, startX, startY, dirX*0.2, dirY*0.3, 30);
 			}
 			break;
 
@@ -1115,9 +1095,23 @@ void Weapons_detonateWeapon(short index)
 {
 	const short weaponType = Weapon_type[index];
 	
+	// always clear this flag, just incase
+	Weapon_isFire &= ~((unsigned short)1<<(index));
+
 	// Deactivate the weapon by default unless a special case keeps it active (e.g., WConcreteDonkey)
 	if(weaponType != WConcreteDonkey)
 		Weapon_active &= ~((unsigned short)1<<(index));
+
+	// if it's a fake fire, convert it into a real fire
+	if(weaponType == WFakeFire)
+	{
+		Weapons_spawn(WFire, Weapon_x[index], Weapon_y[index], 0, 0, 60*TIME_MULTIPLIER);
+		return;
+	}
+
+	// normal fire doesn't explode or do anything, it just ceases to exist
+	if(weaponType == WFire)
+		return;
 
 	// Convert mines to real mines instead of exploding
 	if(weaponType == WMine || weaponType == WFakeMine)
@@ -1290,6 +1284,10 @@ char Weapons_spawn(char type, short x, short y, char xVelocity, char yVelocity, 
 	Weapon_active |= (unsigned short)1<<(slot);
 	Weapon_settled &= ~((unsigned short)1<<(slot));
 	
+	// if it's a fire type, set the bit
+	if(type == WFire)
+		Weapon_isFire |= (unsigned short)1<<(slot);
+
 	// if this weapon DOESN'T use physics, we don't have to instantiate a physObj,
 	// and since this weapon doesn't use physics it will never call physics updates on its null physObj anyway
 	if(Weapon_props[(short)type] & usesPhysics)
@@ -1374,11 +1372,12 @@ void Weapons_setTarget(short x, short y)
 		// air strikes are just bazookas in disguise
 		short spawnItem = WBazooka;
 		char spawnCount = 5;
-
+		char spawnTime = 5;
 		switch(Game_currentWeaponSelected)
 		{
 			case WNapalmStrike:
-				spawnItem = WFire;
+				spawnItem = WFakeFire;
+				spawnTime = 20;
 				break;
 
 			case WMailStrike:
@@ -1391,6 +1390,7 @@ void Weapons_setTarget(short x, short y)
 
 			case WSheepStrike:
 				spawnItem = WSheep;
+				spawnTime = 9;
 				break;
 
 			case WCarpetBomb:
@@ -1399,11 +1399,13 @@ void Weapons_setTarget(short x, short y)
 
 			case WMoleSquadron:
 				spawnItem = WAirMole;
+				spawnTime = 8;
 				break;
 
 			case WMBBomb:
 				spawnItem = WMBBomb;
 				spawnCount = 1;
+				spawnTime = 12;
 				break;
 
 			case WConcreteDonkey:
@@ -1423,14 +1425,14 @@ void Weapons_setTarget(short x, short y)
 		if(spawnCount==1)
 		{
 			// spawn the single weapon
-			Weapons_spawn(spawnItem, x, -50, spawnXVelo, 0, 5*TIME_MULTIPLIER);			
+			Weapons_spawn(spawnItem, x, -50, spawnXVelo, 0, spawnTime*TIME_MULTIPLIER);			
 
 		}else {
 		
 			// for now, spawn 5 weapons in a line above the target
 			int i;
 			for(i=-2; i<=2; i++)		
-				Weapons_spawn(spawnItem, x+(i*8), -50, spawnXVelo, 0, 5*TIME_MULTIPLIER);
+				Weapons_spawn(spawnItem, x+(i*8), -50, spawnXVelo, 0, spawnTime*TIME_MULTIPLIER);
 		}
 
 		// un-set target picked, since these weapons all instantly consume the position
@@ -1950,12 +1952,20 @@ void Weapons_drawAll()
 
 					ClipSprite16_OR_R(screenX-2, screenY-2, 11, weaponSprite, lightPlane);
 					ClipSprite16_OR_R(screenX-2, screenY-2, 11, weaponSprite, darkPlane);
-
 				}
 				else if(Weapon_props[(short)weaponType] & customRender)
 				{
 					switch(weaponType)
-					{
+					{	
+						case WFire:
+						case WFakeFire:
+							{
+								const unsigned short* fireSprite = (Game_timer%2==0) ? spr_weapons[WFire] : spr_weapons_flipped[WFire];
+								ClipSprite16_OR_R(screenX-2, screenY-2, 11, fireSprite, lightPlane);
+								ClipSprite16_OR_R(screenX-2, screenY-2, 11, fireSprite, darkPlane);
+							}
+							break;
+
 						case WLongbow:
 							drawArrow(i, screenX, screenY);
 							break;
@@ -2013,7 +2023,6 @@ void Weapons_drawAll()
 				}
 				else if(!(Weapon_props[(short)weaponType] & noRender))
 				{	
-
 					// for debug we will just draw a generic circle (borrowed from the charge sprites) for the weapon
 					ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, lightPlane);
 					ClipSprite8_OR_R(screenX-2, screenY-2, 4, spr_chargeSmall, darkPlane);
@@ -2037,7 +2046,7 @@ char Weapons_getFirstActive()
 	short i;
 	for(i=0; i<MAX_WEAPONS; i++)
 	{
-		if(Weapon_active & (unsigned short)((unsigned short)1<<(i)))
+		if((Weapon_active & ~Weapon_isFire) & (unsigned short)((unsigned short)1<<(i)))
 			return i;
 	}
 	

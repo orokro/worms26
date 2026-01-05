@@ -65,7 +65,7 @@ void wormWalk()
 	}
 
 	// gtfo if not on ground, or ninja rope mode
-	if ((Worm_onGround & wormMask) && !(Game_stateFlags & gs_ninjaRopeMode))
+	if (!((Worm_onGround & wormMask) && !(Game_stateFlags & gs_ninjaRopeMode)))
 		return;
 
 	// Update last ground position if on ground
