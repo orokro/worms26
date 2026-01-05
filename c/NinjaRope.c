@@ -10,13 +10,12 @@
 	This file will be in-line included in CharacterController.c
 */
 
-// #include <math.h> // Caused FPU Privilege Violation
-
 #ifndef PI
 #define PI 3.14159265358979323846
 #endif
 
 #define SIN_SCALE 8192
+
 
 /**
  * @brief Integer atan2 approximation to avoid FPU usage
@@ -40,6 +39,7 @@ short fastAtan2(short y, short x)
     return angle;
 }
 
+
 /**
  * @brief computes fast sine from degrees
  * 
@@ -57,6 +57,7 @@ float fastSin(short thetaInDegrees)
 	return -(float)RS_sin8192tab[360 - deg] / 8192.0f;
 }
 
+
 /**
  * @brief Computes fast cosine from degrees	
  * 
@@ -68,6 +69,13 @@ float fasCos(short thetaInDegrees)
 	return fastSin(thetaInDegrees + 90);
 }
 
+
+/**
+ * @brief Does fixed point sine
+ * 
+ * @param degrees - degrees
+ * @return short - sine value
+ */
 short fixedSin(short degrees) {
     degrees %= 360;
     if (degrees < 0) degrees += 360;
@@ -77,9 +85,17 @@ short fixedSin(short degrees) {
     return -(short)RS_sin8192tab[360 - degrees];
 }
 
+
+/**
+ * @brief does fixed point cosine
+ * 
+ * @param degrees - degrees
+ * @return short - cosine value
+ */
 short fixedCos(short degrees) {
     return fixedSin(degrees + 90);
 }
+
 
 /**
  * @brief Get the Ninja Rope angles based on a int value between 0-360
@@ -93,6 +109,7 @@ void getNinjaRopeAngles(short *outX, short *outY)
 	*outY = -fixedCos(Game_ninjaRopeAngle);
 }
 
+
 /**
  * @brief Normalizes degrees to 0-359
  * 
@@ -105,6 +122,7 @@ short getNormalizedDegrees(short degrees){
 	return degrees;
 }
 
+
 /**
  * @brief updates the current ninja rope angle based on rotation speed and direction
  */
@@ -115,30 +133,18 @@ void updateNinjaRopeCurrentAngle()
     short wx = Worm_x[(short)Worm_currentWorm];
     short wy = Worm_y[(short)Worm_currentWorm];
 
-    // FIX: Use integer math to avoid FPU usage (Privilege Violation)
-    short dx = wx - ax;
-    short dy = ay - wy;
-    
-    // We want 0=Up, 90=Right.
-    // fastAtan2 returns 0=Right (1,0), 90=Up (0,1).
-    // dx is Right. -dy is Up (since Y grows down).
-    // So fastAtan2(-dy, dx) -> 0=Right, 90=Up.
-    // We want 0=Up (which is 90 in math), 90=Right (which is 0 in math).
-    // So targetAngle = 90 - mathAngle.
-    
-    short mathAngle = fastAtan2(-dy, dx);
-    short newAngle = 90 - mathAngle;
-    
-    // Normalize newAngle to 0-360
-    while(newAngle < 0) newAngle += 360;
-    while(newAngle >= 360) newAngle -= 360;
-
+	// standard atan2(y, x)
+    // we want 0=Up, 90=Right, so atan2(dx, -dy)
+    double angle_rad = atan2((double)(wx - ax), (double)(ay - wy));
+    short newAngle = (short)(angle_rad * 180.0 / PI);
+	
 	// Make newAngle continuous with Game_ninjaRopeAngle
 	short diff = (newAngle - Game_ninjaRopeAngle) % 360;
     if (diff > 180) diff -= 360;
     if (diff < -180) diff += 360;
     Game_ninjaRopeAngle += diff;
 }
+
 
 /**
  * @brief Updates the worm's position based on the current anchor, length, and angle
@@ -154,6 +160,7 @@ void updateWormPosFromRope()
 	Worm_x[(short)Worm_currentWorm] = ax + (short)((long)Game_ninjaRopeLength * fixedSin(Game_ninjaRopeAngle) / SIN_SCALE);
     Worm_y[(short)Worm_currentWorm] = ay - (short)((long)Game_ninjaRopeLength * fixedCos(Game_ninjaRopeAngle) / SIN_SCALE);
 }
+
 
 /**
  * @brief Moves the worm along the ninja rope in or out
@@ -187,6 +194,7 @@ void NinjaRope_moveInOut(short direction)
 	// Apply new position
 	updateWormPosFromRope();
 }
+
 
 /**
  * @brief Changes the worms position based on ninja rope rotation
@@ -227,8 +235,7 @@ char checkToRemoveOldHitPoint()
     short lastAngle = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][2];
     short lastDir = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][3];
     
-    if ((lastDir == 1 && Game_ninjaRopeAngle < lastAngle) || 
-	    (lastDir == -1 && Game_ninjaRopeAngle > lastAngle)) 
+    if ((lastDir == 1 && Game_ninjaRopeAngle < lastAngle) || (lastDir == -1 && Game_ninjaRopeAngle > lastAngle)) 
 	{
 		Game_ninjaRopeAnchorCount--;
 		
@@ -301,6 +308,7 @@ char raycastForNewHitPoint()
 	
 	return FALSE;
 }
+
 
 /**
  * @brief Does the initial ninja rope shot raycast
