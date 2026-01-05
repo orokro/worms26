@@ -11,10 +11,6 @@
 // after a crate is settled, wait a bit before moving the camera
 char afterCrateFrames;
 
-// during the after turn in sudden death, the water will take 10 frames to advance 10 pixels...
-// this is that timer
-char waterLevelTimer = 0;
-
 // true once we've attempted to spawn a crate
 char crateLogicDone = FALSE;
 
@@ -23,14 +19,19 @@ char crateLogicDone = FALSE;
 */
 static void AfterTurn_enter()
 {
-	// for sudden death, we will increase the water level after turns
-	waterLevelTimer=10;
-
 	// put game timer in -1 to disable it
 	Game_timer=-1;
 
 	// reset our crate logic
 	crateLogicDone = FALSE;
+
+	// if we're in sudden death mode, raise the water some
+	if(Game_suddenDeathTimer<=0)
+	{
+		const short weaponID = Weapons_spawn(WWaterRaiser, 160, (196-Game_waterLevel), 0, 0, 30);
+		Camera_focusOn(&Weapon_x[weaponID], &Weapon_y[weaponID]);
+		StatusBar_showMessage("Water Level Risen!");
+	}
 
 	// if any worms are poisoned, damage them now
 	if(Worm_poisoned){
@@ -50,13 +51,6 @@ static void AfterTurn_enter()
 */
 static void AfterTurn_update()
 {
-	// if sudden death is active, we should increase the water level
-	if((Game_suddenDeathTimer<=0) && waterLevelTimer>0)
-	{
-		Game_waterLevel++;
-		waterLevelTimer--;
-	}
-	
 	// the game
 	Draw_renderGame();
 	
@@ -67,7 +61,6 @@ static void AfterTurn_update()
 	// we can move on to the next mode
 	if(Game_allSettled())
 	{
-
 		// if we haven't run our crate-spawn logic yet, do it now
 		if(crateLogicDone==FALSE)
 		{	

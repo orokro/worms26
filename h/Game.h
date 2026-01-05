@@ -86,7 +86,7 @@ extern short Game_retreatTimer;
 extern short Game_graceTimer;
 extern long Game_suddenDeathTimer;
 extern char Game_wind;
-extern char Game_waterLevel;
+extern short Game_waterLevel;
 extern char Game_currentTeam;
 extern char Game_surrenderedTeam;
 extern char Game_currentWormUp[2];

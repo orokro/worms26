@@ -293,12 +293,15 @@ void Worm_update()
  */
 void Worm_setHealth(short index, short health, char additive)
 {
-	// cant adjust health if this worms team is frozen
-	const short team1frozen = (Game_stateFlags & gs_team1Frozen);
-	const short team2frozen = (Game_stateFlags & gs_team2Frozen);
-	if( (team1frozen && (index<8)) || (team2frozen && (index>=8)) )
-		return;
-
+	// cant adjust health if this worms team is frozen, unless it's sudden death
+	if(Game_suddenDeathTimer>0)
+	{
+		const short team1frozen = (Game_stateFlags & gs_team1Frozen);
+		const short team2frozen = (Game_stateFlags & gs_team2Frozen);
+		if( (team1frozen && (index<8)) || (team2frozen && (index>=8)) )
+			return;
+	}
+	
 	if(additive)
 		Worm_health[index] += health;
 	else

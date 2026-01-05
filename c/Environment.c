@@ -160,7 +160,7 @@ void drawWater()
 		return;
 
 	// draw the water rectangle to fill in below the waterline
-	SCR_RECT waterRect = {{0, waterY + 9, 159, 99}};
+	SCR_RECT waterRect = {{0, (waterY + 9)<0 ? 0 : (waterY + 9), 159, 99}};
 
 	// Draw Light Gray: LightPlane = 1 (Black), DarkPlane = 0 (White)
 	PortSet(lightPlane, 239, 127);

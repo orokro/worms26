@@ -154,7 +154,7 @@ short Game_graceTimer = 5;
 long Game_suddenDeathTimer = 60L * TIME_MULTIPLIER * 10;
 
 // water level for sudden death:
-char Game_waterLevel = 0;
+short Game_waterLevel = 0;
 
 // current wind speed
 char Game_wind = 0;
@@ -300,6 +300,7 @@ void Game_initRound(){
 	Game_surrenderedTeam = -1;
 	Game_weaponUsesRemaining = -1;
 	Game_jetPackFuel = 0;
+	Game_suddenDeathTimer = 35L * TIME_MULTIPLIER;
 
 	// reset team weapons to default loadout
 	short i=0;
@@ -460,8 +461,17 @@ static void startSuddenDeath()
 {
 	// we don't even need to test for active worms, just make 'em all 1hp
 	short i=0;
+	unsigned short wormMask;
 	for(i=0; i<16; i++)
-		Worm_health[i]=1;
+	{
+		wormMask = (unsigned short)1<<(i);
+		if((Worm_active & wormMask) && (Worm_isDead & wormMask)==0)
+			Worm_setHealth(i, 1, FALSE);
+	}
+
+	// inform user
+	StatusBar_showMessage("Sudden Death Mode Activated!");
+	StatusBar_showMessage("Water Rises Every Turn");
 }
 
 
@@ -475,14 +485,14 @@ static void startSuddenDeath()
 static void gameTimers()
 {
 	// always decreases the sudden death timer
-	// Game_suddenDeathTimer--;
+	if(Game_suddenDeathTimer>0)
+	{
+		Game_suddenDeathTimer--;
+
+		if(Game_suddenDeathTimer==0)
+			startSuddenDeath();
+	}
 	
-	// note: technically suddenDeathTimer will go negative, but I doubt anyone will play
-	// long enough to get a negative overflow without drowning, so no need to check for negatives
-	// the benefit of this, is that when it's 0 for just one frame, we can init sudden death
-	if(Game_suddenDeathTimer==0)
-		startSuddenDeath();
-		
 	// decrease whichever timer is active
 	if(Game_graceTimer>0)
 		Game_graceTimer--;

@@ -267,7 +267,7 @@ char Weapon_aimPosList[10][2] = {
 	
 	This way, I can avoid the OPs and save space. For debug, it will remain.
 */
-unsigned long Weapon_props[76] = {
+unsigned long Weapon_props[77] = {
 
     // row 1
 
@@ -508,7 +508,11 @@ unsigned long Weapon_props[76] = {
 
 		// normal fire has constant gravity & wind. Fake fire will render the same, but turn
 		// into normal WFire upon impact, used for flame thrower an fire clusters (like barrels exploding)
-		usesPhysics | usesDetonateOnImpact | usesFuse | usesWind | customRender
+		usesPhysics | usesDetonateOnImpact | usesFuse | usesWind | customRender,
+
+		// water raiser will be a hidden weapon that uses a routine to animation water level rising
+		// this will be used both for nuclear test and sudden death
+		usesRoutine | usesFuse | noRender,
 };
     
     
@@ -798,6 +802,10 @@ void doWeaponRoutine(short index, unsigned short props)
 		dirX *= -1;
 
 	switch(Weapon_type[index]){
+
+		case WWaterRaiser:
+			Game_waterLevel += 1;
+			break;
 
 		case WSuperSheep2:
 
@@ -1721,9 +1729,11 @@ char Weapons_fire(short charge)
 	if(Game_currentWeaponSelected == WNuclearTest)
 	{
 		Worm_poisoned = 0b1111111111111111;
-		Game_waterLevel += 30;
 		StatusBar_showMessage("Indian Nuclear Test Detonated");
 		StatusBar_showMessage("All Worms are Poisoned!");
+		
+		// spawn a WWaterRaiser at the current water level to raise it
+		Weapons_spawn(WWaterRaiser, Worm_x[(short)Worm_currentWorm], (196-Game_waterLevel), 0, 0, 30);
 		return TRUE;
 	}
 
