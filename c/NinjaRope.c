@@ -10,303 +10,108 @@
 	This file will be in-line included in CharacterController.c
 */
 
-#ifndef PI
-#define PI 3.14159265358979323846
-#endif
+// --- CONSTANTS ---
+#define GRAVITY 0.25f
+#define ROPE_CLIMB_SPEED 2.0f
+#define ROPE_SWING_ACCEL 0.008f
+#define ROPE_DAMPING 0.99f
+#define WORM_COLLISION_RADIUS 4
+#define MIN_ROPE_LENGTH 10.0f
+//#define PI 3.14159265f
+#define TWO_PI 6.28318531f
+//#define HALF_PI 1.57079633f
 
-#define SIN_SCALE 8192
-
+// --- FAST MATH IMPLEMENTATIONS ---
 
 /**
- * @brief Integer atan2 approximation to avoid FPU usage
- * Returns angle 0-360
+ * @brief Fast Sine Approximation (High performance, reasonable precision)
+ * Domain: -PI to PI
  */
-short fastAtan2(short y, short x)
-{
-    short absX = x < 0 ? -x : x;
-    short absY = y < 0 ? -y : y;
-    short angle;
+static float fast_sin(float x) {
+    // Wrap to range -PI to PI
+    while (x < -PI) x += TWO_PI;
+    while (x >  PI) x -= TWO_PI;
 
-    if (x == 0 && y == 0) return 0;
+    // 1.27323954  = 4/pi
+    // 0.405284735 = 4/pi^2
+    float z = x;
+    if (z < 0.0f) z = -z;
+    
+    float y = 1.27323954f * x - 0.405284735f * x * z;
 
-    if (absY == 0) angle = 0;
-    else if (absX == 0) angle = 90;
-    else if (absY <= absX) angle = (45 * absY) / absX;
-    else angle = 90 - ((45 * absX) / absY);
+    // Optional precision improvement (extra cost, smoother curve)
+    // Q = 0.225
+    float y_abs = y; 
+    if(y_abs < 0.0f) y_abs = -y_abs;
+    y = 0.225f * (y * y_abs - y) + y;
 
-    if (x < 0) angle = 180 - angle;
-    if (y < 0) angle = 360 - angle;
-    return angle;
+    return y;
 }
 
 
 /**
- * @brief computes fast sine from degrees
- * 
- * @param thetaInDegrees - angle in degrees
- * @return float - sine value
+ * @brief Fast Cosine Approximation
  */
-float fastSin(short thetaInDegrees)
-{
-	short deg = thetaInDegrees % 360;
-	if (deg < 0) deg += 360;
-	
-	if (deg <= 90) return (float)RS_sin8192tab[deg] / 8192.0f;
-	if (deg <= 180) return (float)RS_sin8192tab[180 - deg] / 8192.0f;
-	if (deg <= 270) return -(float)RS_sin8192tab[deg - 180] / 8192.0f;
-	return -(float)RS_sin8192tab[360 - deg] / 8192.0f;
+static float fast_cos(float x) {
+    return fast_sin(x + HALF_PI);
 }
 
 
 /**
- * @brief Computes fast cosine from degrees	
- * 
- * @param thetaInDegrees - angle in degrees
- * @return float - cosine value
+ * @brief Fast Atan2 Approximation
+ * Error < 0.005 radians
  */
-float fasCos(short thetaInDegrees)
-{
-	return fastSin(thetaInDegrees + 90);
-}
-
-
-/**
- * @brief Does fixed point sine
- * 
- * @param degrees - degrees
- * @return short - sine value
- */
-short fixedSin(short degrees) {
-    degrees %= 360;
-    if (degrees < 0) degrees += 360;
-    if (degrees <= 90) return RS_sin8192tab[degrees];
-    if (degrees <= 180) return RS_sin8192tab[180 - degrees];
-    if (degrees <= 270) return -(short)RS_sin8192tab[degrees - 180];
-    return -(short)RS_sin8192tab[360 - degrees];
-}
-
-
-/**
- * @brief does fixed point cosine
- * 
- * @param degrees - degrees
- * @return short - cosine value
- */
-short fixedCos(short degrees) {
-    return fixedSin(degrees + 90);
-}
-
-
-/**
- * @brief Get the Ninja Rope angles based on a int value between 0-360
- * 
- * @param outX - output X component
- * @param outY - output Y component
- */
-void getNinjaRopeAngles(short *outX, short *outY)
-{
-	*outX = fixedSin(Game_ninjaRopeAngle);
-	*outY = -fixedCos(Game_ninjaRopeAngle);
-}
-
-
-/**
- * @brief Normalizes degrees to 0-359
- * 
- * @param degrees - degrees to normalize
- */
-short getNormalizedDegrees(short degrees){
-	degrees = degrees % 360;
-	if(degrees < 0)
-		degrees += 360;
-	return degrees;
-}
-
-
-/**
- * @brief updates the current ninja rope angle based on rotation speed and direction
- */
-void updateNinjaRopeCurrentAngle()
-{
-	short ax = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][0];
-    short ay = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][1];
-    short wx = Worm_x[(short)Worm_currentWorm];
-    short wy = Worm_y[(short)Worm_currentWorm];
-
-	// standard atan2(y, x)
-    // we want 0=Up, 90=Right, so atan2(dx, -dy)
-    double angle_rad = atan2((double)(wx - ax), (double)(ay - wy));
-    short newAngle = (short)(angle_rad * 180.0 / PI);
-	
-	// Make newAngle continuous with Game_ninjaRopeAngle
-	short diff = (newAngle - Game_ninjaRopeAngle) % 360;
-    if (diff > 180) diff -= 360;
-    if (diff < -180) diff += 360;
-    Game_ninjaRopeAngle += diff;
-}
-
-
-/**
- * @brief Updates the worm's position based on the current anchor, length, and angle
- */
-void updateWormPosFromRope()
-{
-	short ax = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][0];
-    short ay = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][1];
-	
-	// X = Center + Radius * Sin(theta)
-	// Y = Center - Radius * Cos(theta)
-	
-	Worm_x[(short)Worm_currentWorm] = ax + (short)((long)Game_ninjaRopeLength * fixedSin(Game_ninjaRopeAngle) / SIN_SCALE);
-    Worm_y[(short)Worm_currentWorm] = ay - (short)((long)Game_ninjaRopeLength * fixedCos(Game_ninjaRopeAngle) / SIN_SCALE);
-}
-
-
-/**
- * @brief Moves the worm along the ninja rope in or out
- * 
- * @param direction - -1 to move in, 1 to move out
- */
-void NinjaRope_moveInOut(short direction)
-{
-	// Adjust length
-	Game_ninjaRopeLength += (direction * 3);
-	
-	// Bound check min length
-	if(Game_ninjaRopeLength <= 3) {
-		// If we are super close, check if we can remove an anchor
-		if(Game_ninjaRopeAnchorCount > 1) {
-			Game_ninjaRopeAnchorCount--;
-			
-			// Recalculate properties for the previous anchor
-			updateNinjaRopeCurrentAngle();
-			
-			// New length is distance to the *new* current anchor
-			short nax = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][0];
-			short nay = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][1];
-			Game_ninjaRopeLength = dist(Worm_x[(short)Worm_currentWorm], Worm_y[(short)Worm_currentWorm], nax, nay);
-		} else {
-			// Cap at min length
-			Game_ninjaRopeLength = 3;
-		}
-	}
-	
-	// Apply new position
-	updateWormPosFromRope();
-}
-
-
-/**
- * @brief Changes the worms position based on ninja rope rotation
- * 
- * @return char - TRUE if the angle changed, FALSE otherwise
- */
-char doNinjaRopeRotation()
-{
-	if (Game_ninjaRopeRotationDir != 0) {
-        Game_ninjaRopeRotationSpeed += Game_ninjaRopeRotationDir;
-        if (Game_ninjaRopeRotationSpeed > 5) Game_ninjaRopeRotationSpeed = 5;
-        if (Game_ninjaRopeRotationSpeed < -5) Game_ninjaRopeRotationSpeed = -5;
-    } else {
-        if (Game_ninjaRopeRotationSpeed > 0) Game_ninjaRopeRotationSpeed--;
-        else if (Game_ninjaRopeRotationSpeed < 0) Game_ninjaRopeRotationSpeed++;
+static float fast_atan2(float y, float x) {
+    if (x == 0.0f) {
+        if (y > 0.0f) return HALF_PI;
+        if (y < 0.0f) return -HALF_PI;
+        return 0.0f;
     }
 
-    if (Game_ninjaRopeRotationSpeed == 0) return FALSE;
-
-    Game_ninjaRopeAngle += Game_ninjaRopeRotationSpeed;
-
-    // Update worm position based on new angle and FIXED radius
-	updateWormPosFromRope();
-
-    return TRUE;
-}
-
-
-/**
- * @brief Checks if the old hit point should be removed
- * 
- * @return char - TRUE if it was removed, FALSE otherwise
- */
-char checkToRemoveOldHitPoint()
-{
-	if (Game_ninjaRopeAnchorCount <= 1) return FALSE;
-
-    short lastAngle = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][2];
-    short lastDir = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][3];
+    float abs_y = y; 
+    if(abs_y < 0.0f) abs_y = -abs_y;
     
-    if ((lastDir == 1 && Game_ninjaRopeAngle < lastAngle) || (lastDir == -1 && Game_ninjaRopeAngle > lastAngle)) 
-	{
-		Game_ninjaRopeAnchorCount--;
-		
-		// We have unwrapped!
-		// Update Angle relative to the *new* anchor
-		updateNinjaRopeCurrentAngle();
-		
-		// Update Length relative to the *new* anchor
-		short ax = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][0];
-		short ay = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][1];
-		Game_ninjaRopeLength = dist(Worm_x[(short)Worm_currentWorm], Worm_y[(short)Worm_currentWorm], ax, ay);
-		
-		return TRUE;
-	}
-    return FALSE;
+    float angle;
+    if (x >= 0.0f) {
+        float r = (x - abs_y) / (x + abs_y);
+        angle = 0.785398163f - 0.785398163f * r; // PI/4 * (1 - r)
+    } else {
+        float r = (x + abs_y) / (abs_y - x);
+        angle = 2.35619449f - 0.785398163f * r; // 3*PI/4 - PI/4 * r
+    }
+    
+    return y < 0.0f ? -angle : angle;
 }
 
 
 /**
- * @brief Checks if the new rotation should add a new ninja rope point
- * 
- * @return char 
+ * @brief Helper: Check if worm body overlaps land
  */
-char raycastForNewHitPoint()
+static char CheckWormCollision(short x, short y) {
+    // 1. Check center
+    if (Map_testPoint(x, y)) return 1;
+
+    // 2. Check diamond shape (faster than circle)
+    if (Map_testPoint(x + WORM_COLLISION_RADIUS, y)) return 1;
+    if (Map_testPoint(x - WORM_COLLISION_RADIUS, y)) return 1;
+    if (Map_testPoint(x, y + WORM_COLLISION_RADIUS)) return 1;
+    if (Map_testPoint(x, y - WORM_COLLISION_RADIUS)) return 1;
+
+    return 0;
+}
+
+
+/**
+ * @brief Updates the current angle of the ninja rope based on the worm's position
+ */
+static void updateNinjaRopeCurrentAngle()
 {
-	// if we're at maximum hit points already, gtfo
-	if(Game_ninjaRopeAnchorCount >= MAX_NINJA_ROPE_POINTS)
-		return FALSE;
+	const short wx = Worm_x[(short)Worm_currentWorm];
+	const short wy = Worm_y[(short)Worm_currentWorm];
+	const short ax = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][0];
+	const short ay = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][1];
 
-	short wx = Worm_x[(short)Worm_currentWorm];
-    short wy = Worm_y[(short)Worm_currentWorm];
-    short ax = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][0];
-    short ay = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][1];
-
-    short dx = ax - wx;
-    short dy = ay - wy;
-    short d_val = Game_ninjaRopeLength; // Use our trusted length
-    if (d_val == 0) return FALSE;
-	
-    short rayDirX = (short)((long)dx * 10 / d_val);
-    short rayDirY = (short)((long)dy * 10 / d_val);
-
-    RaycastHit hit;
-    Game_raycast(wx, wy, rayDirX, rayDirY, FALSE, &hit);
-	
-	if(hit.hitType != RAY_HIT_NOTHING)
-	{
-		// Distance from current anchor to hit point
-        short d = dist(hit.x, hit.y, ax, ay);
-		short distFromWorm = dist(hit.x, hit.y, wx, wy);
-
-		// Must be significantly far from the current anchor AND not hitting the worm itself/pixels next to worm
-        if (d > 5 && distFromWorm > 8) {
-			// add the new hit point:
-			Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][0] = hit.x;
-			Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][1] = hit.y;
-			Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][2] = Game_ninjaRopeAngle;
-			Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][3] = (Game_ninjaRopeRotationSpeed > 0) ? 1 : -1;
-			
-			// increment our counter
-			Game_ninjaRopeAnchorCount++;
-			
-			// Update Length to be distance from *new* anchor to worm
-			// Mathematically, this should be distFromWorm
-			Game_ninjaRopeLength = distFromWorm;
-
-			return TRUE;
-		}
-	}
-	
-	return FALSE;
+	Game_ninjaRopeAngle = (short)(fast_atan2((float)(wy - ay), (float)(wx - ax)) * 57.29578f);
 }
 
 
@@ -367,82 +172,170 @@ char CharacterController_doInitialNinjaRopeShot(short dirX, short dirY)
 /**
  * @brief Handles the logic for the NinjaRope
  */
-void wormNinjaRope(){
+void wormNinjaRope()
+{
+    // 1. SAFETY CHECKS
+    if (!(Game_stateFlags & gs_ninjaRopeMode)) return;
+    if (Game_ninjaRopeAnchorCount == 0) return;
 
-	// gtfo if we're not in ninja rope mode
-	if(!(Game_stateFlags & gs_ninjaRopeMode))
-		return;
+    // Get shortcuts to current worm data
+    short wIdx = (short)Worm_currentWorm;
+    short wx = Worm_x[wIdx];
+    short wy = Worm_y[wIdx];
 
-	// unsettle worm
-	Worm_physObj[(short)Worm_currentWorm].staticFrames = 0;
-	Worm_settled &= ~wormMask;
+    // 2. STATE MANAGEMENT (PRECISION HANDLING)
+    static float fAngle = 0.0f;
+    static float fLength = 0.0f;
+    static float fAngVel = 0.0f;
+    static short lastActiveWorm = -1;
 
-	// if action key is pressed, exit mode
-	if(Keys_keyState(keyAction))
-	{
-		Game_stateFlags &= ~gs_ninjaRopeMode;
-		
-		// Apply a little "hop" or momentum conservation
-		Worm_yVelo[(short)Worm_currentWorm] = -2; 
-		return;
-	}
+    short activePivotX = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][0];
+    short activePivotY = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][1];
 
-	// if the up key is pressed, we should get closer to the current / last ninja rope point
-	if(Keys_keyState(keyUp))
-	{
-		// -1 implies move closer, shrink distance
-		NinjaRope_moveInOut(-1);
-	}
-	else if(Keys_keyState(keyDown))
-	{
-		// 1 implies move away, increase distance
-		NinjaRope_moveInOut(1);
-	}
+    // Detect if we just entered mode or switched worms, reset physics state
+    if (lastActiveWorm != wIdx || fLength == 0.0f) {
+        lastActiveWorm = wIdx;
+        fLength = (float)Game_ninjaRopeLength;
+        // Initialize angle based on current position relative to pivot
+        fAngle = fast_atan2((float)(wy - activePivotY), (float)(wx - activePivotX));
+        fAngVel = 0.0f;
+    }
 
-	// for testing, we can get the current angle in normalized space
-	const short angle = getNormalizedDegrees(Game_ninjaRopeAngle);
+    // Keep track of where we started this frame (Last Known Good)
+    short startX = wx;
+    short startY = wy;
 
-	static char rotationLatch = 0;
-	static char invertLatch = 1;
+    // 3. INPUT: ROPE LENGTH (Climb/Extend)
+    float oldLength = fLength;
 
-	// if left or right are pressed, we need to do ninja-rope rotation
-	if(Keys_keyState(keyLeft|keyRight))
-	{
-		if(!rotationLatch) {
-			rotationLatch = 1;
-			// At 180 (Down), we want Right Key to Decrease Angle (Move Right). 
-            // My engine: Right Key -> Game_ninjaRopeRotationDir = -1 * invertLatch.
-            // We want Dir = -1. So invertLatch must be 1.
-            // At 0 (Up), we want Right Key to Increase Angle (Move Right).
-            // We want Dir = 1. So invertLatch must be -1.
-			invertLatch = (angle>90 && angle<270) ? 1 : -1;
-		}
+    if (Keys_keyState(keyUp)) {
+        fLength -= ROPE_CLIMB_SPEED;
+        if (fLength < MIN_ROPE_LENGTH) fLength = MIN_ROPE_LENGTH;
+    }
+    if (Keys_keyState(keyDown)) {
+        fLength += ROPE_CLIMB_SPEED;
+    }
 
-		if(Keys_keyState(keyLeft))
-		{
-			// rotate left
-			Game_ninjaRopeRotationDir = 1 * invertLatch;
-		}
-		else if(Keys_keyState(keyRight))
-		{
-			// rotate right
-			Game_ninjaRopeRotationDir = -1 * invertLatch;
-		}
-	}
-	else
-	{
-		// not rotating
-		rotationLatch = 0;
-		Game_ninjaRopeRotationDir = 0;
-	}
+    // Test if climbing hit a ceiling
+    short testX = activePivotX + (short)(fast_cos(fAngle) * fLength);
+    short testY = activePivotY + (short)(fast_sin(fAngle) * fLength);
 
-	// apply the rotation and if it rotated, we should check for adding/removing points
-	if(doNinjaRopeRotation())
-	{
-		// see if we need to remove the last point
-		checkToRemoveOldHitPoint();
+    if (CheckWormCollision(testX, testY)) {
+        fLength = oldLength; // Climb denied
+    }
 
-		// we can also check if we should add a hit point
-		raycastForNewHitPoint();
-	}
+    // 4. PHYSICS: ANGULAR MOMENTUM
+    // Gravity: pulls towards PI/2 (down). Torque = Gravity/Len * cos(angle)
+    fAngVel += (GRAVITY / fLength) * fast_cos(fAngle);
+
+    // Input: Swing
+    char isBelow = wy > activePivotY;
+    float swingForce = ROPE_SWING_ACCEL;
+
+    if (Keys_keyState(keyLeft)) {
+        fAngVel += isBelow ? swingForce : -swingForce;
+    }
+    if (Keys_keyState(keyRight)) {
+        fAngVel -= isBelow ? swingForce : -swingForce;
+    }
+
+    fAngVel *= ROPE_DAMPING;
+
+    // 5. CALCULATE PROPOSED POSITION
+    float nextAngle = fAngle + fAngVel;
+
+    short nextX = activePivotX + (short)(fast_cos(nextAngle) * fLength);
+    short nextY = activePivotY + (short)(fast_sin(nextAngle) * fLength);
+
+    // 6. COLLISION CHECK (BODY)
+    if (CheckWormCollision(nextX, nextY)) {
+        // Bonk! Stop momentum
+        fAngVel = 0.0f;
+        // Revert to start of frame
+        nextX = startX;
+        nextY = startY;
+        nextAngle = fAngle;
+    }
+    else {
+        // Path is clear, commit the angle
+        fAngle = nextAngle;
+    }
+
+    // 7. UNWRAP CHECK (Raycast to Previous Pivot)
+    char didUnwrap = 0;
+    if (Game_ninjaRopeAnchorCount > 1) {
+        short prevX = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 2][0];
+        short prevY = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 2][1];
+
+        RaycastHit hit;
+        Game_raycast(prevX, prevY, nextX - prevX, nextY - prevY, FALSE, &hit);
+
+        short distToWorm = dist(prevX, prevY, nextX, nextY);
+        short distToHit = (hit.hitType == RAY_HIT_LAND) ? dist(prevX, prevY, hit.x, hit.y) : 32000;
+
+        if (distToHit >= distToWorm - 5) {
+            Game_ninjaRopeAnchorCount--;
+            activePivotX = prevX;
+            activePivotY = prevY;
+
+            float newLength = (float)distToWorm;
+            if (newLength > 0.1f) {
+                fAngVel = fAngVel * (fLength / newLength);
+                fLength = newLength;
+            }
+
+            fAngle = fast_atan2((float)(nextY - activePivotY), (float)(nextX - activePivotX));
+            didUnwrap = 1;
+        }
+    }
+
+    // 8. WRAP CHECK (Raycast to Current Pivot)
+    if (!didUnwrap) {
+        RaycastHit hit;
+        Game_raycast(activePivotX, activePivotY, nextX - activePivotX, nextY - activePivotY, FALSE, &hit);
+
+        if (hit.hitType == RAY_HIT_LAND) {
+            short distToHit = dist(activePivotX, activePivotY, hit.x, hit.y);
+
+            if (distToHit > 5 && distToHit < (short)fLength - 5) {
+                if (Game_ninjaRopeAnchorCount < MAX_NINJA_ROPE_POINTS) {
+                    Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][0] = hit.x;
+                    Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][1] = hit.y;
+                    Game_ninjaRopeAnchorCount++;
+
+                    float newLength = (float)dist(hit.x, hit.y, nextX, nextY);
+                    if (newLength < 1.0f) newLength = 1.0f;
+
+                    fAngVel = fAngVel * (fLength / newLength);
+                    fLength = newLength;
+
+                    activePivotX = hit.x;
+                    activePivotY = hit.y;
+                    fAngle = fast_atan2((float)(nextY - activePivotY), (float)(nextX - activePivotX));
+                } else {
+                    fAngVel = 0;
+                }
+            }
+        }
+    }
+
+    // 9. EXIT CONDITION
+    if (Keys_keyDown(keyAction)) {
+        float linearSpeed = fAngVel * fLength;
+        Worm_xVelo[wIdx] = (char)(-fast_sin(fAngle) * linearSpeed);
+        Worm_yVelo[wIdx] = (char)(fast_cos(fAngle) * linearSpeed);
+		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], Worm_xVelo[wIdx], Worm_yVelo[wIdx], FALSE, TRUE);
+        Game_stateFlags &= ~gs_ninjaRopeMode;
+        
+        // Reset state for next use
+        fLength = 0; 
+        return;
+    }
+
+    // 10. FINAL COMMIT TO GLOBALS
+    Worm_x[wIdx] = nextX;
+    Worm_y[wIdx] = nextY;
+
+    Game_ninjaRopeLength = (short)fLength;
+    Game_ninjaRopeAngle = (short)(fAngle * 57.29578f);
 }

@@ -609,7 +609,7 @@ void CharacterController_weaponConsumed(char noEndTurn){
 		Match_teamWeapons[(short)Game_currentTeam][(short)Game_currentWeaponSelected]=-1;
 
 	// special case for ninja rope: if it is, we should reselect it after
-	char isNinjaRope = (Game_currentWeaponSelected == WNinjaRope);
+	// char isNinjaRope = (Game_currentWeaponSelected == WNinjaRope);
 
 	// reset weapon selection, save last weapon selected
 	if(Game_currentWeaponSelected!=-1)
@@ -617,8 +617,8 @@ void CharacterController_weaponConsumed(char noEndTurn){
 	Game_currentWeaponSelected = -1;
 
 	// reselect ninja rope if needed
-	if(isNinjaRope && Match_teamWeapons[(short)Game_currentTeam][WNinjaRope]>0)
-		Game_currentWeaponSelected = WNinjaRope;
+	// if(isNinjaRope && Match_teamWeapons[(short)Game_currentTeam][WNinjaRope]>0)
+	// 	Game_currentWeaponSelected = WNinjaRope;
 
 	// end turn if necessary
 	if(noEndTurn || (Game_currentWeaponProperties & doesntEndTurn))

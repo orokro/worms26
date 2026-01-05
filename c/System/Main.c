@@ -151,8 +151,15 @@ void GenerateFlippedSprites()
 }
 
 
-// global method to calculate distance between two points
-// maybe I'll move this into a math file one day
+/**
+ * @brief calculates the distance between two points	
+ * 
+ * @param x1 - x1
+ * @param y1 - y1
+ * @param x2 - x2
+ * @param y2 - y2
+ * @return short - distance between points
+ */
 short dist(short x1, short y1, short x2, short y2)
 {
 	long dx = (long)x2 - (long)x1;
