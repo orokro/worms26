@@ -46,21 +46,11 @@ extern void Mines_update();
 
 
 /**
- * Allows a worm to trigger a mine
- *
- * @param index the mine index to trigger
-*/
-extern void Mines_trigger(short);
-
-
-/**
- * Changes the heath of a worm. Updates worms health sprite.
- *
- * @param index the worm to change
- * @param health the amount to set it to, or add/subtract from
- * @param additive TRUE or FALSE if using additive mode
-*/
-extern void Worm_setHealth(short, short, char);
+ * triggers a mine
+ * 
+ * @param index - the mine to trigger
+ */
+void Mines_trigger(short index);
 
 
 /**
@@ -78,4 +68,4 @@ extern void Mines_drawAll();
  */
 extern void Mines_spawnAt(short x, short y);
 
-#endif /* MINES_H */
+#endif

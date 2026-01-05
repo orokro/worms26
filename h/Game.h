@@ -173,6 +173,7 @@ extern char Game_allSettled();
  */
 extern char Game_checkWinConditions();
 
+
 /**
  * @brief Get the Girder Coords object
  * 

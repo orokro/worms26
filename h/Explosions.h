@@ -34,7 +34,7 @@ extern unsigned short Explosion_firstFrame;
  * @param power the max health damage, and velocity causing power of the explosion
  * @param hasFire a char boolean if the explosion should generate fire particles or not
 */
-extern short Explosion_spawn(short, short, char, char, char);
+extern short Explosion_spawn(short x, short y, char size, char power, char hasFire);
 
 
 /**
@@ -76,5 +76,6 @@ extern char Explosion_getFirstActive();
  * @param s radius
  */
 extern void Explosion_dig(short x, short y, short s, char border);
+
 
 #endif

@@ -1194,7 +1194,7 @@ void Weapons_detonateWeapon(short index)
 	// Handle special cases that should NOT explode or should have custom explosions/behavior
 	if(weaponType == WConcreteDonkey)
 	{
-		Explosion_spawn(Weapon_x[index], Weapon_y[index]+1, 15, 10, TRUE);
+		Explosion_spawn(Weapon_x[index], Weapon_y[index]+1, 15, 10, FALSE);
 		Camera_focusOn(&Weapon_x[index], &Weapon_y[index]);
 		Weapon_yVelo[index]=-12;
 		return; // Concrete Donkey handles its own deactivation (when OOB)
@@ -1202,7 +1202,7 @@ void Weapons_detonateWeapon(short index)
 
 	if(weaponType == WMBBomb)
 	{
-		Explosion_spawn(Weapon_x[index], Weapon_y[index]+1, 15, 10, TRUE);
+		Explosion_spawn(Weapon_x[index], Weapon_y[index]+1, 15, 10, FALSE);
 		return;
 	}
 
@@ -1219,14 +1219,17 @@ void Weapons_detonateWeapon(short index)
 		Worm_setHealth((char)Worm_currentWorm, 0, FALSE);
 		Worm_isDead |= (unsigned short)1<<(Worm_currentWorm);
 		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], 0, 2, TRUE, TRUE);
-		Explosion_spawn(Weapon_x[index], Weapon_y[index], 7, 15, TRUE);
+		Explosion_spawn(Weapon_x[index], Weapon_y[index], 7, 15, FALSE);
 		return;
 	}
 
 	// Default: create an explosion
-	Explosion_spawn(Weapon_x[index], Weapon_y[index], 10, 10, TRUE);
+	Explosion_spawn(Weapon_x[index], Weapon_y[index], 10, 10, FALSE);
 
 	// if this is a cluster weapon, spawn some cluster items
+	char clusterXMultiplier = 1;
+	char clusterYValue = 1;
+	short clusterFuse = 6*TIME_MULTIPLIER;
 	if(Weapon_props[weaponType] & isCluster)
 	{	
 		short spawnType = 0;
@@ -1234,18 +1237,25 @@ void Weapons_detonateWeapon(short index)
 		{
 			case WSuperBanana:
 				spawnType = WBanana;
+				clusterYValue = 5;
+				clusterXMultiplier = 1;
 				break;
 			case WPetrolBomb:
-				spawnType = WFire;
+				spawnType = WFakeFire;
+				clusterYValue = 4;
+				clusterXMultiplier = 1;
+				clusterFuse = 60*TIME_MULTIPLIER;
 				break;				
 			default:
 				spawnType = WFragment;
+				clusterYValue = 5;
+				clusterXMultiplier = 2;
 				break;
 		}// swatch 
 		
-		int i;
+		short i;
 		for(i=0; i<5; i++)
-			Weapons_spawn(spawnType, Weapon_x[index], Weapon_y[index], -5+i*2, -6, 6*TIME_MULTIPLIER);
+			Weapons_spawn(spawnType, Weapon_x[index], Weapon_y[index], ((-2+i)/2.0)*clusterXMultiplier, -clusterYValue, clusterFuse);
 	}
 	
 	// focus back on current worm
@@ -1941,6 +1951,9 @@ void Weapons_drawAll()
 {
 	short screenX, screenY, weaponType;
 	
+	static char fireFrame = 0;
+	fireFrame = (fireFrame++)>1 ? 0 : fireFrame;
+
 	// loop over all weapons and draw them if active:
 	short i;
 	for(i=0; i<MAX_WEAPONS; i++)
@@ -1970,7 +1983,7 @@ void Weapons_drawAll()
 						case WFire:
 						case WFakeFire:
 							{
-								const unsigned short* fireSprite = (Game_timer%2==0) ? spr_weapons[WFire] : spr_weapons_flipped[WFire];
+								const unsigned short* fireSprite = fireFrame ? spr_weapons[WFire] : spr_weapons_flipped[WFire];
 								ClipSprite16_OR_R(screenX-2, screenY-2, 11, fireSprite, lightPlane);
 								ClipSprite16_OR_R(screenX-2, screenY-2, 11, fireSprite, darkPlane);
 							}

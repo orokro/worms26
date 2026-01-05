@@ -62,11 +62,20 @@ extern void Worm_spawnWorms();
 extern void Worm_update();
 
 
-/* updates worms health */
+/**
+ * changes the worms health
+ * 
+ * @param index - which worm to change health for
+ * @param health - the amount to set it to, or add/subtract from
+ * @param additive - TRUE or FALSE if using additive mode
+ */
 extern void Worm_setHealth(short index, short health, char additive);
 
 
-/* draws all worms */
+/**
+ * @brief draws all worms 
+ */
 extern void Worm_drawAll();
+
 
 #endif

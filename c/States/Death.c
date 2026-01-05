@@ -95,7 +95,7 @@ static void Death_update()
 		if(Game_deathTimer==30){
 
 			// spawn explosion at worm position
-			Explosion_spawn(Worm_x[wormToKill], Worm_y[wormToKill]+7, 8, 20, TRUE);
+			Explosion_spawn(Worm_x[wormToKill], Worm_y[wormToKill]+7, 8, 20, FALSE);
 
 			// mark worm as dead, it will now render as a grave stone
 			Worm_isDead |= (unsigned short)(1<<wormToKill);

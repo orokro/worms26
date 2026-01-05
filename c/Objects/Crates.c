@@ -101,6 +101,10 @@ void showInfo(const char *txt)
 */
 static char spawnCrate()
 {
+	// don't spawn crates if we're in sudden death mode
+	if(Game_suddenDeathTimer<=0)
+		return FALSE;
+
 	// if no crates are enabled, GTFO early
 	if(Match_healthCratesEnabled==FALSE && Match_weaponCratesEnabled==FALSE && Match_toolCratesEnabled==FALSE)
 		return FALSE;
@@ -147,7 +151,7 @@ static char spawnCrate()
 	Crate_type[index] = enabledCrateTypes[(short)type];
 		
 	// reset health:
-	Crate_health[index] = 30;
+	Crate_health[index] = CRATE_HEALTH;
 
 	// set active, and unsettled!
 	Crate_active |= (unsigned short)1<<(index);
@@ -188,7 +192,6 @@ char Crates_spawnCrate()
 		return spawnCrate();
 	else
 		return FALSE;
-		
 }
 
 
@@ -228,6 +231,7 @@ void Crates_update()
 
 				// nothing left to check on this drum
 				continue;
+				
 			}// end if health<=0
 			
 			// if the Crate is considered "settled" no need for physics

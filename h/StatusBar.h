@@ -5,6 +5,9 @@
 	Main header file for the StatusBar.c module
 */
 
+#ifndef STATUSBAR_H
+#define STATUSBAR_H
+
 /**
  * Shows a message in the status bar for a set amount of time.
  * 
@@ -24,3 +27,5 @@ extern void StatusBar_update();
  * 
  */
 extern void StatusBar_draw();
+
+#endif

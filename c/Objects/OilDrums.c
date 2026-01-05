@@ -34,7 +34,7 @@ short OilDrum_x[MAX_OILDRUMS] = {0, 0, 0, 0, 0, 0};
 short OilDrum_y[MAX_OILDRUMS] = {0, 0, 0, 0, 0, 0};
 
 // health of our oil drums
-char OilDrum_health[MAX_OILDRUMS] = {30, 30, 30, 30, 30, 30};
+char OilDrum_health[MAX_OILDRUMS] = {OILDRUM_HEALTH, OILDRUM_HEALTH, OILDRUM_HEALTH, OILDRUM_HEALTH, OILDRUM_HEALTH, OILDRUM_HEALTH};
 
 // this int will be a bit-wise mask for the drums
 // the first 8 bits will represent if the drums are active or not
@@ -72,17 +72,15 @@ static void spawnDrum(short index)
 	// health is already set in the header file
 	// so let's just enable it:
 	OilDrum_active |= (unsigned short)1<<(index);
-	
+	OilDrum_health[index] = OILDRUM_HEALTH;
+
 	// make a new collider and physics object for this oil drum
 	new_Collider(&(OilDrum_physObj[index].col), COL_DOWN, 0, 5, 0, 0);
 	new_PhysObj(&OilDrum_physObj[index], &OilDrum_x[index], &OilDrum_y[index], &OilDrum_xVelo[index], &OilDrum_yVelo[index], 0, 100, (char)index, &OilDrum_settled);
-	
 }
 
 
-
 // --------------------------------------------------------------------------------------------------------------------------------------
-
 
 
 /**
@@ -118,7 +116,7 @@ void OilDrums_update()
 			if(OilDrum_health[i]<=0)
 			{
 				// boom
-				Explosion_spawn(OilDrum_x[i], OilDrum_y[i], 10, 10, TRUE);
+				Explosion_spawn(OilDrum_x[i], OilDrum_y[i], 12, 12, TRUE);
 				
 				// no longer active
 				OilDrum_active &= ~((unsigned short)1<<(i));
@@ -137,7 +135,8 @@ void OilDrums_update()
 				Physics_apply(&OilDrum_physObj[i]);
 			}
 			
-		}// end if active		
+		}// end if active
+
 	}// next i
 }
 

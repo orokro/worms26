@@ -136,7 +136,7 @@ extern unsigned long Weapon_props[77];
  * @param properties a char that is used as a bitmasked variable for the types of properties this weapon requires
  * @returns a char that is the index of the weapon slot this weapon was spawned into, or -1 if no slot was available.
 */
-extern char Weapons_spawn(char, short, short, char, char, unsigned short);
+extern char Weapons_spawn(char type, short x, short y, char xVelocity, char yVelocity, unsigned short time);
 
 
 /**
@@ -159,7 +159,7 @@ extern void Weapons_update();
  * @param x the x position in world space for the weapon target.
  * @param y the y position in world space for the weapon target.
 */
-extern void Weapons_setTarget(short, short);
+extern void Weapons_setTarget(short x, short y);
 
 
 /**

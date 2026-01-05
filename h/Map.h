@@ -61,7 +61,7 @@ extern char Map_findSpawnPoint(char type, short *outX, short *outY);
  * 
  * @returns TRUE or FALSE if a point is on land
  */
-extern char Map_testPoint(short, short);
+extern char Map_testPoint(short x, short y);
 
 
 /**

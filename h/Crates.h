@@ -12,6 +12,7 @@
 
 // crate defines
 #define MAX_CRATES 8
+#define CRATE_HEALTH 10
 #define crateHealth 0
 #define crateWeapon 1
 #define crateTool 2
@@ -49,7 +50,7 @@ extern void Crates_update();
  * @param index the crate index to pickup
  * @param worm the index of the worm who picked up the crate
 */
-extern void Crates_pickUp(short, short);
+extern void Crates_pickUp(short index, short worm);
 
 
 /**

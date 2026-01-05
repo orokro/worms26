@@ -96,7 +96,7 @@ extern void Draw_HUD();
  * @param wx a char that contains the x-position of the current weapon selected in the matrix of weapons
  * @param wy a char that contains the y-position of the current weapon selected in the matrix of weapons
 */
-extern void Draw_renderWeaponsMenu(char, char);
+extern void Draw_renderWeaponsMenu(char wx, char wy);
 
 
 /**

@@ -290,6 +290,10 @@ void Worm_update()
 
 /**
  * changes the worms health
+ * 
+ * @param index - which worm to change health for
+ * @param health - the amount to set it to, or add/subtract from
+ * @param additive - TRUE or FALSE if using additive mode
  */
 void Worm_setHealth(short index, short health, char additive)
 {
@@ -383,6 +387,7 @@ void txtToBuffer(unsigned long *buffer, unsigned long *mask, char *txt, char col
 
 /**
  * draw health sprite for a worm
+ * 
  * @param index - worm health index to draw
  */
 void renderHealthSprite(short index)
@@ -447,8 +452,8 @@ void renderHealthSprite(short index)
 
 
 /**
-	Draws all the in-game, on-screen Worms.
-*/
+ * @brief draws all worms 
+ */
 void Worm_drawAll()
 {
     short screenX, screenY, i, teamIdx;

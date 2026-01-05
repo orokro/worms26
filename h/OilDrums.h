@@ -15,7 +15,7 @@
 
 // OilDrum defines
 #define MAX_OILDRUMS 6
-
+#define OILDRUM_HEALTH 10
 
 // OilDrum globals
 extern short OilDrum_x[MAX_OILDRUMS];

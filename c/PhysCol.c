@@ -528,8 +528,8 @@ short Physics_checkExplosions(PhysObj *obj)
  */
 short Physics_checkWeapons(short wormIndex, unsigned short wormMask, PhysObj *obj)
 {
-	// gtfo early if no active weapons or if it's the current worm
-	if(Weapon_active==0)
+	// gtfo early if no active weapons or if the worm is dead/inactive
+	if(Weapon_active==0 || (Worm_isDead & wormMask) || !(Worm_active & wormMask))
 		return 0;
 
 	short i;

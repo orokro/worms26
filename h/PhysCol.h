@@ -180,7 +180,7 @@ short Physics_checkWeapons(short wormIndex, unsigned short wormMask, PhysObj *ob
  * @param y the y position in world space to test
  * @param dir the direction of the test. Can be: COL_UP, COL_DOWN, COL_LEFT, COL_RIGHT
 */
-extern short Collide_test(short, short, char);
+extern short Collide_test(short x, short y, char dir);
 
 
 #endif

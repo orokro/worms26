@@ -47,8 +47,10 @@ unsigned short reverseBits16(unsigned short n)
 
 
 // helper for mask generation
-unsigned short generateMaskRow(unsigned short outline) {
-    if (outline == 0) return 0xFFFF;
+unsigned short generateMaskRow(unsigned short outline)
+{
+    if (outline == 0)
+		return 0xFFFF;
     unsigned short left = 15, right = 0;
     
     // Find rightmost bit
@@ -70,7 +72,8 @@ unsigned short generateMaskRow(unsigned short outline) {
 
 
 // programmatically generate missing worm masks from their components
-void GenerateWormMasks() {
+void GenerateWormMasks()
+{
     int w, r;
     unsigned short* currentBufferPos = wormMaskBuffer;
     unsigned short* bufferEnd = wormMaskBuffer + WORM_GENERATED_MASK_BUFFER_SIZE;
@@ -111,7 +114,8 @@ void GenerateWormMasks() {
 
 
 // Call this ONCE in _main()
-void GenerateFlippedSprites() {
+void GenerateFlippedSprites()
+{
     int w, r;
     
     // 1. Flip weapons

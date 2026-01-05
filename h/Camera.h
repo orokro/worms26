@@ -39,7 +39,7 @@ extern void Camera_update();
  * @param targetX a pointer to a short x variable for the Camera to track
  * @param targetY a pointer to a short y variable for the Camera to track
 */
-extern void Camera_focusOn(short*, short*);
+extern void Camera_focusOn(short *targetX, short *targetY);
 
 
 /**

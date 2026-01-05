@@ -21,6 +21,7 @@
 #include "Map.h"
 #include "Draw.h"
 #include "Camera.h"
+#include "Weapons.h"
 
 
 // x/y positions of our Explosions
@@ -190,10 +191,15 @@ void updateExplosion(short index)
  * Spawns fire at an explosion point, for explosions that use fire.
  *
  * Explosions, such as those from OilDrums or Molotov Cocktails spawn fire particles
+ * 
+ * @param x - x location to spawn at
+ * @param y - y location to spawn at
 */
-void spawnFire()
+void spawnFire(short x, short y)
 {
-		
+	short i;
+	for(i=0; i<7; i++)
+		Weapons_spawn(WFakeFire, x, y, ((-3+i)/2.0), -4, 60*TIME_MULTIPLIER);
 }
 
 
@@ -270,7 +276,7 @@ short Explosion_spawn(short x, short y, char size, char power, char hasFire)
 	
 	// if this explosion has fire, let's spawn it now
 	if(hasFire)
-		spawnFire();
+		spawnFire(x, y);
 
 	return expIndex;
 }

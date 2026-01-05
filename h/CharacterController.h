@@ -42,4 +42,4 @@ extern void CharacterController_weaponConsumed(char noEndTurn);
  */
 extern char CharacterController_doInitialNinjaRopeShot(short dirX, short dirY);
 
-#endif // CHARCTRL_H
+#endif

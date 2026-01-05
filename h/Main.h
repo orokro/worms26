@@ -5,12 +5,13 @@
 	Main header file for the game / main.c
 */
 
+#ifndef MAIN_H
+#define MAIN_H
 
 // includes
 #include <tigcclib.h>
 #include "Lib\extgraph.h"
 #include "MainGeneral.h"
-
 
 
 // main defines
@@ -31,11 +32,13 @@ extern void *darkPlane;
 
 /**
  * Calculates the distance between two 2D points.
- 	 * 
- 	 * @param x1 the x value of the first coordinate
- 	 * @param y1 the y value of the first coordinate
- 	 * @param x2 the x value of the second coordinate
- 	 * @param y2 the y value of the second coordinate
- 	 * @return the distance between 2 points, via Pythagorean theorem
+ * 
+ * @param x1 the x value of the first coordinate
+ * @param y1 the y value of the first coordinate
+ * @param x2 the x value of the second coordinate
+ * @param y2 the y value of the second coordinate
+ * @return the distance between 2 points, via Pythagorean theorem
 */
-short dist(short, short, short, short);
+extern short dist(short x1, short y1, short x2, short y2);
+
+#endif
