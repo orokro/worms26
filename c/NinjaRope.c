@@ -199,6 +199,8 @@ void wormNinjaRope()
     static float fAngle = 0.0f;
     static float fLength = 0.0f;
     static float fAngVel = 0.0f;
+    static float fLengthVel = 0.0f;
+    static float fBungeeRestLength = 0.0f;
     static short lastActiveWorm = -1;
 
     short activePivotX = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][0];
@@ -212,6 +214,8 @@ void wormNinjaRope()
         // Initialize angle based on current position relative to pivot
         fAngle = fast_atan2((float)(wy - activePivotY), (float)(wx - activePivotX));
         fAngVel = 0.0f;
+        fLengthVel = 0.0f;
+        fBungeeRestLength = fLength * 5.0f;
     }
 
     // Keep track of where we started this frame (Last Known Good)
@@ -221,7 +225,15 @@ void wormNinjaRope()
     // 3. INPUT: ROPE LENGTH (Climb/Extend)
     float oldLength = fLength;
 
-    if (!(Game_stateFlags & gs_bungeeMode)) {
+    if (Game_stateFlags & gs_bungeeMode) {
+        // Spring physics (Hooke's Law)
+        float diff = fBungeeRestLength - fLength;
+        fLengthVel += diff * 0.04f; // Spring constant (Faster)
+        fLengthVel *= 0.95f;        // Damping
+        fLength += fLengthVel;
+    } else {
+        fLengthVel = 0.0f; // Safety reset
+
         if (Keys_keyState(keyUp)) {
             fLength -= ROPE_CLIMB_SPEED;
             if (fLength < MIN_ROPE_LENGTH) fLength = MIN_ROPE_LENGTH;
