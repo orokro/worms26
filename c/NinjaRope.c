@@ -221,21 +221,23 @@ void wormNinjaRope()
     // 3. INPUT: ROPE LENGTH (Climb/Extend)
     float oldLength = fLength;
 
-    if (Keys_keyState(keyUp)) {
-        fLength -= ROPE_CLIMB_SPEED;
-        if (fLength < MIN_ROPE_LENGTH) fLength = MIN_ROPE_LENGTH;
-    }
-    if (Keys_keyState(keyDown)) {
-        fLength += ROPE_CLIMB_SPEED;
-    }
+    if (!(Game_stateFlags & gs_bungeeMode)) {
+        if (Keys_keyState(keyUp)) {
+            fLength -= ROPE_CLIMB_SPEED;
+            if (fLength < MIN_ROPE_LENGTH) fLength = MIN_ROPE_LENGTH;
+        }
+        if (Keys_keyState(keyDown)) {
+            fLength += ROPE_CLIMB_SPEED;
+        }
 
-    // Test if climbing hit a ceiling
-    short testX = activePivotX + (short)(fast_cos(fAngle) * fLength);
-    short testY = activePivotY + (short)(fast_sin(fAngle) * fLength);
+        // Test if climbing hit a ceiling
+        short testX = activePivotX + (short)(fast_cos(fAngle) * fLength);
+        short testY = activePivotY + (short)(fast_sin(fAngle) * fLength);
 
-	// no climb if we collide
-    if (CheckWormCollision(testX, testY))
-        fLength = oldLength; 
+        // no climb if we collide
+        if (CheckWormCollision(testX, testY))
+            fLength = oldLength; 
+    }
     
     // 4. PHYSICS: ANGULAR MOMENTUM
     // Gravity: pulls towards PI/2 (down). Torque = Gravity/Len * cos(angle)
@@ -243,7 +245,7 @@ void wormNinjaRope()
 
     // Input: Swing
     char isBelow = wy > activePivotY;
-    float swingForce = ROPE_SWING_ACCEL;
+    float swingForce = (Game_stateFlags & gs_bungeeMode) ? (ROPE_SWING_ACCEL * 0.25f) : ROPE_SWING_ACCEL;
 
 	// Invert controls if below pivot
     if (Keys_keyState(keyLeft))
@@ -362,7 +364,7 @@ void wormNinjaRope()
         Worm_xVelo[wIdx] = (char)(-fast_sin(fAngle) * linearSpeed);
         Worm_yVelo[wIdx] = (char)(fast_cos(fAngle) * linearSpeed);
 		Physics_setVelocity(&Worm_physObj[(short)Worm_currentWorm], Worm_xVelo[wIdx], Worm_yVelo[wIdx], FALSE, TRUE);
-        Game_stateFlags &= ~gs_ninjaRopeMode;
+        Game_stateFlags &= ~(gs_ninjaRopeMode | gs_bungeeMode);
         
         // Reset state for next use
         fLength = 0; 

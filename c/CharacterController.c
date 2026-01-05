@@ -31,6 +31,11 @@
 #define MAX_WORM_SLOPE 6
 
 
+// ninja rope logic is complicated enough to warrant its own file
+// so, inline it here for clarity
+#include "NinjaRope.c"
+
+
 // these will be updated by CharacterController_update()
 // so we don't have to constantly calculate them...
 short *wX, *wY;
@@ -40,10 +45,7 @@ unsigned short wormMask = 0;
 static short lastGroundX = 0;
 static short lastGroundY = 0;
 static short ungroundedTimer = 0;
-static char bungeeLatch = 0;
 static char bungeeDisabled = 0;
-static short bungeeValidX = 0;
-static short bungeeValidY = 0;
 
 
 /**
@@ -390,11 +392,22 @@ void wormBungee()
                 // Raycast straight down from center of worm
                 RaycastHit hit;
 				Game_raycast(*wX, *wY, 0, 1, FALSE, &hit);
-                short dist = hit.y - *wY;
+                short distToGround = hit.y - *wY;
                 
                 // Activation Condition: falling over a gap or water
-                if(hit.hitType == RAY_HIT_NOTHING || dist > 40) {
-                    Game_stateFlags |= gs_bungeeMode;
+                if(hit.hitType == RAY_HIT_NOTHING || distToGround > 40) {
+                    
+                    // Initialize Ninja Rope in Bungee Mode
+                    Game_ninjaRopeAnchors[0][0] = lastGroundX;
+                    Game_ninjaRopeAnchors[0][1] = lastGroundY+5;
+                    Game_ninjaRopeAnchorCount = 1;
+                    
+                    // Set initial length and angle
+                    Game_ninjaRopeLength = dist(*wX, *wY, lastGroundX, lastGroundY);
+                    Game_ninjaRopeAngle = (short)(fast_atan2((float)(*wY - lastGroundY), (float)(*wX - lastGroundX)) * 57.29578f);
+
+                    // Enable Bungee mode using the Ninja Rope engine
+                    Game_stateFlags |= (gs_ninjaRopeMode | gs_bungeeMode);
                     
                     // If we used the selected weapon, consume it
                     if(Game_currentWeaponSelected == WBungeeCord) {
@@ -405,84 +418,6 @@ void wormBungee()
                     Game_stateFlags &= ~gs_bungeeActive;
                 }
             }
-        }
-    }
-
-    if(Game_stateFlags & gs_bungeeMode)
-    {
-        // Check for collisions to prevent teleporting
-        if(Worm_physObj[(short)Worm_currentWorm].col.collisions != 0) {
-            // "Bonk" - Revert to last valid position
-            *wX = bungeeValidX;
-            *wY = bungeeValidY;
-            Worm_xVelo[(short)Worm_currentWorm] = 0;
-            Worm_yVelo[(short)Worm_currentWorm] = 0;
-        } else {
-            // Update valid position
-            bungeeValidX = *wX;
-            bungeeValidY = *wY;
-        }
-
-        // Auto-disable if grounded (extra check inside mode block)
-        if(Worm_onGround & wormMask) {
-            Game_stateFlags &= ~gs_bungeeMode;
-            return;
-        }
-
-        if(Keys_keyState(keyAction)) {
-            if(!bungeeLatch) {
-                bungeeLatch = 1;
-                Game_stateFlags &= ~gs_bungeeMode;
-                ungroundedTimer = 0; // Reset timer to prevent instant re-activation
-                Worm_yVelo[(short)Worm_currentWorm] = -4; 
-                return;
-            }
-        } else {
-            bungeeLatch = 0;
-        }
-
-        Worm_physObj[(short)Worm_currentWorm].staticFrames = 0;
-        Worm_settled &= ~wormMask;
-
-        // Draw Line (World to Screen translation)
-        short sx = lastGroundX, sy = lastGroundY, ex = *wX, ey = *wY;
-        worldToScreen(&sx, &sy);
-        worldToScreen(&ex, &ey);
-        Draw_setRayLine(sx, sy, ex, ey);
-
-        long dx = (long)*wX - lastGroundX;
-        long dy = (long)*wY - lastGroundY;
-        long distSq = dx*dx + dy*dy;
-        long maxLenSq = 40L * 40L;
-
-        if(distSq > maxLenSq)
-        {
-            float d = sqrt((float)distSq);
-            float ratio = 40.0f / d;
-            
-            *wX = lastGroundX + (short)(dx * ratio);
-            *wY = lastGroundY + (short)(dy * ratio);
-            
-            float nx = dx / d;
-            float ny = dy / d;
-            float vx = (float)Worm_xVelo[(short)Worm_currentWorm];
-            float vy = (float)Worm_yVelo[(short)Worm_currentWorm];
-            float dot = vx * nx + vy * ny;
-            
-            if(dot > 0) {
-                float bounce = 0.5f; 
-                float impulse = (1.0f + bounce) * dot;
-                vx -= impulse * nx;
-                vy -= impulse * ny;
-                Worm_xVelo[(short)Worm_currentWorm] = (char)vx;
-                Worm_yVelo[(short)Worm_currentWorm] = (char)vy;
-            }
-        }
-
-        if(Keys_keyState(keyLeft)) {
-            Worm_xVelo[(short)Worm_currentWorm] -= 1;
-        } else if(Keys_keyState(keyRight)) {
-            Worm_xVelo[(short)Worm_currentWorm] += 1;
         }
     }
 }
@@ -540,11 +475,6 @@ void wormJetpack()
         }
     }
 }
-
-
-// ninja rope logic is complicated enough to warrant its own file
-// so, inline it here for clarity
-#include "NinjaRope.c"
 
 
 /**
