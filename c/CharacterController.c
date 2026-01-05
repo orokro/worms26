@@ -51,6 +51,23 @@ static short bungeeValidY = 0;
  */
 void wormWalk()
 {
+	// if w're in artillery mode, only allow facing direction to change
+	if(Match_artilleryMode)
+	{
+		// change the direction the worm is facing, even if we dont move:
+		if (Keys_keyState(keyLeft))
+			Worm_dir |= wormMask;
+		else if( Keys_keyState(keyRight))
+			Worm_dir &= ~wormMask;
+
+		// exit early for artillery mode
+		return;
+	}
+
+	// gtfo if not on ground, or ninja rope mode
+	if ((Worm_onGround & wormMask) && !(Game_stateFlags & gs_ninjaRopeMode))
+		return;
+
 	// Update last ground position if on ground
     lastGroundX = *wX;
     lastGroundY = *wY;
@@ -140,6 +157,16 @@ void wormWalk()
  */
 void adjustAim(){
 
+	// gtfo if aiming not currently allowed
+	const char allowed = 
+		(Game_currentWeaponProperties & usesAim)
+		||
+		(Game_currentWeaponState & keepAimDuringUse)
+		||
+		(Weapon_props[(short)Game_currentWeaponSelected] & usesPreAim);
+	if (!allowed)
+		return;
+
 	// if uses aim we should let them press up and down
 	if (Keys_keyState(keyUp))
 		Game_aimAngle++;
@@ -159,6 +186,10 @@ void adjustAim(){
  */
 void wormWeapon()
 {
+	// gtfo if no weapon
+	if (Game_currentWeaponSelected==-1)
+		return;
+
 	// handle meta weapons being pressed
 	if((Game_currentWeaponProperties & isMeta)!=0 && Keys_keyUp(keyAction))
 	{
@@ -533,46 +564,27 @@ void CharacterController_doBackflip()
  */
 void CharacterController_update()
 {
-	// GTFO if camera is being manually controlled
-	if (Keys_keyState(keyCameraControl))
-		return;
-
+	// update our local globals
 	wormMask = (unsigned short)1 << (Worm_currentWorm);
 	wX = &Worm_x[(short)Worm_currentWorm];
 	wY = &Worm_y[(short)Worm_currentWorm];
 
+	// GTFO if camera is being manually controlled
+	if (Keys_keyState(keyCameraControl))
+		return;
+
+	// GTFO if we're controlling the super sheep	
 	if(Weapon_superSheepDir != SHEEP_INACTIVE)
 		return;
 
-	// if we're in the ANIM_TORCH mode, always move the direction it's facing as if its auto-walking
-	// if (Game_wormAnimState == ANIM_TORCH)
-	// {
-	// 	// save the worms new position:
-	// 	*wX += (Worm_dir & wormMask) ? -1 : 1;
-
-	// 	// unsettle worm
-	// 	Worm_physObj[(short)Worm_currentWorm].staticFrames = 0;
-	// 	Worm_settled &= ~wormMask;
-	// }
-
+	// run logic for the various controller sub-systems
     wormParachute();
     wormBungee();
     wormJetpack();
 	wormNinjaRope();
-
-	if ((Worm_onGround & wormMask) && !(Game_stateFlags & gs_ninjaRopeMode))
-		wormWalk();
-
-	if (Game_currentWeaponSelected != -1)
-		wormWeapon();
-
-	if (
-		(Game_currentWeaponProperties & usesAim)
-		||
-		(Game_currentWeaponState & keepAimDuringUse)
-		||
-		Weapon_props[(short)Game_currentWeaponSelected] & usesPreAim	)
-		adjustAim();
+	wormWalk();
+	wormWeapon();
+	adjustAim();
 }
 
 

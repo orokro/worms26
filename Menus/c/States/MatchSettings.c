@@ -11,7 +11,7 @@
 const char *settingsMenuText[12] = {
 	"Worm Starting Health",
 	"Select Worms On Turn Start",
-	"Place Worms on  Game Start",
+	"Place Worms on Game Start",
 	"Turn Time",
 	"Artillery Mode",
 	"Enable Mines",
