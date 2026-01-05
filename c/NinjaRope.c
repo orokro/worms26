@@ -17,9 +17,8 @@
 #define ROPE_DAMPING 0.99f
 #define WORM_COLLISION_RADIUS 4
 #define MIN_ROPE_LENGTH 10.0f
-//#define PI 3.14159265f
 #define TWO_PI 6.28318531f
-//#define HALF_PI 1.57079633f
+
 
 // --- FAST MATH IMPLEMENTATIONS ---
 
@@ -27,7 +26,9 @@
  * @brief Fast Sine Approximation (High performance, reasonable precision)
  * Domain: -PI to PI
  */
-static float fast_sin(float x) {
+static float fast_sin(float x)
+{
+
     // Wrap to range -PI to PI
     while (x < -PI) x += TWO_PI;
     while (x >  PI) x -= TWO_PI;
@@ -42,7 +43,8 @@ static float fast_sin(float x) {
     // Optional precision improvement (extra cost, smoother curve)
     // Q = 0.225
     float y_abs = y; 
-    if(y_abs < 0.0f) y_abs = -y_abs;
+    if(y_abs < 0.0f) 
+		y_abs = -y_abs;		
     y = 0.225f * (y * y_abs - y) + y;
 
     return y;
@@ -52,7 +54,8 @@ static float fast_sin(float x) {
 /**
  * @brief Fast Cosine Approximation
  */
-static float fast_cos(float x) {
+static float fast_cos(float x)
+{
     return fast_sin(x + HALF_PI);
 }
 
@@ -61,21 +64,27 @@ static float fast_cos(float x) {
  * @brief Fast Atan2 Approximation
  * Error < 0.005 radians
  */
-static float fast_atan2(float y, float x) {
-    if (x == 0.0f) {
+static float fast_atan2(float y, float x)
+{
+    if (x == 0.0f)
+	{
         if (y > 0.0f) return HALF_PI;
         if (y < 0.0f) return -HALF_PI;
         return 0.0f;
     }
 
     float abs_y = y; 
-    if(abs_y < 0.0f) abs_y = -abs_y;
+    if(abs_y < 0.0f)
+		abs_y = -abs_y;
     
     float angle;
-    if (x >= 0.0f) {
+    if (x >= 0.0f)
+	{
         float r = (x - abs_y) / (x + abs_y);
         angle = 0.785398163f - 0.785398163f * r; // PI/4 * (1 - r)
-    } else {
+    }
+	else
+	{
         float r = (x + abs_y) / (abs_y - x);
         angle = 2.35619449f - 0.785398163f * r; // 3*PI/4 - PI/4 * r
     }
@@ -87,7 +96,8 @@ static float fast_atan2(float y, float x) {
 /**
  * @brief Helper: Check if worm body overlaps land
  */
-static char CheckWormCollision(short x, short y) {
+static char CheckWormCollision(short x, short y)
+{
     // 1. Check center
     if (Map_testPoint(x, y)) return 1;
 
@@ -175,8 +185,10 @@ char CharacterController_doInitialNinjaRopeShot(short dirX, short dirY)
 void wormNinjaRope()
 {
     // 1. SAFETY CHECKS
-    if (!(Game_stateFlags & gs_ninjaRopeMode)) return;
-    if (Game_ninjaRopeAnchorCount == 0) return;
+    if (!(Game_stateFlags & gs_ninjaRopeMode))
+		return;
+    if (Game_ninjaRopeAnchorCount == 0)
+		return;
 
     // Get shortcuts to current worm data
     short wIdx = (short)Worm_currentWorm;
@@ -193,7 +205,8 @@ void wormNinjaRope()
     short activePivotY = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 1][1];
 
     // Detect if we just entered mode or switched worms, reset physics state
-    if (lastActiveWorm != wIdx || fLength == 0.0f) {
+    if (lastActiveWorm != wIdx || fLength == 0.0f)
+	{
         lastActiveWorm = wIdx;
         fLength = (float)Game_ninjaRopeLength;
         // Initialize angle based on current position relative to pivot
@@ -220,10 +233,10 @@ void wormNinjaRope()
     short testX = activePivotX + (short)(fast_cos(fAngle) * fLength);
     short testY = activePivotY + (short)(fast_sin(fAngle) * fLength);
 
-    if (CheckWormCollision(testX, testY)) {
-        fLength = oldLength; // Climb denied
-    }
-
+	// no climb if we collide
+    if (CheckWormCollision(testX, testY))
+        fLength = oldLength; 
+    
     // 4. PHYSICS: ANGULAR MOMENTUM
     // Gravity: pulls towards PI/2 (down). Torque = Gravity/Len * cos(angle)
     fAngVel += (GRAVITY / fLength) * fast_cos(fAngle);
@@ -232,12 +245,12 @@ void wormNinjaRope()
     char isBelow = wy > activePivotY;
     float swingForce = ROPE_SWING_ACCEL;
 
-    if (Keys_keyState(keyLeft)) {
+	// Invert controls if below pivot
+    if (Keys_keyState(keyLeft))
         fAngVel += isBelow ? swingForce : -swingForce;
-    }
-    if (Keys_keyState(keyRight)) {
+    if (Keys_keyState(keyRight))
         fAngVel -= isBelow ? swingForce : -swingForce;
-    }
+    
 
     fAngVel *= ROPE_DAMPING;
 
@@ -248,37 +261,46 @@ void wormNinjaRope()
     short nextY = activePivotY + (short)(fast_sin(nextAngle) * fLength);
 
     // 6. COLLISION CHECK (BODY)
-    if (CheckWormCollision(nextX, nextY)) {
+    if (CheckWormCollision(nextX, nextY))
+	{
         // Bonk! Stop momentum
         fAngVel = 0.0f;
+		
         // Revert to start of frame
         nextX = startX;
         nextY = startY;
         nextAngle = fAngle;
     }
-    else {
+    else
+	{
         // Path is clear, commit the angle
         fAngle = nextAngle;
     }
 
-    // 7. UNWRAP CHECK (Raycast to Previous Pivot)
+    // 7. UNWRAP CHECK (Reverse Raycast: Worm -> Prev Pivot)
     char didUnwrap = 0;
-    if (Game_ninjaRopeAnchorCount > 1) {
+    if (Game_ninjaRopeAnchorCount > 1)
+	{
         short prevX = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 2][0];
         short prevY = Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount - 2][1];
 
         RaycastHit hit;
-        Game_raycast(prevX, prevY, nextX - prevX, nextY - prevY, FALSE, &hit);
+        // Cast FROM worm TO previous pivot
+        Game_raycast(nextX, nextY, prevX - nextX, prevY - nextY, FALSE, &hit);
 
-        short distToWorm = dist(prevX, prevY, nextX, nextY);
-        short distToHit = (hit.hitType == RAY_HIT_LAND) ? dist(prevX, prevY, hit.x, hit.y) : 32000;
+        short distToPrev = dist(nextX, nextY, prevX, prevY);
+        short distToHit = (hit.hitType == RAY_HIT_LAND) ? dist(nextX, nextY, hit.x, hit.y) : 32000;
 
-        if (distToHit >= distToWorm - 5) {
+        // If we hit nothing, OR we made it all the way back to the previous pivot (with buffer)
+        if (hit.hitType == RAY_HIT_NOTHING || distToHit >= distToPrev - 5)
+		{
+            
             Game_ninjaRopeAnchorCount--;
             activePivotX = prevX;
             activePivotY = prevY;
 
-            float newLength = (float)distToWorm;
+            // Recalculate physics for new pivot
+            float newLength = (float)distToPrev;
             if (newLength > 0.1f) {
                 fAngVel = fAngVel * (fLength / newLength);
                 fLength = newLength;
@@ -289,38 +311,53 @@ void wormNinjaRope()
         }
     }
 
-    // 8. WRAP CHECK (Raycast to Current Pivot)
-    if (!didUnwrap) {
+    // 8. WRAP CHECK (Reverse Raycast: Worm -> Current Pivot)
+    if (!didUnwrap)
+	{
         RaycastHit hit;
-        Game_raycast(activePivotX, activePivotY, nextX - activePivotX, nextY - activePivotY, FALSE, &hit);
+        // Cast FROM worm TO current pivot
+        Game_raycast(nextX, nextY, activePivotX - nextX, activePivotY - nextY, FALSE, &hit);
 
-        if (hit.hitType == RAY_HIT_LAND) {
-            short distToHit = dist(activePivotX, activePivotY, hit.x, hit.y);
+        if (hit.hitType == RAY_HIT_LAND)
+		{
+            short distToHit = dist(nextX, nextY, hit.x, hit.y);
+            short distToPivot = dist(nextX, nextY, activePivotX, activePivotY);
 
-            if (distToHit > 5 && distToHit < (short)fLength - 5) {
-                if (Game_ninjaRopeAnchorCount < MAX_NINJA_ROPE_POINTS) {
+            // If we hit a wall BEFORE reaching the pivot
+            if (distToHit < distToPivot - 5)
+			{
+                
+                if (Game_ninjaRopeAnchorCount < MAX_NINJA_ROPE_POINTS)
+				{
                     Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][0] = hit.x;
                     Game_ninjaRopeAnchors[Game_ninjaRopeAnchorCount][1] = hit.y;
                     Game_ninjaRopeAnchorCount++;
 
-                    float newLength = (float)dist(hit.x, hit.y, nextX, nextY);
-                    if (newLength < 1.0f) newLength = 1.0f;
+                    // New length is distance to the wall we just hit
+                    float newLength = (float)distToHit;
+                    if (newLength < 1.0f)
+						newLength = 1.0f;
 
+                    // Conserve angular momentum
                     fAngVel = fAngVel * (fLength / newLength);
                     fLength = newLength;
 
+                    // Update active pivot
                     activePivotX = hit.x;
                     activePivotY = hit.y;
                     fAngle = fast_atan2((float)(nextY - activePivotY), (float)(nextX - activePivotX));
-                } else {
-                    fAngVel = 0;
+                } 
+				else {
+					// Rope too complex
+                    fAngVel = 0; 
                 }
             }
         }
     }
 
     // 9. EXIT CONDITION
-    if (Keys_keyDown(keyAction)) {
+    if (Keys_keyDown(keyAction))
+	{
         float linearSpeed = fAngVel * fLength;
         Worm_xVelo[wIdx] = (char)(-fast_sin(fAngle) * linearSpeed);
         Worm_yVelo[wIdx] = (char)(fast_cos(fAngle) * linearSpeed);
