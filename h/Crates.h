@@ -10,6 +10,10 @@
 #define CRATES_H
 
 
+// includes
+#include "PhysCol.h"
+
+
 // crate defines
 #define MAX_CRATES 8
 #define CRATE_HEALTH 10
@@ -19,10 +23,11 @@
 
 
 // crate globals
-extern short Crate_x[MAX_CRATES];
-extern short Crate_y[MAX_CRATES];
-extern char Crate_health[MAX_CRATES];
-extern char Crate_type[MAX_CRATES];
+extern short *Crate_x;
+extern short *Crate_y;
+extern PhysObj *Crate_physObj;
+extern char *Crate_health;
+extern char *Crate_type;
 extern unsigned short Crate_active;
 extern unsigned short Crate_settled;
 extern char parachuteCrate;

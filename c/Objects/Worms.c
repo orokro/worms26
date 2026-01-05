@@ -42,7 +42,7 @@ char Worm_xVelo[MAX_WORMS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 char Worm_yVelo[MAX_WORMS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // physics objects for this worm
-PhysObj Worm_physObj[MAX_WORMS];
+PhysObj *Worm_physObj = NULL;
 
 // the direction the worm is currently FACING.. 0 = LEFT 1 = RIGHT
 unsigned short Worm_dir = 0;

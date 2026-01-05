@@ -18,11 +18,12 @@
 
 
 // mine globals
-extern short Mine_x[MAX_MINES];
-extern short Mine_y[MAX_MINES];
-extern char Mine_xVelo[MAX_MINES];
-extern char Mine_yVelo[MAX_MINES];
-extern char Mine_fuse[MAX_MINES];
+extern short *Mine_x;
+extern short *Mine_y;
+extern char *Mine_xVelo;
+extern char *Mine_yVelo;
+extern PhysObj *Mine_physObj;
+extern char *Mine_fuse;
 extern unsigned short Mine_active;
 extern unsigned short Mine_triggered;
 extern unsigned short Mine_settled;

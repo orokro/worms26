@@ -30,11 +30,11 @@
 
 
 // x/y positions of our oil drums
-short OilDrum_x[MAX_OILDRUMS] = {0, 0, 0, 0, 0, 0};
-short OilDrum_y[MAX_OILDRUMS] = {0, 0, 0, 0, 0, 0};
+short *OilDrum_x;
+short *OilDrum_y;
 
 // health of our oil drums
-char OilDrum_health[MAX_OILDRUMS] = {OILDRUM_HEALTH, OILDRUM_HEALTH, OILDRUM_HEALTH, OILDRUM_HEALTH, OILDRUM_HEALTH, OILDRUM_HEALTH};
+char *OilDrum_health;
 
 // this int will be a bit-wise mask for the drums
 // the first 8 bits will represent if the drums are active or not
@@ -43,9 +43,9 @@ unsigned short OilDrum_active = 0;
 // is the oil drum settled on the map?
 unsigned short OilDrum_settled = 0;
 
-PhysObj OilDrum_physObj[MAX_OILDRUMS];
-char OilDrum_xVelo[MAX_OILDRUMS] = {0, 0, 0, 0, 0, 0};
-char OilDrum_yVelo[MAX_OILDRUMS] = {0, 0, 0, 0, 0, 0};
+PhysObj *OilDrum_physObj = NULL;
+char *OilDrum_xVelo;
+char *OilDrum_yVelo;
 
 
 

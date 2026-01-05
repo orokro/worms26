@@ -19,6 +19,12 @@
 #include "Draw.h"
 #include "FileData.h"
 #include "Match.h"
+#include "Worms.h"
+#include "PhysCol.h"
+#include "Crates.h"
+#include "OilDrums.h"
+#include "Mines.h"
+#include "Weapons.h"
 
 
 // the main buffer for the map
@@ -174,6 +180,94 @@ short dist(short x1, short y1, short x2, short y2)
 }
 
 
+/**
+ * @brief allocate memory for our arrays so it's on the heap
+ * 
+ * @return char - success/failure
+ */
+char doMallocs()
+{
+	// phys
+	Worm_physObj = malloc(MAX_WORMS * sizeof(PhysObj));
+	Weapon_physObj = malloc(MAX_WEAPONS * sizeof(PhysObj));
+	Crate_physObj = malloc(MAX_CRATES * sizeof(PhysObj));
+	OilDrum_physObj = malloc(MAX_OILDRUMS * sizeof(PhysObj));
+	Mine_physObj = malloc(MAX_MINES * sizeof(PhysObj));
+
+	// crates stuffs
+	Crate_x = malloc(MAX_CRATES * sizeof(short));
+	Crate_y = malloc(MAX_CRATES * sizeof(short));
+	Crate_health = malloc(MAX_CRATES * sizeof(char));
+	Crate_type = malloc(MAX_CRATES * sizeof(char));
+
+	// oil drum stuffs
+	OilDrum_xVelo = malloc(MAX_OILDRUMS * sizeof(char));
+	OilDrum_yVelo = malloc(MAX_OILDRUMS * sizeof(char));
+	OilDrum_x = malloc(MAX_OILDRUMS * sizeof(short));
+	OilDrum_y = malloc(MAX_OILDRUMS * sizeof(short));
+	OilDrum_health = malloc(MAX_OILDRUMS * sizeof(char));
+
+	// mine stuffs
+	Mine_x = malloc(MAX_MINES * sizeof(short));
+	Mine_y = malloc(MAX_MINES * sizeof(short));\
+	Mine_xVelo = malloc(MAX_MINES * sizeof(char));
+	Mine_yVelo = malloc(MAX_MINES * sizeof(char));
+	Mine_fuse = malloc(MAX_MINES * sizeof(char));
+
+	// weapon stuffs
+	Weapon_x = malloc(MAX_WEAPONS * sizeof(short));
+	Weapon_y = malloc(MAX_WEAPONS * sizeof(short));
+	Weapon_xVelo = malloc(MAX_WEAPONS * sizeof(char));
+	Weapon_yVelo = malloc(MAX_WEAPONS * sizeof(char));
+	Weapon_type = malloc(MAX_WEAPONS * sizeof(char));
+	Weapon_time = malloc(MAX_WEAPONS * sizeof(short));
+
+	return TRUE;
+}
+
+
+/**
+ * @brief Free memory allocated for our arrays
+ */
+void doFrees()
+{
+	// physics objects
+	free(Worm_physObj);
+	free(Weapon_physObj);
+	free(Crate_physObj);
+	free(OilDrum_physObj);
+	free(Mine_physObj);
+
+	// crate stuffs
+	free(Crate_x);
+	free(Crate_y);
+	free(Crate_health);
+	free(Crate_type);
+	
+	// oil drum stuffs
+	free(OilDrum_x);
+	free(OilDrum_y);
+	free(OilDrum_xVelo);
+	free(OilDrum_yVelo);	
+	free(OilDrum_health);
+
+	// mine stuffs
+	free(Mine_x);
+	free(Mine_y);
+	free(Mine_xVelo);
+	free(Mine_yVelo);	
+	free(Mine_fuse);
+
+	// weapon stuffs
+	free(Weapon_x);
+	free(Weapon_y);
+	free(Weapon_xVelo);
+	free(Weapon_yVelo);
+	free(Weapon_type);
+	free(Weapon_time);
+}
+
+
 // Main Function
 void _main(void)
 {
@@ -187,6 +281,9 @@ void _main(void)
 	mapLight = malloc(200*10*sizeof(unsigned long));
 	mapDark = malloc(200*10*sizeof(unsigned long));
 	
+	// allocate all our arrays
+	doMallocs();
+
 	// enable grayscale
 	GrayOn();
 
@@ -279,6 +376,9 @@ void _main(void)
 	free(mapDark);
 	free(GblDBuffer);
 	
+	// free our arrays
+	doFrees();
+
 	//resets key stuff
 	SetIntVec(AUTO_INT_1, save_1); 
 	SetIntVec(AUTO_INT_5, save_5); 

@@ -89,19 +89,19 @@
 
 
 // the type of the weapon!
-char Weapon_type[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char *Weapon_type;
 
 // x/y positions of our weapons
-short Weapon_x[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-short Weapon_y[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+short *Weapon_x;
+short *Weapon_y;
 
 // physics objects and velocities of weapons
-PhysObj Weapon_physObj[MAX_WEAPONS];
-char Weapon_xVelo[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-char Weapon_yVelo[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+PhysObj *Weapon_physObj = NULL;
+char *Weapon_xVelo;
+char *Weapon_yVelo;
 
 // timer: various weapons can make use of a fuse timer, or timers for other reasons
-unsigned short Weapon_time[MAX_WEAPONS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+unsigned short *Weapon_time;
 
 // bit mask if the weapon is active in this slot
 unsigned short Weapon_active = 0;

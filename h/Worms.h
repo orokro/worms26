@@ -34,7 +34,7 @@ extern short Worm_x[MAX_WORMS];
 extern short Worm_y[MAX_WORMS];
 extern char Worm_xVelo[MAX_WORMS];
 extern char Worm_yVelo[MAX_WORMS];
-extern PhysObj Worm_physObj[MAX_WORMS];
+extern PhysObj *Worm_physObj;
 extern unsigned short Worm_dir;
 extern short Worm_health[MAX_WORMS];
 extern unsigned short Worm_isDead;

@@ -79,13 +79,13 @@ enum Weapons {
 extern const char weaponNames[65][16];
 
 // weapons globals
-extern char Weapon_type[MAX_WEAPONS];
-extern short Weapon_x[MAX_WEAPONS];
-extern short Weapon_y[MAX_WEAPONS];
-extern PhysObj Weapon_physObj[MAX_WEAPONS];
-extern char Weapon_xVelo[MAX_WEAPONS];
-extern char Weapon_yVelo[MAX_WEAPONS];
-extern unsigned short Weapon_time[MAX_WEAPONS];
+extern char *Weapon_type;
+extern short *Weapon_x;
+extern short *Weapon_y;
+extern PhysObj *Weapon_physObj;
+extern char *Weapon_xVelo;
+extern char *Weapon_yVelo;
+extern unsigned short *Weapon_time;
 extern unsigned short Weapon_active;
 extern unsigned short Weapon_settled;
 extern unsigned short Weapon_isFire;

@@ -38,15 +38,15 @@
 
 
 // x/y positions of our Mines
-short Mine_x[MAX_MINES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-short Mine_y[MAX_MINES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+short *Mine_x;
+short *Mine_y;
 
 // velocity of mines
-char Mine_xVelo[MAX_MINES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-char Mine_yVelo[MAX_MINES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char *Mine_xVelo;
+char *Mine_yVelo;
 
 // fuse of mines
-char Mine_fuse[MAX_MINES] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+char *Mine_fuse;
 
 // is the mine active? using bits for booleans
 unsigned short Mine_active=0;
@@ -61,7 +61,7 @@ unsigned short Mine_settled=0;
 unsigned short Mine_dud=0;
 
 // local vars
-PhysObj Mine_physObj[MAX_MINES];
+PhysObj *Mine_physObj = NULL;
 
 
 

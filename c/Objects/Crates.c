@@ -37,14 +37,14 @@
 #define NUM_TOOLS 16
 
 // x/y positions of our Crates
-short Crate_x[MAX_CRATES] = {0, 0, 0, 0, 0, 0, 0, 0};
-short Crate_y[MAX_CRATES] = {0, 0, 0, 0, 0, 0, 0, 0};
+short *Crate_x;
+short *Crate_y;
 
 // health of our crates
-char Crate_health[MAX_CRATES] = {-1, -1, -1, -1, -1, -1, -1, -1};
+char *Crate_health;
 
 // type of each Crate
-char Crate_type[MAX_CRATES] = {0, 0, 0, 0, 0, 0, 0, 0};
+char *Crate_type;
 
 // is the crate active?
 unsigned short Crate_active=0;
@@ -52,7 +52,7 @@ unsigned short Crate_active=0;
 // is the crate settled on land?
 unsigned short Crate_settled=0;
 
-PhysObj Crate_physObj[MAX_CRATES];
+PhysObj *Crate_physObj = NULL;
 char Crate_xVelo[MAX_CRATES] = {0, 0, 0, 0, 0, 0, 0, 0};
 char Crate_yVelo[MAX_CRATES] = {0, 0, 0, 0, 0, 0, 0, 0};
 

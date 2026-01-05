@@ -18,13 +18,14 @@
 #define OILDRUM_HEALTH 10
 
 // OilDrum globals
-extern short OilDrum_x[MAX_OILDRUMS];
-extern short OilDrum_y[MAX_OILDRUMS];
-extern char OilDrum_health[MAX_OILDRUMS];
+extern short *OilDrum_x;
+extern short *OilDrum_y;
+extern char *OilDrum_health;
 extern unsigned short OilDrum_active;
 extern unsigned short OilDrum_settled;
-extern char OilDrum_xVelo[MAX_OILDRUMS];
-extern char OilDrum_yVelo[MAX_OILDRUMS];
+extern char *OilDrum_xVelo;
+extern char *OilDrum_yVelo;
+extern PhysObj *OilDrum_physObj;
 
 
 // OilDrum function prototypes
