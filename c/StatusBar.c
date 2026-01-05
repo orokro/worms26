@@ -97,7 +97,7 @@ void StatusBar_draw()
 	{
 		// Calculate centered X position: 80 - (PixelWidth / 2)
 		// Assuming 4x6 font, width is roughly len * 4
-		const short x = 80 - ((strlen(StatusBar_messages[0]) * 4) >> 1);
+		const short x = 80 - DrawStrWidth(StatusBar_messages[0], F_4x6)/2;
 		
 		// Draw to both grayscale planes
 		GrayDrawStr2B(x, 1, StatusBar_messages[0], A_XOR, lightPlane, darkPlane);

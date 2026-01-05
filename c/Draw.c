@@ -197,10 +197,10 @@ void Draw_renderGame()
 
 	// draw the current grace time, turn time, and retreat time on the screen
 	// NOTE: for some reason, drawing sudden death time instead of retreat time crashes the game)
-	char timeStr[40];
+	// char timeStr[40];
 	//sprintf(timeStr, "time: %d, %d, %d", (short)(Game_graceTimer/TIME_MULTIPLIER), (short)(Game_timer/TIME_MULTIPLIER), (short)(Game_retreatTimer));
-	sprintf(timeStr, "SD in: %ld:%02ld", (Game_suddenDeathTimer/(60L*TIME_MULTIPLIER)), (Game_suddenDeathTimer/TIME_MULTIPLIER)%60L);
-	DrawStr(60,20,timeStr, A_XOR);	
+	// sprintf(timeStr, "SD in: %ld:%02ld", (Game_suddenDeathTimer/(60L*TIME_MULTIPLIER)), (Game_suddenDeathTimer/TIME_MULTIPLIER)%60L);
+	// DrawStr(60,20,timeStr, A_XOR);	
 	
 	//unsigned short currentMask = 1;
 	//currentMask = (unsigned short)((unsigned short)currentMask<<(Worm_currentWorm));

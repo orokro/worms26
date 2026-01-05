@@ -151,7 +151,7 @@ short Game_retreatTimer = 5;
 short Game_graceTimer = 5;
 
 // sudden death timer - 10 minutes before sudden death begins
-long Game_suddenDeathTimer = 60L * TIME_MULTIPLIER * 10;
+long Game_suddenDeathTimer = 60L * TIME_MULTIPLIER * 14;
 
 // water level for sudden death:
 short Game_waterLevel = 0;
@@ -300,7 +300,7 @@ void Game_initRound(){
 	Game_surrenderedTeam = -1;
 	Game_weaponUsesRemaining = -1;
 	Game_jetPackFuel = 0;
-	Game_suddenDeathTimer = 35L * TIME_MULTIPLIER;
+	Game_suddenDeathTimer = 60L * TIME_MULTIPLIER * 15;
 
 	// reset team weapons to default loadout
 	short i=0;
