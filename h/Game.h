@@ -20,12 +20,7 @@ enum GameModes {
 	gameMode_Death,
 	gameMode_AfterTurn,
 	gameMode_GameOver,
-	gameMode_MainMenu,
-	gameMode_MatchMenu,
-	gameMode_WeaponsSettings,
-	gameMode_MatchSettings,
-	gameMode_TeamSettings,
-	gameMode_Loading,
+	gameMode_PlaceWorms,
 };
 
 // Enum for what the ray hit
