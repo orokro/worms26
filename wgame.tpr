@@ -8,7 +8,7 @@ Copy Data Variable=1
 Copy Data Variable if Archived=1
 Pack=0
 Packed Variable=wdata
-Project Name=Worms25
+Project Name=wgame
 GCC Switches=-Os -mregparm=5 -fomit-frame-pointer -Wall -W -Wwrite-strings -ffunction-sections -fdata-sections -Ih -I..\h -I..\..\h
 GNU Assembler Switches=--all-relocs
 Assembler Switches=-g -t
