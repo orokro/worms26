@@ -93,11 +93,51 @@ void renderHealthSprite(short index);
 
 
 /**
+ * checks if a worm is close to a crate or a mine, based on the tile the worm is in
+ */
+void checkCratesAndMines(short index)
+{
+		short i, c;
+    
+    // Check Mines
+    for(i=0; i<MAX_MINES; i++)
+    {
+        // Check if active, not triggered, and close enough
+        if((Mine_active & (1<<i)) && !(Mine_triggered & (1<<i)))
+        {
+             if(abs(Mine_x[i] - Worm_x[index]) < 13 && abs(Mine_y[i] - Worm_y[index]) < 13)
+             {
+                 Mines_trigger(i);
+             }
+        }
+    }
+
+    // Check Crates
+    for(c=0; c<MAX_CRATES; c++)
+    {
+        // Check if active, not triggered, and close enough
+        if((Crate_active & (1<<c)))
+        {
+             if(abs(Crate_x[c] - Worm_x[index]) < 15 && abs(Crate_y[c] - Worm_y[index]) < 15)
+             {
+				Crates_pickUp(c, index);
+             }
+        }
+    }
+}
+
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+/**
  * Spawns a Worm of given index on the Map.
  * 
  * @param index the worm to spawn.
 */
-void spawnWorm(short index)
+void Worm_spawnWorm(short index)
 {
 	unsigned short mask = 1;
 	mask = mask<<(index);
@@ -144,55 +184,15 @@ void spawnWorm(short index)
 
 
 /**
- * checks if a worm is close to a crate or a mine, based on the tile the worm is in
- */
-void checkCratesAndMines(short index)
-{
-		short i, c;
-    
-    // Check Mines
-    for(i=0; i<MAX_MINES; i++)
-    {
-        // Check if active, not triggered, and close enough
-        if((Mine_active & (1<<i)) && !(Mine_triggered & (1<<i)))
-        {
-             if(abs(Mine_x[i] - Worm_x[index]) < 13 && abs(Mine_y[i] - Worm_y[index]) < 13)
-             {
-                 Mines_trigger(i);
-             }
-        }
-    }
-
-    // Check Crates
-    for(c=0; c<MAX_CRATES; c++)
-    {
-        // Check if active, not triggered, and close enough
-        if((Crate_active & (1<<c)))
-        {
-             if(abs(Crate_x[c] - Worm_x[index]) < 15 && abs(Crate_y[c] - Worm_y[index]) < 15)
-             {
-				Crates_pickUp(c, index);
-             }
-        }
-    }
-}
-
-
-
-// --------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-/**
  * spawns worms on the map
  */
 void Worm_spawnWorms()
 {
 	short i=0;
 	for(i=0;i<Match_wormCount[0]; i++)
-		spawnWorm(i);
+		Worm_spawnWorm(i);
 	for(i=0;i<Match_wormCount[1]; i++)
-		spawnWorm(8+i);
+		Worm_spawnWorm(8+i);
 }
 
 

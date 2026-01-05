@@ -78,6 +78,7 @@ static void Cursor_enter()
 	cursorFastMove=0;
 	
 	// we should set the camera to follow the cursor:
+	cameraAutoFocus = FALSE;
 	Camera_focusOn(&Game_cursorX, &Game_cursorY);	
 }
 
@@ -87,7 +88,6 @@ static void Cursor_enter()
 */
 static void Cursor_update()
 {
-	
 	// All regular game-updates during this mode
 	gameUpdates();
 	
@@ -217,9 +217,10 @@ static void Cursor_update()
 		if(Game_xMarkAllowedOverLand || (!Game_xMarkAllowedOverLand && !Map_testPoint(Game_cursorX, Game_cursorY)) )
 		{
             // Final safety check for girder
-            if((Game_stateFlags & gs_girderPlace) && !checkGirderBounds(Game_cursorX, Game_cursorY, Game_jetPackFuel)) {
-                // Play error sound? Or just refuse.
-                return;
+            if((Game_stateFlags & gs_girderPlace)) 
+			{
+				if(!checkGirderBounds(Game_cursorX, Game_cursorY, Game_jetPackFuel))
+					return;
             }
 
 			Game_xMarkSpotX = Game_cursorX;

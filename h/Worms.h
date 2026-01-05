@@ -48,6 +48,15 @@ extern unsigned short Worm_onGround;
 
 // worm function prototypes
 
+
+/**
+ * Spawns a Worm of given index on the Map.
+ * 
+ * @param index the worm to spawn.
+*/
+void Worm_spawnWorm(short index);
+
+
 /**
  * At the beginning of the game, this places all the worms on the map and sets them active.
  *

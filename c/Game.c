@@ -273,6 +273,7 @@ void gameUpdates();
 #include "States/Death.c"
 #include "States/AfterTurn.c"
 #include "States/GameOver.c"
+#include "States/PlaceWorms.c"
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -363,6 +364,9 @@ void Game_update()
 		case gameMode_GameOver:
 			GameOver_update();
 			break;
+		case gameMode_PlaceWorms:
+			PlaceWorms_update();
+			break;
 	}	
 }
 
@@ -404,6 +408,9 @@ void Game_changeMode(char newMode)
 		case gameMode_GameOver:
 			GameOver_exit();
 			break;
+		case gameMode_PlaceWorms:
+			PlaceWorms_exit();
+			break;
 	}	
 	
 	// save our current mode as our previous mode
@@ -442,9 +449,11 @@ void Game_changeMode(char newMode)
 		case gameMode_GameOver:
 			GameOver_enter();
 			break;
-	}	
+		case gameMode_PlaceWorms:
+			PlaceWorms_enter();
+			break;
+	}
 }
-
 
 
 /* ----------------------------------------------------------------------------------------
@@ -628,6 +637,10 @@ char Game_allSettled()
  * @brief checks if all of one teams worms are dead, or if both teams are dead
  */
 char Game_checkWinConditions(){
+
+	// gtfo while we're in strategic placement
+	if(Match_strategicPlacement==TRUE)
+		return FALSE;
 
 	// build masks for each team
 	const unsigned short team1Mask = 0b0000000011111111;

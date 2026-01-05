@@ -593,6 +593,14 @@ void CharacterController_update()
  */
 void CharacterController_weaponConsumed(char noEndTurn){
 
+	// if we're in strategic placement mode, we got here by the cursor/teleport hacks.
+	// just return to placement mode immediately
+	if(Match_strategicPlacement)
+	{
+		Game_changeMode(gameMode_PlaceWorms);
+		return;
+	}
+
 	// decrement weapon count
 	Match_teamWeapons[(short)Game_currentTeam][(short)Game_currentWeaponSelected]--;
 

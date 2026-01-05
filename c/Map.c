@@ -311,7 +311,9 @@ void Map_makeMap()
 
 	// part of generating the map will be generating the objects on it..
 	// Prioritize WORMS first, so they get the best spots
-	Worm_spawnWorms();
+	// don't spawn worms if we're in strategic mode
+	if(Match_strategicPlacement==FALSE)
+		Worm_spawnWorms();
 
 	if(Match_minesEnabled)
 		Mines_spawnMines();

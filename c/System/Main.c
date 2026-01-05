@@ -18,6 +18,7 @@
 #include "Keys.h"
 #include "Draw.h"
 #include "FileData.h"
+#include "Match.h"
 
 
 // the main buffer for the map
@@ -39,6 +40,7 @@ char GameRunning = TRUE;
 // Efficient 16-bit bit reversal algorithm
 unsigned short reverseBits16(unsigned short n)
 {
+
     n = ((n >> 1) & 0x5555) | ((n & 0x5555) << 1);
     n = ((n >> 2) & 0x3333) | ((n & 0x3333) << 2);
     n = ((n >> 4) & 0x0F0F) | ((n & 0x0F0F) << 4);
@@ -204,7 +206,13 @@ void _main(void)
 	darkPlane = GrayDBufGetHiddenPlane(DARK_PLANE);
 	
 	// before we can do the main game update loop, we need to change the state machine into the first state
-	Game_changeMode(gameMode_WormSelect);
+	// if we have to place worms, go to that mode first
+	if(Match_strategicPlacement)
+		// start placing worms
+		Game_changeMode(gameMode_PlaceWorms);
+	else
+		// otherwise, go to worm select mode
+		Game_changeMode(gameMode_WormSelect);
 	
 	Draw_cake(0,1);
 	
