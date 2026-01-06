@@ -181,7 +181,6 @@ void Map_makeType1(unsigned long *light, unsigned long *dark, const unsigned lon
 	// loop from left of buffer to right of buffer
 	for(x=0; x<320; x++)
 	{
-		
 		// update loading screen
 		if(x%20==0)
 			Draw_cake(x, 620);
@@ -298,6 +297,89 @@ void Map_makeType1(unsigned long *light, unsigned long *dark, const unsigned lon
 
 
 /**
+ * @brief Makes a type-2 style "Floating Islands" map
+ * 
+ * @param light - light map buffer
+ * @param dark - dark map buffer
+ * @param spr_LandTexture - the land texture sprite to use
+ */
+void Map_makeType2(unsigned long *light, unsigned long *dark, const unsigned long* spr_LandTexture)
+{
+	short x, y, i;
+	
+	// 3 Layers: Top(0), Mid(1), Bot(2)
+	// State: 0=Inactive, 1=Active
+	char active[3] = {0, 0, 0};
+	
+	// Current center Y position for each layer
+	short centerY[3] = {40, 100, 160};
+	
+	// Current half-thickness for each layer
+	short thick[3] = {0, 0, 0};
+	
+	// Loop columns
+	for(x=0; x<320; x++)
+	{
+		// Update loading
+		if(x%20==0) Draw_cake(x, 620);
+		
+		for(i=0; i<3; i++)
+		{
+			// Logic to start/stop islands
+			if(active[i])
+			{
+				// 5% chance to end island if it's been running (thick > 5)
+				// Or force end if out of bounds
+				if((random(20)==0 && thick[i]>5) || centerY[i] < 10 || centerY[i] > 190) {
+					active[i] = 0;
+					thick[i] = 0; // Reset thickness
+				} else {
+					// Grow/Shrink thickness
+					thick[i] += (random(3) - 1); // -1, 0, +1
+					if(thick[i] < 3) thick[i] = 3;
+					if(thick[i] > 20) thick[i] = 20;
+					
+					// Move Y center
+					centerY[i] += (random(3) - 1);
+				}
+			}
+			else
+			{
+				// 2% chance to start new island
+				if(random(50)==0) {
+					active[i] = 1;
+					thick[i] = 2; // Start thin
+					// Reset Y to default lane center +/- random variation
+					centerY[i] = (i==0?40:(i==1?100:160)) + (random(20)-10);
+				}
+			}
+			
+			// Draw pixels if active
+			if(active[i])
+			{
+				short startY = centerY[i] - thick[i];
+				short endY = centerY[i] + thick[i];
+				
+				// Clamp
+				if(startY < 0) startY = 0;
+				if(endY > 199) endY = 199;
+				
+				// Draw Vertical Strip
+				for(y=startY; y<endY; y++)
+				{
+					// Standard drawing logic
+					unsigned long mask = 1UL << (31-(x%32));
+					short row = (x-(x%32))/32;
+					
+					light[(row*200)+y] |= mask;
+					dark[(row*200)+y] |= (spr_LandTexture[y%32] & mask);
+				}
+			}
+		}
+	}
+}
+
+/**
  * builds a random map for the worms to play on
  */
 void Map_makeMap()
@@ -324,7 +406,10 @@ void Map_makeMap()
 	const unsigned long* spr_LandTexture = tex_Ground[(short)Match_mapType];
 	
 	// make type one map (default)
-	Map_makeType1(light, dark, spr_LandTexture);
+	if(Match_mapType == 1)
+		Map_makeType2(light, dark, spr_LandTexture);
+	else
+		Map_makeType1(light, dark, spr_LandTexture);
 	
 	// trace edges in the buffers
 	Map_traceEdges();
