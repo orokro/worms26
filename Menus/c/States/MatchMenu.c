@@ -16,13 +16,6 @@ const char *matchMenuText[5] = {
 	"Adjust Match Settings",	
 };
 
-// pointers to the various grave sprites we have
-const unsigned long* groundTextures[] = {
-	tex_Ground1,
-	tex_Ground2,
-	tex_Ground3
-};
-
 // local var now that we have a new app
 char match_menuItem = 0;
 
@@ -98,9 +91,9 @@ void Draw_renderMatchMenuMenu()
 	// draw the map box label & current map texture
 	GrayDrawStr2B(MAP_LEFT,  MAP_TOP, "Map Type:", A_NORMAL, lightPlane, darkPlane);
 	Draw_RectOutlineColor(MAP_LEFT, MAP_TOP+6, 34, 34, match_menuItem==MENU_ITEM_MAP_TYPE ? 3 : 1);
-	ClipSprite32_OR_R(MAP_LEFT+1, MAP_TOP+7, 32, groundTextures[(short)Match_mapType], lightPlane);
+	ClipSprite32_OR_R(MAP_LEFT+1, MAP_TOP+7, 32, tex_Ground[(short)Match_mapType], lightPlane);
 	FastFilledRect_Invert_R(lightPlane, MAP_LEFT+1, MAP_TOP+7, MAP_LEFT+1+31, MAP_TOP+7+31);	
-	ClipSprite32_OR_R(MAP_LEFT+1, MAP_TOP+7, 32, groundTextures[(short)Match_mapType], darkPlane);
+	ClipSprite32_OR_R(MAP_LEFT+1, MAP_TOP+7, 32, tex_Ground[(short)Match_mapType], darkPlane);
 
 	// -----------------
 
@@ -191,7 +184,7 @@ static void MatchMenu_update()
 		if(Keys_keyUp(keyMinus) && Match_mapType>0)
 			Match_mapType--;
 		
-		else if(Keys_keyUp(keyPlus) && Match_mapType<2)
+		else if(Keys_keyUp(keyPlus) && Match_mapType<4)
 			Match_mapType++;
 	}
 

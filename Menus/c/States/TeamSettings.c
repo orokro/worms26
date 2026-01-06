@@ -17,12 +17,6 @@ const char *teamMenuText[5] = {
 // which team tab is currently focused
 char tab = 0;
 
-// pointers to the various grave sprites we have
-const unsigned char* graves[] = {
-	spr_Grave,
-	spr_Grave2,
-	spr_Grave3
-};
 
 // local var now that we have a new app
 char teamSettings_menuItem = 0;
@@ -196,7 +190,7 @@ void Draw_renderTeamSettingsMenu()
 
 	// square box for grave stone with sprite inside
 	Draw_RectOutlineColor(17, 46, 18, 18, teamSettings_menuItem==MENU_ITEM_GRAVESTONE ? 3 : 1);
-	GrayClipSprite8_OR_R(22, 49, 12, graves[(short)Match_gravestones[(short)tab]], graves[(short)Match_gravestones[(short)tab]], lightPlane, darkPlane);
+	GrayClipSprite8_OR_R(22, 49, 12, spr_Grave[(short)Match_gravestones[(short)tab]], spr_Grave[(short)Match_gravestones[(short)tab]], lightPlane, darkPlane);
 
 	// draw text for minus and + on both sides of the gravestone box
 	GrayDrawStr2B(11, 52, "-", A_NORMAL, lightPlane, darkPlane);
@@ -337,7 +331,7 @@ static void TeamSettings_update()
 		if(Keys_keyUp(keyMinus) && Match_gravestones[(short)tab]>0)
 			Match_gravestones[(short)tab]--;
 		
-		else if(Keys_keyUp(keyPlus) && Match_gravestones[(short)tab]<2)
+		else if(Keys_keyUp(keyPlus) && Match_gravestones[(short)tab]<4)
 			Match_gravestones[(short)tab]++;
 	}
 	

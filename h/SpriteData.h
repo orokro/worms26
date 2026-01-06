@@ -53,7 +53,7 @@ extern const unsigned long spr_Donkey_Mask[];
 
 extern const unsigned char spr_Fuel[];
 
-#define NUM_GRAVE 3
+#define NUM_GRAVE 5
 extern const unsigned char spr_Grave[][12];
 
 extern const unsigned char spr_launcher[];
@@ -122,11 +122,8 @@ extern const unsigned char spr_XSpot[];
 
 extern const unsigned char spr_XSpotMask[];
 
-extern const unsigned long tex_Ground1[];
-
-extern const unsigned long tex_Ground2[];
-
-extern const unsigned long tex_Ground3[];
+#define NUM_TEX_GROUND 5
+extern const unsigned long tex_Ground[][32];
 
 /* --- Worms Data --- */
 

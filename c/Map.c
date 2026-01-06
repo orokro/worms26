@@ -154,8 +154,7 @@ void Map_makeMap()
 	}
 	
 	// pick the correct texture from settings
-	const unsigned long* groundTextures[] = {tex_Ground1, tex_Ground2, tex_Ground3};
-	const unsigned long* spr_LandTexture = groundTextures[(short)Match_mapType];
+	const unsigned long* spr_LandTexture = tex_Ground[(short)Match_mapType];
 	
 	/*
 		Generating the map...

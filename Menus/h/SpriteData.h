@@ -37,11 +37,8 @@ extern const unsigned short spr_Disabled_Mask[];
 
 extern const unsigned short spr_Disabled_Outline[];
 
-extern const unsigned char spr_Grave[];
-
-extern const unsigned char spr_Grave2[];
-
-extern const unsigned char spr_Grave3[];
+#define NUM_GRAVE 5
+extern const unsigned char spr_Grave[][12];
 
 extern const unsigned char spr_Infinite[];
 
@@ -116,11 +113,8 @@ extern const unsigned short spr_weaponSelect[];
 #define NUM_WEAPONS 65
 extern const unsigned short spr_weapons[][11];
 
-extern const unsigned long tex_Ground1[];
-
-extern const unsigned long tex_Ground2[];
-
-extern const unsigned long tex_Ground3[];
+#define NUM_TEX_GROUND 5
+extern const unsigned long tex_Ground[][32];
 
 extern const unsigned short worm_IDLE_Mask[];
 
