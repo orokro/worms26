@@ -133,6 +133,8 @@ void FileData_loadData()
 	result += fread(&Match_healthCratesEnabled, sizeof(char), 1, f);
 	result += fread(&Match_weaponCratesEnabled, sizeof(char), 1, f);
 	
+	result += fread(&Match_weaponCratesEnabled, sizeof(char), 1, f);
+	
 	result += fread(&Match_mapType, sizeof(char), 1, f);
 	result += fread(&Match_drawingFlags, sizeof(char), 1, f);
 	

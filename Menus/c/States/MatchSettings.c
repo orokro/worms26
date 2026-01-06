@@ -8,11 +8,12 @@
 */
 
 // help strings
-const char *settingsMenuText[12] = {
+const char *settingsMenuText[13] = {
 	"Worm Starting Health",
 	"Select Worms On Turn Start",
 	"Place Worms on Game Start",
 	"Turn Time",
+	"Sudden Death after 10 min",
 	"Artillery Mode",
 	"Enable Mines",
 	"Mine Fuse Length",
@@ -29,23 +30,24 @@ const char *settingsMenuText[12] = {
 char matchSettings_menuItem = 0;
 
 // define menu item ids
-#define MENU_ITEM_WORM_HEALTH         0
-#define MENU_ITEM_SELECT_WORMS        1
-#define MENU_ITEM_PLACE_WORMS         2
-#define MENU_ITEM_TURN_TIME           3
-#define MENU_ITEM_ARTILLERY_MODE      4
-#define MENU_ITEM_ENABLE_MINES        5
-#define MENU_ITEM_MINE_FUSE_LENGTH    6
-#define MENU_ITEM_ENABLE_DUD_MINES    7
-#define MENU_ITEM_ENABLE_OIL_DRUMS    8
-#define MENU_ITEM_ENABLE_TOOL_CRATES  9
-#define MENU_ITEM_ENABLE_HEALTH_CRATES 10
-#define MENU_ITEM_ENABLE_WEAPON_CRATES 11
+#define MENU_ITEM_WORM_HEALTH         	0
+#define MENU_ITEM_SELECT_WORMS        	1
+#define MENU_ITEM_PLACE_WORMS         	2
+#define MENU_ITEM_TURN_TIME           	3
+#define MENU_ITEM_SUDDEN_DEATH		  	4
+#define MENU_ITEM_ARTILLERY_MODE      	5
+#define MENU_ITEM_ENABLE_MINES        	6
+#define MENU_ITEM_MINE_FUSE_LENGTH    	7
+#define MENU_ITEM_ENABLE_DUD_MINES    	8
+#define MENU_ITEM_ENABLE_OIL_DRUMS    	9
+#define MENU_ITEM_ENABLE_TOOL_CRATES  	10
+#define MENU_ITEM_ENABLE_HEALTH_CRATES 	11
+#define MENU_ITEM_ENABLE_WEAPON_CRATES 	12
 
 // layout defines
-#define GENERAL_FRAME_TOP 20
-#define GENERAL_FRAME_LEFT 80-52
-#define GENERAL_FRAME_WIDTH 104
+#define GENERAL_FRAME_TOP 18
+#define GENERAL_FRAME_LEFT 80-63
+#define GENERAL_FRAME_WIDTH 124
 #define OBJECT_FRAME_TOP 49
 #define OBJECT_FRAME_LEFT 4
 #define OBJECT_FRAME_WIDTH 84
@@ -167,8 +169,12 @@ void Draw_renderMatchSettingsMenu()
 	drawOptionsBox(GENERAL_FRAME_LEFT+63, GENERAL_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_TURN_TIME,
 		FALSE, 14, 0, turnTimeSprite, turnTimeSprite);
 
+	// Sudden Death after 10 min
+	drawOptionsBox(GENERAL_FRAME_LEFT+83, GENERAL_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_SUDDEN_DEATH,
+		!Match_suddenDeathEnabled, 14, 0, spr_SuddenDeath, spr_SuddenDeath);
+
 	// Artillery Mode
-	drawOptionsBox(GENERAL_FRAME_LEFT+83, GENERAL_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_ARTILLERY_MODE,
+	drawOptionsBox(GENERAL_FRAME_LEFT+103, GENERAL_FRAME_TOP+7, matchSettings_menuItem==MENU_ITEM_ARTILLERY_MODE,
 		!Match_artilleryMode, 12, 1, spr_Option_Artillery, spr_Option_Artillery);
 
 	// -----------------
@@ -246,7 +252,7 @@ static void MatchSettings_update()
 	}
 	else if(Keys_keyDown(keyRight))
 	{
-		if(matchSettings_menuItem<11)
+		if(matchSettings_menuItem<12)
 			matchSettings_menuItem++;
 	}
 
@@ -256,17 +262,17 @@ static void MatchSettings_update()
 	// if up is pushed and exactly 11, it should go to 4
 	if(Keys_keyDown(keyDown))
 	{
-		if(matchSettings_menuItem<5)
-			matchSettings_menuItem+=6;
+		if(matchSettings_menuItem<6)
+			matchSettings_menuItem+=7;
 	}
 	else if(Keys_keyDown(keyUp))
 	{
-		if(matchSettings_menuItem>5 && matchSettings_menuItem<11)
-			matchSettings_menuItem-=6;
+		if(matchSettings_menuItem>6 && matchSettings_menuItem<12)
+			matchSettings_menuItem-=7;
 		else if(matchSettings_menuItem==5)
 			matchSettings_menuItem=0;
 		else if(matchSettings_menuItem==11)
-			matchSettings_menuItem=4;
+			matchSettings_menuItem=5;
 	}
 
 	// if action is pressed it should toggle the corresponding setting
@@ -274,7 +280,7 @@ static void MatchSettings_update()
 	{
 		switch(matchSettings_menuItem)
 		{
-			case 0: // Worm Starting Health
+			case MENU_ITEM_WORM_HEALTH:
 				if(Match_wormStartHealth==50)
 					Match_wormStartHealth=100;
 				else if(Match_wormStartHealth==100)
@@ -283,15 +289,15 @@ static void MatchSettings_update()
 					Match_wormStartHealth=50;
 				break;
 
-			case 1: // Select Worms On Turn Start
+			case MENU_ITEM_SELECT_WORMS:
 				Match_allowWormSelection = !Match_allowWormSelection;
 				break;
 
-			case 2: // Place Worms on Game Start
+			case MENU_ITEM_PLACE_WORMS:
 				Match_strategicPlacement = !Match_strategicPlacement;
 				break;
 
-			case 3: // Turn Time
+			case MENU_ITEM_TURN_TIME:
 				if(Match_turnTime==30)
 					Match_turnTime=45;
 				else if(Match_turnTime==45)
@@ -300,37 +306,41 @@ static void MatchSettings_update()
 					Match_turnTime=30;
 				break;
 
-			case 4: // Artillery Mode
+			case MENU_ITEM_SUDDEN_DEATH:
+				Match_suddenDeathEnabled = !Match_suddenDeathEnabled;
+				break;
+
+			case MENU_ITEM_ARTILLERY_MODE:
 				Match_artilleryMode = !Match_artilleryMode;
 				break;
 
-			case 5: // Enable Mines
+			case MENU_ITEM_ENABLE_MINES:
 				Match_minesEnabled = !Match_minesEnabled;
 				break;
 
-			case 6: // Mine Fuse Length
+			case MENU_ITEM_MINE_FUSE_LENGTH:
 				Match_mineFuseLength++;
 				if(Match_mineFuseLength>4)
 					Match_mineFuseLength=0;
 				break;
 
-			case 7: // Enable Dud Mines
+			case MENU_ITEM_ENABLE_DUD_MINES:
 				Match_dudMines = !Match_dudMines;
 				break;
 
-			case 8: // Enable Oil Drums
+			case MENU_ITEM_ENABLE_OIL_DRUMS:
 				Match_oilDrumsEnabled = !Match_oilDrumsEnabled;
 				break;
 
-			case 9: // Enable Tool Crates
+			case MENU_ITEM_ENABLE_TOOL_CRATES:
 				Match_toolCratesEnabled = !Match_toolCratesEnabled;
 				break;
 
-			case 10: // Enable Health Crates
+			case MENU_ITEM_ENABLE_HEALTH_CRATES:
 				Match_healthCratesEnabled = !Match_healthCratesEnabled;
 				break;
 
-			case 11: // Enable Weapon Crates
+			case MENU_ITEM_ENABLE_WEAPON_CRATES:
 				Match_weaponCratesEnabled = !Match_weaponCratesEnabled;
 				break;
 		}

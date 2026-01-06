@@ -95,7 +95,11 @@ extern const unsigned short spr_SelectionArrowFrame1[];
 
 extern const unsigned short spr_SelectionArrowFrame2[];
 
+extern const unsigned short spr_SuddenDeath[];
+
 extern const unsigned long spr_TeamTab[];
+
+extern const unsigned long spr_TeamTabR[];
 
 #define NUM_TITLEDARK 5
 extern const unsigned long spr_TitleDark[][100];

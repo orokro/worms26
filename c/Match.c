@@ -51,6 +51,9 @@ char Match_toolCratesEnabled = TRUE;
 char Match_healthCratesEnabled = TRUE;
 char Match_weaponCratesEnabled = TRUE;
 
+// is sudden death mode enabled?
+char Match_suddenDeathEnabled = TRUE;
+
 // kind of map texture
 char Match_mapType = MAP_SAND;
 

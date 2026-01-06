@@ -35,6 +35,7 @@ extern char Match_oilDrumsEnabled;
 extern char Match_toolCratesEnabled;
 extern char Match_healthCratesEnabled;
 extern char Match_weaponCratesEnabled;
+extern char Match_suddenDeathEnabled;
 extern char Match_mapType;
 extern char Match_drawingFlags;
 extern char Match_defaultWeapons[65];
