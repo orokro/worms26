@@ -181,6 +181,10 @@ void Draw_bigMenuButton(short x, short y, char itemId, char currentItem, const u
 		ClipSprite32_OR_R(x, y+1, 21, sprite, lightPlane);
 		ClipSprite32_OR_R(x+1, y+1, 21, sprite, lightPlane);
 	}
+	else
+	{
+		ClipSprite32_AND_R(x, y, 21, spr_MenuBorder, darkPlane);
+	}
 }
 
 
