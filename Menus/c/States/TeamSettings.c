@@ -136,6 +136,23 @@ void handleTextEdit(char* buffer, short maxLen)
 
 
 /**
+ * @brief Draws just the text box that's being edited so it's more performant
+ */
+void Draw_editBoxOnly()
+{
+	Draw_textBox(
+		teamSettings_menuItem==MENU_ITEM_TEAM_NAME ? 5 : 55 + (( (teamSettings_menuItem - 2) % 2) * 49),
+		teamSettings_menuItem==MENU_ITEM_TEAM_NAME ? 26 : 26 + (( (teamSettings_menuItem - 2) / 2) * 10),
+		teamSettings_menuItem==MENU_ITEM_TEAM_NAME ? 47 : 50,
+		1,
+		teamSettings_menuItem==MENU_ITEM_TEAM_NAME ? Match_teamNames[(short)tab] : Match_wormNames[(short)(tab*8)+(teamSettings_menuItem-2)]
+	);
+
+	screenIsStale--;
+}
+
+
+/**
  * main drawing routine for the TeamSettings menu
  */
 void Draw_renderTeamSettingsMenu()
@@ -143,6 +160,13 @@ void Draw_renderTeamSettingsMenu()
 	// gtfo if nothing has changed
 	if(screenIsStale==0)
 		return;
+
+	// if we're editing, just draw the text box only instead of a complete redraw
+	if(teamSettings_isEditing)
+	{
+		Draw_editBoxOnly();
+		return;
+	}
 
 	// start fresh
 	Draw_clearBuffers();

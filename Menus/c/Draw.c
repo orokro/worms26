@@ -22,10 +22,8 @@
  */
 void Draw_clearBuffers()
 {
-	GrayDBufSetHiddenAMSPlane(DARK_PLANE);
-	ClrScr();
-	GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
-	ClrScr();
+	FastClearScreen_R(lightPlane);
+	FastClearScreen_R(darkPlane);
 }
 
 
@@ -197,6 +195,9 @@ void Draw_bigMenuButton(short x, short y, char itemId, char currentItem, const u
  */
 void Draw_textBox(char x, char y, char width, char isSelected, const char* text)
 {
+	// clear under box
+	GrayFastFillRect_R(lightPlane, darkPlane, (short)x, (short)y, (short)(x+width), (short)(y+11), 0);
+
 	// draw a box for the text box
 	Draw_RectOutlineColor((short)x, (short)y, width, 11, isSelected ? 3 : 1);
 
