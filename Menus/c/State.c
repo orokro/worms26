@@ -53,6 +53,7 @@ char App_exitRequested = FALSE;
 #include "States/Credits.c"
 #include "States/SaveAndExit.c"
 #include "States/HelpAndSettings.c"
+#include "States/MapSettings.c"
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------
@@ -117,6 +118,9 @@ void State_update()
 		case menuMode_HelpAndSettings:
 			HelpAndSettings_update();
 			break;
+		case menuMode_MapSettings:	
+			MapSettings_update();
+			break;
 	}	
 }
 
@@ -171,6 +175,9 @@ void State_changeMode(char newMode, char timer)
 		case menuMode_HelpAndSettings:
 			HelpAndSettings_exit();
 			break;
+		case menuMode_MapSettings:
+			MapSettings_exit();
+			break;
 	}	
 	
 	// save our current mode as our previous mode
@@ -208,6 +215,9 @@ void State_changeMode(char newMode, char timer)
 			break;
 		case menuMode_HelpAndSettings:
 			HelpAndSettings_enter();
+			break;
+		case menuMode_MapSettings:
+			MapSettings_enter();
 			break;
 	}	
 }

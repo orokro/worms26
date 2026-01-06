@@ -53,8 +53,9 @@ char Match_weaponCratesEnabled = TRUE;
 // sudden death mode enabled?
 char Match_suddenDeathEnabled = FALSE;
 
-// kind of map texture
+// kind of map texture / land generation
 char Match_mapType = MAP_SAND;
+char Match_mapLandType = LAND_LAYERS;
 
 // what things to draw
 char Match_drawingFlags = DRAW_CLOUDS | DRAW_LEAVES | DRAW_MOUNTAINS;

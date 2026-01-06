@@ -22,6 +22,7 @@ enum MenuModes {
 	menuMode_Credits,
 	menuMode_SaveAndExit,
 	menuMode_HelpAndSettings,
+	menuMode_MapSettings,
 };
 
 // for making menu screens scale (minimum 4 redraws for safety)

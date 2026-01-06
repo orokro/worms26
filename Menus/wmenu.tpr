@@ -50,7 +50,7 @@ Use Return Value=0
 Enable Error Return=0
 Save Screen=1
 [File Editing]
-Open File=C:\Users\geem4\Desktop\worms17\Menus\c\Draw.c
+Open File=C:\Users\geem4\Desktop\worms17\Menus\c\States\MapSettings.c
 [Included Files]
 C File 1=c\SpriteData.c
 C File 2=c\Match.c
@@ -91,3 +91,5 @@ Header File 18=c\States\WeaponSettings.c
 Header File 18 Folder=States
 Header File 19=c\States\SaveAndExit.c
 Header File 19 Folder=States
+Header File 20=c\States\MapSettings.c
+Header File 20 Folder=States

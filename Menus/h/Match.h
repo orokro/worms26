@@ -15,6 +15,11 @@
 #define MAP_STONE 1
 #define MAP_BRICKS 2
 
+// land styles
+#define LAND_LAYERS 0
+#define LAND_ISLANDS 1
+#define LAND_TOWERS 2
+
 // game drawing flags
 #define DRAW_CLOUDS 0b00000001
 #define DRAW_LEAVES 0b00000010
@@ -37,6 +42,7 @@ extern char Match_healthCratesEnabled;
 extern char Match_weaponCratesEnabled;
 extern char Match_suddenDeathEnabled;
 extern char Match_mapType;
+extern char Match_mapLandType;
 extern char Match_drawingFlags;
 extern char Match_defaultWeapons[65];
 extern char Match_teamNames[2][10];

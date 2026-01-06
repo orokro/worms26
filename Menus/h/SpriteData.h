@@ -42,11 +42,16 @@ extern const unsigned char spr_Grave[][12];
 
 extern const unsigned char spr_Infinite[];
 
+#define NUM_LAND 3
+extern const unsigned long spr_Land[][32];
+
 extern const unsigned long spr_MenuBorder[];
 
 extern const unsigned long spr_MenuCredits[];
 
 extern const unsigned long spr_MenuGame[];
+
+extern const unsigned long spr_MenuMap[];
 
 extern const unsigned long spr_MenuMatch[];
 

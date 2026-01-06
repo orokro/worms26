@@ -9,32 +9,31 @@
 
 // help strings
 const char *matchMenuText[5] = {
-	"+/- To Adjust Map Type",
+	"Adjust Weapons Stock",
+	"Adjust Match Settings",
+	"Adjust Map Settings",
 	"+/- To Change Team 1 Size",
 	"+/- To Change Team 2 Size",
-	"Adjust Weapons Stock",
-	"Adjust Match Settings",	
 };
 
 // local var now that we have a new app
 char match_menuItem = 0;
 
 // define menu item ids
-#define MENU_ITEM_MAP_TYPE     0
-#define MENU_ITEM_TEAM_1       1
-#define MENU_ITEM_TEAM_2       2
-#define MENU_ITEM_WEAPONS      3
-#define MENU_ITEM_MATCH        4
+#define MENU_ITEM_WEAPONS      	0
+#define MENU_ITEM_MATCH        	1
+#define MENU_ITEM_MAP     		2
+#define MENU_ITEM_TEAM_1       	3
+#define MENU_ITEM_TEAM_2       	4
 
 // define positions for layout
-#define MAP_LEFT 20
-#define MAP_TOP 15
-#define BIG_BUTTONS_TOP 60
-#define WEAPONS_BUTTON_LEFT 80-32-5
-#define MATCH_BUTTON_LEFT 85
-#define TEAMS_LEFT 60
-#define TEAM_1_TOP 15
-#define TEAM_2_TOP 37
+#define BIG_BUTTONS_TOP 16
+#define WEAPONS_BUTTON_LEFT 22
+#define MATCH_BUTTON_LEFT 22+42
+#define MAP_BUTTON_LEFT 22+42+42
+#define TEAMS_LEFT 40
+#define TEAM_1_TOP 41
+#define TEAM_2_TOP 62
 
 
 /**
@@ -88,22 +87,14 @@ void Draw_renderMatchMenuMenu()
 
 	// -----------------
 
-	// draw the map box label & current map texture
-	GrayDrawStr2B(MAP_LEFT,  MAP_TOP, "Map Type:", A_NORMAL, lightPlane, darkPlane);
-	Draw_RectOutlineColor(MAP_LEFT, MAP_TOP+6, 34, 34, match_menuItem==MENU_ITEM_MAP_TYPE ? 3 : 1);
-	ClipSprite32_OR_R(MAP_LEFT+1, MAP_TOP+7, 32, tex_Ground[(short)Match_mapType], lightPlane);
-	FastFilledRect_Invert_R(lightPlane, MAP_LEFT+1, MAP_TOP+7, MAP_LEFT+1+31, MAP_TOP+7+31);	
-	ClipSprite32_OR_R(MAP_LEFT+1, MAP_TOP+7, 32, tex_Ground[(short)Match_mapType], darkPlane);
-
-	// -----------------
+	// Draw the big menu buttons for sub menus
+	Draw_bigMenuButton(WEAPONS_BUTTON_LEFT, BIG_BUTTONS_TOP, MENU_ITEM_WEAPONS, match_menuItem, spr_MenuWeapons);
+	Draw_bigMenuButton(MATCH_BUTTON_LEFT, BIG_BUTTONS_TOP, MENU_ITEM_MATCH, match_menuItem, spr_MenuMatch);
+	Draw_bigMenuButton(MAP_BUTTON_LEFT, BIG_BUTTONS_TOP, MENU_ITEM_MAP, match_menuItem, spr_MenuMap);
 
 	// Draw the team names & rows of worms
 	drawTeamRow(TEAMS_LEFT, TEAM_1_TOP, 0, (match_menuItem==MENU_ITEM_TEAM_1));
 	drawTeamRow(TEAMS_LEFT, TEAM_2_TOP, 1, (match_menuItem==MENU_ITEM_TEAM_2));
-
-	// Draw the big menu buttons for sub menus
-	Draw_bigMenuButton(WEAPONS_BUTTON_LEFT, BIG_BUTTONS_TOP, MENU_ITEM_WEAPONS, match_menuItem, spr_MenuWeapons);
-	Draw_bigMenuButton(MATCH_BUTTON_LEFT, BIG_BUTTONS_TOP, MENU_ITEM_MATCH, match_menuItem, spr_MenuMatch);
 
 	// we're done drawing
 	screenIsStale--;
@@ -142,51 +133,30 @@ static void MatchMenu_update()
 		State_changeMode(menuMode_SaveAndExit, 3);
 	}
 		
-	// left and right navigation
-	if(Keys_keyDown(keyLeft))
+	// if match_menuItem < 3, left/right just clamps between 0 and 2
+	if(match_menuItem<3)
 	{
-		if(match_menuItem==MENU_ITEM_TEAM_1 || match_menuItem==MENU_ITEM_TEAM_2)
-			match_menuItem=MENU_ITEM_MAP_TYPE;
-		else if(match_menuItem==MENU_ITEM_MATCH)
-			match_menuItem=MENU_ITEM_WEAPONS;
-	}
-	else if(Keys_keyDown(keyRight))
-	{
-		if(match_menuItem==MENU_ITEM_MAP_TYPE)
-			match_menuItem=MENU_ITEM_TEAM_1;
-		else if(match_menuItem==MENU_ITEM_WEAPONS)
-			match_menuItem=MENU_ITEM_MATCH;
+		if(Keys_keyDown(keyLeft) && match_menuItem>0)
+			match_menuItem--;
+		else if(Keys_keyDown(keyRight) && match_menuItem<2)
+			match_menuItem++;
 	}
 
-	// up and down navigation
-	if(Keys_keyDown(keyUp))
-	{	
-		if(match_menuItem==MENU_ITEM_WEAPONS)
-			match_menuItem=MENU_ITEM_MAP_TYPE;
-		else if(match_menuItem==MENU_ITEM_TEAM_2)
-			match_menuItem=MENU_ITEM_TEAM_1;
-		else if(match_menuItem==MENU_ITEM_MATCH)
-			match_menuItem=MENU_ITEM_TEAM_2;
-	}
-	else if(Keys_keyDown(keyDown))
+	// if match_menuItem <3 down goes to 3, otherwise down goes to 4 if on 3
+	if(Keys_keyDown(keyDown))
 	{
-		if(match_menuItem==MENU_ITEM_MAP_TYPE)
-			match_menuItem=MENU_ITEM_WEAPONS;
-		else if(match_menuItem==MENU_ITEM_TEAM_1)
-			match_menuItem=MENU_ITEM_TEAM_2;
-		else if(match_menuItem==MENU_ITEM_TEAM_2)
-			match_menuItem=MENU_ITEM_MATCH;
+		if(match_menuItem<3)
+			match_menuItem = 3;
+		else if(match_menuItem==3)
+			match_menuItem = 4;
 	}
-
-	// if we're on map type, +/- changes it
-	if(match_menuItem==MENU_ITEM_MAP_TYPE)
+	else if(Keys_keyDown(keyUp))
 	{
-		if(Keys_keyUp(keyMinus) && Match_mapType>0)
-			Match_mapType--;
-		
-		else if(Keys_keyUp(keyPlus) && Match_mapType<4)
-			Match_mapType++;
-	}
+		if(match_menuItem==4)
+			match_menuItem = 3;
+		else if(match_menuItem==3)
+			match_menuItem = 1;
+	}	
 
 	// if we're over team 1 or team 2, then +/- changes worm count
 	if(match_menuItem==MENU_ITEM_TEAM_1)
@@ -213,6 +183,8 @@ static void MatchMenu_update()
 			State_changeMode(menuMode_WeaponsSettings, 0);
 		else if(match_menuItem==MENU_ITEM_MATCH)
 			State_changeMode(menuMode_MatchSettings, 0);
+		else if(match_menuItem==MENU_ITEM_MAP)
+			State_changeMode(menuMode_MapSettings, 0);
 	}
 
 	// redraw for any keypress

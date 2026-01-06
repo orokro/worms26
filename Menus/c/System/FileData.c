@@ -136,6 +136,8 @@ void FileData_loadData()
 	result += fread(&Match_suddenDeathEnabled, sizeof(char), 1, f);
 	
 	result += fread(&Match_mapType, sizeof(char), 1, f);
+	result += fread(&Match_mapLandType, sizeof(char), 1, f);
+
 	result += fread(&Match_drawingFlags, sizeof(char), 1, f);
 	
 	result += fread(Match_defaultWeapons, sizeof(char), 65, f);
@@ -190,6 +192,8 @@ void FileData_saveData()
 	fwrite(&Match_suddenDeathEnabled, sizeof(char), 1, f);
 
 	fwrite(&Match_mapType, sizeof(char), 1, f);
+	fwrite(&Match_mapLandType, sizeof(char), 1, f);
+	
 	fwrite(&Match_drawingFlags, sizeof(char), 1, f);
 	
 	fwrite(Match_defaultWeapons, sizeof(char), 65, f);

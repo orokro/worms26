@@ -496,15 +496,16 @@ void Map_makeMap()
 	const unsigned long* spr_LandTexture = tex_Ground[(short)Match_mapType];
 	
 	// make type one map (default)
-	if(Match_mapType == 1)
-		Map_makeType2(light, dark, spr_LandTexture);
-	else if(Match_mapType == 2)
-		Map_makeType3(light, dark, spr_LandTexture);
-	else
+	if(Match_mapLandType == LAND_LAYERS)
 		Map_makeType1(light, dark, spr_LandTexture);
+	else if(Match_mapLandType == LAND_ISLANDS)
+		Map_makeType2(light, dark, spr_LandTexture);
+	else if(Match_mapLandType == LAND_TOWERS)
+		Map_makeType3(light, dark, spr_LandTexture);
 	
 	// trace edges in the buffers
 	Map_traceEdges();
+	
 	// part of generating the map will be generating the objects on it..
 	// Prioritize WORMS first, so they get the best spots
 	// don't spawn worms if we're in strategic mode
