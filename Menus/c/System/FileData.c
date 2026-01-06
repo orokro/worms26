@@ -143,12 +143,6 @@ void FileData_loadData()
 	result += fread(Match_wormNames, sizeof(char) * 12, MAX_WORMS, f);
 
 	fclose(f);
-
-	// If reading failed (corrupt or short file), force defaults
-	if (result != 101) {
-		FileData_setGameDefaults();
-		FileData_saveData();
-	}
 }
 
 

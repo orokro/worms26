@@ -133,7 +133,7 @@ void FileData_loadData()
 	result += fread(&Match_healthCratesEnabled, sizeof(char), 1, f);
 	result += fread(&Match_weaponCratesEnabled, sizeof(char), 1, f);
 	
-	result += fread(&Match_weaponCratesEnabled, sizeof(char), 1, f);
+	result += fread(&Match_suddenDeathEnabled, sizeof(char), 1, f);
 	
 	result += fread(&Match_mapType, sizeof(char), 1, f);
 	result += fread(&Match_drawingFlags, sizeof(char), 1, f);
@@ -143,12 +143,6 @@ void FileData_loadData()
 	result += fread(Match_wormNames, sizeof(char) * 12, MAX_WORMS, f);
 
 	fclose(f);
-
-	// If reading failed (corrupt or short file), force defaults
-	if (result != 101) {
-		FileData_setGameDefaults();
-		FileData_saveData();
-	}
 }
 
 
@@ -157,5 +151,5 @@ void FileData_loadData()
  */
 void FileData_saveData()
 {
-	// game executabe cannot write to the data file
+	// game executable cannot write to the data file
 }

@@ -468,6 +468,10 @@ void Game_changeMode(char newMode)
  */
 static void startSuddenDeath()
 {
+	// do nothing if user disabled sudden death mode
+	if(Match_suddenDeathEnabled==FALSE)
+		return;
+
 	// we don't even need to test for active worms, just make 'em all 1hp
 	short i=0;
 	unsigned short wormMask;
