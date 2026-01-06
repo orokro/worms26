@@ -2043,8 +2043,8 @@ void Weapons_drawAll()
 							{
 								const unsigned short* ladySprite = facingLeft ? spr_weapons_flipped[24] : spr_weapons[24];
 								const char shakerPos = facingLeft ? screenX-6 : screenX-3;
-								ClipSprite16_OR_R(screenX-8, screenY-11, 11, ladySprite, lightPlane);
-								ClipSprite16_OR_R(screenX-8, screenY-11, 11, ladySprite, darkPlane);
+								ClipSprite16_OR_R(screenX-8, screenY-8, 11, ladySprite, lightPlane);
+								ClipSprite16_OR_R(screenX-8, screenY-8, 11, ladySprite, darkPlane);
 								ClipSprite16_OR_R(shakerPos, screenY-9, 8, spr_weapons[48]+2, lightPlane);
 								ClipSprite16_OR_R(shakerPos, screenY-9, 8, spr_weapons[48]+2, darkPlane);
 							}
