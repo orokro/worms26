@@ -258,6 +258,9 @@ void Worm_update()
 					// add gravity to the worm
 					Worm_yVelo[i]++;
 					
+					// save current velocity so we can check for collision after physics
+					char impactVelo = Worm_yVelo[i];
+
 					// if the worm is dead, it's gravestone can only have vertical velocity, no X
 					if(Worm_isDead & wormMask)
 						Worm_xVelo[i]=0;
@@ -265,6 +268,22 @@ void Worm_update()
 					// do physics and collision for worm
 					Physics_apply(&Worm_physObj[i]);				
 					
+					// DETECT FALL DAMAGE
+					// 1. Did we hit the ground? (COL_DOWN)
+					// 2. Was our velocity high enough? (> 10 ignores jumps/backflips)
+					// 3. Are we alive? (Dead worms/gravestones don't take damage)
+					if((Worm_physObj[i].col.collisions & COL_DOWN) && impactVelo > 10 && !(Worm_isDead & wormMask))
+					{
+						// Calculate damage: (Velocity - Threshold) * Multiplier
+						// Example: Fall velocity 14 -> (14 - 8) * 3 = 18 damage.
+						short dmg = (impactVelo - 10) * 3;
+						Worm_setHealth(i, -dmg, TRUE);
+						
+						// Optional: You could show a message here if you wanted
+						sprintf(buffer, "Ouch! -%d", dmg);
+						StatusBar_showMessage(buffer);
+					}
+
 					// if we collided with the ground on the last frame, assume the worm is grounded.
 					// (it should collide with the ground ever frame its grounded, due to gravity.
 					// if the worm was settled on this frame, we won't get here on the next frame
