@@ -19,6 +19,10 @@ extern const unsigned char spr_chargeMed[];
 
 extern const unsigned char spr_chargeSmall[];
 
+extern const unsigned short spr_Check_Fill[];
+
+extern const unsigned short spr_Check_Outline[];
+
 extern const unsigned long spr_Cloud_Dark[];
 
 extern const unsigned long spr_Cloud_Light[];

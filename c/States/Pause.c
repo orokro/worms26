@@ -112,21 +112,7 @@ void Draw_renderPauseMenu(char menuItem)
 	FontSetSys(F_6x8);
 	Draw_pauseMenuWormCounter(50, 0);
 	Draw_pauseMenuWormCounter(70, 1);
-	
 
-	/*
-	// controls text:
-	char controlsStr[] = "[2nd] confirm / use weapon\n[?] jump\n[a] back flip\n[?]+[?]/[?]/[?]/[?] move camera\n[F1]/[CAT] weapons menu\n[APPS] select worm (if enabled)\n[ESC] pause\n[1]/[2]/[3]/[4]/[5] fuse length / opts";
-	
-	// use tiny font to draw controls
-	FontSetSys(F_4x6);
-
-	// draw dark on light plane, then xor to erase
-	GrayDrawStr2B(10, 30, controlsStr, A_NORMAL, lightPlane, darkPlane);
-	GrayDrawStr2B(10, 30, controlsStr, A_XOR, lightPlane, darkPlane);
-	
-	FontSetSys(F_6x8);
-	*/
 }
 
 

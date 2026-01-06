@@ -29,6 +29,9 @@ static char loseYPos = 0;
 // animation timer to make the winners jump
 static char animationTimer = 0;
 
+// when the button is pressed, we start counting frames to move it down
+static char buttonPressFrames = 0;
+
 
 /**
  * @brief Draws a stack of worms for the pause menu worm counter
@@ -133,6 +136,12 @@ void drawGameOver()
 
 	// draw losing worms, if any
 	drawGameOverTeam(70, (winningTeam==0) ? 1 : 0);
+
+	// hackishly draw mask for the button
+	const char offset = buttonPressFrames>0 ? 2 : 0;
+	GrayClipSprite16_OR_R(140+offset, 76+offset, 20, spr_Check_Fill, spr_Check_Fill, lightPlane, darkPlane);
+	GrayClipSprite16_XOR_R(140+offset, 76+offset, 20, spr_Check_Fill, spr_Check_Fill, lightPlane, darkPlane);
+	GrayClipSprite16_OR_R(140+offset, 76+offset, 20, spr_Check_Fill, spr_Check_Outline, lightPlane, darkPlane);
 }
 
 
@@ -206,13 +215,27 @@ static void GameOver_update()
 	// the game
 	drawGameOver();
 
-	// if the user presses the action key, we should either quit the game, or exit the pause menu
-	if(Keys_keyDown(keyF5))
+	// if exiting due to button press, count frames
+	if(buttonPressFrames>0)
 	{
-		// setting this will exit the next tick of our main loop
-		GameRunning = FALSE;
+		buttonPressFrames++;
+		if(buttonPressFrames>4)
+		{
+			// setting this will exit the next tick of our main loop
+			GameRunning = FALSE;
+			return;		
+		}
+		return;
+	}
+
+	// if the user presses the action key, we should either quit the game, or exit the pause menu
+	if(Keys_keyDown(keyF5|keyAction|keyEscape) && buttonPressFrames<=0)
+	{
+		// start counting frames to exit
+		buttonPressFrames = 1;
 		return;		
 	}
+
 }
 
 
