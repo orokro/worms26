@@ -373,6 +373,7 @@ char Map_testPoint(short x, short y)
 	return pixelOn;
 }
 
+
 /**
  * Helper to check distance between two points squared
  */
@@ -381,6 +382,7 @@ static long distSq(short x1, short y1, short x2, short y2) {
 	long dy = (long)(y1 - y2);
 	return dx*dx + dy*dy;
 }
+
 
 /**
  * Finds a valid spawn point for the given object type.
@@ -528,6 +530,7 @@ char Map_findSpawnPoint(char type, short *outX, short *outY)
 	
 	return FALSE;
 }
+
 
 // draw the map.. but I can't call this, crashes
 void Map_draw()

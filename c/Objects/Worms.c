@@ -162,7 +162,7 @@ void Worm_spawnWorm(short index)
 	Worm_active |= mask;
 
 	// make a new collider and physics object for this worm
-	new_Collider(&(Worm_physObj[index].col), COL_UDLR, -4, 6, -2, 2);
+	new_Collider(&(Worm_physObj[index].col), COL_UDLR, 4, 6, 2, 2);
 	new_PhysObj(&Worm_physObj[index], &Worm_x[index], &Worm_y[index], &Worm_xVelo[index], &Worm_yVelo[index], 40, 100, (char)index, &Worm_settled);
 	
 	// allow worms to bounce of walls, but not land
