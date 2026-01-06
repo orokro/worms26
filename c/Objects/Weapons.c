@@ -1991,8 +1991,8 @@ void Weapons_drawAll()
 						case WFakeFire:
 							{
 								const unsigned short* fireSprite = fireFrame ? spr_weapons[WFire] : spr_weapons_flipped[WFire];
-								ClipSprite16_OR_R(screenX-2, screenY-2, 11, fireSprite, lightPlane);
-								ClipSprite16_OR_R(screenX-2, screenY-2, 11, fireSprite, darkPlane);
+								ClipSprite16_OR_R(screenX-2, screenY-1, 11, fireSprite, lightPlane);
+								ClipSprite16_OR_R(screenX-2, screenY-1, 11, fireSprite, darkPlane);
 							}
 							break;
 
@@ -2004,8 +2004,8 @@ void Weapons_drawAll()
 							{
 								short spriteIndex = (Weapon_yVelo[i] < 0) ? 72 : 73;
 								const unsigned short* moleSprite = facingLeft ? spr_weapons_flipped[spriteIndex] : spr_weapons[spriteIndex];
-								ClipSprite16_OR_R(screenX-2, screenY-2, 11, moleSprite, lightPlane);
-								ClipSprite16_OR_R(screenX-2, screenY-2, 11, moleSprite, darkPlane);
+								ClipSprite16_OR_R(screenX-2, screenY-1, 11, moleSprite, lightPlane);
+								ClipSprite16_OR_R(screenX-2, screenY-1, 11, moleSprite, darkPlane);
 							}
 							break;
 
@@ -2024,19 +2024,19 @@ void Weapons_drawAll()
 
 						case WMBBomb:
 							{
-								ClipSprite32_AND_R(screenX-16, screenY-32, 32, spr_MB_Mask, lightPlane);
-								ClipSprite32_AND_R(screenX-16, screenY-32, 32, spr_MB_Mask, darkPlane);
-								ClipSprite32_OR_R(screenX-16, screenY-32, 32, spr_MB_Light, lightPlane);
-								ClipSprite32_OR_R(screenX-16, screenY-32, 32, spr_MB_Dark, darkPlane);
+								ClipSprite32_AND_R(screenX-16, screenY-29, 32, spr_MB_Mask, lightPlane);
+								ClipSprite32_AND_R(screenX-16, screenY-29, 32, spr_MB_Mask, darkPlane);
+								ClipSprite32_OR_R(screenX-16, screenY-29, 32, spr_MB_Light, lightPlane);
+								ClipSprite32_OR_R(screenX-16, screenY-29, 32, spr_MB_Dark, darkPlane);
 							}
 							break;
 
 						case WConcreteDonkey:
 							{
-								ClipSprite32_AND_R(screenX-16, screenY-32, 32, spr_Donkey_Mask, lightPlane);
-								ClipSprite32_AND_R(screenX-16, screenY-32, 32, spr_Donkey_Mask, darkPlane);
-								ClipSprite32_OR_R(screenX-16, screenY-32, 32, spr_Donkey_Light, lightPlane);
-								ClipSprite32_OR_R(screenX-16, screenY-32, 32, spr_Donkey_Dark, darkPlane);
+								ClipSprite32_AND_R(screenX-16, screenY-27, 32, spr_Donkey_Mask, lightPlane);
+								ClipSprite32_AND_R(screenX-16, screenY-27, 32, spr_Donkey_Mask, darkPlane);
+								ClipSprite32_OR_R(screenX-16, screenY-27, 32, spr_Donkey_Light, lightPlane);
+								ClipSprite32_OR_R(screenX-16, screenY-27, 32, spr_Donkey_Dark, darkPlane);
 							}
 							break;
 						case WSalvationArmy:
