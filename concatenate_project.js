@@ -17,7 +17,8 @@ const IGNORED_DIRS = new Set([
   'public',         // Binary assets (GLB, PNG, MP3)
   'html',
   'Resources',
-  
+  'Menus',
+  'lib',
 ]);
 
 // Files to strictly ignore (optional, for specific large files)
@@ -30,15 +31,16 @@ const IGNORED_FILES = new Set([
 // Extensions we WANT to read.
 // If a file is in 'src' but is a .png, it will still be skipped.
 const ALLOWED_EXTENSIONS = new Set([
-  '.js',
-  '.mjs',
-  '.vue',
-  '.json',
-  '.html',
-  '.css',
-  '.scss',
-  '.md',
-  '.txt',
+//   '.js',
+//   '.mjs',
+//   '.vue',
+//   '.json',
+//   '.html',
+//   '.css',
+//   '.scss',
+//   '.md',
+//   '.txt',
+ '.tpr',
   '.c',
   '.h',
 ]);
