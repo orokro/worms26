@@ -160,22 +160,13 @@ void OilDrums_drawAll()
 			if(worldToScreen(&screenX, &screenY))
 			{
 				// draw the oil drums fill and outline
-				GrayClipSprite16_AND_R(screenX-4, screenY-5, 12, spr_OilMask, spr_OilMask, lightPlane, darkPlane);
-				GrayClipSprite16_OR_R(screenX-4, screenY-5, 12, spr_OilLight, spr_OilDark, lightPlane, darkPlane);
-				
-				
-				// if the oil drum is "settled" draw an arrow above it, for debug
-				//if(OilDrum_settled & (unsigned short)1<<(i))
-				//	DrawChar(screenX, screenY-10, (char)20, A_NORMAL);
-				
-				/*
-				char txt[4];
-				sprintf(txt, "%d", (short)OilDrum_yVelo[i]);
-				DrawStr(screenX-4, screenY-20, txt, A_NORMAL);
-				*/
-				
+				GrayClipSprite16_AND_R(screenX-4, screenY-4, 11, spr_OilMask, spr_OilMask, lightPlane, darkPlane);
+				GrayClipSprite16_OR_R(screenX-4, screenY-4, 11, spr_OilLight, spr_OilDark, lightPlane, darkPlane);
+	
 			}// end if on screen
+
 		}// end if active
+
 	}// next i
 	
 }
