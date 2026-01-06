@@ -1971,7 +1971,7 @@ void Weapons_drawAll()
 			char facingLeft = (Weapon_facing & (unsigned short)1<<(i))>0;
 
 			screenX=Weapon_x[i];
-			screenY=Weapon_y[i];
+			screenY=Weapon_y[i]-3;
 			if(worldToScreen(&screenX, &screenY))
 			{	
 				// if weapon uses spawnSelf, we can use it's same sprite as from the menu
