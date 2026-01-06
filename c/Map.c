@@ -379,6 +379,98 @@ void Map_makeType2(unsigned long *light, unsigned long *dark, const unsigned lon
 	}
 }
 
+
+/**
+ * @brief Makes a type-3 style "Towers" map
+ * 
+ * @param light - light map buffer
+ * @param dark - dark map buffer
+ * @param spr_LandTexture - the land texture sprite to use
+ */
+void Map_makeType3(unsigned long *light, unsigned long *dark, const unsigned long* spr_LandTexture)
+{
+	short x, y, i;
+	short groundY = 180;
+	
+	// Generate 2 to 3 towers
+	short numTowers = 2 + random(2);
+	short towerX[3];
+	
+	// Place towers somewhat evenly but randomized
+	// Divide screen into 'numTowers' sections and pick a spot in each
+	short sectionWidth = 300 / numTowers;
+	for(i=0; i<numTowers; i++) {
+		towerX[i] = 10 + (i * sectionWidth) + random(sectionWidth - 40);
+	}
+
+	for(x=0; x<320; x++)
+	{
+		if(x%20==0) Draw_cake(x, 620);
+		
+		// 1. Wavy Ground Logic
+		groundY += (random(3) - 1);
+		if(groundY < 175) groundY = 175;
+		if(groundY > 195) groundY = 195;
+		
+		// Draw Ground
+		for(y=groundY; y<200; y++) {
+			unsigned long mask = 1UL << (31-(x%32));
+			short row = (x-(x%32))/32;
+			light[(row*200)+y] |= mask;
+			dark[(row*200)+y] |= (spr_LandTexture[y%32] & mask);
+		}
+		
+		// 2. Towers Logic
+		for(i=0; i<numTowers; i++)
+		{
+			short dist = abs(x - towerX[i]);
+			short startY = 200, endY = 200;
+			
+			// Tower Core (Thick)
+			if(dist < 12) {
+				startY = 30 + random(5); // Varied top
+				endY = groundY;
+			}
+			// Ledges (Jutting out)
+			// Ledge 1: Low (approx y=130), Ledge 2: High (approx y=70)
+			// Randomize ledge width per pixel for ragged look
+			else if(dist < 35) {
+				// Upper Ledge
+				if(dist < 20 + random(15)) {
+					short ly = 70;
+					for(y=ly; y<ly+8; y++) { // 8px thick
+						unsigned long mask = 1UL << (31-(x%32));
+						short row = (x-(x%32))/32;
+						light[(row*200)+y] |= mask;
+						dark[(row*200)+y] |= (spr_LandTexture[y%32] & mask);
+					}
+				}
+				// Lower Ledge
+				if(dist < 25 + random(10)) {
+					short ly = 130;
+					for(y=ly; y<ly+8; y++) {
+						unsigned long mask = 1UL << (31-(x%32));
+						short row = (x-(x%32))/32;
+						light[(row*200)+y] |= mask;
+						dark[(row*200)+y] |= (spr_LandTexture[y%32] & mask);
+					}
+				}
+			}
+			
+			// Draw Core Vertical Strip if set
+			if(startY < endY) {
+				for(y=startY; y<endY; y++) {
+					unsigned long mask = 1UL << (31-(x%32));
+					short row = (x-(x%32))/32;
+					light[(row*200)+y] |= mask;
+					dark[(row*200)+y] |= (spr_LandTexture[y%32] & mask);
+				}
+			}
+		}
+	}
+}
+
+
 /**
  * builds a random map for the worms to play on
  */
@@ -387,15 +479,13 @@ void Map_makeMap()
 	// gotta be random!
 	randomize();
 	
-	// iteration vars
-	short x, y;
-	
 	// map buffer reference as unsigned long
 	unsigned long *light = (unsigned long*)mapLight;
 	unsigned long *dark = (unsigned long*)mapDark;
 	
 	// before we generate the map, lets clear the memory entirely
 	// clear the buffer entirely:
+	short x;
 	for(x=0; x<2000; x++)
 	{
 		light[x]=0;
@@ -408,12 +498,13 @@ void Map_makeMap()
 	// make type one map (default)
 	if(Match_mapType == 1)
 		Map_makeType2(light, dark, spr_LandTexture);
+	else if(Match_mapType == 2)
+		Map_makeType3(light, dark, spr_LandTexture);
 	else
 		Map_makeType1(light, dark, spr_LandTexture);
 	
 	// trace edges in the buffers
 	Map_traceEdges();
-
 	// part of generating the map will be generating the objects on it..
 	// Prioritize WORMS first, so they get the best spots
 	// don't spawn worms if we're in strategic mode
