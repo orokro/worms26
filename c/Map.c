@@ -131,31 +131,17 @@ void Map_traceEdges()
 
 
 /**
- * builds a random map for the worms to play on
+ * @brief Makes a type-1 style land generation map
+ * 
+ * @param light - light map buffer
+ * @param dark - dark map buffer
+ * @param spr_LandTexture - the land texture sprite to use
  */
-void Map_makeMap()
+void Map_makeType1(unsigned long *light, unsigned long *dark, const unsigned long* spr_LandTexture)
 {
-	// gotta be random!
-	randomize();
-	
 	// iteration vars
 	short x, y;
-	
-	// map buffer reference as unsigned long
-	unsigned long *light = (unsigned long*)mapLight;
-	unsigned long *dark = (unsigned long*)mapDark;
-	
-	// before we generate the map, lets clear the memory entirely
-	// clear the buffer entirely:
-	for(x=0; x<2000; x++)
-	{
-		light[x]=0;
-		dark[x]=0;
-	}
-	
-	// pick the correct texture from settings
-	const unsigned long* spr_LandTexture = tex_Ground[(short)Match_mapType];
-	
+
 	/*
 		Generating the map...
 		
@@ -191,7 +177,6 @@ void Map_makeMap()
 	char upperTopLength = random(7);
 	char upperBotLength = random(7);
 	char lowerTopLength = random(7);
-	
 	
 	// loop from left of buffer to right of buffer
 	for(x=0; x<320; x++)
@@ -309,6 +294,37 @@ void Map_makeMap()
 		}// next y
 
 	}// next x
+}
+
+
+/**
+ * builds a random map for the worms to play on
+ */
+void Map_makeMap()
+{
+	// gotta be random!
+	randomize();
+	
+	// iteration vars
+	short x, y;
+	
+	// map buffer reference as unsigned long
+	unsigned long *light = (unsigned long*)mapLight;
+	unsigned long *dark = (unsigned long*)mapDark;
+	
+	// before we generate the map, lets clear the memory entirely
+	// clear the buffer entirely:
+	for(x=0; x<2000; x++)
+	{
+		light[x]=0;
+		dark[x]=0;
+	}
+	
+	// pick the correct texture from settings
+	const unsigned long* spr_LandTexture = tex_Ground[(short)Match_mapType];
+	
+	// make type one map (default)
+	Map_makeType1(light, dark, spr_LandTexture);
 	
 	// trace edges in the buffers
 	Map_traceEdges();
