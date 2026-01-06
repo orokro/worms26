@@ -150,7 +150,7 @@ void updateMine(short index)
 void Mines_spawnMines()
 {
 	char i=0;
-	
+	// Draw_cake(98, 100);
 	// only spawn 6 mines, leaving 4 free slots for user placeable mines
 	for(i=0; i<3; i++)
 		spawnMine(i);

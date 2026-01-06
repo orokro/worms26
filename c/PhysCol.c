@@ -75,111 +75,160 @@ void new_PhysObj(PhysObj *obj, short *x, short *y, char *xVelo, char *yVelo, cha
 
 
 /**
- * Applys an objects collider. This can mutate it's X/Y.
+ * tests for a collision and moves the opposite direction until a free pixel is found, if it did collide
+ * @param x - test x
+ * @param y - test y
+ * @param dir - direction to test from
+ */
+short Collide_test(short x, short y, char dir)
+{
+	// test for a collision, and if none, just return 0
+	if(Map_testPoint(x, y)==FALSE)
+		return 0;
+		
+	// get the direction to move:
+	char xDir=0;
+	char yDir=0;
+	
+	switch(dir)
+	{
+		case COL_UP:    xDir=0; yDir=1;  break;
+		case COL_DOWN:  xDir=0; yDir=-1; break;
+		case COL_LEFT:  xDir=1; yDir=0;  break;
+		case COL_RIGHT: xDir=-1; yDir=0; break;
+	}
+	
+	// make relative pixel coordinates to test with:
+	char xMovement = 0;
+	char yMovement = 0;
+	short safetyCount = 0;
+	
+	/*
+		move until a free pixel.
+		SAFETY FIX: Added safetyCount. If we are buried deeper than 25 pixels,
+		something is wrong. Stop searching to prevent CPU freeze.
+	*/
+	while(Map_testPoint(x+xMovement, y+yMovement))
+	{
+		xMovement += xDir;
+		yMovement += yDir;
+		
+		safetyCount++;
+		if(safetyCount > 25) return 0; // Abort: Too thick, don't teleport/freeze
+	}
+	
+	// return the amount that direction needs to move:
+	return (dir < 4) ? yMovement : xMovement;
+}
+
+
+/**
+ * Applies an object's collider. This can mutate its X/Y.
  *
- * @param *col pointer the Collider struct to apply
- * @param *x pointer the x position to test relatively
- * @param *y pointer the y position to test relatively
+ * @param *obj pointer to the Physics Object
  * @return an unsigned char with bits masked based on which collisions were responded to
 */
-unsigned char Collider_apply(Collider *col, short *x, short *y)
+unsigned char Collider_apply(PhysObj *obj)
 {
-	// reset the collisions bitmask for this collider
+	Collider *col = &obj->col;
+	short *x = obj->x;
+	short *y = obj->y;
+	char yVelo = *obj->yVelo; 
+
+	// Safety Flag: Did we just hit a ceiling?
+	char hitCeiling = 0;
+
 	col->collisions = 0;
 	
-	// do we need to test up and/or down?
+	// --- UP / DOWN ---
 	if(col->type & COL_UD)
 	{
-		// perform up and down tests if need be:
 		char movedUp = (col->type & COL_UP) ? (Collide_test(*x, (*y)-col->u, COL_UP)) : 0;
 		char movedDown = (col->type & COL_DOWN) ? (Collide_test(*x, (*y)+col->d, COL_DOWN)) : 0;
 		
-		// testing down takes precedence, so if we moved down at all, just apply that
-		if(movedDown!=0)
+		// INTELLIGENT FIX: STRICT VELOCITY GATING
+		if(yVelo < 0)
 		{
-			*y = *y + movedDown;
-			col->collisions |= COL_DOWN;
-		// otherwise, we will apply the up movement
-		}else if(movedUp!=0)
+			// CASE 1: Moving UP (Jumping/Jetpack)
+			// We ONLY care about the ceiling. We MUST ignore the floor (movedDown).
+			// Even if movedUp is 0 (head in air) and movedDown is -20 (feet in rock),
+			// we ignore the feet. Gravity will pull us down later.
+			
+			if(movedUp != 0)
+			{
+				*y = *y + movedUp;
+				col->collisions |= COL_UP;
+				hitCeiling = 1;
+			}
+		}
+		else
 		{
-			*y = *y + movedUp;
-			col->collisions |= COL_UP;
-		}		
-	}// end if up or down collision
+			// CASE 2: Moving DOWN or STATIC (Falling/Walking)
+			// Standard behavior with MTV conflict resolution
+			if(movedDown != 0 && movedUp != 0)
+			{
+				// Both hit. Choose the smaller correction.
+				if(abs(movedUp) < abs(movedDown))
+				{
+					*y = *y + movedUp;
+					col->collisions |= COL_UP;
+					hitCeiling = 1;
+				}
+				else
+				{
+					*y = *y + movedDown;
+					col->collisions |= COL_DOWN;
+				}
+			}
+			else if(movedDown != 0)
+			{
+				*y = *y + movedDown;
+				col->collisions |= COL_DOWN;
+			}
+			else if(movedUp != 0)
+			{
+				*y = *y + movedUp;
+				col->collisions |= COL_UP;
+				hitCeiling = 1;
+			}
+		}
+	}
 	
-	// do we need to test left and/or right?
+	// --- LEFT / RIGHT ---
 	if(col->type & COL_LR)
 	{
-		// perform left and right tests if need be:
 		char movedLeft = (col->type & COL_LEFT) ? (Collide_test((*x)-col->l, *y, COL_LEFT)) : 0;
 		char movedRight = (col->type & COL_RIGHT) ? (Collide_test((*x)+col->r, *y, COL_RIGHT)) : 0;
 		
-		/*
-			unlike up and down colliders, neither can take precedence.
-			we don't want to push the object off the edges of the map, which can happen with a feedback
-			loop of collisions. If the left collider and right collider both hit something, instead
-			we want to push the item UP since both it's edges are "on ground"
-			
-			This might end up in some unrealistic behavior, but its better than pushing the object to the
-			far edges of the map.
-			
-			in this case, we will push the object up, and test again, until neither collider hits.
-			
-			also note that this mode only needs to apply if we're testing both COL_LEFT and COL_RIGHT
-			such as in COL_LR or COL_UDLR
-			
-			also note that, the movedLeft or movedRight variables would default to 0 if this wasn't
-			the case so this IF will only pass if we're testing both LEFT and RIGHT and they both collided
-		*/
 		if(movedLeft && movedRight)
 		{
-			// move until neither is colliding any more
-			// note that, the worst case scenario is that the worm is moved to the top of the map,
-			// in which case both colliders will definitely return false, so this won't be an endless while
-			while(movedLeft && movedRight)
+			// CRASH FIX:
+			// The original code pushes the worm UP (*y = *y - 1) to escape a squeeze.
+			// If we are moving UP (yVelo < 0), we are jamming ourselves into the ceiling.
+			// We should ONLY climb if we are falling/stable AND definitely didn't just bonk a ceiling.
+			
+			if (yVelo >= 0 && !hitCeiling)
 			{
-				// move the object up:
-				*y = *y - 1;
-				
-				// test again. No need for ternary since the only way to get to this loop is if both are tested
-				movedLeft = Collide_test(*x-col->l, *y, COL_LEFT);
-				movedRight = Collide_test(*x+col->r, *y, COL_RIGHT);
+				short safety = 0;
+				// Safety: Prevent infinite loops if geometry is weird
+				while(movedLeft && movedRight && safety < 10)
+				{
+					*y = *y - 1;
+					movedLeft = Collide_test(*x-col->l, *y, COL_LEFT);
+					movedRight = Collide_test(*x+col->r, *y, COL_RIGHT);
+					safety++;
+				}
 			}
 			
-			// we will consider colliding both LEFT and RIGHT the same as colliding with DOWN (the ground)
-			// special case: both left and right hit. We should stop movement on this object and settle it ASAP
 			col->collisions |= COL_BOTHLR;
-			
-		// other wise we can just move the object left or right by the some of movedLeft and movedRight
-		}else if(movedLeft || movedRight)
+		}
+		else if(movedLeft || movedRight)
 		{
-			
-			/*
-				so, we can end up here in 3 scenarios:
-					- we are testing both left and right, but one was 0 (i.e. didn't collide)
-					- we are testing left, and right defaulted to 0
-					- we are testing right, and left defaulted to 0
-					
-				thus, no matter how you look at it, one will always be 0.
-				
-				if we add movedLeft and movedRight it will return the amount to move the x
-				value left or right.
-				
-				if both movedLeft and movedRight were non zero, then the above while loop would have happened
-				instead.
-				
-				Note that, movedLeft and movedRight can be negative for their corresponding direction.
-			*/
 			*x = *x + (movedLeft+movedRight);
-			
-			// save which side we hit
-			// if our net total is negative, the right collider hit and pushed the object left:
 			col->collisions |= ((movedLeft+movedRight)<0 ? COL_RIGHT : COL_LEFT);
-		}// end if both hit
-		
-	}// end if left or right
+		}
+	}
 	
-	// return what we collided with, if anything
 	return col->collisions;
 }
 
@@ -222,7 +271,7 @@ char Physics_apply(PhysObj *obj)
 		*obj->y += (*obj->yVelo);
 	
 	// apply the collider, which might move our object
-	unsigned char hits = Collider_apply(&obj->col, obj->x, obj->y);
+	unsigned char hits = Collider_apply(obj);
 	
 	// calculate if the object moved at all, either from velo or the collider:
 	char moved = (*obj->x!=initX || *obj->y!=initY);
@@ -243,7 +292,8 @@ char Physics_apply(PhysObj *obj)
 		return 0;
 		
 	// if hit nothing, nothing to do here:
-	}else if(hits!=0)
+	}
+	else if(hits!=0)
 	{
 		// for left and right hits
 		if(hits & COL_LR)
@@ -370,68 +420,6 @@ void Physics_setVelocity(PhysObj *obj, char x, char y, char additive, char impac
 	// any object that had velocity added is definitely "not" settled
 	obj->staticFrames = 0;
 	*obj->settled &= ~((unsigned short)1<<(obj->index));
-}
-
-
-/**
- * tests for a collision and moves the opposite direction until a free pixel is found, if it did collide
- * @param x - test x
- * @param y - test y
- * @param dir - direction to test from
- */
-short Collide_test(short x, short y, char dir)
-{
-	// test for a collision, and if none, just return 0
-	if(Map_testPoint(x, y)==FALSE)
-		return 0;
-		
-	// get the direction to move:
-	char xDir=0;
-	char yDir=0;
-	
-	switch(dir)
-	{
-		case COL_UP:
-			xDir=0;
-			yDir=1;
-			break;
-		case COL_DOWN:
-			xDir=0;
-			yDir=-1;
-			break;
-		case COL_LEFT:
-			xDir=1;
-			yDir=0;
-			break;
-		case COL_RIGHT:
-			xDir=-1;
-			yDir=0;
-			break;
-	}
-	
-	// make relative pixel coordinates to test with:
-	char xMovement = 0;
-	char yMovement = 0;
-	
-	/*
-		move until a free pixel.
-	  worst case scenario is that the worm is put in an invalid state on the map
-	  and this function moves them all the way to the edge of the map.
-	  
-	  Map_testPoint WILL return false once OOB of the map.. so the worm
-	  would fly to the left or right of the map. Lets hope the game never lets worms
-	  end up in invalid places...
-	*/
-	while(Map_testPoint(x+xMovement, y+yMovement))
-	{
-		xMovement += xDir;
-		yMovement += yDir;
-	}// wend
-	
-	// return the amount that direction needs to move:
-	// COL_UP and COL_DOWN are 0 and 1 respectively, so they are less than 2
-	return (dir < 4) ? yMovement : xMovement;
-	
 }
 
 

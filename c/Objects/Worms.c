@@ -188,6 +188,7 @@ void Worm_spawnWorm(short index)
  */
 void Worm_spawnWorms()
 {
+	// Draw_cake(97, 100);
 	short i=0;
 	for(i=0;i<Match_wormCount[0]; i++)
 		Worm_spawnWorm(i);

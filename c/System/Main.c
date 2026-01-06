@@ -96,6 +96,9 @@ void GenerateWormMasks()
                 wormsSprites[w] = currentBufferPos;
                 
                 for (r = 0; r < h; r++) {
+                    // Safety check to prevent overflow
+                    if (currentBufferPos >= bufferEnd) break;
+
                     // OR all components that follow this mask until we hit another mask or end of array
                     unsigned short shape = 0;
                     int c = w + 1;
@@ -119,6 +122,7 @@ void GenerateWormMasks()
 void GenerateFlippedSprites()
 {
     int w, r;
+    unsigned short* bufferEnd = wormFlipBuffer + WORM_FLIP_BUFFER_SIZE;
     
     // 1. Flip weapons
     for(w = 0; w < NUM_WEAPONS; w++) {
@@ -140,6 +144,9 @@ void GenerateFlippedSprites()
 
         // flip each row
         for(r = 0; r < h; r++) {
+            // Safety check to prevent overflow
+            if (currentBufferPos >= bufferEnd) break;
+
             if (src != NULL) {
                 *currentBufferPos = reverseBits16(src[r]);
             } else {
@@ -187,11 +194,28 @@ void _main(void)
 	mapLight = malloc(200*10*sizeof(unsigned long));
 	mapDark = malloc(200*10*sizeof(unsigned long));
 	
+	// Safety check for malloc failure
+	if (mapLight == NULL || mapDark == NULL) {
+		if(mapLight) free(mapLight);
+		if(mapDark) free(mapDark);
+		GrayOff();
+		SetIntVec(AUTO_INT_1, save_1); 
+		SetIntVec(AUTO_INT_5, save_5); 
+		return;
+	}
+
 	// enable grayscale
 	GrayOn();
 
 	// allocate space for double-buffering
 	void *dbuffer=malloc(GRAYDBUFFER_SIZE);
+
+	// enable double-buffering
+	GrayDBufInit(dbuffer);
+	GblDBuffer=dbuffer;
+
+	lightPlane = GrayDBufGetHiddenPlane(LIGHT_PLANE);
+	darkPlane = GrayDBufGetHiddenPlane(DARK_PLANE);
 
 	// load our settings file to get match settings from the menu executable
 	FileData_loadData();
@@ -205,13 +229,6 @@ void _main(void)
 	// render the map and spawn items on the map (worms, oil drums, etc)
 	Map_makeMap();
 
-	// enable double-buffering
-	GrayDBufInit(dbuffer);
-	GblDBuffer=dbuffer;
-  
-  	lightPlane = GrayDBufGetHiddenPlane(LIGHT_PLANE);
-	darkPlane = GrayDBufGetHiddenPlane(DARK_PLANE);
-	
 	// before we can do the main game update loop, we need to change the state machine into the first state
 	// if we have to place worms, go to that mode first
 	if(Match_strategicPlacement)
@@ -221,7 +238,7 @@ void _main(void)
 		// otherwise, go to worm select mode
 		Game_changeMode(gameMode_WormSelect);
 	
-	Draw_cake(0,1);
+	Draw_cake(50,100);
 	
 	// generates masks for worms that are missing them in ROM
 	GenerateWormMasks();
@@ -246,7 +263,8 @@ void _main(void)
 			GameRunning=FALSE;
 
 		// update game logic
-		if(i==0) Game_update();
+		if(i==0)
+			Game_update();
 		//i++;
 		//if(i>400)
 		//	i = 0;

@@ -27,6 +27,7 @@
 #include "Game.h"
 #include "Camera.h"
 #include "Match.h"
+#include "Keys.h"
 
 	
 // when a spawn point is requested of the map, it will find one
@@ -122,7 +123,9 @@ void Map_traceEdges()
 			
 			// save for next loop, so it can see what was above
 			lastValues = current;
+
 		}// next x
+
 	}// next y
 }
 
@@ -269,7 +272,8 @@ void Map_makeMap()
 		{
 			if(upperLineTop<5) upperLineTop=5;
 			if(lowerLineTop>20) lowerLineTop=20;
-		}else
+		}
+		else
 		{
 			// calculate if either land sections are "0" height:
 			if(lowerLineTop>=30)
@@ -304,6 +308,7 @@ void Map_makeMap()
 			}// pixel on
 			
 		}// next y
+
 	}// next x
 	
 	// trace edges in the buffers
@@ -317,7 +322,7 @@ void Map_makeMap()
 
 	if(Match_minesEnabled)
 		Mines_spawnMines();
-
+	
 	if(Match_oilDrumsEnabled)
 		OilDrums_spawnDrums();
 }

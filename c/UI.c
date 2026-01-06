@@ -341,6 +341,11 @@ void Draw_HUD()
  */
 void Draw_cake(short amount, short total)
 {
+	static char loadingFrame=0;
+	loadingFrame++;
+	if(loadingFrame>5)
+		loadingFrame=0;
+
 	GrayDBufSetHiddenAMSPlane(DARK_PLANE);
 	ClrScr();
 	GrayDBufSetHiddenAMSPlane(LIGHT_PLANE);
@@ -351,7 +356,8 @@ void Draw_cake(short amount, short total)
 	
 	char progStr[40];
 	FontSetSys(F_6x8);
-	sprintf(progStr, "Loading... %d%%", 100*amount/total);
+	const char lf = (loadingFrame/2);
+	sprintf(progStr, (lf==0 ? "Loading.   %d%%" : (lf==1 ? "Loading..  %d%%" : "Loading... %d%%")), (short)((long)100*amount/total));
 	DrawStr(40,70, progStr, A_NORMAL);	
 
 	// now flip the planes
