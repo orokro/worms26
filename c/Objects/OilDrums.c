@@ -64,7 +64,7 @@ static void spawnDrum(short index)
 	short sx, sy;
 	if(Map_findSpawnPoint(SPAWN_DRUM, &sx, &sy)) {
 		OilDrum_x[index] = sx;
-		OilDrum_y[index] = sy;
+		OilDrum_y[index] = sy-5;
 	} else {
 		return;
 	}

@@ -134,8 +134,7 @@ void checkCratesAndMines(short index)
 
 /**
  * Spawns a Worm of given index on the Map.
- * 
- * @param index the worm to spawn.
+ * * @param index the worm to spawn.
 */
 void Worm_spawnWorm(short index)
 {
@@ -146,14 +145,18 @@ void Worm_spawnWorm(short index)
 	short sx = 0;
 	short sy = 0;
 	
-	// This function handles retry logic internally, but always good to check
 	if(Map_findSpawnPoint(SPAWN_WORM, &sx, &sy)) {
 		Worm_x[index] = sx;
-		Worm_y[index] = sy;
+		
+		// The map generator guarantees 'sy' is a solid land pixel.
+		// Our bottom sensor checks 'y + 6'.
+		// By placing the worm at 'sy - 6', our sensor checks 'sy - 6 + 6 = sy'.
+		// This guarantees the sensor hits the solid land found by the map generator,
+		// preventing the worm from falling through thin terrain.
+		Worm_y[index] = sy - 6;
+		
 	} else {
 		// Fallback: This should ideally not happen if maxAttempts is high enough.
-		// We'll just dump them somewhere "safeish" or leave as is (which is bad).
-		// For now, let's just pick a random spot and pray.
 		Worm_x[index] = random(300) + 10;
 		Worm_y[index] = 10; 
 	}
@@ -162,6 +165,7 @@ void Worm_spawnWorm(short index)
 	Worm_active |= mask;
 
 	// make a new collider and physics object for this worm
+	// Using the corrected offsets: Up=4, Down=6, Left=2, Right=2
 	new_Collider(&(Worm_physObj[index].col), COL_UDLR, 4, 6, 2, 2);
 	new_PhysObj(&Worm_physObj[index], &Worm_x[index], &Worm_y[index], &Worm_xVelo[index], &Worm_yVelo[index], 40, 100, (char)index, &Worm_settled);
 	
