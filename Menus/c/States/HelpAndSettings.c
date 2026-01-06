@@ -7,14 +7,21 @@
 	This handles the HelpAndSettings state machine specific code.
 */
 
-
-// local var now that we have a new app
-char help_menuItem = 0;
+// define tabs
+#define TAB_SETTINGS 0
+#define TAB_HELP     1
 
 // define menu item ids
 #define MENU_ITEM_DRAW_CLOUDS     0
 #define MENU_ITEM_DRAW_LEAVES     1
 #define MENU_ITEM_DRAW_MOUNTAINS  2
+
+
+// local var now that we have a new app
+char help_menuItem = 0;
+
+// which tab are we on
+char helpTab = TAB_SETTINGS;
 
 
 /**
@@ -57,20 +64,32 @@ void Draw_renderHelpAndSettings()
 	// draw the x close & check accept buttons
 	Draw_XandCheck(BTN_ACCEPT);
 
-	// draw 3 options:
-	drawToggleSetting(17, "Draw Clouds",   (Match_drawingFlags & DRAW_CLOUDS) ? 1 : 0, help_menuItem==MENU_ITEM_DRAW_CLOUDS);
-	drawToggleSetting(27, "Draw Leaves",   (Match_drawingFlags & DRAW_LEAVES) ? 1 : 0, help_menuItem==MENU_ITEM_DRAW_LEAVES);
-	drawToggleSetting(37, "Draw Mountains",(Match_drawingFlags & DRAW_MOUNTAINS) ? 1 : 0, help_menuItem==MENU_ITEM_DRAW_MOUNTAINS);
+	// draw the tabs along the bottom
+	Draw_tabBar(helpTab, "[F1] Settings", "[F2] Help");
 
-	// draw help text
-	GrayDrawStr2B(80-15, 45, "Controls:", A_NORMAL, lightPlane, darkPlane);
-	GrayDrawStr2B(20, 52, "[U/D/L/R] - Move Worm", A_NORMAL, lightPlane, darkPlane);
-	GrayDrawStr2B(20, 59, "[Diamond] - Jump", A_NORMAL, lightPlane, darkPlane);
-	GrayDrawStr2B(20, 66, "[Alpha] - Backflip", A_NORMAL, lightPlane, darkPlane);
-	GrayDrawStr2B(20, 73, "[2nd] - Fire Weapon", A_NORMAL, lightPlane, darkPlane);
-	GrayDrawStr2B(20, 80, "[APPS] - Select Worm", A_NORMAL, lightPlane, darkPlane);
-	GrayDrawStr2B(20, 87, "[CATALOG] - Select Weapon", A_NORMAL, lightPlane, darkPlane);
-	GrayDrawStr2B(20, 94, "[Shift] - Control Camera", A_NORMAL, lightPlane, darkPlane);
+	// -----------------
+
+	// if we're in options, draw the options
+	if(helpTab == TAB_SETTINGS)
+	{		
+		// draw 3 options:
+		drawToggleSetting(20, "Draw Clouds",   (Match_drawingFlags & DRAW_CLOUDS) ? 1 : 0, help_menuItem==MENU_ITEM_DRAW_CLOUDS);
+		drawToggleSetting(30, "Draw Leaves",   (Match_drawingFlags & DRAW_LEAVES) ? 1 : 0, help_menuItem==MENU_ITEM_DRAW_LEAVES);
+		drawToggleSetting(40, "Draw Mountains",(Match_drawingFlags & DRAW_MOUNTAINS) ? 1 : 0, help_menuItem==MENU_ITEM_DRAW_MOUNTAINS);
+	}
+	// otherwise draw the help text
+	else
+	{
+		// draw help text
+		GrayDrawStr2B(80-15, 20, "Controls:", A_NORMAL, lightPlane, darkPlane);
+		GrayDrawStr2B(20, 27, "[U/D/L/R] - Move Worm", A_NORMAL, lightPlane, darkPlane);
+		GrayDrawStr2B(20, 34, "[Diamond] - Jump", A_NORMAL, lightPlane, darkPlane);
+		GrayDrawStr2B(20, 42, "[Alpha] - Backflip", A_NORMAL, lightPlane, darkPlane);
+		GrayDrawStr2B(20, 49, "[2nd] - Fire Weapon", A_NORMAL, lightPlane, darkPlane);
+		GrayDrawStr2B(20, 56, "[APPS] - Select Worm", A_NORMAL, lightPlane, darkPlane);
+		GrayDrawStr2B(20, 63, "[CATALOG] - Select Weapon", A_NORMAL, lightPlane, darkPlane);
+		GrayDrawStr2B(20, 70, "[Shift] - Control Camera", A_NORMAL, lightPlane, darkPlane);
+	}
 
 	// we're done drawing
 	screenIsStale--;
@@ -97,56 +116,68 @@ static void HelpAndSettings_update()
 {
 	Draw_renderHelpAndSettings();
 
+	// f1 and f1 select team 0 and 1 respectively
+	if(Keys_keyUp(keyF1)) {
+		helpTab = TAB_SETTINGS;
+	}
+	else if(Keys_keyUp(keyF2)) {
+		helpTab = TAB_HELP;
+	}
+
 	// this menu only has accept, so F5 returns to MatchMenu
-	if(Keys_keyUp(keyF1|keyF5|keyEscape))
+	if(Keys_keyUp(keyF5|keyEscape))
 	{
 		State_transitionButton = BTN_ACCEPT;
 		State_changeMode(menuMode_MainMenu, 3);
 	}		
 
-	// up and down to change menu item
-	if(Keys_keyDown(keyUp))
+	// only allow menu keys in settings tab
+	if(helpTab == TAB_SETTINGS)
 	{
-		if(help_menuItem>0)
-			help_menuItem--;
-	}
-	else if(Keys_keyDown(keyDown))
-	{
-		if(help_menuItem<2)
-			help_menuItem++;
-	}
+		// up and down to change menu item
+		if(Keys_keyDown(keyUp))
+		{
+			if(help_menuItem>0)
+				help_menuItem--;
+		}
+		else if(Keys_keyDown(keyDown))
+		{
+			if(help_menuItem<2)
+				help_menuItem++;
+		}
 
-	// if right is pressed, enable the setting
-	if(Keys_keyUp(keyRight))
-	{
-		if(help_menuItem==MENU_ITEM_DRAW_CLOUDS)
-			Match_drawingFlags |= DRAW_CLOUDS;
-		else if(help_menuItem==MENU_ITEM_DRAW_LEAVES)
-			Match_drawingFlags |= DRAW_LEAVES;
-		else if(help_menuItem==MENU_ITEM_DRAW_MOUNTAINS)
-			Match_drawingFlags |= DRAW_MOUNTAINS;
-	}
+		// if right is pressed, enable the setting
+		if(Keys_keyUp(keyRight))
+		{
+			if(help_menuItem==MENU_ITEM_DRAW_CLOUDS)
+				Match_drawingFlags |= DRAW_CLOUDS;
+			else if(help_menuItem==MENU_ITEM_DRAW_LEAVES)
+				Match_drawingFlags |= DRAW_LEAVES;
+			else if(help_menuItem==MENU_ITEM_DRAW_MOUNTAINS)
+				Match_drawingFlags |= DRAW_MOUNTAINS;
+		}
 
-	// if left is pressed, disable the setting
-	if(Keys_keyUp(keyLeft))
-	{
-		if(help_menuItem==MENU_ITEM_DRAW_CLOUDS)
-			Match_drawingFlags &= ~DRAW_CLOUDS;
-		else if(help_menuItem==MENU_ITEM_DRAW_LEAVES)
-			Match_drawingFlags &= ~DRAW_LEAVES;
-		else if(help_menuItem==MENU_ITEM_DRAW_MOUNTAINS)
-			Match_drawingFlags &= ~DRAW_MOUNTAINS;
-	}
+		// if left is pressed, disable the setting
+		if(Keys_keyUp(keyLeft))
+		{
+			if(help_menuItem==MENU_ITEM_DRAW_CLOUDS)
+				Match_drawingFlags &= ~DRAW_CLOUDS;
+			else if(help_menuItem==MENU_ITEM_DRAW_LEAVES)
+				Match_drawingFlags &= ~DRAW_LEAVES;
+			else if(help_menuItem==MENU_ITEM_DRAW_MOUNTAINS)
+				Match_drawingFlags &= ~DRAW_MOUNTAINS;
+		}
 
-	// action button should just toggle the setting
-	if(Keys_keyUp(keyAction))
-	{
-		if(help_menuItem==MENU_ITEM_DRAW_CLOUDS)
-			Match_drawingFlags ^= DRAW_CLOUDS;
-		else if(help_menuItem==MENU_ITEM_DRAW_LEAVES)
-			Match_drawingFlags ^= DRAW_LEAVES;
-		else if(help_menuItem==MENU_ITEM_DRAW_MOUNTAINS)
-			Match_drawingFlags ^= DRAW_MOUNTAINS;
+		// action button should just toggle the setting
+		if(Keys_keyUp(keyAction))
+		{
+			if(help_menuItem==MENU_ITEM_DRAW_CLOUDS)
+				Match_drawingFlags ^= DRAW_CLOUDS;
+			else if(help_menuItem==MENU_ITEM_DRAW_LEAVES)
+				Match_drawingFlags ^= DRAW_LEAVES;
+			else if(help_menuItem==MENU_ITEM_DRAW_MOUNTAINS)
+				Match_drawingFlags ^= DRAW_MOUNTAINS;
+		}
 	}
 	
 	// redraw for any keypress

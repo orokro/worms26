@@ -157,23 +157,7 @@ void Draw_renderTeamSettingsMenu()
 	Draw_XandCheck(BTN_ACCEPT);
 	
 	// draw the tabs along the bottom
-
-	// black line across bottom
-	GrayDrawClipLine2B(0, 88, 135, 88, 3, lightPlane, darkPlane);
-
-	// skip the first row of of the tab sprite and draw it twice on the light plane
-	ClipSprite32_OR_R(2, 89, 10, spr_TeamTab+1, lightPlane);
-	ClipSprite32_OR_R(33, 89, 10, spr_TeamTab+1, lightPlane);
-
-	// draw the selected tab on the dark plane
-	short tabX = (short)(2 + (tab * 31));
-	GrayClipSprite32_AND_R(tabX, 88, 11, spr_TeamTab, spr_TeamTab, lightPlane, darkPlane);
-	GrayClipSprite32_OR_R(tabX, 88, 11, spr_TeamTab, spr_TeamTab, lightPlane, darkPlane);
-
-	// tiny font draw tab labels
-	FontSetSys(F_4x6);
-	GrayDrawStr2B(5, 91, "Tm1 F1", A_NORMAL, darkPlane, darkPlane);
-	GrayDrawStr2B(36, 91, "Tm2 F2", A_NORMAL, darkPlane, darkPlane);
+	Draw_tabBar(tab, "[F1] Team 1", "[F2] Team 2");
 
 	// -----------------
 	

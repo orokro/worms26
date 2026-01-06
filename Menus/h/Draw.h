@@ -26,6 +26,16 @@ void Draw_clearBuffers();
 
 
 /**
+ * @brief Draws a tab bar w/ two named tabs
+ * 
+ * @param selectedTab - 0 or 1 for which tab is selected
+ * @param tab1Name - label for tab 1
+ * @param tab2Name - label for tab 2
+ */
+extern void Draw_tabBar(char selectedTab, const char* tab1Name, const char* tab2Name);
+
+
+/**
  * @brief Draws a rectangle outline in the specified color
  * 
  * @param x - x

@@ -30,6 +30,40 @@ void Draw_clearBuffers()
 
 
 /**
+ * @brief Draws a tab bar w/ two named tabs
+ * 
+ * @param selectedTab - 0 or 1 for which tab is selected
+ * @param tab1Name - label for tab 1
+ * @param tab2Name - label for tab 2
+ */
+void Draw_tabBar(char selectedTab, const char* tab1Name, const char* tab2Name)
+{
+	// black line across bottom
+	GrayDrawClipLine2B(0, 88, 135, 88, 3, lightPlane, darkPlane);
+
+	// skip the first row of of the tab sprite and draw it twice on the light plane
+	ClipSprite32_OR_R(2, 89, 10, spr_TeamTab+1, lightPlane);
+	ClipSprite32_OR_R(20, 89, 10, spr_TeamTabR+1, lightPlane);
+
+	ClipSprite32_OR_R(51, 89, 10, spr_TeamTab+1, lightPlane);	
+	ClipSprite32_OR_R(69, 89, 10, spr_TeamTabR+1, lightPlane);
+
+	// draw the selected tab on the dark plane
+	short tabX = (short)(2 + (selectedTab * 49));
+	GrayClipSprite32_AND_R(tabX, 88, 11, spr_TeamTab, spr_TeamTab, lightPlane, darkPlane);
+	GrayClipSprite32_AND_R(tabX+18, 88, 11, spr_TeamTabR, spr_TeamTabR, lightPlane, darkPlane);
+	GrayClipSprite32_OR_R(tabX, 88, 11, spr_TeamTab, spr_TeamTab, lightPlane, darkPlane);
+	GrayClipSprite32_OR_R(tabX+18, 88, 11, spr_TeamTabR, spr_TeamTabR, lightPlane, darkPlane);
+
+	// tiny font draw tab labels
+	FontSetSys(F_4x6);
+	GrayDrawStr2B(5, 91, tab1Name, A_NORMAL, darkPlane, darkPlane);
+	GrayDrawStr2B(54, 91, tab2Name, A_NORMAL, darkPlane, darkPlane);
+}
+
+
+
+/**
  * @brief Draws a rectangle outline in the specified color
  * 
  * @param x - x
