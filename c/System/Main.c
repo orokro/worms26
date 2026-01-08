@@ -265,9 +265,9 @@ void _main(void)
 		// update game logic
 		if(i==0)
 			Game_update();
-		//i++;
-		//if(i>400)
-		//	i = 0;
+		// i++;
+		// if(i>400)
+			// i = 0;
 			
 		// now flip the planes
 		GrayDBufToggleSync();
