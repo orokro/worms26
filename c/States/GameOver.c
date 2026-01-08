@@ -199,8 +199,9 @@ static void GameOver_enter()
 	winXPos = 80 - ((strlen(winnerBuffer) * 4) >> 1);
 	loseYPos = 80 - ((strlen(loserBuffer) * 4) >> 1);
 
-	// reset timer
+	// reset timers
 	animationTimer = 0;
+	buttonPressFrames = 0;
 }
 
 
